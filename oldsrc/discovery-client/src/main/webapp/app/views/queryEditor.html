@@ -1,0 +1,15 @@
+<section class="query-editor-component">
+    <div class="header">
+        <input type="text" style="width: 400px;" data-bind="textInput: title" class="form-control center-block">
+        <div class="form-group">
+            <label for="parentId" class="control-label">Parent</label>
+            <input type="text" class="form-control" id="parentId">
+        </div>
+    </div>
+    <ul data-bind="foreach: rules" class="list-unstyled">
+        <li data-bind="widget: {kind:'rule', headerProperty:'name'}"></li>
+    </ul>
+    <div class="add-section">
+        <a>Add Section</a>
+    </div>
+</section>

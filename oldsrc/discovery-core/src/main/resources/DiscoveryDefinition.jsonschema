@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Contains the definitions for all queries, folders etc.",
+  "type": "object",
+  "properties": {
+    "queries": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/query" },
+      "minItems": 1
+    },
+    "calculations": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/calculation" },
+      "minItems": 1
+    }
+  },
+  "required": ["queries"],
+
+  "definitions": {
+
+    "query" : {
+      "type": "object",
+      "properties" : {
+        "entityId" : {
+          "type" : "string"
+        },
+        "valueFilters" : {
+          "type": "array",
+          "items": { "$ref": "#/definitions/valueFilter" },
+          "minItems": 1
+        }
+
+      },
+      "required" : ["entityId"]
+    },
+
+    "calculation": {
+      "type": "object",
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "points": {
+          "type": "object",
+          "properties": {
+            "query": { "$ref": "#/definitions/query" },
+            "x": {
+              "type": "string"
+            },
+            "y": {
+              "type": "string"
+            }
+          },
+          "required": ["query", "x", "y"]
+        },
+        "test" : { "$ref": "#/definitions/valueFilter" }
+      },
+      "required" : ["id", "points", "valueFilter"]
+    },
+
+    "valueFilter" : {
+      "type": "object",
+      "properties": {
+        "fieldId": {
+          "type": "string"
+        },
+        "codeSets" : {
+          "type": "array",
+          "items": { "$ref": "#/definitions/codeSet" },
+          "minItems": 1
+        },
+        "valueFrom": { "$ref": "#/definitions/valueFrom" },
+        "valueTo": { "$ref": "#/definitions/valueTo" },
+        "valueRange": { "$ref": "#/definitions/valueRange" },
+        "valueEqualTo": { "$ref": "#/definitions/value" }
+      },
+      "oneOf" : [
+        {
+            "required" : ["codeSets"]
+        },
+        {
+            "required" : ["valueFrom"]
+        },
+        {
+            "required" : ["valueTo"]
+        },
+        {
+            "required" : ["valueRange"]
+        },
+        {
+            "required" : ["valueEqualTo"]
+        }
+      ],
+
+      "required": ["fieldId"]
+    },
+
+    "codeSet" : {
+      "type": "object",
+      "properties": {
+        "codingSystem": {
+          "type": "string"
+        },
+        "codeSetValues": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/codeSetValue" },
+          "minItems": 1
+        }
+      },
+      "required": ["codingSystem", "codeSetValues"]
+    },
+
+    "codeSetValue": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "includeChildren": {
+          "type": "boolean"
+        },
+        "exclusion" : {
+          "type": "array",
+          "items": { "$ref": "#/definitions/codeSetValue" },
+          "minItems": 1
+        }
+      },
+      "required": ["code"]
+    },
+
+    "valueFrom" : {
+      "type": "object",
+      "properties" : {
+        "operator": { "enum": [ "greaterThan", "greaterThanOrEqualTo" ] },
+        "value" : { "$ref": "#/definitions/value" }
+      },
+      "required": ["operator", "value"]
+    },
+
+    "valueTo" : {
+      "type": "object",
+      "properties" : {
+        "operator": { "enum": [ "lessThan", "lessThanOrEqualTo" ] },
+        "value" : { "$ref": "#/definitions/value" }
+      },
+      "required": ["operator", "value"]
+    },
+
+    "valueRange" : {
+      "type": "object",
+      "properties": {
+        "from": { "$ref": "#/definitions/valueFrom" },
+        "to": { "$ref": "#/definitions/valueTo" }
+      },
+      "required": ["from", "to"]
+    },
+
+    "value" : {
+      "type": "object",
+      "properties": {
+        "value" : {
+          "type": "string"
+        }
+      },
+      "required": ["value"]
+    }
+  }
+}

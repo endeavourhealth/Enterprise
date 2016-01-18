@@ -1,0 +1,14 @@
+.query-editor-component {
+  > .add-section {
+    border-top-style: solid;
+    border-top-color: gray;
+    border-top-width: 1px;
+  }
+}
+
+.rule-component {
+  .header {
+    height: 25px;
+    background-color: lightgray;
+  }
+}

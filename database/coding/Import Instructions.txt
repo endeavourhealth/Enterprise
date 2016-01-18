@@ -1,0 +1,17 @@
+ReadV2 from TRUD
+
+
+1) Download the ReadV2 files from TRUD
+2) Import the following files into the SQL database using SSIS import wizard:
+
+V2\Unified\Corev2.all
+V2\Unified\Keyv2.all
+
+Make the "Text qualifier" a quotation mark.  Untick the "first row is header".
+The Source Mapping types will need altered from String to Text for the following.  Without this it will create 50 character term fields rather than varchar(max) and you'll get truncation errors.
+
+Core: 1,2,3
+Key: 2,3,4
+
+
+3) Run the "Import ReadV2.sql" script

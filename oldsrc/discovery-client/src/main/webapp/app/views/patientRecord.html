@@ -1,0 +1,21 @@
+<section>
+    <form class="form-inline">
+        <div class="form-group">
+            <label for="patientIdInput">Patient ID</label>
+            <input type="text" class="form-control" id="patientIdInput" data-bind="value: patientId">
+        </div>
+        <button type="submit" class="btn btn-default" data-bind="click: findPatientClick">Get</button>
+    </form>
+
+    <div style="margin-top: 20px;" class="row" data-bind="visible: showResults">
+        <div class="col-md-9">
+            <table class="table table-striped table-hover" id="resultTable"></table>
+        </div>
+        <div class="col-md-3">
+            <div style="font-weight: 600" data-bind="text: plotValue"></div>
+            <div class="chart-container" style="height: 200px">
+                <div class="chart-placeholder" id="clinical-plot"></div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,14 @@
+<entityMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EntityMap.xsd">
+	<entity>
+		<logicalName>PATIENT</logicalName>
+		<displayName>Patient</displayName>
+		<schema>dbo</schema>
+		<physicalName>Patient</physicalName>
+		<field>
+			<logicalName>DOB</logicalName>
+			<displayName>Date Of Birth</displayName>
+			<physicalName>DateOfBirth</physicalName>
+			<logicalDataType>date</logicalDataType>
+		</field>
+	</entity>
+</entityMap>

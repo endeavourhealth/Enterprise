@@ -1,5 +1,6 @@
 /// <reference path="../../lib/angular/angular.d.ts" />
 /// <reference path="../../services/dashboard.service.ts" />
+/// <reference path="../../model/dashboard.model.ts"/>
 
 module Dashboard
 {
@@ -8,10 +9,10 @@ module Dashboard
         static $inject = ["$rootScope", "DashboardService"];
 
         rootScope : ng.IRootScopeService;
-        _engineHistoryData: string;
-        _recentDocumentsData: string;
-        _engineState: string;
-        _reportActivityData: string;
+        _engineHistoryData: EngineHistoryItem[];
+        _recentDocumentsData: RecentDocumentItem[];
+        _engineState: EngineState;
+        _reportActivityData: ReportActivityItem[];
 
         constructor(private $rootScope : ng.IRootScopeService, private dashboardService: IDashboardService) {
             this.rootScope = $rootScope;

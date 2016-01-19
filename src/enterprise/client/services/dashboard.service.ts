@@ -2,107 +2,53 @@
 module Dashboard
 {
     export interface IDashboardService {
-        getEngineHistoryData() : string;
-        getRecentDocumentsData() : string;
-        getEngineState() : string;
-        getReportActivityData() : string;
+        getEngineHistory();
+        getRecentDocumentsData();
+        getEngineState();
+        getReportActivityData();
     }
 
     class DashboardService implements IDashboardService
     {
-        static $inject = ["$http"];
+        static $inject = ["$http", "$rootScope"];
+        private rootScope : ng.IRootScopeService;
+        private http : ng.IHttpService;
 
-        constructor(protected $http: ng.IHttpService) {
+        constructor(protected $http: ng.IHttpService, protected $rootScope: ng.IRootScopeService) {
+            this.rootScope = $rootScope;
+            this.http = $http;
         }
 
-        getEngineHistoryData() : string {
-            return JSON.parse(`[
-              {
-                "History": {
-                  "Outcome": "Success",
-                  "Datetime": "08-Dec-2015"
-                }
-              },
-              {
-                "History": {
-                  "Outcome": "Success",
-                  "Datetime": "07-Dec-2015"
-                }
-              },
-              {
-                "History": {
-                  "Outcome": "Success",
-                  "Datetime": "06-Dec-2015"
-                }
-              }
-            ]`);
+        getEngineHistory() {
+            var vm = this;
+            vm.http.get("services/dashboard.enginehistory.json")
+                .then(function(response) {
+                    vm.rootScope.$broadcast("enginehistory.updated", {data: response.data});
+                });
         }
-        getRecentDocumentsData() : string {
-            return JSON.parse(`[
-              {
-                "Document": {
-                  "Name": "Diabetic Review",
-                  "Modified": "07-Dec-2015",
-                  "Type": "Report"
-                }
-              },
-              {
-                "Document": {
-                  "Name": "Asthmatics",
-                  "Modified": "07-Dec-2015",
-                  "Type": "Query"
-                }
-              },
-              {
-                "Document": {
-                  "Name": "Asthma Review Required",
-                  "Modified": "06-Dec-2015",
-                  "Type": "Query"
-                }
-              },
-              {
-                "Document": {
-                  "Name": "Cancer Indicators",
-                  "Modified": "04-Dec-2015",
-                  "Type": "Codeset"
-                }
-              },
-              {
-                "Document": {
-                  "Name": "New Problems",
-                  "Modified": "04-Dec-2015",
-                  "Type": "Query"
-                }
-              }
-            ]
-            `);
+        getRecentDocumentsData() {
+            var vm = this;
+            vm.http.get("services/dashboard.recentdocuments.json")
+                .then(function(response) {
+                    vm.rootScope.$broadcast("recentdocuments.updated", {data: response.data});
+                });
         }
-        getEngineState() : string {
-            return JSON.parse(`{
-              "EngineState": {
-                "State": "Idle"
-              }
-            }`);
+        getEngineState() {
+            var vm = this;
+            vm.http.get("services/dashboard.enginestate.json")
+                .then(function(response) {
+                    vm.rootScope.$broadcast("enginestate.updated", {data: response.data});
+                });
         }
-        getReportActivityData() : string {
-            return JSON.parse(`[
-              {
-                "Activity": {
-                  "Name": "Diabetic Review",
-                  "Rundate": "08-Dec-2015"
-                }
-              },
-              {
-                "Activity": {
-                  "Name": "Diabetic Review",
-                  "Rundate": "07-Dec-2015"
-                }
-              }
-            ]`);
-        }
+        getReportActivityData() {
+            var vm = this;
+            vm.http.get("services/dashboard.reportactivity.json")
+                .then(function(response) {
+                    vm.rootScope.$broadcast("reportactivity.updated", {data: response.data});
+                });        }
     }
 
     angular
         .module("Dashboard")
-        .service("DashboardService", DashboardService)
+        .service("DashboardService", DashboardService);
 }

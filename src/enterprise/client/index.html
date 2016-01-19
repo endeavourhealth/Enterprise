@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html ng-app="Enterprise" ng-strict-di>
+
+<head>
+    <title>Endeavour : Enterprise</title>
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="sidebar.css">
+    <script src="lib/angular/angular.js"></script>
+    <script src="lib/bootstrap/ui-bootstrap-tpls-1.0.3.min.js"></script>
+
+    <script src="app.module.js"></script>
+
+    <script src="components/dashboard.directive.js"></script>
+    <script src="services/dashboard.service.js"></script>
+    <script src="modules/dashboard/dashboard.controller.js"></script>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar-header">
+        <h1>Endeavour : <small>Enterprise</small></h1>
+    </div>
+</div>
+<div class="container">
+    <nav class="main-menu">
+    <ul>
+        <li>
+            <a href="#">
+                <span class="glyphicon glyphicon-2x glyphicon-dashboard"></span>
+                        <span class="nav-text">
+                            Dashboard
+                        </span>
+            </a>
+        </li>
+        <li class="dropdown-submenu">
+            <a href="#">
+                <i class="glyphicon glyphicon-2x glyphicon-book"></i>
+                        <span class="nav-text">
+                            Library
+                        </span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a tabindex="-1" href="#">Library item 1</a></li>
+                <li><a href="#">Library item 2</a></li>
+                <li><a href="#">Library item 3</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#">
+                <i class="glyphicon glyphicon-2x glyphicon-file"></i>
+                        <span class="nav-text">
+                            Reports
+                        </span>
+            </a>
+
+        </li>
+        <li>
+            <a href="#">
+                <i class="glyphicon glyphicon-2x glyphicon-cog"></i>
+                        <span class="nav-text">
+                            Administration
+                        </span>
+            </a>
+
+        </li>
+        <li>
+            <a href="#">
+                <i class="glyphicon glyphicon-2x glyphicon-check"></i>
+                        <span class="nav-text">
+                            Audit
+                        </span>
+            </a>
+        </li>
+    </ul>
+    <ul class="logout">
+        <li>
+            <a href="#">
+                <i class="glyphicon glyphicon-2x glyphicon-off"></i>
+                        <span class="nav-text">
+                            Logout
+                        </span>
+            </a>
+        </li>
+    </ul>
+</nav>
+    <dashboard></dashboard>
+</div>
+
+</body>
+
+</html>

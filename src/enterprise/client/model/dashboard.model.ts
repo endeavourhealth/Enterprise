@@ -1,4 +1,4 @@
-/// <reference path="../lib/angular/angular.d.ts" />
+/// <reference path="../typings/angularjs/angular.d.ts" />
 
 module Dashboard {
     export class EngineHistoryItem {

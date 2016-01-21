@@ -2,5 +2,6 @@
 bower_components/
 typings/
 out/
+target/
 *.map
 *.js

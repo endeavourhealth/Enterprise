@@ -1,12 +1,11 @@
-/// <reference path="../../typings/angularjs/angular.d.ts" />
-/// <reference path="../../services/dashboard.service.ts" />
-/// <reference path="../../model/dashboard.model.ts"/>
+/// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="../core/library.service.ts" />
+/// <reference path="dashboard.model.ts"/>
 
-module Dashboard
+module app.dashboard
 {
     class DashboardController
     {
-        static $inject = ["$rootScope", "DashboardService"];
 
         rootScope : ng.IRootScopeService;
         _engineHistoryData: EngineHistoryItem[];
@@ -14,14 +13,15 @@ module Dashboard
         _engineState: EngineState;
         _reportActivityData: ReportActivityItem[];
 
-        constructor(private $rootScope : ng.IRootScopeService, private dashboardService: IDashboardService) {
+        static $inject = ["$rootScope", "LibraryService"];
+        constructor(private $rootScope : ng.IRootScopeService, private libraryService: app.core.ILibraryService) {
             this.rootScope = $rootScope;
             DashboardController.setupEventListeners(this);
 
-            dashboardService.getEngineHistory();
-            dashboardService.getRecentDocumentsData();
-            dashboardService.getEngineState();
-            dashboardService.getReportActivityData();
+            libraryService.getEngineHistory();
+            libraryService.getRecentDocumentsData();
+            libraryService.getEngineState();
+            libraryService.getReportActivityData();
         }
 
         private static setupEventListeners(instance : DashboardController) {
@@ -44,6 +44,6 @@ module Dashboard
     }
 
     angular
-        .module('Dashboard')
+        .module('app.dashboard')
         .controller('DashboardController',  DashboardController);
 }

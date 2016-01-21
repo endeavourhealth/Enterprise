@@ -1,6 +1,6 @@
-/// <reference path="../typings/angularjs/angular.d.ts" />
+/// <reference path="../../typings/tsd.d.ts" />
 
-module Dashboard {
+module app.dashboard {
     export class EngineHistoryItem {
         Datetime : string;
         Outcome : string;

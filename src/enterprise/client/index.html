@@ -1,32 +1,29 @@
 <!DOCTYPE html>
-<html ng-app="Enterprise" ng-strict-di>
+<html ng-app="app" ng-strict-di>
+    <head>
+        <title>Endeavour : Enterprise</title>
+        <link rel="stylesheet" href="/bower_components/bootstrap-css/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/bower_components/bootstrap-css/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="/content/sidebar.css">
+    </head>
+    <body>
+        <div ng-include="'app/layout/shell.html'"></div>
 
-<head>
-    <title>Endeavour : Enterprise</title>
-    <link rel="stylesheet" href="bower_components/bootstrap-css/css/bootstrap.min.css">
-   <link rel="stylesheet" href="bower_components/bootstrap-css/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="sidebar.css">
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <!--Scripts-->
+        <script src="/bower_components/angular/angular.js"></script>
+        <script src="/bower_components/angular-route/angular-route.js"></script>
+        <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-    <script src="app.module.js"></script>
+        <script src="app/app.module.js"></script>
 
-    <script src="components/sidebar.directive.js"></script>
-    <script src="components/dashboard.directive.js"></script>
-    <script src="services/dashboard.service.js"></script>
-    <script src="modules/dashboard/dashboard.controller.js"></script>
-</head>
-<body>
-<div class="navbar navbar-default navbar-fixed-top">
-    <div class="navbar-header">
-        <h1>Endeavour : <small>Enterprise</small></h1>
-    </div>
-</div>
-<sidebar></sidebar>
-<div class="container">
-    <dashboard></dashboard>
-</div>
+        <script src="app/core/core.module.js"></script>
+        <script src="app/core/library.service.js"></script>
 
-</body>
+        <script src="app/blocks/router/router.module.js"></script>
 
+        <script src="app/dashboard/dashboard.module.js"></script>
+        <script src="app/dashboard/dashboard.route.js"></script>
+        <script src="app/dashboard/dashboard.controller.js"></script>
+
+    </body>
 </html>

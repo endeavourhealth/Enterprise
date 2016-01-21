@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="exploded-war" build-on-make="true" name="enterprise">
-    <output-path>$PROJECT_DIR$/out/artifacts/enterprise</output-path>
-    <root id="root">
-      <element id="dir-copy" path="$PROJECT_DIR$/enterprise/client" />
-    </root>
-  </artifact>
-</component>

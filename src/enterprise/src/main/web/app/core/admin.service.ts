@@ -3,6 +3,7 @@
 module app.core
 {
     export interface IAdminService {
+        getCurrentUser();
     }
 
     export class AdminService implements IAdminService
@@ -14,6 +15,14 @@ module app.core
         constructor(protected $http: ng.IHttpService, protected $rootScope: ng.IRootScopeService) {
             this.rootScope = $rootScope;
             this.http = $http;
+        }
+
+        getCurrentUser() {
+            var vm = this;
+            vm.http.get("/api/user")
+                .then(function(response) {
+                    vm.rootScope.$broadcast("currentuser.updated", {data: response.data});
+                });
         }
     }
 

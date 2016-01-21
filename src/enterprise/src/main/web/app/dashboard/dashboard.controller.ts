@@ -6,7 +6,6 @@ module app.dashboard
 {
     class DashboardController
     {
-
         rootScope : ng.IRootScopeService;
         _engineHistoryData: EngineHistoryItem[];
         _recentDocumentsData: RecentDocumentItem[];
@@ -14,7 +13,9 @@ module app.dashboard
         _reportActivityData: ReportActivityItem[];
 
         static $inject = ["$rootScope", "LibraryService"];
-        constructor(private $rootScope : ng.IRootScopeService, private libraryService: app.core.ILibraryService) {
+        constructor(
+            private $rootScope : ng.IRootScopeService,
+            private libraryService: app.core.ILibraryService) {
             this.rootScope = $rootScope;
             DashboardController.setupEventListeners(this);
 

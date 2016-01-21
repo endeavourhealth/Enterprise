@@ -2,6 +2,8 @@
 
 angular.module('app', [
     'app.core',
+    'app.layout',
+
     'app.blocks.router',
 
     'app.dashboard'

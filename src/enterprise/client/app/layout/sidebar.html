@@ -1,51 +1,17 @@
-<nav class="main-menu">
-    <ul>
+<nav class="main-menu" ng-controller="SidebarController as sidebar">
+    <ul ng-repeat="menuItem in sidebar.menuOptions">
         <li>
-            <a href="/#/dashboard">
-                <span class="glyphicon glyphicon-2x glyphicon-dashboard"></span>
+            <a href="#/{{menuItem.Url}}">
+                <span class="glyphicon glyphicon-2x {{menuItem.Icon}}"></span>
                         <span class="nav-text">
-                            Dashboard
-                        </span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="glyphicon glyphicon-2x glyphicon-book"></i>
-                        <span class="nav-text">
-                            Library
-                        </span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="glyphicon glyphicon-2x glyphicon-file"></i>
-                        <span class="nav-text">
-                            Reports
-                        </span>
-            </a>
-
-        </li>
-        <li>
-            <a href="#">
-                <i class="glyphicon glyphicon-2x glyphicon-cog"></i>
-                        <span class="nav-text">
-                            Administration
-                        </span>
-            </a>
-
-        </li>
-        <li>
-            <a href="#">
-                <i class="glyphicon glyphicon-2x glyphicon-check"></i>
-                        <span class="nav-text">
-                            Audit
+                            {{menuItem.Caption}}
                         </span>
             </a>
         </li>
     </ul>
     <ul class="logout">
         <li>
-            <a href="#">
+            <a href="#/logout">
                 <i class="glyphicon glyphicon-2x glyphicon-off"></i>
                         <span class="nav-text">
                             Logout

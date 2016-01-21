@@ -9,24 +9,30 @@
     <body>
         <div ng-include="'app/layout/shell.html'"></div>
 
-        <!--Scripts-->
+        <!-- 3rd Party Scripts-->
         <script src="/bower_components/angular/angular.js"></script>
         <script src="/bower_components/angular-route/angular-route.js"></script>
         <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
+        <!-- Main application script -->
         <script src="app/app.module.js"></script>
 
+        <!-- Core (i.e. config/constants/services) -->
         <script src="app/core/core.module.js"></script>
         <script src="app/core/library.service.js"></script>
+        <script src="app/core/admin.service.js"></script>
 
+        <!-- Blocks -->
+        <script src="app/blocks/router/router.module.js"></script>
+
+        <!-- Layout -->
         <script src="app/layout/layout.module.js"></script>
         <script src="app/layout/sidebar.controller.js"></script>
 
-        <script src="app/blocks/router/router.module.js"></script>
-
+        <!-- Modules -->
+        <!-- Dashboard -->
         <script src="app/dashboard/dashboard.module.js"></script>
         <script src="app/dashboard/dashboard.route.js"></script>
         <script src="app/dashboard/dashboard.controller.js"></script>
-
     </body>
 </html>

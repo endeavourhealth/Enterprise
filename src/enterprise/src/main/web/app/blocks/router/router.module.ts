@@ -1,6 +1,6 @@
 /// <reference path="../../../typings/tsd.d.ts" />
 
-angular.module('app.blocks.router',['ngRoute'])
-    .run(['$route', function($route) {
-        $route.reload();
-    }]);
+angular.module('app.blocks.router', ['ui.router'])
+	.run(['$state', function ($state) {
+		$state.go('dashboard', {}, {reload: true});
+	}]);

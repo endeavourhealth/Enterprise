@@ -2,27 +2,27 @@
 /// <reference path="../core/admin.service.ts" />
 
 module app.layout {
-    class TopnavController {
-        rootScope : ng.IRootScopeService;
-        currentUser;
+	class TopnavController {
+		currentUser;
 
-        static $inject = ["$rootScope", "AdminService"];
-        constructor(
-            private $rootScope : ng.IRootScopeService,
-            private adminService: app.core.IAdminService) {
-            this.rootScope = $rootScope;
-            TopnavController.setupEventListeners(this);
+		static $inject = ["AdminService"];
 
-            adminService.getCurrentUser();
-        }
+		constructor(private adminService:app.core.IAdminService) {
+			this.getCurrentUser();
+		}
 
-        private static setupEventListeners(instance : TopnavController) {
-            instance.rootScope.$on("currentuser.updated", function(event, message) {
-                instance.currentUser = message.data;
-            });
-        }
-    }
+		getCurrentUser() {
+			var vm = this;
+			this.adminService.getCurrentUser()
+				.then(function (data) {
+					vm.currentUser = data;
+				})
+				.catch(function (data) {
+					vm.currentUser = data;
+				});
+		}
+	}
 
-    angular.module('app.layout')
-        .controller('TopnavController', TopnavController);
+	angular.module('app.layout')
+		.controller('TopnavController', TopnavController);
 }

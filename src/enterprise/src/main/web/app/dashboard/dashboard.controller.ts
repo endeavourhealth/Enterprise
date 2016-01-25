@@ -2,49 +2,56 @@
 /// <reference path="../core/library.service.ts" />
 /// <reference path="dashboard.model.ts"/>
 
-module app.dashboard
-{
-    class DashboardController
-    {
-        rootScope : ng.IRootScopeService;
-        _engineHistoryData: EngineHistoryItem[];
-        _recentDocumentsData: RecentDocumentItem[];
-        _engineState: EngineState;
-        _reportActivityData: ReportActivityItem[];
+module app.dashboard {
+	class DashboardController {
+		_engineHistoryData:EngineHistoryItem[];
+		_recentDocumentsData:RecentDocumentItem[];
+		_engineState:EngineState;
+		_reportActivityData:ReportActivityItem[];
 
-        static $inject = ["$rootScope", "LibraryService"];
-        constructor(
-            private $rootScope : ng.IRootScopeService,
-            private libraryService: app.core.ILibraryService) {
-            this.rootScope = $rootScope;
-            DashboardController.setupEventListeners(this);
+		static $inject = ["LibraryService"];
 
-            libraryService.getEngineHistory();
-            libraryService.getRecentDocumentsData();
-            libraryService.getEngineState();
-            libraryService.getReportActivityData();
-        }
+		constructor(private libraryService:app.core.ILibraryService) {
+			this.getEngineHistory();
+			this.getRecentDocumentsData();
+			this.getEngineState();
+			this.getReportActivityData();
+		}
 
-        private static setupEventListeners(instance : DashboardController) {
-            instance.rootScope.$on("enginehistory.updated", function(event, message) {
-                instance._engineHistoryData = message.data;
-            });
+		getEngineHistory() {
+			var vm = this;
+			this.libraryService.getEngineHistory()
+				.then(function (data) {
+					vm._engineHistoryData = data;
+				});
+		}
 
-            instance.rootScope.$on("recentdocuments.updated", function(event, message) {
-                instance._recentDocumentsData = message.data;
-            });
+		getRecentDocumentsData() {
+			var vm = this;
+			this.libraryService.getRecentDocumentsData()
+				.then(function (data) {
+					vm._recentDocumentsData = data;
+				});
+		}
 
-            instance.rootScope.$on("enginestate.updated", function(event, message) {
-                instance._engineState = message.data;
-            });
+		getEngineState() {
+			var vm = this;
+			this.libraryService.getEngineState()
+				.then(function (data) {
+					vm._engineState = data;
+				});
+		}
 
-            instance.rootScope.$on("reportactivity.updated", function(event, message) {
-                instance._reportActivityData = message.data;
-            });
-        }
-    }
+		getReportActivityData() {
+			var vm = this;
+			this.libraryService.getReportActivityData()
+				.then(function (data) {
+					vm._reportActivityData = data;
+				});
+		}
+	}
 
-    angular
-        .module('app.dashboard')
-        .controller('DashboardController',  DashboardController);
+	angular
+		.module('app.dashboard')
+		.controller('DashboardController', DashboardController);
 }

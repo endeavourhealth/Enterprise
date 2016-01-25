@@ -1,32 +1,31 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-module app.core
-{
-    export interface IAdminService {
-        getCurrentUser();
-    }
+module app.core {
+	export interface IAdminService {
+		getCurrentUser() : ng.IPromise<any>;
+	}
 
-    export class AdminService implements IAdminService
-    {
-        static $inject = ["$http", "$rootScope"];
-        private rootScope : ng.IRootScopeService;
-        private http : ng.IHttpService;
+	export class AdminService implements IAdminService {
+		static $inject = ["$http", "$q"];
 
-        constructor(protected $http: ng.IHttpService, protected $rootScope: ng.IRootScopeService) {
-            this.rootScope = $rootScope;
-            this.http = $http;
-        }
+		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
+		}
 
-        getCurrentUser() {
-            var vm = this;
-            vm.http.get("/api/user")
-                .then(function(response) {
-                    vm.rootScope.$broadcast("currentuser.updated", {data: response.data});
-                });
-        }
-    }
+		getCurrentUser():ng.IPromise<any> {
+			var defer = this.promise.defer();
+			this.http.get("/api/user")
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
 
-    angular
-        .module("app.core")
-        .service("AdminService", AdminService);
+			return defer.promise;
+		}
+	}
+
+	angular
+		.module("app.core")
+		.service("AdminService", AdminService);
 }

@@ -5,3 +5,5 @@ out/
 target/
 *.map
 *.js
+uiDesigner.xml
+workspace.xml

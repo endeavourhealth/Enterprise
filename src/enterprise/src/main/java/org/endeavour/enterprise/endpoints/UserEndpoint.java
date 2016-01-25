@@ -19,7 +19,7 @@ public class UserEndpoint {
         user.setPurpose("Do good things");
         user.setEmail("david.stables@endeavourhealth.org");
 
-        return ResponseBuilder.build(Response.Status.OK, user);
+        return Response.ok(user).build();
     }
 
     @POST

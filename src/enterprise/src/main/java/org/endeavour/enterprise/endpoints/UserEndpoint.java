@@ -14,9 +14,9 @@ public class UserEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response get() {
         User user = new User();
-        user.setName("David Stables");
-        user.setOrganisation("Endeavour Health Charitable Trust");
-        user.setPurpose("Do good things");
+        user.setTitle("Dr");
+        user.setForename("David");
+        user.setSurname("Stables");
         user.setEmail("david.stables@endeavourhealth.org");
 
         return Response.ok(user).build();
@@ -37,6 +37,4 @@ public class UserEndpoint {
             return ResponseBuilder.build(Response.Status.SERVICE_UNAVAILABLE);
         }
     }
-
-
 }

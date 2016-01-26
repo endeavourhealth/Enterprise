@@ -1,18 +1,18 @@
 package org.endeavour.enterprise.filters;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
+import java.io.IOException;
 
 public class AuthenticationFilter implements ContainerRequestFilter
 {
     @Override
-    public ContainerRequest filter(ContainerRequest containerRequest)
+    public void filter(ContainerRequestContext containerRequestContext) throws IOException
     {
-        // Get the HTTP Authorization header from the request
+// Get the HTTP Authorization header from the request
         String authorizationHeader =
-                containerRequest.getHeaderValue(HttpHeaders.AUTHORIZATION);
+                containerRequestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
         // Check if the HTTP Authorization header is present and formatted correctly
 //        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -32,11 +32,10 @@ public class AuthenticationFilter implements ContainerRequestFilter
 //                    Response.status(Response.Status.UNAUTHORIZED).build());
 //        }
 
-        return null;
     }
 
     private void validateToken(String token) throws Exception {
-    // Check if it was issued by the server and if it's not expired
-    // Throw an Exception if the token is invalid
+        // Check if it was issued by the server and if it's not expired
+        // Throw an Exception if the token is invalid
     }
 }

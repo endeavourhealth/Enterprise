@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.data;
+package org.endeavour.enterprise.authentication;
 
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.Role;

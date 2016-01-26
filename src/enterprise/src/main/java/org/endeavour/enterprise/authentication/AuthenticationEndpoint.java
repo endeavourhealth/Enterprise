@@ -1,10 +1,8 @@
-package org.endeavour.enterprise.endpoints;
+package org.endeavour.enterprise.authentication;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavour.enterprise.data.AuthenticationData;
-import org.endeavour.enterprise.exceptions.NotAuthorizedException;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
@@ -31,6 +29,7 @@ public class AuthenticationEndpoint
     @Produces("application/json")
     @Consumes("application/json")
     @Path("/authenticateUser")
+    @Unsecured
     public Response authenticateUser(Credentials credentials)
     {
         try

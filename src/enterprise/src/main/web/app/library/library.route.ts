@@ -1,0 +1,36 @@
+/// <reference path="../../typings/tsd.d.ts" />
+
+module app.library {
+	'use strict';
+
+	class LibraryRoute {
+		static $inject = ["$stateProvider"];
+
+		constructor(stateProvider:angular.ui.IStateProvider) {
+			var routes = LibraryRoute.getRoutes();
+
+			routes.forEach(function (route) {
+				stateProvider.state(route.state, route.config);
+			});
+		}
+
+		static getRoutes() {
+			return [
+				{
+					state: "library",
+					config: {
+						url: "/library",
+						templateUrl: "app/library/library.html",
+						controller: "LibraryController",
+						controllerAs: "library"
+					}
+				}
+			];
+		}
+	}
+
+	angular
+		.module('app.library')
+		.config(LibraryRoute);
+
+}

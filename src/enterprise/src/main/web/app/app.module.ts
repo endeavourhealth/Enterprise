@@ -6,7 +6,8 @@ angular.module('app', [
 
     'app.blocks.router',
 
-    'app.dashboard'
+    'app.dashboard',
+    'app.library'
 ]);
 
 

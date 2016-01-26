@@ -1,8 +1,10 @@
 <div class="navbar navbar-default navbar-fixed-top">
-    <div class="navbar-header">
-        <h1>Endeavour : <small>Enterprise</small></h1>
-    </div>
-    <div ng-controller="TopnavController as topnav" class="pull-right">
-        Logged in : {{topnav.currentUser.name}}
-    </div>
+	<div class="navbar-header">
+		<h1>Endeavour :
+			<small>Enterprise</small>
+		</h1>
+	</div>
+	<div ng-controller="TopnavController as topnav" class="pull-right">
+		Logged in : {{topnav.currentUser.title}} {{topnav.currentUser.forename}} {{topnav.currentUser.surname}}
+	</div>
 </div>

@@ -1,22 +1,22 @@
 <nav class="main-menu" ng-controller="SidebarController as sidebar">
-    <ul ng-repeat="menuItem in sidebar.menuOptions">
-        <li>
-            <a href="#/{{menuItem.Url}}">
-                <span class="glyphicon glyphicon-2x {{menuItem.Icon}}"></span>
-                        <span class="nav-text">
-                            {{menuItem.Caption}}
-                        </span>
-            </a>
-        </li>
-    </ul>
-    <ul class="logout">
-        <li>
-            <a href="#/logout">
-                <i class="glyphicon glyphicon-2x glyphicon-off"></i>
-                        <span class="nav-text">
-                            Logout
-                        </span>
-            </a>
-        </li>
-    </ul>
+	<ul ng-repeat="menuItem in sidebar.menuOptions">
+		<li>
+			<div ui-sref="{{menuItem.State}}" class="menuItem">
+				<span class="glyphicon glyphicon-2x {{menuItem.Icon}}"></span>
+				<span class="nav-text">
+						{{menuItem.Caption}}
+				</span>
+			</div>
+		</li>
+	</ul>
+	<ul class="logout">
+		<li>
+			<div ui-sref="logout" class="menuItem">
+				<i class="glyphicon glyphicon-2x glyphicon-off"></i>
+				<span class="nav-text">
+						Logout
+				</span>
+			</div>
+		</li>
+	</ul>
 </nav>

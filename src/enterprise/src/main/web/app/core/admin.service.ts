@@ -1,6 +1,8 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module app.core {
+	'use strict';
+	
 	export interface IAdminService {
 		getCurrentUser() : ng.IPromise<any>;
 	}

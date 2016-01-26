@@ -1,6 +1,8 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module app.core {
+	'use strict';
+	
 	class Config {
 		constructor() {
 			toastr.options.timeOut = 4000;

@@ -2,6 +2,8 @@
 /// <reference path="../core/admin.service.ts" />
 
 module app.layout {
+	'use strict';
+
 	class TopnavController {
 		currentUser;
 

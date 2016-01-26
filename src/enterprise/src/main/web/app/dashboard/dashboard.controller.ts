@@ -4,6 +4,8 @@
 /// <reference path="dashboard.model.ts"/>
 
 module app.dashboard {
+	'use strict';
+
 	class DashboardController {
 		_engineHistoryData:EngineHistoryItem[];
 		_recentDocumentsData:RecentDocumentItem[];

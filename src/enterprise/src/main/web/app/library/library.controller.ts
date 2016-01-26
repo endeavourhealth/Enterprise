@@ -3,6 +3,8 @@
 /// <reference path="library.model.ts"/>
 
 module app.library {
+	'use strict';
+
 	class LibraryController {
 		_engineHistoryData:EngineHistoryItem[];
 		_recentDocumentsData:RecentDocumentItem[];

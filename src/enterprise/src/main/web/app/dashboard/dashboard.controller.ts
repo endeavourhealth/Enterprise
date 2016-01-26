@@ -1,5 +1,6 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../core/library.service.ts" />
+/// <reference path="../blocks/logger.service.ts" />
 /// <reference path="dashboard.model.ts"/>
 
 module app.dashboard {
@@ -9,13 +10,14 @@ module app.dashboard {
 		_engineState:EngineState;
 		_reportActivityData:ReportActivityItem[];
 
-		static $inject = ["LibraryService"];
+		static $inject = ["LibraryService", "LoggerService"];
 
-		constructor(private libraryService:app.core.ILibraryService) {
+		constructor(private libraryService:app.core.ILibraryService, private logger:app.blocks.ILoggerService) {
 			this.getEngineHistory();
 			this.getRecentDocumentsData();
 			this.getEngineState();
 			this.getReportActivityData();
+			logger.success("Dashboard constructed", "DashData", "Dashboard");
 		}
 
 		getEngineHistory() {

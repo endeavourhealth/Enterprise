@@ -1,24 +1,25 @@
 {
-	"name": "enterprise",
-	"homepage": "https://github.com/endeavourhealth/Enterprise",
-	"authors": [
-		"ErgoSoftUK <ergosoftuk@gmail.com>"
-	],
-	"description": "endeavour enterprise reporting",
-	"main": "",
-	"moduleType": [],
-	"license": "MIT",
-	"ignore": [
-		"**/.*",
-		"node_modules",
-		"bower_components",
-		"test",
-		"tests"
-	],
-	"dependencies": {
-		"angular": "~1.4.8",
-		"bootstrap-css": "~3.3.6",
-		"angular-bootstrap": "~1.1.0",
-		"angular-ui-router": "~0.2.15"
-	}
+  "name": "enterprise",
+  "homepage": "https://github.com/endeavourhealth/Enterprise",
+  "authors": [
+    "ErgoSoftUK <ergosoftuk@gmail.com>"
+  ],
+  "description": "endeavour enterprise reporting",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.8",
+    "bootstrap-css": "~3.3.6",
+    "angular-bootstrap": "~1.1.0",
+    "angular-ui-router": "~0.2.15",
+    "toastr": "~2.1.2"
+  }
 }

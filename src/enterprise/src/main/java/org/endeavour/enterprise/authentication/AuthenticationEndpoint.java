@@ -8,26 +8,19 @@ import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
 @Path("/authentication")
 public class AuthenticationEndpoint
 {
-    // get from database and place in cache
-    final String COOKIE_NAME = "enterprise.endeavourhealth.org/authentication";
-    final String COOKIE_VALID_DOMAIN = "127.0.0.1";
-    final boolean COOKIE_REQUIRES_HTTPS = false;
-    final int COOKIE_MAX_AGE_SECONDS = 60 * 60 * 18;
-    final String TOKEN_SIGNING_SECRET = "DLKV342nNaCapGgSieNde18OFRYwg3etCabRfsPcrnc=";
-
-    @GET
-    @Produces("application/json")
-    @Consumes("application/json")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/authenticateUser")
     @Unsecured
     public Response authenticateUser(Credentials credentials)
@@ -73,25 +66,30 @@ public class AuthenticationEndpoint
 
     private NewCookie createCookie(String token)
     {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, COOKIE_MAX_AGE_SECONDS);
-        Date expiryDate = calendar.getTime();
-
-        return new NewCookie(COOKIE_NAME, token, "/", COOKIE_VALID_DOMAIN, 1, null, COOKIE_MAX_AGE_SECONDS, expiryDate, COOKIE_REQUIRES_HTTPS, true);
+        return new NewCookie(AuthenticationConstants.COOKIE_NAME,
+                token,
+                AuthenticationConstants.COOKIE_VALID_PATH,
+                AuthenticationConstants.COOKIE_VALID_DOMAIN,
+                1,
+                null,
+                -1,
+                null,
+                AuthenticationConstants.COOKIE_REQUIRES_HTTPS,
+                true);
     }
 
     private String createToken(User user, UserInRole userInRole)
     {
         Map<String, Object> bodyParameterMap = new HashMap<>();
-        bodyParameterMap.put("usr", user.getUserUuid());
-        bodyParameterMap.put("org", userInRole.getOrganisationUuid());
-        bodyParameterMap.put("rol", userInRole.getRole().name());
+        bodyParameterMap.put(AuthenticationConstants.TOKEN_USER, user.getUserUuid());
+        bodyParameterMap.put(AuthenticationConstants.TOKEN_ORGANISATION, userInRole.getOrganisationUuid());
+        bodyParameterMap.put(AuthenticationConstants.TOKEN_ROLE, userInRole.getRole().name());
+        bodyParameterMap.put(AuthenticationConstants.TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
 
         JwtBuilder builder = Jwts.builder()
-                .setHeaderParam("typ", "JWT")
-                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setHeaderParam(AuthenticationConstants.TOKEN_TYPE, AuthenticationConstants.TOKEN_TYPE_JWT)
                 .setClaims(bodyParameterMap)
-                .signWith(SignatureAlgorithm.HS256, TOKEN_SIGNING_SECRET);
+                .signWith(SignatureAlgorithm.HS256, AuthenticationConstants.TOKEN_SIGNING_SECRET);
 
         return builder.compact();
     }

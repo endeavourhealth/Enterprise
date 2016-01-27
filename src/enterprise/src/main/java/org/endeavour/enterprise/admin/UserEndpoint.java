@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.admin;
 
+import org.endeavour.enterprise.authentication.AuthenticationData;
 import org.endeavour.enterprise.authentication.Unsecured;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
@@ -11,31 +12,13 @@ import java.util.UUID;
 
 @Path("/user")
 public class UserEndpoint {
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Unsecured
 	public Response get() {
-		User user = new User();
-		user.setTitle("Dr");
-		user.setForename("David");
-		user.setSurname("Stables");
-		user.setEmail("david.stables@endeavourhealth.org");
-		user.setInitialUserInRoleUuid(UUID.randomUUID());
 
-		UserInRole uir = new UserInRole();
-		uir.setUserInRoleUuid(user.getInitialUserInRoleUuid());
-		uir.setOrganisationName("Organisation 1");
-		user.addUserInRole(uir);
-
-		uir = new UserInRole();
-		uir.setUserInRoleUuid(UUID.randomUUID());
-		uir.setOrganisationName("Organisation 2");
-		user.addUserInRole(uir);
-
-		uir = new UserInRole();
-		uir.setUserInRoleUuid(UUID.randomUUID());
-		uir.setOrganisationName("Organisation 3");
-		user.addUserInRole(uir);
+		User user = new AuthenticationData().getUser("david.stables@endeavourhealth.org");
 
 		return Response
 				.ok(user)

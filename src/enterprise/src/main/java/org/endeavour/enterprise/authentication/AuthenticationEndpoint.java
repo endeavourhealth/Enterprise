@@ -1,19 +1,12 @@
 package org.endeavour.enterprise.authentication;
 
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
-import org.endeavour.enterprise.model.UserInRole;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 @Path("/authentication")
 public class AuthenticationEndpoint
@@ -40,7 +33,7 @@ public class AuthenticationEndpoint
             if (user.getInitialUserInRole() == null)
                 throw new NotAuthorizedException("InitialUserInRole not found");
 
-            String token = createToken(user, user.getInitialUserInRole());
+            String token = TokenHelper.createToken(user, user.getInitialUserInRole());
 
             NewCookie cookie = createCookie(token);
 
@@ -76,21 +69,5 @@ public class AuthenticationEndpoint
                 null,
                 AuthenticationConstants.COOKIE_REQUIRES_HTTPS,
                 true);
-    }
-
-    private String createToken(User user, UserInRole userInRole)
-    {
-        Map<String, Object> bodyParameterMap = new HashMap<>();
-        bodyParameterMap.put(AuthenticationConstants.TOKEN_USER, user.getUserUuid());
-        bodyParameterMap.put(AuthenticationConstants.TOKEN_ORGANISATION, userInRole.getOrganisationUuid());
-        bodyParameterMap.put(AuthenticationConstants.TOKEN_ROLE, userInRole.getRole().name());
-        bodyParameterMap.put(AuthenticationConstants.TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
-
-        JwtBuilder builder = Jwts.builder()
-                .setHeaderParam(AuthenticationConstants.TOKEN_TYPE, AuthenticationConstants.TOKEN_TYPE_JWT)
-                .setClaims(bodyParameterMap)
-                .signWith(SignatureAlgorithm.HS256, AuthenticationConstants.TOKEN_SIGNING_SECRET);
-
-        return builder.compact();
     }
 }

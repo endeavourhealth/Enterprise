@@ -1,10 +1,10 @@
 <nav class="main-menu" ng-controller="SidebarController as sidebar">
 	<ul>
 		<li ng-repeat="menuItem in sidebar.menuOptions">
-			<div ui-sref="{{menuItem.State}}" class="menuItem">
-				<span class="glyphicon glyphicon-2x {{menuItem.Icon}}"></span>
+			<div ui-sref="{{menuItem.state}}" class="menuItem">
+				<span class="glyphicon glyphicon-2x {{menuItem.icon}}"></span>
 				<span class="nav-text">
-						{{menuItem.Caption}}
+						{{menuItem.caption}}
 				</span>
 			</div>
 		</li>

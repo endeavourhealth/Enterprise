@@ -1,10 +1,15 @@
 /// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="../models/MenuOption.ts" />
+/// <reference path="../models/Role.ts" />
+/// <reference path="../models/User.ts" />
+/// <reference path="../models/UserInRole.ts" />
 
 module app.core {
 	'use strict';
-	
+
 	export interface IAdminService {
-		getCurrentUser() : ng.IPromise<any>;
+		getCurrentUser() : ng.IPromise<app.models.User>;
+		getMenuOptions() : app.models.MenuOption[];
 	}
 
 	export class AdminService implements IAdminService {
@@ -13,7 +18,7 @@ module app.core {
 		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
 		}
 
-		getCurrentUser():ng.IPromise<any> {
+		getCurrentUser():ng.IPromise<app.models.User> {
 			var defer = this.promise.defer();
 			this.http.get("/api/user")
 				.then(function (response) {
@@ -24,6 +29,16 @@ module app.core {
 				});
 
 			return defer.promise;
+		}
+
+		getMenuOptions():app.models.MenuOption[] {
+			return [
+				{caption: "Dashboard", state: "dashboard", icon: "glyphicon-dashboard"},
+				{caption: "Library", state: "library", icon: "glyphicon-book"},
+				{caption: "Reports", state: "reports", icon: "glyphicon-file"},
+				{caption: "Administration", state: "admin", icon: "glyphicon-cog"},
+				{caption: "Audit", state: "audit", icon: "glyphicon-check"}
+			];
 		}
 	}
 

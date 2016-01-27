@@ -1,16 +1,20 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../core/library.service.ts" />
 /// <reference path="../blocks/logger.service.ts" />
-/// <reference path="dashboard.model.ts"/>
+/// <reference path="../models/EngineState.ts" />
+/// <reference path="../models/EngineHistoryItem.ts" />
+/// <reference path="../models/RecentDocumentItem.ts" />
+/// <reference path="../models/ReportActivityItem.ts" />
+
 
 module app.dashboard {
 	'use strict';
 
 	class DashboardController {
-		_engineHistoryData:EngineHistoryItem[];
-		_recentDocumentsData:RecentDocumentItem[];
-		_engineState:EngineState;
-		_reportActivityData:ReportActivityItem[];
+		engineHistoryData:app.models.EngineHistoryItem[];
+		recentDocumentsData:app.models.RecentDocumentItem[];
+		engineState:app.models.EngineState;
+		reportActivityData:app.models.ReportActivityItem[];
 
 		static $inject = ["LibraryService", "LoggerService"];
 
@@ -23,34 +27,34 @@ module app.dashboard {
 		}
 
 		getEngineHistory() {
-			var vm = this;
+			var vm:DashboardController = this;
 			this.libraryService.getEngineHistory()
-				.then(function (data) {
-					vm._engineHistoryData = data;
+				.then(function (data:app.models.EngineHistoryItem[]) {
+					vm.engineHistoryData = data;
 				});
 		}
 
 		getRecentDocumentsData() {
-			var vm = this;
+			var vm:DashboardController = this;
 			this.libraryService.getRecentDocumentsData()
-				.then(function (data) {
-					vm._recentDocumentsData = data;
+				.then(function (data:app.models.RecentDocumentItem[]) {
+					vm.recentDocumentsData = data;
 				});
 		}
 
 		getEngineState() {
-			var vm = this;
+			var vm:DashboardController = this;
 			this.libraryService.getEngineState()
-				.then(function (data) {
-					vm._engineState = data;
+				.then(function (data:app.models.EngineState) {
+					vm.engineState = data;
 				});
 		}
 
 		getReportActivityData() {
-			var vm = this;
+			var vm:DashboardController = this;
 			this.libraryService.getReportActivityData()
-				.then(function (data) {
-					vm._reportActivityData = data;
+				.then(function (data:app.models.ReportActivityItem[]) {
+					vm.reportActivityData = data;
 				});
 		}
 	}

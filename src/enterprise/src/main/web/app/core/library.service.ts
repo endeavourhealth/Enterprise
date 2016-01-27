@@ -1,22 +1,26 @@
 /// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="../models/EngineState.ts" />
+/// <reference path="../models/EngineHistoryItem.ts" />
+/// <reference path="../models/RecentDocumentItem.ts" />
+/// <reference path="../models/ReportActivityItem.ts" />
 
 module app.core {
 	'use strict';
-	
+
 	export interface ILibraryService {
-		getEngineHistory() : ng.IPromise<any>;
-		getRecentDocumentsData() : ng.IPromise<any>;
-		getEngineState() : ng.IPromise<any>;
-		getReportActivityData() : ng.IPromise<any>;
+		getEngineHistory() : ng.IPromise<app.models.EngineHistoryItem[]>;
+		getRecentDocumentsData() : ng.IPromise<app.models.RecentDocumentItem[]>;
+		getEngineState() : ng.IPromise<app.models.EngineState>;
+		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
 	}
 
 	export class LibraryService implements ILibraryService {
 		static $inject = ["$http", "$q"];
 
-		constructor(protected http:ng.IHttpService, protected promise:ng.IQService) {
+		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
 		}
 
-		getEngineHistory():ng.IPromise<any> {
+		getEngineHistory():ng.IPromise<app.models.EngineHistoryItem[]> {
 			var defer = this.promise.defer();
 			this.http.get("app/core/data/enginehistory.json")
 				.then(function (response) {
@@ -29,7 +33,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getRecentDocumentsData():ng.IPromise<any> {
+		getRecentDocumentsData():ng.IPromise<app.models.RecentDocumentItem[]> {
 			var defer = this.promise.defer();
 			this.http.get("app/core/data/recentdocuments.json")
 				.then(function (response) {
@@ -42,7 +46,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getEngineState():ng.IPromise<any> {
+		getEngineState():ng.IPromise<app.models.EngineState> {
 			var defer = this.promise.defer();
 			this.http.get("app/core/data/enginestate.json")
 				.then(function (response) {
@@ -55,7 +59,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getReportActivityData():ng.IPromise<any> {
+		getReportActivityData():ng.IPromise<app.models.ReportActivityItem[]> {
 			var defer = this.promise.defer();
 			this.http.get("app/core/data/reportactivity.json")
 				.then(function (response) {

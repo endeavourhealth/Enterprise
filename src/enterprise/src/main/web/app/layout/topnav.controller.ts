@@ -1,12 +1,15 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../core/admin.service.ts" />
+/// <reference path="../models/Role.ts" />
+/// <reference path="../models/User.ts" />
+/// <reference path="../models/UserInRole.ts" />
 
 module app.layout {
 	'use strict';
 
 	class TopnavController {
-		currentUser;
-		selectedRole;
+		currentUser:app.models.User;
+		selectedRole:app.models.UserInRole;
 
 		static $inject = ["AdminService"];
 
@@ -15,9 +18,9 @@ module app.layout {
 		}
 
 		getCurrentUser() {
-			var vm = this;
+			var vm:TopnavController = this;
 			this.adminService.getCurrentUser()
-				.then(function (data) {
+				.then(function (data:app.models.User) {
 					vm.currentUser = data;
 					var matches = $.grep(vm.currentUser.userInRoles, function (e) {
 						return e.userInRoleUuid === vm.currentUser.initialUserInRoleUuid;

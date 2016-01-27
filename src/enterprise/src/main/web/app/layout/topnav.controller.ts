@@ -6,6 +6,7 @@ module app.layout {
 
 	class TopnavController {
 		currentUser;
+		selectedRole;
 
 		static $inject = ["AdminService"];
 
@@ -18,6 +19,10 @@ module app.layout {
 			this.adminService.getCurrentUser()
 				.then(function (data) {
 					vm.currentUser = data;
+					var matches = $.grep(vm.currentUser.userInRoles, function (e) {
+						return e.userInRoleUuid === vm.currentUser.initialUserInRoleUuid;
+					});
+					vm.selectedRole = matches[0];
 				})
 				.catch(function (data) {
 					vm.currentUser = data;

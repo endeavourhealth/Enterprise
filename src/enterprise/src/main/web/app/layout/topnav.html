@@ -6,5 +6,17 @@
 	</div>
 	<div ng-controller="TopnavController as topnav" class="pull-right">
 		Logged in : {{topnav.currentUser.title}} {{topnav.currentUser.forename}} {{topnav.currentUser.surname}}
+
+
+		<div class="dropdown" uib-dropdown>
+			Organisation : <a href="#" class="dropdown-toggle" uib-dropdown-toggle>
+			{{ topnav.selectedRole.organisationName }}
+			<span class="caret"></span>
+		</a>
+			<ul uib-dropdown-menu>
+				<li ng-repeat="role in topnav.currentUser.userInRoles"><a href="#/selectedRole/{{ role.userInRoleUuid }}">{{
+					role.organisationName }}</a></li>
+			</ul>
+		</div>
 	</div>
 </div>

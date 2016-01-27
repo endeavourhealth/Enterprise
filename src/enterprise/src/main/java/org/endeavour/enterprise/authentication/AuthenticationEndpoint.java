@@ -7,12 +7,10 @@ import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +21,11 @@ public class AuthenticationEndpoint
     // get from database and place in cache
     final String COOKIE_NAME = "enterprise.endeavourhealth.org/authentication";
     final String COOKIE_VALID_DOMAIN = "127.0.0.1";
+    final boolean COOKIE_REQUIRES_HTTPS = false;
+    final int COOKIE_MAX_AGE_SECONDS = 60 * 60 * 18;
     final String TOKEN_SIGNING_SECRET = "DLKV342nNaCapGgSieNde18OFRYwg3etCabRfsPcrnc=";
 
-    @POST
+    @GET
     @Produces("application/json")
     @Consumes("application/json")
     @Path("/authenticateUser")
@@ -73,11 +73,11 @@ public class AuthenticationEndpoint
 
     private NewCookie createCookie(String token)
     {
-        int cookieMaxAgeSeconds = 100;
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, COOKIE_MAX_AGE_SECONDS);
+        Date expiryDate = calendar.getTime();
 
-        NewCookie cookie = new NewCookie(COOKIE_NAME, token, "/", COOKIE_VALID_DOMAIN, 1, null, cookieMaxAgeSeconds, true);
-
-        return cookie;
+        return new NewCookie(COOKIE_NAME, token, "/", COOKIE_VALID_DOMAIN, 1, null, COOKIE_MAX_AGE_SECONDS, expiryDate, COOKIE_REQUIRES_HTTPS, true);
     }
 
     private String createToken(User user, UserInRole userInRole)

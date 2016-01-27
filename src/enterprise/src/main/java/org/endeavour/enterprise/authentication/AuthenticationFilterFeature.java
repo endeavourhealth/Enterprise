@@ -1,5 +1,7 @@
 package org.endeavour.enterprise.authentication;
 
+import org.glassfish.jersey.server.ServerProperties;
+
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
@@ -12,9 +14,18 @@ public class AuthenticationFilterFeature implements DynamicFeature
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext featureContext)
     {
-        final String PACKAGE_NAME_PREFIX = "org.endeavour.enterprise";
+        boolean usePackageFilter = true;
 
-        if ((resourceInfo.getResourceClass().getName().startsWith(PACKAGE_NAME_PREFIX)))
+        String packageName = (String)featureContext.getConfiguration().getProperties().get(ServerProperties.PROVIDER_PACKAGES);
+
+        if ((packageName == null) || (packageName.trim().equals("")))
+        {
+            usePackageFilter = false;
+
+            // raise error
+        }
+
+        if ((!usePackageFilter) || (resourceInfo.getResourceClass().getName().startsWith(packageName)))
         {
             if (!containsUnsecuredAnnotation(resourceInfo.getResourceMethod().getAnnotations()))
             {

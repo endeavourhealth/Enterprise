@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.admin;
 
+import org.endeavour.enterprise.authentication.Unsecured;
 import org.endeavour.enterprise.model.User;
 
 import javax.ws.rs.*;
@@ -11,6 +12,7 @@ public class UserEndpoint
 {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Unsecured
     public Response get()
     {
         User user = new User();

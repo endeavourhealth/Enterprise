@@ -22,14 +22,22 @@ module app.layout {
 			this.adminService.getCurrentUser()
 				.then(function (data:app.models.User) {
 					vm.currentUser = data;
-					var matches = $.grep(vm.currentUser.userInRoles, function (e) {
-						return e.userInRoleUuid === vm.currentUser.currentUserInRoleUuid;
-					});
-					vm.selectedRole = matches[0];
+					vm.updateRole(vm.currentUser.currentUserInRoleUuid);
 				})
 				.catch(function (data) {
 					vm.currentUser = data;
 				});
+		}
+
+		updateRole(userInRoleUuid) {
+			var vm = this;
+			var matches = $.grep(vm.currentUser.userInRoles, function (e) {
+				return e.userInRoleUuid === userInRoleUuid;
+			});
+			if (matches.length === 1) {
+				vm.currentUser.currentUserInRoleUuid = userInRoleUuid;
+				vm.selectedRole = matches[0];
+			}
 		}
 	}
 

@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.authentication;
+package org.endeavour.enterprise.framework.authentication;
 
 import org.glassfish.jersey.server.ServerProperties;
 

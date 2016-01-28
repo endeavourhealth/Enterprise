@@ -4,8 +4,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 @XmlRootElement
-public class Credentials implements Serializable {
-
+public class Credentials implements Serializable
+{
     private String username;
     private String password;
 

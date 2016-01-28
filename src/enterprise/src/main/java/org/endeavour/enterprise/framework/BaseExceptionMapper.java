@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.common;
+package org.endeavour.enterprise.framework;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

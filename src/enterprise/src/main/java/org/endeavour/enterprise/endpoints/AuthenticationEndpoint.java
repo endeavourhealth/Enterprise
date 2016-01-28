@@ -1,5 +1,8 @@
-package org.endeavour.enterprise.authentication;
+package org.endeavour.enterprise.endpoints;
 
+import org.endeavour.enterprise.data.AuthenticationData;
+import org.endeavour.enterprise.framework.authentication.*;
+import org.endeavour.enterprise.framework.authentication.NotAuthorizedException;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
 
@@ -35,7 +38,7 @@ public class AuthenticationEndpoint
 
             String token = TokenHelper.createToken(user, user.getInitialUserInRole());
 
-            NewCookie cookie = createCookie(token);
+            NewCookie cookie = TokenHelper.createCookie(token);
 
             return Response
                     .ok()
@@ -55,19 +58,5 @@ public class AuthenticationEndpoint
                     .status(Response.Status.INTERNAL_SERVER_ERROR)
                     .build();
         }
-    }
-
-    private NewCookie createCookie(String token)
-    {
-        return new NewCookie(AuthenticationConstants.COOKIE_NAME,
-                token,
-                AuthenticationConstants.COOKIE_VALID_PATH,
-                AuthenticationConstants.COOKIE_VALID_DOMAIN,
-                1,
-                null,
-                -1,
-                null,
-                AuthenticationConstants.COOKIE_REQUIRES_HTTPS,
-                true);
     }
 }

@@ -1,18 +1,22 @@
-package org.endeavour.enterprise.authentication;
+package org.endeavour.enterprise.framework.authentication;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavour.enterprise.model.Token;
+import org.endeavour.enterprise.model.Role;
+import org.endeavour.enterprise.model.UserContext;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
 
+import javax.ws.rs.core.NewCookie;
 import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-class TokenHelper
+public class TokenHelper
 {
     private static final String TOKEN_TYPE = "typ";
     private static final String TOKEN_TYPE_JWT = "JWT";
@@ -37,7 +41,21 @@ class TokenHelper
         return builder.compact();
     }
 
-    public static Token validateToken(String token) throws Exception
+    public static NewCookie createCookie(String token)
+    {
+        return new NewCookie(AuthenticationConstants.COOKIE_NAME,
+                token,
+                AuthenticationConstants.COOKIE_VALID_PATH,
+                AuthenticationConstants.COOKIE_VALID_DOMAIN,
+                1,
+                null,
+                -1,
+                null,
+                AuthenticationConstants.COOKIE_REQUIRES_HTTPS,
+                true);
+    }
+
+    public static UserContext validateToken(String token) throws Exception
     {
         Claims claims = Jwts
                 .parser()
@@ -45,13 +63,11 @@ class TokenHelper
                 .parseClaimsJws(token)
                 .getBody();
 
-        Token result = new Token();
+        UUID userUuid = UUID.fromString((String)claims.get(TOKEN_USER));
+        UUID organisationUuid = UUID.fromString((String) claims.get(TOKEN_ORGANISATION));
+        Role role = Enum.valueOf(Role.class, (String)claims.get(TOKEN_ROLE));
+        Date tokenIssued = new Date(Long.parseLong((String) claims.get(TOKEN_ISSUED_AT)) * 1000L);
 
-        result.setUserUuidFromString((String)claims.get(TOKEN_USER));
-        result.setOrganisationUuidFromString((String)claims.get(TOKEN_ORGANISATION));
-        result.setRoleFromString((String)claims.get(TOKEN_ROLE));
-        result.setIssuedAtFromUnixEpoch(Long.parseLong((String)claims.get(TOKEN_ISSUED_AT)));
-
-        return result;
+        return new UserContext(userUuid, organisationUuid, role, tokenIssued);
     }
 }

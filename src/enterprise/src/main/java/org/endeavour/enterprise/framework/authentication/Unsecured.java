@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.authentication;
+package org.endeavour.enterprise.framework.authentication;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

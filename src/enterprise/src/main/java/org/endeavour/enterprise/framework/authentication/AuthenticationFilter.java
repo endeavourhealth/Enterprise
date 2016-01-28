@@ -1,6 +1,6 @@
-package org.endeavour.enterprise.authentication;
+package org.endeavour.enterprise.framework.authentication;
 
-import org.endeavour.enterprise.model.Token;
+import org.endeavour.enterprise.model.UserContext;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -28,10 +28,9 @@ public class AuthenticationFilter implements ContainerRequestFilter
 
             String tokenString = cookie.getValue();
 
-            Token token = TokenHelper.validateToken(tokenString);
+            UserContext userContext = TokenHelper.validateToken(tokenString);
 
-            containerRequestContext.setSecurityContext(new SecurityContext(token));
-
+            containerRequestContext.setSecurityContext(new UserSecurityContext(userContext));
         }
         catch (Exception e)
         {

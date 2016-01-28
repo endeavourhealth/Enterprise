@@ -4,17 +4,16 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.endeavour.enterprise.framework.configuration.SecurityConfiguration;
 import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.UserContext;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
 
+import javax.naming.AuthenticationException;
 import javax.ws.rs.core.NewCookie;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TokenHelper
 {
@@ -36,22 +35,22 @@ public class TokenHelper
         JwtBuilder builder = Jwts.builder()
                 .setHeaderParam(TOKEN_TYPE, TOKEN_TYPE_JWT)
                 .setClaims(bodyParameterMap)
-                .signWith(SignatureAlgorithm.HS256, SecurityConstants.TOKEN_SIGNING_SECRET);
+                .signWith(SignatureAlgorithm.HS256, SecurityConfiguration.TOKEN_SIGNING_SECRET);
 
         return builder.compact();
     }
 
     public static NewCookie createCookie(String token)
     {
-        return new NewCookie(SecurityConstants.COOKIE_NAME,
+        return new NewCookie(SecurityConfiguration.AUTH_COOKIE_NAME,
                 token,
-                SecurityConstants.COOKIE_VALID_PATH,
-                SecurityConstants.COOKIE_VALID_DOMAIN,
+                SecurityConfiguration.AUTH_COOKIE_VALID_PATH,
+                SecurityConfiguration.AUTH_COOKIE_VALID_DOMAIN,
                 1,
                 null,
                 -1,
                 null,
-                SecurityConstants.COOKIE_REQUIRES_HTTPS,
+                SecurityConfiguration.AUTH_COOKIE_REQUIRES_HTTPS,
                 true);
     }
 
@@ -59,14 +58,20 @@ public class TokenHelper
     {
         Claims claims = Jwts
                 .parser()
-                .setSigningKey(SecurityConstants.TOKEN_SIGNING_SECRET)
+                .setSigningKey(SecurityConfiguration.TOKEN_SIGNING_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
 
         UUID userUuid = UUID.fromString((String)claims.get(TOKEN_USER));
         UUID organisationUuid = UUID.fromString((String) claims.get(TOKEN_ORGANISATION));
         Role role = Enum.valueOf(Role.class, (String)claims.get(TOKEN_ROLE));
-        Date tokenIssued = new Date(Long.parseLong((String) claims.get(TOKEN_ISSUED_AT)) * 1000L);
+        long tokenIssuedMilliseconds = Long.parseLong((String) claims.get(TOKEN_ISSUED_AT)) * 1000L;
+        Date tokenIssued = new Date(tokenIssuedMilliseconds);
+
+        Date tokenExpiry = new Date(tokenIssuedMilliseconds + (SecurityConfiguration.TOKEN_EXPIRY_MINUTES * 60L * 1000L));
+
+        if (Calendar.getInstance().getTime().after(tokenExpiry))
+            throw new AuthenticationException("Token expired");
 
         return new UserContext(userUuid, organisationUuid, role, tokenIssued);
     }

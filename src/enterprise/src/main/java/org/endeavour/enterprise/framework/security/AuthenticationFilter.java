@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.framework.security;
 
+import org.endeavour.enterprise.framework.configuration.SecurityConfiguration;
 import org.endeavour.enterprise.model.UserContext;
 
 import javax.annotation.Priority;
@@ -21,10 +22,10 @@ public class AuthenticationFilter implements ContainerRequestFilter
         {
             Map<String, Cookie> cookies = containerRequestContext.getCookies();
 
-            if (!cookies.containsKey(SecurityConstants.COOKIE_NAME))
+            if (!cookies.containsKey(SecurityConfiguration.AUTH_COOKIE_NAME))
                 throw new NotAuthorizedException("Cookie not found");
 
-            Cookie cookie = cookies.get(SecurityConstants.COOKIE_NAME);
+            Cookie cookie = cookies.get(SecurityConfiguration.AUTH_COOKIE_NAME);
 
             String tokenString = cookie.getValue();
 

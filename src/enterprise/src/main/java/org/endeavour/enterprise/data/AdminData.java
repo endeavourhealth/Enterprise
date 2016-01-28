@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AuthenticationData
+public class AdminData
 {
     public boolean areCredentialsValid(Credentials credentials)
     {
@@ -20,24 +20,20 @@ public class AuthenticationData
 
     public User getUser(UUID userUuid)
     {
-        List<User> users = getUsers();
-
-        for (User user : users)
-            if (user.getUserUuid().equals(userUuid))
-                return user;
-
-        return null;
+        return getUsers()
+                .stream()
+                .filter(t -> t.getUserUuid().equals(userUuid))
+                .findFirst()
+                .orElse(null);
     }
 
     public User getUser(String username)
     {
-        List<User> users = getUsers();
-
-        for (User user : users)
-            if (user.getEmail().equals(username))
-                return user;
-
-        return null;
+        return getUsers()
+                .stream()
+                .filter(t -> t.getEmail().equals(username))
+                .findFirst()
+                .orElse(null);
     }
 
     private List<User> getUsers()

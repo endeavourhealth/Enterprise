@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.data.AuthenticationData;
+import org.endeavour.enterprise.data.AdminData;
+import org.endeavour.enterprise.framework.exceptions.InvalidParameterException;
 import org.endeavour.enterprise.framework.security.Roles;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.model.Role;
@@ -23,7 +24,7 @@ public class UserEndpoint extends Endpoint
 	@Unsecured
 	public Response getUnsecured()
 	{
-		User user = new AuthenticationData().getUser("david.stables@endeavourhealth.org");
+		User user = new AdminData().getUser("david.stables@endeavourhealth.org");
 
 		return Response
 				.ok(user)
@@ -44,7 +45,7 @@ public class UserEndpoint extends Endpoint
 	{
 		UserContext context = this.getUserContext();
 
-		User user = new AuthenticationData().getUser(context.getUserUuid());
+		User user = new AdminData().getUser(context.getUserUuid());
 
 		return Response
 				.ok(user)
@@ -67,7 +68,7 @@ public class UserEndpoint extends Endpoint
 	{
 		UserContext context = this.getUserContext();
 
-		User user = new AuthenticationData().getUser(context.getUserUuid());
+		User user = new AdminData().getUser(context.getUserUuid());
 
 		return Response
 				.ok(user)
@@ -90,7 +91,7 @@ public class UserEndpoint extends Endpoint
 	{
 		UserContext context = this.getUserContext();
 
-		User user = new AuthenticationData().getUser(context.getUserUuid());
+		User user = new AdminData().getUser(context.getUserUuid());
 
 		return Response
 				.ok(user)
@@ -104,29 +105,15 @@ public class UserEndpoint extends Endpoint
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response post(User user)
+	public Response post(User user) throws InvalidParameterException
 	{
-		try
-		{
-			if (user == null)
-			{
-				return Response
-						.status(Response.Status.BAD_REQUEST)
-						.build();
-			}
+		if (user == null)
+			throw new InvalidParameterException("user");
 
-			// save user
+		// save user
 
-			return Response
-					.status(Response.Status.CREATED)
-					.build();
-
-		}
-		catch (Exception e)
-		{
-			return Response
-					.status(Response.Status.SERVICE_UNAVAILABLE)
-					.build();
-		}
+		return Response
+				.status(Response.Status.CREATED)
+				.build();
 	}
 }

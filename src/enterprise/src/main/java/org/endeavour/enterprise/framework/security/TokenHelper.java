@@ -24,8 +24,15 @@ public class TokenHelper
     private static final String TOKEN_ROLE = "rol";
     private static final String TOKEN_ORGANISATION = "org";
 
-    public static String createToken(User user, UserInRole userInRole)
+    public static NewCookie createTokenAsCookie(User user)
     {
+        return createCookie(createToken(user));
+    }
+
+    private static String createToken(User user)
+    {
+        UserInRole userInRole = user.getCurrentUserInRole();
+
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_USER, user.getUserUuid());
         bodyParameterMap.put(TOKEN_ORGANISATION, userInRole.getOrganisationUuid());
@@ -40,7 +47,7 @@ public class TokenHelper
         return builder.compact();
     }
 
-    public static NewCookie createCookie(String token)
+    private static NewCookie createCookie(String token)
     {
         return new NewCookie(SecurityConfiguration.AUTH_COOKIE_NAME,
                 token,

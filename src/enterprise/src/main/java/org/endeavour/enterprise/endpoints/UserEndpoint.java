@@ -75,6 +75,29 @@ public class UserEndpoint extends Endpoint
 	}
 
 	//
+	// Example secure GET with restriction to role of SUPER
+	// (absence of @Unsecured attribute)
+	// (and use of @Roles({Role.SUPER}))
+	//
+	// And use of context in token
+	// (Endpoint.getUserContext())
+	//
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/securedSuper")
+	@Roles({Role.SUPER})
+	public Response getSecuredWithSuperRole()
+	{
+		UserContext context = this.getUserContext();
+
+		User user = new AuthenticationData().getUser(context.getUserUuid());
+
+		return Response
+				.ok(user)
+				.build();
+	}
+
+	//
 	// Example secure POST
 	// (absence of @Unsecured attribute)
 	//

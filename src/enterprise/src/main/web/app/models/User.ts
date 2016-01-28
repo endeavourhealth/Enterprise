@@ -10,6 +10,6 @@ module app.models {
 		surname:string;
 		email:string;
 		userInRoles:UserInRole[];
-		initialUserInRoleUuid:string;
+		currentUserInRoleUuid:string;
 	}
 }

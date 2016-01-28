@@ -67,6 +67,19 @@ public class AuthorizationFilter implements ContainerRequestFilter
 
     private void checkPermissions(UserContext userContext, List<Role> allowedRoles) throws Exception
     {
+        if (userContext == null)
+            throw new NotAuthorizedException("Could not find userContext");
 
+        if (!isAllowedIn(userContext.getRole(), allowedRoles))
+            throw new NotAuthorizedException("Role not allowed");
+    }
+
+    private static boolean isAllowedIn(Role userRole, List<Role> allowedRoles)
+    {
+        for (Role allowedRole : allowedRoles)
+            if (userRole.isGreaterThanOrEqualTo(allowedRole))
+                return true;
+
+        return false;
     }
 }

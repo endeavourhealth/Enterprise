@@ -67,7 +67,7 @@ public class AuthenticationData
 
         user.addUserInRole(userInRole2);
 
-        user.setInitialUserInRoleUuid(userInRole.getUserInRoleUuid());
+        user.setCurrentUserInRoleUuid(userInRole.getUserInRoleUuid());
 
         users.add(user);
 

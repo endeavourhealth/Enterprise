@@ -23,7 +23,7 @@ module app.layout {
 				.then(function (data:app.models.User) {
 					vm.currentUser = data;
 					var matches = $.grep(vm.currentUser.userInRoles, function (e) {
-						return e.userInRoleUuid === vm.currentUser.initialUserInRoleUuid;
+						return e.userInRoleUuid === vm.currentUser.currentUserInRoleUuid;
 					});
 					vm.selectedRole = matches[0];
 				})

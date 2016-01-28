@@ -17,7 +17,12 @@ public class User implements Serializable {
     private String surname;
     private String email;
     private List<UserInRole> userInRoles = new ArrayList<>();
-    private UUID initialUserInRoleUuid;
+    private UUID currentUserInRoleUuid;
+
+    public void setUserInRoles(List<UserInRole> userInRoles)
+    {
+        this.userInRoles = userInRoles;
+    }
 
     public UUID getUserUuid()
     {
@@ -79,27 +84,27 @@ public class User implements Serializable {
         userInRoles.add(userInRole);
     }
 
-    public UUID getInitialUserInRoleUuid()
+    public UUID getCurrentUserInRoleUuid()
     {
-        return initialUserInRoleUuid;
+        return currentUserInRoleUuid;
     }
 
-    public void setInitialUserInRoleUuid(UUID initialUserInRoleUuid)
+    public void setCurrentUserInRoleUuid(UUID currentUserInRoleUuid)
     {
-        this.initialUserInRoleUuid = initialUserInRoleUuid;
+        this.currentUserInRoleUuid = currentUserInRoleUuid;
     }
 
     @JsonIgnore
-    public UserInRole getInitialUserInRole()
+    public UserInRole getCurrentUserInRole()
     {
         if (userInRoles == null)
             return null;
 
-        if (initialUserInRoleUuid == null)
+        if (currentUserInRoleUuid == null)
             return null;
 
         for (UserInRole userInRole : userInRoles)
-            if (userInRole.getUserInRoleUuid().equals(initialUserInRoleUuid))
+            if (userInRole.getUserInRoleUuid().equals(currentUserInRoleUuid))
                 return userInRole;
 
         return null;

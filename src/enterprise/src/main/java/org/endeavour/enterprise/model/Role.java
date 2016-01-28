@@ -17,4 +17,9 @@ public enum Role
     {
         return value;
     }
+
+    public boolean isGreaterThanOrEqualTo(Role role)
+    {
+        return (value >= role.getValue());
+    }
 }

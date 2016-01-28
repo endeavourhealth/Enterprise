@@ -33,10 +33,10 @@ public class SecurityEndpoint
             if (user == null)
                 throw new NotAuthorizedException("User not found");
 
-            if (user.getInitialUserInRole() == null)
+            if (user.getCurrentUserInRole() == null)
                 throw new NotAuthorizedException("InitialUserInRole not found");
 
-            String token = TokenHelper.createToken(user, user.getInitialUserInRole());
+            String token = TokenHelper.createToken(user, user.getCurrentUserInRole());
 
             NewCookie cookie = TokenHelper.createCookie(token);
 

@@ -13,14 +13,14 @@ module app.core {
 	}
 
 	export class AdminService implements IAdminService {
-		static $inject = ["$http", "$q"];
+		static $inject = ['$http', '$q'];
 
 		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
 		}
 
 		getCurrentUser():ng.IPromise<app.models.User> {
 			var defer = this.promise.defer();
-			this.http.get("/api/user")
+			this.http.get('/api/user')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})
@@ -33,16 +33,16 @@ module app.core {
 
 		getMenuOptions():app.models.MenuOption[] {
 			return [
-				{caption: "Dashboard", state: "dashboard", icon: "glyphicon-dashboard"},
-				{caption: "Library", state: "library", icon: "glyphicon-book"},
-				{caption: "Reports", state: "reports", icon: "glyphicon-file"},
-				{caption: "Administration", state: "admin", icon: "glyphicon-cog"},
-				{caption: "Audit", state: "audit", icon: "glyphicon-check"}
+				{caption: 'Dashboard', state: 'dashboard', icon: 'glyphicon-dashboard'},
+				{caption: 'Library', state: 'library', icon: 'glyphicon-book'},
+				{caption: 'Reports', state: 'reports', icon: 'glyphicon-file'},
+				{caption: 'Administration', state: 'admin', icon: 'glyphicon-cog'},
+				{caption: 'Audit', state: 'audit', icon: 'glyphicon-check'}
 			];
 		}
 	}
 
 	angular
-		.module("app.core")
-		.service("AdminService", AdminService);
+		.module('app.core')
+		.service('AdminService', AdminService);
 }

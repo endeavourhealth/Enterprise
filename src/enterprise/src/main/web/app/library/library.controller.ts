@@ -11,7 +11,7 @@ module app.library {
 		_engineState:EngineState;
 		_reportActivityData:ReportActivityItem[];
 
-		static $inject = ["LibraryService"];
+		static $inject = ['LibraryService'];
 
 		constructor(private libraryService:app.core.ILibraryService) {
 			this.getEngineHistory();

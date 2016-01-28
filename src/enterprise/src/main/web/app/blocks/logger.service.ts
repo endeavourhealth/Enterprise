@@ -2,7 +2,7 @@
 
 module app.blocks {
 	'use strict';
-	
+
 	export interface ILoggerService {
 		info: (message:string, data?:{}, title?:string) => void;
 		error: (message:string, data?:{}, title?:string) => void;

@@ -15,14 +15,14 @@ module app.core {
 	}
 
 	export class LibraryService implements ILibraryService {
-		static $inject = ["$http", "$q"];
+		static $inject = ['$http', '$q'];
 
 		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
 		}
 
 		getEngineHistory():ng.IPromise<app.models.EngineHistoryItem[]> {
 			var defer = this.promise.defer();
-			this.http.get("app/core/data/enginehistory.json")
+			this.http.get('app/core/data/enginehistory.json')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})
@@ -35,7 +35,7 @@ module app.core {
 
 		getRecentDocumentsData():ng.IPromise<app.models.RecentDocumentItem[]> {
 			var defer = this.promise.defer();
-			this.http.get("app/core/data/recentdocuments.json")
+			this.http.get('app/core/data/recentdocuments.json')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})
@@ -48,7 +48,7 @@ module app.core {
 
 		getEngineState():ng.IPromise<app.models.EngineState> {
 			var defer = this.promise.defer();
-			this.http.get("app/core/data/enginestate.json")
+			this.http.get('app/core/data/enginestate.json')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})
@@ -61,7 +61,7 @@ module app.core {
 
 		getReportActivityData():ng.IPromise<app.models.ReportActivityItem[]> {
 			var defer = this.promise.defer();
-			this.http.get("app/core/data/reportactivity.json")
+			this.http.get('app/core/data/reportactivity.json')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})
@@ -74,6 +74,6 @@ module app.core {
 	}
 
 	angular
-		.module("app.core")
-		.service("LibraryService", LibraryService);
+		.module('app.core')
+		.service('LibraryService', LibraryService);
 }

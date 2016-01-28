@@ -4,7 +4,7 @@ module app.dashboard {
 	'use strict';
 
 	class DashboardRoute {
-		static $inject = ["$stateProvider"];
+		static $inject = ['$stateProvider'];
 
 		constructor(stateProvider:angular.ui.IStateProvider) {
 			var routes = DashboardRoute.getRoutes();
@@ -17,12 +17,12 @@ module app.dashboard {
 		static getRoutes() {
 			return [
 				{
-					state: "dashboard",
+					state: 'dashboard',
 					config: {
-						url: "/dashboard",
-						templateUrl: "app/dashboard/dashboard.html",
-						controller: "DashboardController",
-						controllerAs: "dashboard"
+						url: '/dashboard',
+						templateUrl: 'app/dashboard/dashboard.html',
+						controller: 'DashboardController',
+						controllerAs: 'dashboard'
 					}
 				}
 			];

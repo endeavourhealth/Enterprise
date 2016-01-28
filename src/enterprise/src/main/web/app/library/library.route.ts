@@ -4,7 +4,7 @@ module app.library {
 	'use strict';
 
 	class LibraryRoute {
-		static $inject = ["$stateProvider"];
+		static $inject = ['$stateProvider'];
 
 		constructor(stateProvider:angular.ui.IStateProvider) {
 			var routes = LibraryRoute.getRoutes();
@@ -17,12 +17,12 @@ module app.library {
 		static getRoutes() {
 			return [
 				{
-					state: "library",
+					state: 'library',
 					config: {
-						url: "/library",
-						templateUrl: "app/library/library.html",
-						controller: "LibraryController",
-						controllerAs: "library"
+						url: '/library',
+						templateUrl: 'app/library/library.html',
+						controller: 'LibraryController',
+						controllerAs: 'library'
 					}
 				}
 			];

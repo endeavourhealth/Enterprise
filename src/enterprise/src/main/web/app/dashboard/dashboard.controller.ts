@@ -16,14 +16,14 @@ module app.dashboard {
 		engineState:app.models.EngineState;
 		reportActivityData:app.models.ReportActivityItem[];
 
-		static $inject = ["LibraryService", "LoggerService"];
+		static $inject = ['LibraryService', 'LoggerService'];
 
 		constructor(private libraryService:app.core.ILibraryService, private logger:app.blocks.ILoggerService) {
 			this.getEngineHistory();
 			this.getRecentDocumentsData();
 			this.getEngineState();
 			this.getReportActivityData();
-			logger.success("Dashboard constructed", "DashData", "Dashboard");
+			logger.success('Dashboard constructed', 'DashData', 'Dashboard');
 		}
 
 		getEngineHistory() {

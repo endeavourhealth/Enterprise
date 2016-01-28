@@ -2,27 +2,32 @@
 
 module app.layout {
 	class ShellController {
-		static $inject = ['$scope', 'Idle', '$uibModal'];
+		started:boolean;
+		warning;
+		timedout;
 
-		constructor($scope, Idle, $modal) {
-			$scope.started = false;
+		static $inject = ['$scope', '$uibModal'];
+
+		constructor($scope, $modal) {
+			var vm = this;
+			vm.started = false;
 
 			function closeModals() {
-				if ($scope.warning) {
-					$scope.warning.close();
-					$scope.warning = null;
+				if (vm.warning) {
+					vm.warning.close();
+					vm.warning = null;
 				}
 
-				if ($scope.timedout) {
-					$scope.timedout.close();
-					$scope.timedout = null;
+				if (vm.timedout) {
+					vm.timedout.close();
+					vm.timedout = null;
 				}
 			}
 
 			$scope.$on('IdleStart', function () {
 				closeModals();
 
-				$scope.warning = $modal.open({
+				vm.warning = $modal.open({
 					templateUrl: 'warning-dialog.html',
 					windowClass: 'modal-danger'
 				});
@@ -34,7 +39,7 @@ module app.layout {
 
 			$scope.$on('IdleTimeout', function () {
 				closeModals();
-				$scope.timedout = $modal.open({
+				vm.timedout = $modal.open({
 					templateUrl: 'timedout-dialog.html',
 					windowClass: 'modal-danger'
 				});

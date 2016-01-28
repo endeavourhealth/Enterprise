@@ -12,9 +12,9 @@
 			<div class="modal-header">
 				<h3>Session Idle.</h3>
 			</div>
-			<div idle-countdown="countdown" ng-init="countdown=10" class="modal-body">
-				You'll be logged out in {{countdown}} second(s).
-				<uib-progressbar max="10" value="countdown" animate="true" class="progress-striped active"/>
+			<div idle-countdown="shell.countdown" ng-init="shell.countdown=10" class="modal-body">
+				You'll be logged out in {{shell.countdown}} second(s).
+				<uib-progressbar max="10" value="shell.countdown" animate="true" class="progress-striped active"/>
 			</div>
 		</script>
 

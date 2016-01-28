@@ -11,7 +11,7 @@ module app.layout {
 		currentUser:app.models.User;
 		selectedRole:app.models.UserInRole;
 
-		static $inject = ["AdminService"];
+		static $inject = ['AdminService'];
 
 		constructor(private adminService:app.core.IAdminService) {
 			this.getCurrentUser();

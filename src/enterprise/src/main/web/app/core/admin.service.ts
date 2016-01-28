@@ -10,6 +10,7 @@ module app.core {
 	export interface IAdminService {
 		getCurrentUser() : ng.IPromise<app.models.User>;
 		getMenuOptions() : app.models.MenuOption[];
+		isAuthenticated() : boolean;
 	}
 
 	export class AdminService implements IAdminService {
@@ -39,6 +40,10 @@ module app.core {
 				{caption: 'Administration', state: 'admin', icon: 'glyphicon-cog'},
 				{caption: 'Audit', state: 'audit', icon: 'glyphicon-check'}
 			];
+		}
+
+		isAuthenticated():boolean {
+			return true;
 		}
 	}
 

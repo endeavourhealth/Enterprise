@@ -11,7 +11,13 @@ angular.module('app', [
 		'app.dashboard',
 		'app.library'
 	])
-	.run(['$state', 'Idle', function ($state, Idle) {
+	.run(['$state', 'Idle', '$rootScope', 'AdminService', function ($state, Idle, $rootScope, adminService) {
+		$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+			if (toState.unsecured !== true && !adminService.isAuthenticated()) {
+				event.preventDefault();
+				// $state.transitionTo('unauthorised');
+			}
+		});
 		$state.go('dashboard', {}, {reload: true});
 		Idle.watch();
 	}]);

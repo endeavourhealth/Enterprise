@@ -1,8 +1,8 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.data.AuthenticationData;
-import org.endeavour.enterprise.framework.authentication.*;
-import org.endeavour.enterprise.framework.authentication.NotAuthorizedException;
+import org.endeavour.enterprise.framework.security.*;
+import org.endeavour.enterprise.framework.security.NotAuthorizedException;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
 
@@ -11,15 +11,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
-@Path("/authentication")
-public class AuthenticationEndpoint
+@Path("/security")
+public class SecurityEndpoint
 {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/authenticateUser")
+    @Path("/login")
     @Unsecured
-    public Response authenticateUser(Credentials credentials)
+    public Response login(Credentials credentials)
     {
         try
         {

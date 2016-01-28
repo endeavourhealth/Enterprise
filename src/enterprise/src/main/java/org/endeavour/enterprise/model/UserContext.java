@@ -1,5 +1,8 @@
 package org.endeavour.enterprise.model;
 
+import org.endeavour.enterprise.framework.security.UserPrincipal;
+
+import javax.ws.rs.core.SecurityContext;
 import java.util.Date;
 import java.util.UUID;
 
@@ -36,5 +39,15 @@ public class UserContext
     public Date getTokenIssued()
     {
         return tokenIssued;
+    }
+
+    public static UserContext fromSecurityContext(SecurityContext securityContext)
+    {
+        if (securityContext != null)
+            if (securityContext.getUserPrincipal() != null)
+                if (UserPrincipal.class.isInstance(securityContext.getUserPrincipal()))
+                    return ((UserPrincipal)securityContext.getUserPrincipal()).getUserContext();
+
+        return null;
     }
 }

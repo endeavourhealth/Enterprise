@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.framework.authentication;
+package org.endeavour.enterprise.framework.security;
 
 import org.endeavour.enterprise.model.UserContext;
 

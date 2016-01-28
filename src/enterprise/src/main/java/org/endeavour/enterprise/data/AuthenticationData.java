@@ -5,23 +5,44 @@ import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class AuthenticationData
 {
-    public boolean areCredentialsValid(Credentials credentials) {
-
+    public boolean areCredentialsValid(Credentials credentials)
+    {
         // db call
 
         return (credentials.getUsername().equals("david.stables@endeavourhealth.org") && credentials.getPassword().equals("1234"));
     }
 
-    public User getUser(String username) {
+    public User getUser(UUID userUuid)
+    {
+        List<User> users = getUsers();
 
-        // db call
+        for (User user : users)
+            if (user.getUserUuid().equals(userUuid))
+                return user;
 
-        if (!username.equals("david.stables@endeavourhealth.org"))
-            return null;
+        return null;
+    }
+
+    public User getUser(String username)
+    {
+        List<User> users = getUsers();
+
+        for (User user : users)
+            if (user.getEmail().equals(username))
+                return user;
+
+        return null;
+    }
+
+    private List<User> getUsers()
+    {
+        List<User> users = new ArrayList<>();
 
         User user = new User();
         user.setUserUuid(UUID.fromString("b860db4c-7270-4e0f-a59f-77fa9b74973f"));
@@ -48,6 +69,8 @@ public class AuthenticationData
 
         user.setInitialUserInRoleUuid(userInRole.getUserInRoleUuid());
 
-        return user;
+        users.add(user);
+
+        return users;
     }
 }

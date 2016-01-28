@@ -1,6 +1,6 @@
-package org.endeavour.enterprise.framework.authentication;
+package org.endeavour.enterprise.framework.security;
 
-public class AuthenticationConstants
+public class SecurityConstants
 {
     public static final String COOKIE_NAME = "AUTH";
     public static final String COOKIE_VALID_DOMAIN = "127.0.0.1";

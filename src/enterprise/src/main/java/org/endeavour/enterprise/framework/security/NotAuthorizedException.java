@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.framework.authentication;
+package org.endeavour.enterprise.framework.security;
 
 public class NotAuthorizedException extends Exception
 {

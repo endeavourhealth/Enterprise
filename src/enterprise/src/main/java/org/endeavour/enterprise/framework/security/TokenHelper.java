@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.framework.authentication;
+package org.endeavour.enterprise.framework.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -36,22 +36,22 @@ public class TokenHelper
         JwtBuilder builder = Jwts.builder()
                 .setHeaderParam(TOKEN_TYPE, TOKEN_TYPE_JWT)
                 .setClaims(bodyParameterMap)
-                .signWith(SignatureAlgorithm.HS256, AuthenticationConstants.TOKEN_SIGNING_SECRET);
+                .signWith(SignatureAlgorithm.HS256, SecurityConstants.TOKEN_SIGNING_SECRET);
 
         return builder.compact();
     }
 
     public static NewCookie createCookie(String token)
     {
-        return new NewCookie(AuthenticationConstants.COOKIE_NAME,
+        return new NewCookie(SecurityConstants.COOKIE_NAME,
                 token,
-                AuthenticationConstants.COOKIE_VALID_PATH,
-                AuthenticationConstants.COOKIE_VALID_DOMAIN,
+                SecurityConstants.COOKIE_VALID_PATH,
+                SecurityConstants.COOKIE_VALID_DOMAIN,
                 1,
                 null,
                 -1,
                 null,
-                AuthenticationConstants.COOKIE_REQUIRES_HTTPS,
+                SecurityConstants.COOKIE_REQUIRES_HTTPS,
                 true);
     }
 
@@ -59,7 +59,7 @@ public class TokenHelper
     {
         Claims claims = Jwts
                 .parser()
-                .setSigningKey(AuthenticationConstants.TOKEN_SIGNING_SECRET)
+                .setSigningKey(SecurityConstants.TOKEN_SIGNING_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
 

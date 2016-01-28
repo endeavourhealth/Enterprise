@@ -38,7 +38,8 @@ module app.core {
 				{caption: 'Library', state: 'library', icon: 'glyphicon-book'},
 				{caption: 'Reports', state: 'reports', icon: 'glyphicon-file'},
 				{caption: 'Administration', state: 'admin', icon: 'glyphicon-cog'},
-				{caption: 'Audit', state: 'audit', icon: 'glyphicon-check'}
+				{caption: 'Audit', state: 'audit', icon: 'glyphicon-check'},
+				{caption: 'Query Builder', state: 'query', icon: 'glyphicon-question-sign'}
 			];
 		}
 

@@ -9,7 +9,8 @@ angular.module('app', [
 		'app.layout',
 
 		'app.dashboard',
-		'app.library'
+		'app.library',
+		'app.query'
 	])
 	.run(['$state', 'Idle', '$rootScope', 'AdminService', function ($state, Idle, $rootScope, adminService) {
 		$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {

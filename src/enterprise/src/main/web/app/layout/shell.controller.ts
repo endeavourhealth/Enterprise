@@ -1,7 +1,7 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module app.layout {
-	class DemoCtrl {
+	class ShellController {
 		static $inject = ['$scope', 'Idle', '$uibModal'];
 
 		constructor($scope, Idle, $modal) {
@@ -43,5 +43,5 @@ module app.layout {
 	}
 
 	angular.module('app.layout')
-		.controller('DemoCtrl', DemoCtrl);
+		.controller('ShellController', ShellController);
 }

@@ -2,15 +2,13 @@
 
 module app.layout {
 	class ShellController {
-		started:boolean;
 		warning;
 		timedout;
 
-		static $inject = ['$scope', '$uibModal'];
+		static $inject = ['$scope', '$uibModal', '$state'];
 
-		constructor($scope, $modal) {
+		constructor($scope, $modal, $state) {
 			var vm = this;
-			vm.started = false;
 
 			function closeModals() {
 				if (vm.warning) {
@@ -39,6 +37,7 @@ module app.layout {
 
 			$scope.$on('IdleTimeout', function () {
 				closeModals();
+				$state.transitionTo('login');
 				vm.timedout = $modal.open({
 					templateUrl: 'timedout-dialog.html',
 					windowClass: 'modal-danger'

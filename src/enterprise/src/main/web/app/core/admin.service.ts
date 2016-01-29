@@ -11,12 +11,16 @@ module app.core {
 		getCurrentUser() : ng.IPromise<app.models.User>;
 		getMenuOptions() : app.models.MenuOption[];
 		isAuthenticated() : boolean;
+		login() : boolean;
+		logout();
 	}
 
 	export class AdminService implements IAdminService {
 		static $inject = ['$http', '$q'];
+		authenticated:boolean;
 
 		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
+			this.authenticated = false;
 		}
 
 		getCurrentUser():ng.IPromise<app.models.User> {
@@ -44,7 +48,16 @@ module app.core {
 		}
 
 		isAuthenticated():boolean {
-			return true;
+			return this.authenticated;
+		}
+
+		login() {
+			this.authenticated = true;
+			return this.authenticated;
+		}
+
+		logout() {
+			this.authenticated = false;
 		}
 	}
 

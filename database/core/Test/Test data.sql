@@ -1,4 +1,4 @@
-use Discovery_Core;
+use Enterprise_Core;
 
 declare @orgId uniqueidentifier = '04CF1D8D-B6E6-4E20-9A74-D6F197A9FE78';
 declare @userId uniqueidentifier = '007A3176-98EF-41F6-AEAB-16B34369ECC2'

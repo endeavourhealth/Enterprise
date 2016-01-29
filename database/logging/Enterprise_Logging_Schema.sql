@@ -1,4 +1,4 @@
-use Discovery_Logging
+use Enterprise_Logging
 
 go
 
@@ -26,8 +26,8 @@ go
 -- without testing.
 
 
-CREATE TABLE logging_event 
-  ( 
+create table logging_event 
+( 
     timestmp         DECIMAL(20) NOT NULL,
    	formatted_message  VARCHAR(4000) NOT NULL,
     logger_name       VARCHAR(254) NOT NULL,
@@ -44,22 +44,22 @@ CREATE TABLE logging_event
     caller_line       CHAR(4) NOT NULL,
     event_id          DECIMAL(38) NOT NULL identity,
     PRIMARY KEY(event_id) 
-  ) 
+) 
 
-CREATE TABLE logging_event_property 
-  ( 
+create table logging_event_property 
+( 
     event_id          DECIMAL(38) NOT NULL, 
     mapped_key        VARCHAR(254) NOT NULL, 
     mapped_value      VARCHAR(1024), 
     PRIMARY KEY(event_id, mapped_key), 
     FOREIGN KEY (event_id) REFERENCES logging_event(event_id) 
-  ) 
+) 
 
-CREATE TABLE logging_event_exception 
-  ( 
+create table logging_event_exception 
+( 
     event_id         DECIMAL(38) NOT NULL, 
     i                SMALLINT NOT NULL, 
     trace_line       VARCHAR(254) NOT NULL, 
     PRIMARY KEY(event_id, i), 
     FOREIGN KEY (event_id) REFERENCES logging_event(event_id) 
-  ) 
+)

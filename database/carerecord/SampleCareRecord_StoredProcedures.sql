@@ -4,24 +4,24 @@ go
 
 ----------DROP OBJECTS----------
 
-if (object_id('EndeavourDiscovery.GetStatistics') is not null)
-	drop procedure EndeavourDiscovery.GetStatistics;
+if (object_id('EndeavourEnterprise.GetStatistics') is not null)
+	drop procedure EndeavourEnterprise.GetStatistics;
 	
-if (object_id('EndeavourDiscovery.GetRecords') is not null)
-	drop procedure EndeavourDiscovery.GetRecords;
+if (object_id('EndeavourEnterprise.GetRecords') is not null)
+	drop procedure EndeavourEnterprise.GetRecords;
 
-IF EXISTS (SELECT * FROM sys.schemas WHERE name = 'EndeavourDiscovery')
-	drop schema EndeavourDiscovery;
+IF EXISTS (SELECT * FROM sys.schemas WHERE name = 'EndeavourEnterprise')
+	drop schema EndeavourEnterprise;
 
 go
 
 ---------CREATE OBJECTS------
 
-create schema EndeavourDiscovery;
+create schema EndeavourEnterprise;
 
 go
 
-create procedure EndeavourDiscovery.GetStatistics
+create procedure EndeavourEnterprise.GetStatistics
 as
 begin
 
@@ -34,7 +34,7 @@ end;
 
 go
 
-create procedure EndeavourDiscovery.GetRecords
+create procedure EndeavourEnterprise.GetRecords
 (
 	@MinimumId int,
 	@MaximumId int,

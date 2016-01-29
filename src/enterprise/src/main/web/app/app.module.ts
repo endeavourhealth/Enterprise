@@ -7,6 +7,7 @@ angular.module('app', [
 		'app.core',
 		'app.blocks',
 		'app.layout',
+		'app.login',
 
 		'app.dashboard',
 		'app.library',
@@ -19,7 +20,7 @@ angular.module('app', [
 				// $state.transitionTo('unauthorised');
 			}
 		});
-		$state.go('dashboard', {}, {reload: true});
+		$state.go('login', {}, {reload: true});
 		Idle.watch();
 	}]);
 

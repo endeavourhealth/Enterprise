@@ -1,13 +1,13 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-module app.query {
+module app.login {
 	'use strict';
 
-	class QueryRoute {
+	class LoginRoute {
 		static $inject = ['$stateProvider'];
 
 		constructor(stateProvider:angular.ui.IStateProvider) {
-			var routes = QueryRoute.getRoutes();
+			var routes = LoginRoute.getRoutes();
 
 			routes.forEach(function (route) {
 				stateProvider.state(route.state, route.config);
@@ -17,12 +17,13 @@ module app.query {
 		static getRoutes() {
 			return [
 				{
-					state: 'app.query',
+					state: 'login',
 					config: {
-						url: '/query',
-						templateUrl: 'app/query/query.html',
-						controller: 'QueryController',
-						controllerAs: 'query'
+						url: '/',
+						templateUrl: 'app/login/login.html',
+						controller: 'LoginController',
+						controllerAs: 'login',
+						unsecured: true
 					}
 				}
 			];
@@ -30,7 +31,7 @@ module app.query {
 	}
 
 	angular
-		.module('app.query')
-		.config(QueryRoute);
+		.module('app.login')
+		.config(LoginRoute);
 
 }

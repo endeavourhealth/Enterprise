@@ -17,7 +17,7 @@ module app.library {
 		static getRoutes() {
 			return [
 				{
-					state: 'library',
+					state: 'app.library',
 					config: {
 						url: '/library',
 						templateUrl: 'app/library/library.html',

@@ -17,7 +17,7 @@ module app.dashboard {
 		static getRoutes() {
 			return [
 				{
-					state: 'dashboard',
+					state: 'app.dashboard',
 					config: {
 						url: '/dashboard',
 						templateUrl: 'app/dashboard/dashboard.html',

@@ -8,7 +8,7 @@
 		<link rel="stylesheet" href="/content/sidebar.css">
 	</head>
 	<body>
-		<div ng-include="'app/layout/shell.html'"></div>
+		<div ui-view></div>
 
 		<!-- 3rd Party Scripts-->
 		<script src="/bower_components/angular/angular.js"></script>
@@ -20,6 +20,7 @@
 
 		<!-- Main application script -->
 		<script src="app/app.module.js"></script>
+		<script src="app/app.route.js"></script>
 
 		<!-- Core (i.e. config/constants/services) -->
 		<script src="app/core/core.module.js"></script>
@@ -37,6 +38,11 @@
 		<script src="app/layout/topnav.controller.js"></script>
 		<script src="app/layout/shell.controller.js"></script>
 
+		<!-- Login -->
+		<script src="app/login/login.module.js"></script>
+		<script src="app/login/login.route.js"></script>
+		<script src="app/login/login.controller.js"></script>
+
 		<!-- Modules -->
 		<!-- Dashboard -->
 		<script src="app/dashboard/dashboard.module.js"></script>
@@ -53,3 +59,4 @@
 
 	</body>
 </html>
+

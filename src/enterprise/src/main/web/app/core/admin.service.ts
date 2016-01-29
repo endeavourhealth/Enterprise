@@ -34,12 +34,12 @@ module app.core {
 
 		getMenuOptions():app.models.MenuOption[] {
 			return [
-				{caption: 'Dashboard', state: 'dashboard', icon: 'glyphicon-dashboard'},
-				{caption: 'Library', state: 'library', icon: 'glyphicon-book'},
-				{caption: 'Reports', state: 'reports', icon: 'glyphicon-file'},
-				{caption: 'Administration', state: 'admin', icon: 'glyphicon-cog'},
-				{caption: 'Audit', state: 'audit', icon: 'glyphicon-check'},
-				{caption: 'Query Builder', state: 'query', icon: 'glyphicon-question-sign'}
+				{caption: 'Dashboard', state: 'app.dashboard', icon: 'glyphicon-dashboard'},
+				{caption: 'Library', state: 'app.library', icon: 'glyphicon-book'},
+				{caption: 'Reports', state: 'app.reports', icon: 'glyphicon-file'},
+				{caption: 'Administration', state: 'app.admin', icon: 'glyphicon-cog'},
+				{caption: 'Audit', state: 'app.audit', icon: 'glyphicon-check'},
+				{caption: 'Query Builder', state: 'app.query', icon: 'glyphicon-question-sign'}
 			];
 		}
 

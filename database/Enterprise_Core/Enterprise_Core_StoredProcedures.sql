@@ -2,6 +2,22 @@ use Enterprise_Core;
 
 go
 
+create procedure Administration.GetOrganisation
+(
+	@OrganisationId integer
+)
+as
+begin
+
+	select 
+		o.OrganisationUuid,
+		o.Name
+	from Administration.Organisation o
+	
+end
+
+go
+
 --go
 
 --create procedure [Definition].GetRootFolders

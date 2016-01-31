@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.data;
 
 import org.endeavour.enterprise.framework.database.DatabaseHelper;
+import org.endeavour.enterprise.framework.database.StoredProcedure;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.User;
@@ -80,9 +81,9 @@ public class AdminData
         {
             Connection con = DatabaseHelper.getConnection();
 
-            CallableStatement ps = con.prepareCall("exec Admin.GetUser ?,?");
-            ps.setInt("@UserId", 1);
-            ps.setString("@UserName", "dstables");
+            CallableStatement ps = con.prepareCall("exec Administration.GetOrganisation ?");
+            ps.setInt("@OrganisationId", 1);
+
             boolean hasResults = ps.execute();
 
             while (hasResults)
@@ -92,6 +93,25 @@ public class AdminData
 
                 hasResults = ps.getMoreResults();
             }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        TestConnection2();
+    }
+
+    public void TestConnection2()
+    {
+        try
+        {
+            Connection conn = DatabaseHelper.getConnection();
+
+            StoredProcedure storedProcedure = new StoredProcedure(conn, "Administration.GetOrganisation");
+            storedProcedure.setParameter("@OrganisationId", 1);
+
+            storedProcedure.execute();
         }
         catch (Exception e)
         {

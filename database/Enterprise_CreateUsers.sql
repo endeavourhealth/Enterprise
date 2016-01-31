@@ -38,6 +38,7 @@ use Enterprise_Core;
 
 	create user [Enterprise] for login [Enterprise]
 	grant connect to [Enterprise]
+	grant execute to [Enterprise]
 
 use Enterprise_Logging;
 
@@ -53,6 +54,7 @@ use Enterprise_Logging;
 
 	create user [Enterprise] for login [Enterprise]
 	grant connect to [Enterprise]
+	grant execute to [Enterprise]
 
 use Enterprise_Coding;
 
@@ -68,6 +70,7 @@ use Enterprise_Coding;
 
 	create user [Enterprise] for login [Enterprise]
 	grant connect to [Enterprise]
+	grant execute to [Enterprise]
 
 use SampleCareRecord;
 
@@ -83,6 +86,7 @@ use SampleCareRecord;
 
 	create user [Enterprise] for login [Enterprise]
 	grant connect to [Enterprise]
+	grant execute to [Enterprise]
 
 
 

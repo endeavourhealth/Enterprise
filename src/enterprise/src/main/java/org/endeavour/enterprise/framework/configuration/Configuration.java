@@ -8,5 +8,5 @@ public class Configuration
     public static final String AUTH_COOKIE_VALID_DOMAIN = "127.0.0.1";
     public static final String AUTH_COOKIE_VALID_PATH = "/";
     public static final boolean AUTH_COOKIE_REQUIRES_HTTPS = false;
-    public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://localhost:1433/Enterprise_Core;user=Enterprise_User;password=XXXXXXXX";
+    public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://localhost:1433/Enterprise_Core;user=Enterprise;password=XXXXXXXX";
 }

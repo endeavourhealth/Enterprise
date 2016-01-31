@@ -1,10 +1,14 @@
 package org.endeavour.enterprise.data;
 
+import org.endeavour.enterprise.framework.database.DatabaseHelper;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -69,4 +73,30 @@ public class AdminData
 
         return users;
     }
+
+    public void TestConnection()
+    {
+        try
+        {
+            Connection con = DatabaseHelper.getConnection();
+
+            CallableStatement ps = con.prepareCall("exec Admin.GetUser ?,?");
+            ps.setInt("@UserId", 1);
+            ps.setString("@UserName", "dstables");
+            boolean hasResults = ps.execute();
+
+            while (hasResults)
+            {
+                ResultSet resultSet = ps.getResultSet();
+
+
+                hasResults = ps.getMoreResults();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 }

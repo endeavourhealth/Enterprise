@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavour.enterprise.framework.configuration.SecurityConfiguration;
+import org.endeavour.enterprise.framework.configuration.Configuration;
 import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.UserContext;
 import org.endeavour.enterprise.model.User;
@@ -42,22 +42,22 @@ public class TokenHelper
         JwtBuilder builder = Jwts.builder()
                 .setHeaderParam(TOKEN_TYPE, TOKEN_TYPE_JWT)
                 .setClaims(bodyParameterMap)
-                .signWith(SignatureAlgorithm.HS256, SecurityConfiguration.TOKEN_SIGNING_SECRET);
+                .signWith(SignatureAlgorithm.HS256, Configuration.TOKEN_SIGNING_SECRET);
 
         return builder.compact();
     }
 
     private static NewCookie createCookie(String token)
     {
-        return new NewCookie(SecurityConfiguration.AUTH_COOKIE_NAME,
+        return new NewCookie(Configuration.AUTH_COOKIE_NAME,
                 token,
-                SecurityConfiguration.AUTH_COOKIE_VALID_PATH,
-                SecurityConfiguration.AUTH_COOKIE_VALID_DOMAIN,
+                Configuration.AUTH_COOKIE_VALID_PATH,
+                Configuration.AUTH_COOKIE_VALID_DOMAIN,
                 1,
                 null,
                 -1,
                 null,
-                SecurityConfiguration.AUTH_COOKIE_REQUIRES_HTTPS,
+                Configuration.AUTH_COOKIE_REQUIRES_HTTPS,
                 true);
     }
 
@@ -65,7 +65,7 @@ public class TokenHelper
     {
         Claims claims = Jwts
                 .parser()
-                .setSigningKey(SecurityConfiguration.TOKEN_SIGNING_SECRET)
+                .setSigningKey(Configuration.TOKEN_SIGNING_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -75,7 +75,7 @@ public class TokenHelper
         long tokenIssuedMilliseconds = Long.parseLong((String) claims.get(TOKEN_ISSUED_AT)) * 1000L;
         Date tokenIssued = new Date(tokenIssuedMilliseconds);
 
-        Date tokenExpiry = new Date(tokenIssuedMilliseconds + (SecurityConfiguration.TOKEN_EXPIRY_MINUTES * 60L * 1000L));
+        Date tokenExpiry = new Date(tokenIssuedMilliseconds + (Configuration.TOKEN_EXPIRY_MINUTES * 60L * 1000L));
 
         if (Calendar.getInstance().getTime().after(tokenExpiry))
             throw new AuthenticationException("Token expired");

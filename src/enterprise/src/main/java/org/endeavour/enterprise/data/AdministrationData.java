@@ -1,10 +1,9 @@
 package org.endeavour.enterprise.data;
 
-import org.endeavour.enterprise.framework.database.Database;
+import org.endeavour.enterprise.framework.database.DatabaseConnection;
 import org.endeavour.enterprise.framework.database.StoredProcedure;
 import org.endeavour.enterprise.model.*;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class AdministrationData
 
     public List<Organisation> GetOrganisation() throws Exception
     {
-        try (Connection conn = Database.getConnection())
+        try (Connection conn = DatabaseConnection.get(DatabaseName.ENDEAVOUR_CORE))
         {
             try (StoredProcedure storedProcedure = new StoredProcedure(conn, "Administration.GetOrganisation"))
             {

@@ -12,11 +12,17 @@ import java.util.UUID;
 
 public class AdministrationData
 {
-    public boolean areCredentialsValid(Credentials credentials)
+    public String getPasswordHash(String emailAddress) throws Exception
     {
-        // db call
+        try (Connection connection = DatabaseConnection.get(DatabaseName.ENTERPRISE_CORE))
+        {
+            try (StoredProcedure storedProcedure = new StoredProcedure(connection, "Administration.GetPasswordHash"))
+            {
+                storedProcedure.setParameter("@EmailAddress", emailAddress);
 
-        return (credentials.getUsername().equals("david.stables@endeavourhealth.org") && credentials.getPassword().equals("1234"));
+                return (String)storedProcedure.executeScalar();
+            }
+        }
     }
 
     public User getUser(UUID userUuid)
@@ -73,7 +79,7 @@ public class AdministrationData
 
     public List<Organisation> GetOrganisation() throws Exception
     {
-        try (Connection conn = DatabaseConnection.get(DatabaseName.ENDEAVOUR_CORE))
+        try (Connection conn = DatabaseConnection.get(DatabaseName.ENTERPRISE_CORE))
         {
             try (StoredProcedure storedProcedure = new StoredProcedure(conn, "Administration.GetOrganisation"))
             {

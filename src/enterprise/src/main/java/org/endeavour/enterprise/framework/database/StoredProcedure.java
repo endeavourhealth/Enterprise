@@ -38,6 +38,16 @@ public class StoredProcedure implements AutoCloseable
         return resultSet;
     }
 
+    public Object executeScalar() throws SQLException
+    {
+        ResultSet resultSet = executeQuery();
+
+        if (resultSet.next())
+            return resultSet.getObject(1);
+
+        return null;
+    }
+
     private CallableStatement prepareStatement() throws SQLException
     {
         String parametersDeclaration = String.join(", ", Collections.nCopies(parameters.size(), "?"));

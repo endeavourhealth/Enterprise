@@ -76,8 +76,34 @@ create table Administration.Organisation
 create table Administration.[User]
 (
 	UserUuid uniqueidentifier not null,
+	EmailAddress varchar(200) not null,
+	Title varchar(35) null,
+    GivenName varchar(35) null,
+    FamilyName varchar(35) null
 
-	constraint PK_Administration_User primary key clustered (UserUuid)
+	constraint PK_Administration_User_UserUuid primary key clustered (UserUuid),
+	constraint UQ_Administration_User_EmailAddress unique nonclustered (EmailAddress),
+	constraint CK_Administration_User_EmailAddress check (len(ltrim(rtrim(EmailAddress))) > 0)
+);
+
+create table Administration.UserPassword
+(
+	UserUuid uniqueidentifier not null,
+	PasswordHash varchar(500) not null,
+	PasswordCreated datetime2 not null
+              
+	constraint PK_Administration_UserPassword_UserUuid primary key clustered (UserUuid),
+	constraint FK_Administration_UserPassword_UserUuid foreign key (UserUuid) references Administration.[User] (UserUuid)
+);
+
+create table Administration.UserPreviousPassword
+(
+	UserUuid uniqueidentifier not null,
+	PasswordCreated datetime2 not null,
+	PasswordHash varchar(500) not null
+
+	constraint PK_Administration_UserPreviousPassword_UserUuid_PasswordCreated primary key clustered (UserUuid, PasswordCreated),
+	constraint FK_Administration_UserPreviousPassword_UserUuid foreign key (UserUuid) references Administration.[User] (UserUuid)
 );
 
 create table Administration.UserAtOrganisation

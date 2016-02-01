@@ -20,11 +20,16 @@ public class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
     @Unsecured
-    public Response login(Credentials credentials) throws NotAuthorizedException
+    public Response login(Credentials credentials) throws Exception
     {
         AdministrationData administrationData = new AdministrationData();
 
-        if (!administrationData.areCredentialsValid(credentials))
+        String passwordHash = administrationData.getPasswordHash(credentials.getUsername());
+
+        if ((passwordHash == null) || (passwordHash.isEmpty()))
+            throw new NotAuthorizedException("User does not have a password");
+
+        if (!PasswordHash.validatePassword(credentials.getPassword(), passwordHash))
             throw new NotAuthorizedException("Invalid credentials");
 
         User user = administrationData.getUser(credentials.getUsername());

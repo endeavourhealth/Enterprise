@@ -1,6 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.data.AdminData;
+import org.endeavour.enterprise.data.AdministrationData;
 import org.endeavour.enterprise.framework.security.*;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
@@ -22,12 +22,12 @@ public class SecurityEndpoint extends Endpoint
     @Unsecured
     public Response login(Credentials credentials) throws NotAuthorizedException
     {
-        AdminData adminData = new AdminData();
+        AdministrationData administrationData = new AdministrationData();
 
-        if (!adminData.areCredentialsValid(credentials))
+        if (!administrationData.areCredentialsValid(credentials))
             throw new NotAuthorizedException("Invalid credentials");
 
-        User user = adminData.getUser(credentials.getUsername());
+        User user = administrationData.getUser(credentials.getUsername());
 
         if (user == null)
             throw new NotAuthorizedException("User not found");
@@ -50,7 +50,7 @@ public class SecurityEndpoint extends Endpoint
     @Path("/switchUserInRole")
     public Response switchUserInRole(UUID userInRoleUuid) throws NotAuthorizedException
     {
-        User user = new AdminData().getUser(getUserContext().getUserUuid());
+        User user = new AdministrationData().getUser(getUserContext().getUserUuid());
 
         if (user == null)
             throw new NotFoundException("User not found");

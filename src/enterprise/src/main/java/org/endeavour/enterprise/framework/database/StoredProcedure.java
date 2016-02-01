@@ -1,17 +1,17 @@
 package org.endeavour.enterprise.framework.database;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StoredProcedure
+public class StoredProcedure implements AutoCloseable
 {
     private Connection connection;
     private String storedProcedureName;
     private Map<String, Object> parameters = new HashMap<>();
+    private CallableStatement callableStatement;
+    private ResultSet resultSet;
 
     public StoredProcedure(Connection connection, String storedProcedureName)
     {
@@ -29,15 +29,49 @@ public class StoredProcedure
         this.parameters.put(parameterName, value);
     }
 
-    public void execute() throws SQLException
+    public ResultSet executeQuery() throws SQLException
+    {
+        callableStatement = prepareStatement();
+
+        resultSet = callableStatement.executeQuery();
+
+        return resultSet;
+    }
+
+    private CallableStatement prepareStatement() throws SQLException
     {
         String parametersDeclaration = String.join(", ", Collections.nCopies(parameters.size(), "?"));
 
-        CallableStatement ps = connection.prepareCall("call " + this.storedProcedureName + " (" + parametersDeclaration + ")");
+        callableStatement = connection.prepareCall("call " + this.storedProcedureName + " (" + parametersDeclaration + ")");
+
+        callableStatement.setEscapeProcessing(true);
 
         for (String parameterName : parameters.keySet())
-            ps.setObject(parameterName, parameters.get(parameterName));
+            callableStatement.setObject(parameterName, parameters.get(parameterName));
 
-        ps.execute();
+        return callableStatement;
+    }
+
+    @Override
+    public void close() throws SQLException
+    {
+        try
+        {
+            try
+            {
+                if (resultSet != null)
+                    resultSet.close();
+            }
+            finally
+            {
+                if (callableStatement != null)
+                    callableStatement.close();
+            }
+        }
+        finally
+        {
+            if (connection != null)
+                connection.close();
+        }
     }
 }

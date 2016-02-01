@@ -4,7 +4,7 @@ import org.endeavour.enterprise.framework.configuration.Configuration;
 
 import java.sql.*;
 
-public class DatabaseHelper
+public class Database
 {
     public static Connection getConnection() throws ClassNotFoundException, SQLException
     {

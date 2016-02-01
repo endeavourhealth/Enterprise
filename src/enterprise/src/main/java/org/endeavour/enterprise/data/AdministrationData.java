@@ -1,11 +1,8 @@
 package org.endeavour.enterprise.data;
 
-import org.endeavour.enterprise.framework.database.DatabaseHelper;
+import org.endeavour.enterprise.framework.database.Database;
 import org.endeavour.enterprise.framework.database.StoredProcedure;
-import org.endeavour.enterprise.model.Credentials;
-import org.endeavour.enterprise.model.Role;
-import org.endeavour.enterprise.model.User;
-import org.endeavour.enterprise.model.UserInRole;
+import org.endeavour.enterprise.model.*;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -14,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AdminData
+public class AdministrationData
 {
     public boolean areCredentialsValid(Credentials credentials)
     {
@@ -75,48 +72,29 @@ public class AdminData
         return users;
     }
 
-    public void TestConnection()
+    public List<Organisation> GetOrganisation() throws Exception
     {
-        try
+        try (Connection conn = Database.getConnection())
         {
-            Connection con = DatabaseHelper.getConnection();
-
-            CallableStatement ps = con.prepareCall("exec Administration.GetOrganisation ?");
-            ps.setInt("@OrganisationId", 1);
-
-            boolean hasResults = ps.execute();
-
-            while (hasResults)
+            try (StoredProcedure storedProcedure = new StoredProcedure(conn, "Administration.GetOrganisation"))
             {
-                ResultSet resultSet = ps.getResultSet();
+                storedProcedure.setParameter("@OrganisationId", 1);
 
+                ResultSet resultSet = storedProcedure.executeQuery();
 
-                hasResults = ps.getMoreResults();
+                ArrayList<Organisation> result = new ArrayList<>();
+
+                while (resultSet.next())
+                {
+                    Organisation organisation = new Organisation();
+                    organisation.setOrganisationUuid(UUID.fromString(resultSet.getString("OrganisationUuid")));
+                    organisation.setName(resultSet.getString("Name"));
+
+                    result.add(organisation);
+                }
+
+                return result;
             }
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        TestConnection2();
     }
-
-    public void TestConnection2()
-    {
-        try
-        {
-            Connection conn = DatabaseHelper.getConnection();
-
-            StoredProcedure storedProcedure = new StoredProcedure(conn, "Administration.GetOrganisation");
-            storedProcedure.setParameter("@OrganisationId", 1);
-
-            storedProcedure.execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
 }

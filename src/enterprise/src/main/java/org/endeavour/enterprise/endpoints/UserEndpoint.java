@@ -1,6 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.data.AdminData;
+import org.endeavour.enterprise.data.AdministrationData;
 import org.endeavour.enterprise.framework.exceptions.InvalidParameterException;
 import org.endeavour.enterprise.framework.security.Roles;
 import org.endeavour.enterprise.framework.security.Unsecured;
@@ -24,7 +24,7 @@ public class UserEndpoint extends Endpoint
 	@Unsecured
 	public Response getUnsecured()
 	{
-		User user = new AdminData().getUser("david.stables@endeavourhealth.org");
+		User user = new AdministrationData().getUser("david.stables@endeavourhealth.org");
 
 		return Response
 				.ok(user)
@@ -45,7 +45,7 @@ public class UserEndpoint extends Endpoint
 	{
 		UserContext context = this.getUserContext();
 
-		User user = new AdminData().getUser(context.getUserUuid());
+		User user = new AdministrationData().getUser(context.getUserUuid());
 
 		return Response
 				.ok(user)
@@ -68,7 +68,7 @@ public class UserEndpoint extends Endpoint
 	{
 		UserContext context = this.getUserContext();
 
-		User user = new AdminData().getUser(context.getUserUuid());
+		User user = new AdministrationData().getUser(context.getUserUuid());
 
 		return Response
 				.ok(user)
@@ -91,7 +91,7 @@ public class UserEndpoint extends Endpoint
 	{
 		UserContext context = this.getUserContext();
 
-		User user = new AdminData().getUser(context.getUserUuid());
+		User user = new AdministrationData().getUser(context.getUserUuid());
 
 		return Response
 				.ok(user)

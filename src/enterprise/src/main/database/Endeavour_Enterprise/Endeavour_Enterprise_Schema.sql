@@ -1,67 +1,12 @@
-use Enterprise_Core;
+use Endeavour_Enterprise
 
 go
 
-----------DROP ALL OBJECTS----------
-
-declare @n char(1)
-set @n = char(10)
-
-declare @stmt nvarchar(max)
-
--- procedures
-select @stmt = isnull( @stmt + @n, '' ) +
-    'drop procedure [' + schema_name(schema_id) + '].[' + name + ']'
-from sys.procedures
-
--- check constraints
-select @stmt = isnull( @stmt + @n, '' ) +
-'alter table [' + schema_name(schema_id) + '].[' + object_name( parent_object_id ) + ']    drop constraint [' + name + ']'
-from sys.check_constraints
-
--- functions
-select @stmt = isnull( @stmt + @n, '' ) +
-    'drop function [' + schema_name(schema_id) + '].[' + name + ']'
-from sys.objects
-where type in ( 'FN', 'IF', 'TF' )
-
--- views
-select @stmt = isnull( @stmt + @n, '' ) +
-    'drop view [' + schema_name(schema_id) + '].[' + name + ']'
-from sys.views
-
--- foreign keys
-select @stmt = isnull( @stmt + @n, '' ) +
-    'alter table [' + schema_name(schema_id) + '].[' + object_name( parent_object_id ) + '] drop constraint [' + name + ']'
-from sys.foreign_keys
-
--- tables
-select @stmt = isnull( @stmt + @n, '' ) +
-    'drop table [' + schema_name(schema_id) + '].[' + name + ']'
-from sys.tables
-
--- user defined types
-select @stmt = isnull( @stmt + @n, '' ) +
-    'drop type [' + schema_name(schema_id) + '].[' + name + ']'
-from sys.types
-where is_user_defined = 1
-
--- schemas
-select @stmt = isnull( @stmt + @n, '' ) +
-    'drop schema [' + name + ']'
-from sys.schemas
-where principal_id = 1 and name != 'dbo'
-
-
-exec sp_executesql @stmt
-
-go
-
-
------------------------------ADMINISTRATION-----------------------------
-------------------------------------------------------------------------
-
-create schema Administration;
+execute sp_executesql N'create schema Administration;'
+execute sp_executesql N'create schema [Definition];'
+execute sp_executesql N'create schema Execution;'
+execute sp_executesql N'create schema ReadV2;'
+execute sp_executesql N'create schema Logging;'
 
 go
 
@@ -114,17 +59,7 @@ create table Administration.UserAtOrganisation
 	constraint PK_Administration_UserAtOrganisation primary key clustered (UserUuid, OrganisationUuid)
 );
 
-
 go
-
-
------------------------------DEFINITION----------------------------
--------------------------------------------------------------------
-
-create schema [Definition];
-
-go
-
 
 create table [Definition].ItemType
 (
@@ -260,13 +195,6 @@ create nonclustered index IDX_Definition_ActiveItemDependency_DependsOnItemUuid 
 
 go
 
----------------------------------EXECUTION-------------------------------
--------------------------------------------------------------------------
-
-create schema Execution;
-
-go
-
 create table Execution.[Status]
 (
 	StatusId tinyint not null,
@@ -359,3 +287,79 @@ create table Execution.Request
 		references Execution.Job (JobUuid) on delete no action on update no action,
 );
 
+go
+
+create table ReadV2.Code
+(
+	CodeId int identity not null,
+	Code varchar(10) collate Latin1_General_CS_AS not null,
+	Term varchar(max) not null,
+	ParentCodeId int null,
+	Discontinued bit not null,
+
+	constraint PK_ReadV2_Code primary key clustered (CodeId),
+	constraint UQ_ReadV2_Code_Code unique (Code),
+	constraint FK_ReadV2_Code_ParentCodeId foreign key (ParentCodeId)
+		references ReadV2.Code (CodeId) on delete no action on update no action
+
+);
+
+create table ReadV2.SynonymCode
+(
+	CompleteCode varchar(10) collate Latin1_General_CS_AS not null,
+	RootCodeId int not null,
+	SynonymousTermCode varchar(10) collate Latin1_General_CS_AS not null,
+	Term varchar(max) not null,
+	Discontinued bit not null,
+	
+	constraint PK_ReadV2_SynonymCode primary key clustered (CompleteCode),
+	constraint UQ_ReadV2_SynonymCode_RootCodeId_SynonymousTermId unique (RootCodeId, SynonymousTermCode),
+
+	constraint FK_ReadV2_SynonymCode_RootCodeId foreign key (RootCodeId)
+		references ReadV2.Code (CodeId) on delete no action on update no action
+);
+
+go
+
+create table Logging.logging_event
+( 
+	timestmp decimal(20) not null,
+	formatted_message varchar(4000) not null,
+	logger_name varchar(254) not null,
+	level_string varchar(254) not null,
+	thread_name varchar(254),
+	reference_flag smallint,
+	arg0 varchar(254),
+	arg1 varchar(254),
+	arg2 varchar(254),
+	arg3 varchar(254),
+	caller_filename varchar(254) not null,
+	caller_class varchar(254) not null,
+	caller_method varchar(254) not null,
+	caller_line char(4) not null,
+	event_id decimal(38) not null identity(1, 1)
+
+	constraint PK_Logging_logging_event_event_id primary key clustered (event_id) 
+)
+
+create table Logging.logging_event_property 
+( 
+	event_id decimal(38) not null, 
+	mapped_key varchar(254) not null, 
+	mapped_value varchar(1024)
+
+	constraint PK_Logging_logging_event_property_event_id_mapped_key primary key clustered (event_id, mapped_key), 
+	constraint FK_Logging_logging_event_property_event_id foreign key (event_id) references Logging.logging_event (event_id)
+)
+
+create table Logging.logging_event_exception 
+( 
+	event_id decimal(38) not null, 
+	i smallint not null, 
+	trace_line varchar(254) not null
+
+	constraint PK_Logging_logging_event_exception_event_id_i primary key clustered (event_id, i), 
+	constraint FK_Logging_logging_event_exception_event_id foreign key (event_id) references Logging.logging_event (event_id)
+)
+
+go

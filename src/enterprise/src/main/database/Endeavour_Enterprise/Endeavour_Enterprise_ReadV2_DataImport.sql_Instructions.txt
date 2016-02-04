@@ -14,4 +14,4 @@ Core: 1,2,3
 Key: 2,3,4
 
 
-3) Run the "Import ReadV2.sql" script
+3) Run the "Endeavour_Enterprise_ReadV2_DataImport.sql" script

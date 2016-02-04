@@ -1,4 +1,4 @@
-use Enterprise_Coding;
+use Endeavour_Enterprise;
 
 insert into ReadV2.Code
 	(Code, Term, ParentCodeId, Discontinued)

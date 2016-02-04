@@ -3,8 +3,10 @@ use Endeavour_Enterprise;
 begin transaction;
 
 	declare @OrganisationUuid uniqueidentifier = '04CF1D8D-B6E6-4E20-9A74-D6F197A9FE78';
-	declare @UserUuid uniqueidentifier = 'A8F2A206-4384-4E92-AF55-86D590BA07DA'
-	declare @firstItem uniqueidentifier = '841D92D1-E80C-4512-A8C2-BBDE37FD80E1'
+	declare @UserUuid1 uniqueidentifier = 'A8F2A206-4384-4E92-AF55-86D590BA07DA'
+	declare @UserUuid2 uniqueidentifier = '4E6A847E-F0D4-4B6F-B797-6D94C4571460'
+	declare @FirstItem uniqueidentifier = '841D92D1-E80C-4512-A8C2-BBDE37FD80E1'
+	
 
 	insert into Administration.Organisation 
 	(
@@ -18,34 +20,25 @@ begin transaction;
 	)
 
 	insert into Administration.[User]
-	(
-		UserUuid,
-		EmailAddress,
-		Title,
-		GivenName,
-		FamilyName
-	)
+		(UserUuid, EmailAddress, Title, GivenName, FamilyName)
 	values
-	(
-		'A8F2A206-4384-4E92-AF55-86D590BA07DA',
-		'david.stables@endeavourhealth.org',
-		'Dr',
-		'David',
-		'Stables'
-	)
+		(@UserUuid1, 'david.stables@endeavourhealth.org', 'Dr', 'David', 'Stables')
 
 	insert into Administration.UserPassword
-	(
-		UserUuid,
-		PasswordHash, 
-		PasswordCreated
-	)
+		(UserUuid, PasswordHash, PasswordCreated)
 	values
-	(
-		@UserUuid,
-		'1000:00edacb7bbffa28264a8fc9a02d7d9982f89b5de7337aed5:7b4c79b3c97260908d429bd3296011abe953d708291632d7',
-		getdate()
-	)
+		(@UserUuid1, '1000:00edacb7bbffa28264a8fc9a02d7d9982f89b5de7337aed5:7b4c79b3c97260908d429bd3296011abe953d708291632d7', getdate())
+	
+	insert into Administration.[User]
+		(UserUuid, EmailAddress, Title, GivenName, FamilyName)
+	values
+		(@UserUuid2, 'kb', 'Dr', 'Kambiz', 'Boomla')
+
+	insert into Administration.UserPassword
+		(UserUuid, PasswordHash, PasswordCreated)
+	values
+		(@UserUuid2, '1000:0a0dc7f9b97198dfac6dfb2335ab6485689179c5697b7972:c62bd866a3dffbe5684b910fca154ef1acc40e3ad4fe2c39', getdate())
+
 
 	insert into Administration.UserAtOrganisation values (@UserUuid, @OrganisationUuid);
 

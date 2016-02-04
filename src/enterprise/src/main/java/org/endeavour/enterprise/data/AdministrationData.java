@@ -74,6 +74,34 @@ public class AdministrationData
 
         users.add(user);
 
+
+        User user2 = new User();
+        user2.setUserUuid(UUID.fromString("80EB4C43-0BB4-46E0-865B-0EE15481CA16"));
+        user2.setTitle("Dr");
+        user2.setForename("Kambiz");
+        user2.setSurname("Boomla");
+        user2.setEmail("kb");
+
+        UserInRole userInRole3 = new UserInRole();
+        userInRole3.setUserInRoleUuid(UUID.fromString("D2364591-B473-4CE7-89CB-5DB7BEA30536"));
+        userInRole3.setOrganisationUuid(UUID.fromString("e9f71c8a-be36-42ff-8cd7-f2ab9f188a4f"));
+        userInRole3.setOrganisationName("Alpha Surgery");
+        userInRole3.setRole(Role.ADMIN);
+
+        user2.addUserInRole(userInRole3);
+
+        UserInRole userInRole4 = new UserInRole();
+        userInRole4.setUserInRoleUuid(UUID.fromString("4E415BDE-FE23-4348-8435-E564F37C2A65"));
+        userInRole4.setOrganisationUuid(UUID.fromString("31287afa-a5b9-4a0e-ac70-0646d0508adb"));
+        userInRole4.setOrganisationName("Bravo Hospital");
+        userInRole4.setRole(Role.USER);
+
+        user2.addUserInRole(userInRole4);
+
+        user2.setCurrentUserInRoleUuid(userInRole3.getUserInRoleUuid());
+
+        users.add(user2);
+
         return users;
     }
 

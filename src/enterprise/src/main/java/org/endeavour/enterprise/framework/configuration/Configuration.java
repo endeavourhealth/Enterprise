@@ -8,6 +8,5 @@ public class Configuration
     public static final String AUTH_COOKIE_VALID_DOMAIN = "127.0.0.1";
     public static final String AUTH_COOKIE_VALID_PATH = "/";
     public static final boolean AUTH_COOKIE_REQUIRES_HTTPS = false;
-    public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://localhost:1433/%s;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
-
+    public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
 }

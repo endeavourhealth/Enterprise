@@ -8,7 +8,9 @@ public class DatabaseConnection
 {
     public static Connection get(String databaseName) throws ClassNotFoundException, SQLException
     {
+        // databaseName not used at present
+
         Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
-        return DriverManager.getConnection(String.format(Configuration.DB_CONNECTION_STRING, databaseName));
+        return DriverManager.getConnection(Configuration.DB_CONNECTION_STRING);
     }
 }

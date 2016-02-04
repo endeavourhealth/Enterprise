@@ -14,7 +14,7 @@ public class AdministrationData
 {
     public String getPasswordHash(String emailAddress) throws Exception
     {
-        try (Connection connection = DatabaseConnection.get(DatabaseName.ENTERPRISE_CORE))
+        try (Connection connection = DatabaseConnection.get(DatabaseName.ENDEAVOUR_ENTERPRISE))
         {
             try (StoredProcedure storedProcedure = new StoredProcedure(connection, "Administration.GetPasswordHash"))
             {
@@ -79,7 +79,7 @@ public class AdministrationData
 
     public List<Organisation> GetOrganisation() throws Exception
     {
-        try (Connection conn = DatabaseConnection.get(DatabaseName.ENTERPRISE_CORE))
+        try (Connection conn = DatabaseConnection.get(DatabaseName.ENDEAVOUR_ENTERPRISE))
         {
             try (StoredProcedure storedProcedure = new StoredProcedure(conn, "Administration.GetOrganisation"))
             {

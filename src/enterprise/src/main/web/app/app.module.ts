@@ -12,7 +12,11 @@ angular.module('app', [
 
 		'app.dashboard',
 		'app.library',
-		'app.query'
+		'app.query',
+		'flowChart',
+		'dragging',
+		'mouseCapture'
+
 	])
 	.run(['$state', '$rootScope', 'AdminService', 'LoggerService',
 		function ($state, $rootScope, adminService, logger:ILoggerService) {

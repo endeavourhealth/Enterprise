@@ -19,14 +19,8 @@ module app.layout {
 
 		getCurrentUser() {
 			var vm:TopnavController = this;
-			this.adminService.getCurrentUser()
-				.then(function (data:app.models.User) {
-					vm.currentUser = data;
-					vm.updateRole(vm.currentUser.currentUserInRoleUuid);
-				})
-				.catch(function (data) {
-					vm.currentUser = data;
-				});
+			vm.currentUser = vm.adminService.getCurrentUser();
+			vm.updateRole(vm.currentUser.currentUserInRoleUuid);
 		}
 
 		updateRole(userInRoleUuid) {
@@ -35,8 +29,11 @@ module app.layout {
 				return e.userInRoleUuid === userInRoleUuid;
 			});
 			if (matches.length === 1) {
-				vm.currentUser.currentUserInRoleUuid = userInRoleUuid;
-				vm.selectedRole = matches[0];
+				vm.adminService.switchUserInRole(userInRoleUuid)
+					.then(function(data) {
+						vm.currentUser.currentUserInRoleUuid = userInRoleUuid;
+						vm.selectedRole = matches[0];
+					});
 			}
 		}
 	}

@@ -8,32 +8,24 @@ module app.core {
 	'use strict';
 
 	export interface IAdminService {
-		getCurrentUser() : ng.IPromise<app.models.User>;
+		getCurrentUser() : app.models.User;
+		switchUserInRole(userInRoleUuid:string);
 		getMenuOptions() : app.models.MenuOption[];
 		isAuthenticated() : boolean;
-		login() : boolean;
+		login(username:string, password:string);
 		logout();
 	}
 
 	export class AdminService implements IAdminService {
 		static $inject = ['$http', '$q'];
-		authenticated:boolean;
+		currentUser:app.models.User;
 
 		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
-			this.authenticated = false;
+			this.currentUser = null;
 		}
 
-		getCurrentUser():ng.IPromise<app.models.User> {
-			var defer = this.promise.defer();
-			this.http.get('/api/user')
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
+		getCurrentUser() : app.models.User {
+			return this.currentUser;
 		}
 
 		getMenuOptions():app.models.MenuOption[] {
@@ -48,16 +40,46 @@ module app.core {
 		}
 
 		isAuthenticated():boolean {
-			return this.authenticated;
+			return this.currentUser != null;
 		}
 
-		login() {
-			this.authenticated = true;
-			return this.authenticated;
+		login(username:string, password:string) {
+			var vm = this;
+			vm.currentUser = null;
+			var defer = vm.promise.defer();
+			var request = {
+				'username': username,
+				'password': password
+			};
+			vm.http.post('/api/security/login', request)
+				.then(function (response) {
+					vm.currentUser = <app.models.User>response.data;
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		switchUserInRole(userInRoleUuid:string) {
+			var vm = this;
+			var defer = vm.promise.defer();
+			var request = '"' + userInRoleUuid + '"';
+			vm.http.post('/api/security/switchUserInRole', request)
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
 		}
 
 		logout() {
-			this.authenticated = false;
+			this.currentUser = null;
 		}
 	}
 

@@ -8,14 +8,14 @@
 						<span class="input-group-addon">
 							<i class="glyphicon glyphicon-user" id="username" aria-hidden="true"></i>
 						</span>
-						<input type="text" class="form-control" placeholder="Username" aria-describedby="username">
+						<input type="text" class="form-control" placeholder="Username" aria-describedby="username" ng-model="login.username">
 					</div>
 					<br/>
 					<div class="input-group">
 						<span class="input-group-addon">
 							<i class="glyphicon glyphicon-lock" id="password" aria-hidden="true"></i>
 						</span>
-						<input type="text" class="form-control" placeholder="Password" aria-describedby="password">
+						<input type="password" class="form-control" placeholder="Password" aria-describedby="password" ng-model="login.password">
 					</div>
 					<br>
 					<button ng-click="login.login()" class="btn btn-default" aria-label="Left Align">

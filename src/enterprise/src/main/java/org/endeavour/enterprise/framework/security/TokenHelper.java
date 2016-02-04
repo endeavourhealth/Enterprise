@@ -58,7 +58,7 @@ public class TokenHelper
                 -1,
                 null,
                 Configuration.AUTH_COOKIE_REQUIRES_HTTPS,
-                true);
+                false);
     }
 
     public static UserContext validateToken(String token) throws Exception

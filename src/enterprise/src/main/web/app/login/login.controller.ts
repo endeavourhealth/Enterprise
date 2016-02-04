@@ -23,13 +23,17 @@ module app.login {
 		}
 
 		login() {
-			if (this.AdminService.login()) {
-				this.logger.success('User logged in', this.username, 'Logged In');
-				this.Idle.watch();
-				this.$state.transitionTo('app.dashboard');
-			}
+			var vm = this;
+			vm.AdminService.login(vm.username, vm.password)
+				.then(function (response) {
+					vm.logger.success('User logged in', vm.username, 'Logged In');
+					vm.Idle.watch();
+					vm.$state.transitionTo('app.dashboard');
+				})
+				.catch(function (data) {
+					vm.logger.error(data.statusText, data, 'Login error!');
+				});
 		}
-
 	}
 
 	angular

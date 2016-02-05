@@ -1,4 +1,7 @@
 /// <reference path="../../typings/tsd.d.ts" />
+
+var flowchart : any;
+
 module app.query {
 	'use strict';
 
@@ -14,7 +17,7 @@ module app.query {
 			// Return the browsers prompt function.
 			return prompt;
 		})
-		.controller('QueryController', ['$scope', 'prompt', function QueryController ($scope, prompt) {
+		.controller('QueryController', ['$scope', 'prompt', function QueryController ($scope : any, prompt : any) {
 			//
 			// Selects the next node id.
 			//

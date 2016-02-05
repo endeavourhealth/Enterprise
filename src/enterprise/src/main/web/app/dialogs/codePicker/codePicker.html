@@ -25,7 +25,7 @@
 					<script type="text/ng-template" id="nodes_renderer.html">
 
 						<div ui-tree-handle class="tree-node tree-node-content">
-							<a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="codePicker.toggle(node)"><span
+							<a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="node.show = !node.show"><span
 								class="glyphicon"
 								ng-class="{
           'glyphicon-chevron-right': collapsed,

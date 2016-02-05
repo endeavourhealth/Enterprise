@@ -19,10 +19,6 @@ module app.dialogs {
 			this.selectedItems = this.getSelectedItems();
 		}
 
-		toggle(node : any) {
-			node.show = !node.show;
-		}
-
 		getButtonProperties(item : CodeSearchResult) {
 			if (item.matches.length === 0) {
 				return 'btn-danger disabled';

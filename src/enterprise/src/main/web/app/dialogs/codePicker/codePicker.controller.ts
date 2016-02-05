@@ -4,6 +4,7 @@
 module app.dialogs {
 	import CodeSearchResult = app.models.CodeSearchResult;
 	import CodeSearchMatch = app.models.CodeSearchMatch;
+	import ITreeNode = AngularUITree.ITreeNode;
 	'use strict';
 
 	class CodePickerController {
@@ -97,7 +98,7 @@ module app.dialogs {
 				;
 		}
 
-		data = [{
+		data : ITreeNode[] = [{
 			'id': 1,
 			'title': 'node1',
 			'nodes': [
@@ -121,7 +122,6 @@ module app.dialogs {
 		}, {
 			'id': 2,
 			'title': 'node2',
-			'nodrop': true, // An arbitrary property to check in custom template for nodrop-enabled
 			'nodes': [
 				{
 					'id': 21,

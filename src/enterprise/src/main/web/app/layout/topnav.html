@@ -1,10 +1,9 @@
 <div class="navbar navbar-default navbar-fixed-top">
 	<div class="navbar-header">
-		<h1><img src="/content/img/endeavour_logo.png" style="height: 50px; width: 50px">
-			<small>Enterprise</small>
-		</h1>
+		<img src="/content/img/endeavour_logo.png" style="height: 50px; width: 50px">
+			<span class="logo">Enterprise</span>
 	</div>
-	<div ng-controller="TopnavController as topnav" class="pull-right">
+	<div ng-controller="TopnavController as topnav" class="pull-right" style="padding: 10px;color:gray">
 		Logged in : {{topnav.currentUser.title}} {{topnav.currentUser.forename}} {{topnav.currentUser.surname}}
 
 

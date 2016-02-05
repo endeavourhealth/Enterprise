@@ -21,6 +21,7 @@
     "angular-bootstrap": "~1.1.0",
     "angular-ui-router": "~0.2.15",
     "toastr": "~2.1.2",
-    "ng-idle": "~1.1.1"
+    "ng-idle": "~1.1.1",
+    "angular-ui-tree": "~2.15.0"
   }
 }

@@ -23,7 +23,7 @@ module app.layout {
 			vm.updateRole(vm.currentUser.currentUserInRoleUuid);
 		}
 
-		updateRole(userInRoleUuid) {
+		updateRole(userInRoleUuid : string) {
 			var vm = this;
 			var matches = $.grep(vm.currentUser.userInRoles, function (e) {
 				return e.userInRoleUuid === userInRoleUuid;

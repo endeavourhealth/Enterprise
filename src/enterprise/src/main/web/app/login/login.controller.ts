@@ -5,6 +5,7 @@ module app.login {
 	import IIdleService = angular.idle.IIdleService;
 	import IAdminService = app.core.IAdminService;
 	import AdminService = app.core.AdminService;
+	import IStateService = angular.ui.IStateService;
 	'use strict';
 
 	export class LoginController {
@@ -15,7 +16,7 @@ module app.login {
 
 		constructor(private logger:app.blocks.ILoggerService,
 								private Idle:IIdleService,
-								private $state,
+								private $state : IStateService,
 								private AdminService:IAdminService) {
 			Idle.unwatch();
 			AdminService.logout();

@@ -5,15 +5,16 @@
 /// <reference path="../models/UserInRole.ts" />
 
 module app.core {
+	import IPromise = angular.IPromise;
 	'use strict';
 
 	export interface IAdminService {
 		getCurrentUser() : app.models.User;
-		switchUserInRole(userInRoleUuid:string);
+		switchUserInRole(userInRoleUuid:string) : IPromise<app.models.UserInRole>;
 		getMenuOptions() : app.models.MenuOption[];
 		isAuthenticated() : boolean;
-		login(username:string, password:string);
-		logout();
+		login(username:string, password:string) : IPromise<app.models.User>;
+		logout() : void;
 	}
 
 	export class AdminService implements IAdminService {

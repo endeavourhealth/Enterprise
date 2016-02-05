@@ -1,13 +1,17 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module app.layout {
+	import IRootScopeService = angular.IRootScopeService;
+	import IStateService = angular.ui.IStateService;
+	import IModalService = angular.ui.bootstrap.IModalService;
+	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 	class ShellController {
-		warning;
-		timedout;
+		warning : IModalServiceInstance;
+		timedout : IModalServiceInstance;
 
 		static $inject = ['$scope', '$uibModal', '$state'];
 
-		constructor($scope, $modal, $state) {
+		constructor($scope : IRootScopeService, $modal : IModalService, $state : IStateService) {
 			var vm = this;
 
 			function closeModals() {

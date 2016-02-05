@@ -1,0 +1,63 @@
+<div class="container vcenter">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<div class="panel panel-default">
+				<div class="panel-heading">Code Picker</div>
+				<div class="panel-body">
+
+					<div class="row">
+						<div class="col-md-10">
+							<div class="input-group">
+						<span class="input-group-addon">
+							<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
+						</span>
+								<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
+											 value="Asthma, Angina, Diabetes, Hedche, Glaucoma, Ankle">
+							</div>
+						</div>
+						<div class="col-md-2">
+							<button ng-click="codePicker.search()" class="btn btn-default" aria-label="Left Align">
+								Search
+							</button>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="panel">
+							<div class="panel-body">
+								<div class="well col-md-5">
+									Broken Ankle<br>
+									Fractured Ankle<br>
+									Twisted Ankle<br>
+								</div>
+								<div class="well col-md-7">Tree navigator</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="panel">
+							<div class="panel-body">
+								Selected Items
+								<div class="well col-md-12">
+									<span ng-repeat="item in codePicker.selectedItems" uib-dropdown>
+										<button class="button dropdown-toggle {{codePicker.getButtonProperties(item)}}" uib-dropdown-toggle>
+											{{item.term }}
+											<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
+											<i class="glyphicon glyphicon-remove-circle" aria-hidden="true"></i>
+										</button>
+										<ul uib-dropdown-menu hidden="codePicker.isPartialMatch({{item}});">
+											<li ng-repeat="match in item.matches">{{match.term}}</li>
+										</ul>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+</div>

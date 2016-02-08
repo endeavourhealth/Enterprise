@@ -5,19 +5,42 @@ module app.dialogs {
 	import CodeSearchResult = app.models.CodeSearchResult;
 	import CodeSearchMatch = app.models.CodeSearchMatch;
 	import ITreeNode = AngularUITree.ITreeNode;
+	import ILibraryService = app.core.ILibraryService;
+	import LibraryService = app.core.LibraryService;
 	'use strict';
 
 	class CodePickerController {
-		selectedItems : any;
+		searchData : string;
+		searchResults : CodeSearchResult;
+		treeData : ITreeNode[];
+		selectedItems : CodeSearchResult[];
 
-		static $inject = ['LoggerService'];
+		static $inject = ['LoggerService', 'LibraryService'];
 
-		constructor(private logger:app.blocks.ILoggerService) {
+		constructor(private logger:app.blocks.ILoggerService, private libraryService : ILibraryService) {
+			this.searchData = '"Asthma","Angina","Diabetes","Hadache","Glaucoma","Ankle"';
 			logger.success('CodePicker constructed', 'CodePickerData', 'CodePicker');
 		}
 
 		search() {
-			this.selectedItems = this.getSelectedItems();
+			var vm = this;
+			vm.libraryService.searchCodes(vm.searchData)
+				.then(function(result:CodeSearchResult[]) {
+					vm.selectedItems = result;
+					if (result.length === 1) {
+						vm.searchResults = result[0];
+					} else {
+						vm.searchResults = null;
+					}
+				});
+		}
+
+		getTreeData(match : CodeSearchMatch) {
+			var vm = this;
+			vm.libraryService.getTreeData(match.code)
+				.then(function(result:ITreeNode[]) {
+					vm.treeData = result;
+				});
 		}
 
 		getButtonProperties(item : CodeSearchResult) {
@@ -33,118 +56,6 @@ module app.dialogs {
 		getMatchCount(item : CodeSearchResult) {
 			return item.matches.length > 1 ? item.matches.length : null;
 		}
-
-		getSelectedItems() : CodeSearchResult[] {
-			return [
-				{
-					term: 'Asthma',
-					matches: [
-						{
-							term: 'Asthma',
-							code: 'H33'
-						}
-					]
-				},
-				{
-					term: 'Angina',
-					matches: [
-						{
-							term: 'Angina',
-							code: 'H33'
-						}
-					]
-				},
-				{
-					term: 'Diabetes',
-					matches: [
-						{
-							term: 'Diabetes',
-							code: 'H33'
-						}
-					]
-				},
-				{
-					term: 'Hedche',
-					matches: []
-				}
-				,
-				{
-					term: 'Glaucoma',
-					matches: [
-						{
-							term: 'Glaucoma',
-							code: 'H33'
-						}
-					]
-				},
-				{
-					term: 'Ankle',
-					matches: [
-						{
-							term: 'Broken ankle',
-							code: 'ANKBRK'
-						},
-						{
-							term: 'Fractured ankle',
-							code: 'ANKFRC'
-						},
-						{
-							term: 'Twisted ankle',
-							code: 'ANKTWS'
-						}
-					]
-				}
-			]
-				;
-		}
-
-		data : ITreeNode[] = [{
-			'id': 1,
-			'title': 'node1',
-			'nodes': [
-				{
-					'id': 11,
-					'title': 'node1.1',
-					'nodes': [
-						{
-							'id': 111,
-							'title': 'node1.1.1',
-							'nodes': []
-						}
-					]
-				},
-				{
-					'id': 12,
-					'title': 'node1.2',
-					'nodes': []
-				}
-			]
-		}, {
-			'id': 2,
-			'title': 'node2',
-			'nodes': [
-				{
-					'id': 21,
-					'title': 'node2.1',
-					'nodes': []
-				},
-				{
-					'id': 22,
-					'title': 'node2.2',
-					'nodes': []
-				}
-			]
-		}, {
-			'id': 3,
-			'title': 'node3',
-			'nodes': [
-				{
-					'id': 31,
-					'title': 'node3.1',
-					'nodes': []
-				}
-			]
-		}];
 	}
 
 	angular

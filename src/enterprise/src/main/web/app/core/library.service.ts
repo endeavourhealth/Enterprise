@@ -5,6 +5,7 @@
 /// <reference path="../models/ReportActivityItem.ts" />
 
 module app.core {
+	import ITreeNode = AngularUITree.ITreeNode;
 	'use strict';
 
 	export interface ILibraryService {
@@ -12,6 +13,8 @@ module app.core {
 		getRecentDocumentsData() : ng.IPromise<app.models.RecentDocumentItem[]>;
 		getEngineState() : ng.IPromise<app.models.EngineState>;
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
+		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]>;
+		getTreeData(code : string):ng.IPromise<ITreeNode[]>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -62,6 +65,32 @@ module app.core {
 		getReportActivityData():ng.IPromise<app.models.ReportActivityItem[]> {
 			var defer = this.promise.defer();
 			this.http.get('app/core/data/reportactivity.json')
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]> {
+			var defer = this.promise.defer();
+			this.http.get('app/core/data/searchResults.json')
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		getTreeData(code : string):ng.IPromise<ITreeNode> {
+			var defer = this.promise.defer();
+			this.http.get('app/core/data/treeResults.json')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

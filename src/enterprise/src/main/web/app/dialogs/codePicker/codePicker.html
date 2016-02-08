@@ -1,4 +1,18 @@
 <div class="container vcenter">
+
+	<script type="text/ng-template" id="nodes_renderer.html">
+		<div ui-tree-handle class="tree-node tree-node-content">
+			<a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="node.show = !node.show">
+				<span	class="glyphicon"	ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}"></span>
+			</a>
+			{{node.title}}
+		</div>
+		<ol ui-tree-nodes="" ng-model="node.nodes" ng-show="node.show">
+			<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
+			</li>
+		</ol>
+	</script>
+
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
@@ -12,7 +26,7 @@
 							<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
 						</span>
 								<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
-											 value="Asthma, Angina, Diabetes, Hedche, Glaucoma, Ankle">
+											 ng-model="codePicker.searchData">
 							</div>
 						</div>
 						<div class="col-md-2">
@@ -22,34 +36,18 @@
 						</div>
 					</div>
 
-					<script type="text/ng-template" id="nodes_renderer.html">
-
-						<div ui-tree-handle class="tree-node tree-node-content">
-							<a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="node.show = !node.show"><span
-								class="glyphicon"
-								ng-class="{
-          'glyphicon-chevron-right': collapsed,
-          'glyphicon-chevron-down': !collapsed
-        }"></span></a>
-							{{node.title}}
-						</div>
-						<ol ui-tree-nodes="" ng-model="node.nodes" ng-show="node.show">
-							<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
-							</li>
-						</ol>					</script>
-
 					<div class="row">
 						<div class="panel">
 							<div class="panel-body">
 								<div class="well col-md-5" style="height: 150px; overflow-y: scroll;">
-									Broken Ankle<br>
-									Fractured Ankle<br>
-									Sprained Ankle
+									<span ng-repeat="match in codePicker.searchResults.matches" ng-click="codePicker.getTreeData(match)">
+										 <span class="glyphicon glyphicon-plus" value="match"></span>{{ match.term }}<br>
+									</span>
 								</div>
 								<div class="well col-md-7" style="height: 150px; overflow-y: scroll;">
 									<div ui-tree id="tree-root">
-										<ol ui-tree-nodes ng-model="codePicker.data">
-											<li ng-repeat="node in codePicker.data" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+										<ol ui-tree-nodes ng-model="codePicker.searchResults">
+											<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
 										</ol>
 									</div>
 								</div>
@@ -63,7 +61,10 @@
 								Selected Items
 								<div class="well col-md-12">
 									<span ng-repeat="item in codePicker.selectedItems" uib-dropdown>
-										<button class="button dropdown-toggle {{codePicker.getButtonProperties(item)}}" uib-dropdown-toggle>
+										<button class="button dropdown-toggle {{codePicker.getButtonProperties(item)}}"
+														uib-dropdown-toggle
+														value="item"
+														ng-click="codePicker.searchResults = item; codePicker.searchData = item.term">
 											{{item.term }}
 											<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
 											<i class="glyphicon glyphicon-remove-circle" aria-hidden="true"></i>
@@ -76,10 +77,10 @@
 							</div>
 						</div>
 					</div>
+
 				</div>
 
 			</div>
 		</div>
 	</div>
-</div>
 </div>

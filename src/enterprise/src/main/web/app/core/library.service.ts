@@ -88,7 +88,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getTreeData(code : string):ng.IPromise<ITreeNode> {
+		getTreeData(code : string):ng.IPromise<ITreeNode[]> {
 			var defer = this.promise.defer();
 			this.http.get('app/core/data/treeResults.json')
 				.then(function (response) {

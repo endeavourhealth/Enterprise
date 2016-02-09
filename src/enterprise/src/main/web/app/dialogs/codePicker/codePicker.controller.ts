@@ -45,12 +45,12 @@ module app.dialogs {
 
 		getButtonProperties(item : CodeSearchResult) {
 			if (item.matches.length === 0) {
-				return 'btn-danger disabled';
+				return 'btn-danger';
 			}
 			if (item.matches.length > 1) {
 				return 'btn-warning';
 			}
-			return 'btn-success disabled';
+			return 'btn-success';
 		}
 
 		getMatchCount(item : CodeSearchResult) {

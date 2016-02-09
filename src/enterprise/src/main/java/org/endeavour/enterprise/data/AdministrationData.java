@@ -43,7 +43,7 @@ public class AdministrationData
                 .orElse(null);
     }
 
-    private List<User> getUsers()
+    public List<User> getUsers()
     {
         List<User> users = new ArrayList<>();
 

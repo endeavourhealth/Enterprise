@@ -15,6 +15,7 @@ module app.core {
 		isAuthenticated() : boolean;
 		login(username:string, password:string) : IPromise<app.models.User>;
 		logout() : void;
+		getUserList() : IPromise<app.models.User[]>;
 	}
 
 	export class AdminService implements IAdminService {
@@ -44,7 +45,7 @@ module app.core {
 			return this.currentUser != null;
 		}
 
-		login(username:string, password:string) {
+		login(username:string, password:string) : IPromise<app.models.User> {
 			var vm = this;
 			vm.currentUser = null;
 			var defer = vm.promise.defer();
@@ -64,11 +65,25 @@ module app.core {
 			return defer.promise;
 		}
 
-		switchUserInRole(userInRoleUuid:string) {
+		switchUserInRole(userInRoleUuid:string) : IPromise<app.models.UserInRole> {
 			var vm = this;
 			var defer = vm.promise.defer();
 			var request = '"' + userInRoleUuid + '"';
 			vm.http.post('/api/security/switchUserInRole', request)
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		getUserList() : IPromise<app.models.User[]> {
+			var vm = this;
+			var defer = vm.promise.defer();
+			vm.http.get('/api/user/getUserList')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

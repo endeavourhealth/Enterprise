@@ -4,6 +4,7 @@ import org.endeavour.enterprise.data.AdministrationData;
 import org.endeavour.enterprise.framework.exceptions.InvalidParameterException;
 import org.endeavour.enterprise.framework.security.Roles;
 import org.endeavour.enterprise.framework.security.Unsecured;
+import org.endeavour.enterprise.model.UserSummary;
 import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserContext;
@@ -11,6 +12,8 @@ import org.endeavour.enterprise.model.UserContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/user")
 public class UserEndpoint extends Endpoint
@@ -116,4 +119,20 @@ public class UserEndpoint extends Endpoint
 				.status(Response.Status.CREATED)
 				.build();
 	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/getUserList")
+	public Response getUserList()
+	{
+		List<UserSummary> userSummaryList = new AdministrationData().getUsers()
+				.stream()
+				.map(UserSummary::createFromUser)
+				.collect(Collectors.toList());
+
+		return Response
+				.ok(userSummaryList)
+				.build();
+	}
+
 }

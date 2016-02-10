@@ -7,6 +7,7 @@ module app.dialogs {
 	import ITreeNode = AngularUITree.ITreeNode;
 	import ILibraryService = app.core.ILibraryService;
 	import LibraryService = app.core.LibraryService;
+	import IModalService = angular.ui.bootstrap.IModalService;
 	'use strict';
 
 	class CodePickerController {
@@ -14,12 +15,27 @@ module app.dialogs {
 		searchResults : CodeSearchResult;
 		treeData : ITreeNode[];
 		selectedItems : CodeSearchResult[];
+		showModal : boolean;
 
-		static $inject = ['LoggerService', 'LibraryService'];
+		static $inject = ['LoggerService', 'LibraryService', '$uibModal'];
 
-		constructor(private logger:app.blocks.ILoggerService, private libraryService : ILibraryService) {
+		constructor(private logger:app.blocks.ILoggerService,
+								private libraryService : ILibraryService,
+								private $uibModal : IModalService) {
+			this.showModal = false;
 			this.searchData = '"Asthma","Angina","Diabetes","Hadache","Glaucoma","Ankle"';
 			logger.success('CodePicker constructed', 'CodePickerData', 'CodePicker');
+		}
+
+		open() {
+			var vm = this;
+			vm.$uibModal.open({
+				animation : true,
+				size : 'lg',
+				templateUrl : 'myModalContent.html',
+				controller : 'CodePickerController',
+				controllerAs : 'codePicker'
+			});
 		}
 
 		search() {

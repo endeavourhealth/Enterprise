@@ -1,90 +1,89 @@
-<div class="panel panel-default">
-	<div class="panel-heading">
-		<b>Code Picker</b>
-	</div>
-	<div class="panel-body">
-		<form>
-			<!-- Search -->
-			<div class="form-group">
-				<label class="control-label">Search Criteria</label>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="input-group">
-							<span class="input-group-addon">
-								<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
-							</span>
-							<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
-										 ng-model="codePicker.searchData">
-							<div class="input-group-btn">
-								<button type="button" ng-click="codePicker.search()" class="btn btn-default" aria-label="Left Align">
-									Search
-								</button>
+<div class="container">
+	<button ng-click="codePicker.open()" class="btn btn-default">Open Code Picker</button>
+
+	<script type="text/ng-template" id="myModalContent.html">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title">Code Picker</h4>
+					</div>
+					<div class="modal-body">
+						<form role="form">
+							<!-- Search -->
+							<div class="form-group">
+								<label class="control-label">Search Criteria</label>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="input-group">
+											<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
+														 ng-model="codePicker.searchData">
+											<span class="btn input-group-addon" ng-click="codePicker.search()">
+												<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
+											</span>
+										</div>
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 
-			<!-- Matches -->
-			<div class="form-group">
-				<label class="control-label">Matches</label>
-				<div class="row">
-					<div class="col-md-5">
-						<div class="well" style="height: 150px; overflow-y: scroll;">
-							<span ng-repeat="match in codePicker.searchResults.matches" ng-click="codePicker.getTreeData(match)">
-								 <span class="glyphicon glyphicon-plus" value="match"></span>{{ match.term }}<br>
-							</span>
-						</div>
-					</div>
-					<div class="col-md-7">
-						<div class="well" style="height: 150px; overflow-y: scroll;">
-							<div ui-tree id="tree-root">
-								<ol ui-tree-nodes ng-model="codePicker.searchResults">
-									<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-								</ol>
+							<!-- Matches -->
+							<div class="form-group">
+								<label class="control-label">Matches</label>
+								<div class="row">
+									<div class="col-md-5">
+										<div class="well" style="height: 150px; overflow-y: scroll;">
+											<span ng-repeat="match in codePicker.searchResults.matches" ng-click="codePicker.getTreeData(match)">
+												 <span class="glyphicon glyphicon-plus" value="match"></span>{{ match.term }}<br>
+											</span>
+										</div>
+									</div>
+									<div class="col-md-7">
+										<div class="well" style="height: 150px; overflow-y: scroll;">
+											<div ui-tree id="tree-root">
+												<ol ui-tree-nodes ng-model="codePicker.searchResults">
+													<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+												</ol>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 
-			<!-- Selection -->
-			<div class="form-group">
-				<label class="control-label">Selection</label>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="well">
-							<span ng-repeat="item in codePicker.selectedItems" uib-dropdown>
-								<button type="button" class="btn btn-sm {{codePicker.getButtonProperties(item)}}"
-												uib-dropdown-toggle
-												value="item"
-												ng-click="codePicker.searchResults = item; codePicker.searchData = item.term">
-									{{item.term }}
-									<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
-									<i class="glyphicon glyphicon-remove-circle" aria-hidden="true"></i>
-								</button>
-								<ul uib-dropdown-menu ng-if="codePicker.getMatchCount(item) > 1;">
-									<li ng-repeat="match in item.matches">{{match.term}}</li>
-								</ul>
-							</span>
-						</div>
+							<!-- Selection -->
+							<div class="form-group">
+								<label class="control-label">Selection</label>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="well">
+											<span ng-repeat="item in codePicker.selectedItems" uib-dropdown>
+												<button type="button" class="btn btn-sm {{codePicker.getButtonProperties(item)}}"
+																uib-dropdown-toggle
+																value="item"
+																ng-click="codePicker.searchResults = item; codePicker.searchData = item.term">
+													{{item.term }}
+													<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
+													<i class="glyphicon glyphicon-remove-circle" aria-hidden="true"></i>
+												</button>
+												<ul uib-dropdown-menu ng-if="codePicker.getMatchCount(item) > 1;">
+													<li ng-repeat="match in item.matches">{{match.term}}</li>
+												</ul>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
 					</div>
-				</div>
+		</script>
+		<script type="text/ng-template" id="nodes_renderer.html">
+			<div ui-tree-handle class="tree-node tree-node-content">
+				<a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="node.show = !node.show">
+					<span	class="glyphicon"	ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}"></span>
+				</a>
+				{{node.title}}
 			</div>
-		</form>
-	</div>
-
-	<script type="text/ng-template" id="nodes_renderer.html">
-		<div ui-tree-handle class="tree-node tree-node-content">
-			<a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="node.show = !node.show">
-				<span	class="glyphicon"	ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}"></span>
-			</a>
-			{{node.title}}
-		</div>
-		<ol ui-tree-nodes="" ng-model="node.nodes" ng-show="node.show">
-			<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
-			</li>
-		</ol>
-	</script>
+			<ol ui-tree-nodes="" ng-model="node.nodes" ng-show="node.show">
+				<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
+				</li>
+			</ol>
+		</script>
 
 </div>

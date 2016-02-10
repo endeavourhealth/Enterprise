@@ -5,12 +5,14 @@ module app.admin {
 	'use strict';
 
 	class AdminController {
+		userType : string;
 		userList : app.models.User[];
 
 		static $inject = ['LoggerService', 'AdminService'];
 
 		constructor(private logger:app.blocks.ILoggerService, private adminService : app.core.IAdminService) {
 			logger.success('Admin constructed', 'AdminData', 'Administration');
+			this.userType = 'all';
 			this.loadUsers();
 		}
 

@@ -7,7 +7,11 @@ import java.util.UUID;
 @XmlRootElement
 public class UserSummary implements Serializable {
 	private UUID userUuid;
+	private String name;
 	private String email;
+	private boolean isActive;
+	private boolean isAdmin;
+	private boolean isSuper;
 
 	public UUID getUserUuid()
 	{
@@ -18,6 +22,9 @@ public class UserSummary implements Serializable {
 		this.userUuid = userUuid;
 	}
 
+	public String getName() { return name; }
+	public void setName(String name) { this.name = name; }
+
 	public String getEmail()
 	{
 		return email;
@@ -27,10 +34,23 @@ public class UserSummary implements Serializable {
 		this.email = email;
 	}
 
+	public boolean getIsActive() { return isActive;	}
+	public void setIsActive(boolean active) { isActive = active; }
+
+	public boolean getIsAdmin() { return isAdmin; }
+	public void setIsAdmin(boolean admin) { isAdmin = admin; }
+
+	public boolean getIsSuper() { return isSuper; }
+	public void setIsSuper(boolean aSuper) { isSuper = aSuper; }
+
 	public static UserSummary createFromUser(User user) {
 		UserSummary userSummary = new UserSummary();
 		userSummary.userUuid = user.getUserUuid();
+		userSummary.name = user.getTitle() + ' ' + user.getForename() + ' ' + user.getSurname();
 		userSummary.email = user.getEmail();
+		userSummary.isActive = true;
+		userSummary.isAdmin = (user.getUserInRoles().stream().filter(uir -> uir.getRole().equals(Role.ADMIN)).findFirst().orElse(null) != null);
+		userSummary.isSuper = (user.getUserInRoles().stream().filter(uir -> uir.getRole().equals(Role.SUPER)).findFirst().orElse(null) != null);
 		return userSummary;
 	}
 }

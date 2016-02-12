@@ -1,30 +1,60 @@
 <div>
+	<script type="text/ng-template" id="node_template.html">
+		<div ui-tree-handle class="tree-node tree-node-content">
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-unchecked text-muted"></span>
+				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon text-muted"	ng-class="{'glyphicon-expand': !node.show,'glyphicon-collapse-down': node.show}" ng-click="library.showNode(node)"></span>
+			<span	class="glyphicon glyphicon-folder-open text-primary"></span>
+			{{node.title}}
+		</div>
+		<ol ng-model="node.nodes" ng-show="node.show" class="angular-ui-tree-nodes">
+			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
+			</li>
+		</ol>
+	</script>
+
 	<div class="col-md-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<label class="btn btn-xs btn-success pull-right">Add new</label>
+				<label class="btn btn-xs btn-success pull-right" ng-click="library.getLibraryRootFolders()">Add new</label>
 				Library items
 			</div>
 			<div class="panel-body">
-				<div class="table">
-					<table class="table table-striped table-condensed">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Type</th>
-								<th>Last updated</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="item in library.itemList">
-								<td>{{item.name}}</td>
-								<td>{{item.type}}</td>
-								<td>{{item.lastUpdated}}</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+
+				<form>
+					<div class="form-group">
+						<div class="row">
+							<div class="col-md-3">
+								<div id="tree-root" class="angular-ui-tree">
+									<ol ng-model="codePicker.searchResults" class="angular-ui-tree-nodes">
+										<li ng-repeat="node in library.treeData" ng-include="'node_template.html'" class="angular-ui-tree-node"></li>
+									</ol>
+								</div>
+							</div>
+
+							<div class="col-md-9">
+								<div class="table">
+									<table class="table table-striped table-condensed">
+										<thead>
+											<tr>
+												<th>Title</th>
+												<th>Type</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat="item in library.itemSummaryList">
+												<td>{{item.title}}</td>
+												<td>{{item.itemUuid}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+
 			</div>
 		</div>
 	</div>
+
 </div>

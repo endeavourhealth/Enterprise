@@ -15,6 +15,9 @@ module app.core {
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
 		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]>;
 		getTreeData(code : string):ng.IPromise<ITreeNode[]>;
+		getRootFolders(organisationUuid : string, moduleId : number):ng.IPromise<any[]>;
+		getChildFolders(folderId : string):ng.IPromise<any[]>;
+		getFolderContents(folderId : string):ng.IPromise<any[]>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -100,6 +103,55 @@ module app.core {
 
 			return defer.promise;
 		}
+
+		getRootFolders(organisationUuid : string, moduleId : number):ng.IPromise<any[]> {
+			var vm = this;
+			var defer = vm.promise.defer();
+			var request = {
+				'organisationUuid' : organisationUuid,
+				'moduleId' : moduleId
+			};
+
+			vm.http.post('api/definition/getRootFolders', request)
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		getChildFolders(itemUuid : string):ng.IPromise<any[]> {
+			var vm = this;
+			var defer = vm.promise.defer();
+			var request = '"' + itemUuid + '"';
+			vm.http.post('api/definition/getChildFolders', request)
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		getFolderContents(folderId : string):ng.IPromise<any[]> {
+			var vm = this;
+			var defer = vm.promise.defer();
+			vm.http.post('api/definition/getFolderContents', folderId)
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
 	}
 
 	angular

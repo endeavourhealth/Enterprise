@@ -63,7 +63,7 @@ begin transaction;
 	--	('D279B1ED-E854-4438-BEF2-C9F70A0B7C7D', 'Child 1', 0, 0, null, 'C69970DA-CF6C-406B-BEEC-31762FC9A0A4'),
 	--	('62B07090-F17A-43C5-BD5A-4B808508A874', 'Child 2', 0, 0, null, 'C69970DA-CF6C-406B-BEEC-31762FC9A0A4'),
 	--	('B6DE05EE-B7ED-4058-B4F6-93154A48028B', 'Sub Child', 0, 0, null, '62B07090-F17A-43C5-BD5A-4B808508A874'),
-	--	('973473AD-9A9C-4E70-ACE6-E3D831BF192A', 'Sub Child 2', 0, 0, null, '973473AD-9A9C-4E70-ACE6-E3D831BF192A'),
+	--	('973473AD-9A9C-4E70-ACE6-E3D831BF192A', 'Sub Child 2', 0, 0, null, '62B07090-F17A-43C5-BD5A-4B808508A874'),
 
 	--	('D7219FF4-339F-4A54-9DDD-818A0E00ACE9', 'Diabetics', 0, 2, '01BE7640-802F-416B-8FD4-CC58A133F40E', null),
 	--	('ECB4497A-16A2-44C3-8B51-15CFC4BEA9F5', 'Asthmatics', 0, 2, '01BE7640-802F-416B-8FD4-CC58A133F40E', null),
@@ -92,11 +92,11 @@ begin transaction;
 	--where a.WithinDependency is not null;
 
 
-	--insert into [Definition].Items (ItemGuid, AuditId, Content, IsDeleted, OwnerOrganisationGuid, ItemTypeId, Title)
-	--	values (@firstItem, @AuditId, null, 0, @@OrganisationUuid, 1, 'Test report');
+	--insert into [Definition].Items (ItemUuid, AuditId, Content, IsDeleted, OwnerOrganisationUuid, ItemTypeId, Title, ModuleId)
+	--	values (@firstItem, @AuditId, null, 0, @OrganisationUuid, 1, 'Test report', 0);
 
-	--insert into [Definition].ActiveItems (ItemGuid, CurrentAuditId, OwnerOrganisationGuid, ItemTypeId, Title)
-	--	values (@firstItem, @AuditId, @@OrganisationUuid, 1, 'Test report');
+	--insert into [Definition].ActiveItems (ItemUuid, CurrentAuditId, OwnerOrganisationUuid, ItemTypeId, Title, ModuleId)
+	--	values (@firstItem, @AuditId, @OrganisationUuid, 1, 'Test report', 0);
 
 	--insert into Execution.Request (ReportItemUuid, [DateTime], UserUuid, [Parameters])
 	--	values (@firstItem, getdate(), @userId, '');

@@ -2,11 +2,12 @@
 /// <reference path="../core/library.service.ts" />
 
 module app.library {
-	import ITreeNode = AngularUITree.ITreeNode;
+	import TreeNode = app.models.TreeNode;
 	'use strict';
 
 	class LibraryController {
-		treeData : any[];
+		treeData : TreeNode[];
+		itemSummaryList : any[]; // DefinitionItemSummary[];
 
 		static $inject = ['LibraryService', '$scope'];
 
@@ -22,12 +23,12 @@ module app.library {
 				});
 		}
 
-		showNode(node : any) {
+		toggleExpansion(node : TreeNode) {
 			if (!node.hasChildren) { return; }
 
-			node.show = !node.show;
+			node.isExpanded = !node.isExpanded;
 
-			if (node.show && (node.nodes == null || node.nodes.length === 0)) {
+			if (node.isExpanded && (node.nodes == null || node.nodes.length === 0)) {
 				var vm = this;
 				var folderId = node.itemUuid;
 				this.libraryService.getChildFolders(folderId)

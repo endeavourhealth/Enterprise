@@ -2,11 +2,13 @@
 	<script type="text/ng-template" id="node_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content">
 				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-unchecked text-muted"></span>
-				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon text-muted"	ng-class="{'glyphicon-expand': !node.show,'glyphicon-collapse-down': node.show}" ng-click="library.showNode(node)"></span>
+				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon text-muted"
+							ng-class="{'glyphicon-expand': !node.isExpanded,'glyphicon-collapse-down': node.isExpanded}"
+							ng-click="library.toggleExpansion(node)"></span>
 			<span	class="glyphicon glyphicon-folder-open text-primary"></span>
 			{{node.title}}
 		</div>
-		<ol ng-model="node.nodes" ng-show="node.show" class="angular-ui-tree-nodes">
+		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">
 			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
 			</li>
 		</ol>
@@ -23,6 +25,7 @@
 				<form>
 					<div class="form-group">
 						<div class="row">
+
 							<div class="col-md-3">
 								<div id="tree-root" class="angular-ui-tree">
 									<ol ng-model="codePicker.searchResults" class="angular-ui-tree-nodes">
@@ -37,12 +40,14 @@
 										<thead>
 											<tr>
 												<th>Title</th>
+												<th>Date modified</th>
 												<th>Type</th>
 											</tr>
 										</thead>
 										<tbody>
 											<tr ng-repeat="item in library.itemSummaryList">
 												<td>{{item.title}}</td>
+												<td>{{item.dateModified}}</td>
 												<td>{{item.itemUuid}}</td>
 											</tr>
 										</tbody>

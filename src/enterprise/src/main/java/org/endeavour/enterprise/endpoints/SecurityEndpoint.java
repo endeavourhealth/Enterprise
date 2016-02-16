@@ -42,6 +42,24 @@ public class SecurityEndpoint extends Endpoint
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user);
 
+/*
+        System.err.println("Going to create response");
+        Response r = null;
+        try {
+            r = Response
+                    .ok()
+                    .entity(user)
+                    .cookie(cookie)
+                    .build();
+        }
+        catch (Throwable t)
+        {
+            System.err.println("Had exception!");
+            t.printStackTrace(System.err);
+        }
+        return r;
+*/
+
         return Response
                 .ok()
                 .entity(user)

@@ -59,7 +59,7 @@ begin transaction;
 	--insert into @ItemsToAdd
 	--values
 	--	('01BE7640-802F-416B-8FD4-CC58A133F40E', 'Clinical', 0, 0, null, null),
-	--	('C69970DA-CF6C-406B-BEEC-31762FC9A0A4', 'My Folder', 0, 0, null, null),
+	--	('C69970DA-CF6C-406B-BEEC-31762FC9A0A4', 'My JsonFolder', 0, 0, null, null),
 	--	('D279B1ED-E854-4438-BEF2-C9F70A0B7C7D', 'Child 1', 0, 0, null, 'C69970DA-CF6C-406B-BEEC-31762FC9A0A4'),
 	--	('62B07090-F17A-43C5-BD5A-4B808508A874', 'Child 2', 0, 0, null, 'C69970DA-CF6C-406B-BEEC-31762FC9A0A4'),
 	--	('B6DE05EE-B7ED-4058-B4F6-93154A48028B', 'Sub Child', 0, 0, null, '62B07090-F17A-43C5-BD5A-4B808508A874'),

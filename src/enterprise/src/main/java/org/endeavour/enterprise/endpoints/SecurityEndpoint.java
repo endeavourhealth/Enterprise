@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.data.AdministrationData;
+import org.endeavour.enterprise.entity.database.DbPerson;
 import org.endeavour.enterprise.framework.security.*;
 import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
@@ -20,8 +21,21 @@ public class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
     @Unsecured
-    public Response login(Credentials credentials) throws Exception
+    public Response login(Credentials credentials) throws Throwable
     {
+        String email = credentials.getUsername();
+        String password = credentials.getPassword();
+
+        DbPerson person = DbPerson.retrieveForEmail(email);
+        if (person == null)
+        {
+            throw new NotAuthorizedException("No user found for email");
+        }
+
+
+
+
+
         AdministrationData administrationData = new AdministrationData();
 
         String passwordHash = administrationData.getPasswordHash(credentials.getUsername());

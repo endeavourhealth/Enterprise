@@ -27,8 +27,8 @@ public class TableAdapter
     private String[] columns = null;
 
     //lazily derived
-    private List<Method> cachedGetMethods = null;
-    private List<Method> cachedSetMethods = null;
+/*    private List<Method> cachedGetMethods = null;
+    private List<Method> cachedSetMethods = null;*/
 
     public TableAdapter(Class cls, String tableName, String schema, String database, String[] columns)
     {
@@ -74,6 +74,7 @@ public class TableAdapter
      * returns a list of Method objects used to get all the values from one of our
      * entities in the order the database expects them
      */
+/*
     public List<Method> getGetMethods() throws NoSuchMethodException
     {
         if (cachedGetMethods == null)
@@ -111,14 +112,19 @@ public class TableAdapter
             for (int i=0; i<columns.length; i++) {
                 String column = columns[i];
 
+                Method m = null;
+
                 //the primary UUID is always called <TableName>Uuid on the DB, so we need
                 //to use an alternative get/set method pair to access that
                 if (column.equals(primaryKeyCol))
                 {
-                    column = "PrimaryUuid";
+                    m = findSetMethod(cls.getSuperclass(), "PrimaryUuid");
+                }
+                else
+                {
+                    m = findSetMethod(cls, column);
                 }
 
-                Method m = findSetMethod(column);
                 tmp.add(m);
             }
 
@@ -126,17 +132,17 @@ public class TableAdapter
         }
         return cachedSetMethods;
     }
+*/
 
     /**
      * when caching the set methods for our entity, we use this fn to look up an appropriately named
      * method with the right return type (void) and right number of parameters (one)
      */
-    private Method findSetMethod(String columnName) throws NoSuchMethodException
+/*    private static Method findSetMethod(Class cls, String columnName) throws NoSuchMethodException
     {
         //we're looking for a set method to match the column name
         String methodName = "set" + columnName;
 
-        Class cls = this.getClass();
         Method[] arr = cls.getMethods();
         for (int i=0; i<arr.length; i++)
         {
@@ -165,16 +171,65 @@ public class TableAdapter
         }
 
         throw new NoSuchMethodException("Couldn't find " + methodName);
-    }
+    }*/
 
 
-    public static DbAbstractTable retrieveSingleEntityForUuid(TableAdapter adapter, UUID uuid) throws Throwable
+  /*  public static DbAbstractTable retrieveSingleEntityForUuid(TableAdapter adapter, UUID uuid) throws Throwable
     {
         //the retrieve for UUID has a standard name for all entities
         String spName = adapter.getSchema() + "." + adapter.getTableName() + "_SelectForUuidUUId";
         return adapter.retrieveSingleEntity(spName, uuid);
-    }
+    }*/
+
+
     public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Throwable
+    {
+        List<? extends DbAbstractTable> v = retrieveEntities(spName, parameters);
+        //List<DbAbstractTable> v = retrieveEntities(spName, parameters);
+
+        if (v.size() == 1)
+        {
+            return v.get(0);
+        }
+        else if (v.size() == 0)
+        {
+            return null;
+        }
+        //if we're expecting zero or one and get MORE, then something is wrong
+        else
+        {
+            throw new RuntimeException("Retrieved multiple results from " + spName);
+        }
+    }
+    public List<DbAbstractTable> retrieveEntities(String spName, Object... spParameters) throws Throwable
+    {
+        Connection connection = DatabaseConnection.get(getDatabase());
+
+        String sql = spName;
+
+        if (spParameters != null) {
+            for (int i = 0; i < spParameters.length; i++) {
+                Object parameter = spParameters[i];
+                parameter = quoteAndEscapeString(parameter);
+
+                if (i > 0) {
+                    sql += ", ";
+                } else {
+                    sql += " ";
+                }
+
+                sql += parameter;
+            }
+        }
+
+        Statement s = connection.createStatement();
+        s.execute(sql);
+
+        ResultSet rs = s.getResultSet();
+
+        return readFromResultSet(rs);
+    }
+    /*public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Throwable
     {
         try {
             Connection connection = DatabaseConnection.get(getDatabase());
@@ -224,7 +279,7 @@ public class TableAdapter
 
 
         return null;
-    }
+    }*/
 
     private static Object quoteAndEscapeString(Object obj)
     {
@@ -255,8 +310,21 @@ public class TableAdapter
     }
 
 
-
     private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Throwable
+    {
+        List<DbAbstractTable> ret = new ArrayList<DbAbstractTable>();
+        ResultReader rr = new ResultReader(rs);
+
+        while (rr.nextResult())
+        {
+            DbAbstractTable entity = newEntity();
+            entity.readFromDb(rr);
+            ret.add(entity);
+        }
+
+        return ret;
+    }
+/*    private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Throwable
     {
         List<DbAbstractTable> ret = new ArrayList<DbAbstractTable>();
 
@@ -268,7 +336,10 @@ public class TableAdapter
             for (int i=0; i<setMethods.size(); i++)
             {
                 Method m = setMethods.get(i);
-                Object value = rs.getObject(i);
+
+                //2016-02-18 DL - result set columns start at ONE, not ZERO
+                Object value = rs.getObject(i+1);
+                //Object value = rs.getObject(i);
                 m.invoke(entity, new Object[]{value});
             }
 
@@ -276,10 +347,29 @@ public class TableAdapter
         }
 
         return ret;
+    }*/
+
+    public void saveToDb(boolean insert, DbAbstractTable entity) throws Throwable
+    {
+
+        String spName = getSchema() + "." + getTableName();
+        if (insert) {
+            spName += "_Insert";
+        } else {
+            spName += "_Update";
+        }
+
+        InsertBuilder ib = new InsertBuilder(spName + " ");
+        entity.writeForDb(ib);
+
+        String sql = ib.toString();
+
+        Connection connection = DatabaseConnection.get(getDatabase());
+        Statement s = connection.createStatement();
+        s.execute(sql);
     }
 
-
-    public void saveToDb(boolean insert, DbAbstractTable entity) throws Throwable {
+/*    public void saveToDb(boolean insert, DbAbstractTable entity) throws Throwable {
 
         String spName = getSchema() + "." + getTableName();
         if (insert) {
@@ -310,7 +400,7 @@ public class TableAdapter
 
         Statement s = connection.createStatement();
         s.execute(sql);
-    }
+    }*/
 
     /**
      * calls the ...delete SP for the given entity to remove from the DB

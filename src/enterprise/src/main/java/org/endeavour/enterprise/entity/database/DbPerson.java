@@ -2,6 +2,7 @@ package org.endeavour.enterprise.entity.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 
+import java.sql.SQLException;
 import java.util.UUID;
 
 /**
@@ -9,7 +10,6 @@ import java.util.UUID;
  */
 public final class DbPerson extends DbAbstractTable {
 
-    private UUID personUuid = null;
     private String title = null;
     private String forename = null;
     private String surname = null;
@@ -41,18 +41,32 @@ public final class DbPerson extends DbAbstractTable {
         return adapter;
     }
 
+    @Override
+    public void writeForDb(InsertBuilder builder)
+    {
+        builder.add(getPrimaryUuid());
+        builder.add(title);
+        builder.add(forename);
+        builder.add(surname);
+        builder.add(email);
+        builder.add(isSuperUser);
+    }
+
+    @Override
+    public void readFromDb(ResultReader reader) throws SQLException
+    {
+        setPrimaryUuid(reader.readUuid());
+        title = reader.readString();
+        forename = reader.readString();
+        surname = reader.readString();
+        email = reader.readString();
+        isSuperUser = reader.readBoolean();
+    }
+
 
     /**
      * gets/sets
      */
-    public UUID getPersonUuid() {
-        return personUuid;
-    }
-
-    public void setPersonUuid(UUID personUuid) {
-        this.personUuid = personUuid;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -85,11 +99,11 @@ public final class DbPerson extends DbAbstractTable {
         this.email = email;
     }
 
-    public boolean isSuperUser() {
+    public boolean getIsSuperUser() {
         return isSuperUser;
     }
 
-    public void setSuperUser(boolean superUser) {
+    public void setIsSuperUser(boolean superUser) {
         isSuperUser = superUser;
     }
 

@@ -20,6 +20,7 @@ import java.util.UUID;
 
 /**
  * Created by Drew on 17/02/2016.
+ * Endpoint for functions related to creating and managing folders
  */
 @Path("/folder")
 public class FolderEndpoint extends Endpoint {
@@ -29,7 +30,6 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/createFolder")
-    @Unsecured
     public Response createFolder(JsonFolder folderParameters) throws Throwable
     {
         //get the organisation from the server token
@@ -77,7 +77,6 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/renameFolder")
-    @Unsecured
     public Response renameFolder(JsonFolder folderParameters) throws Throwable
     {
         //get the organisation from the server token
@@ -112,7 +111,6 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/moveFolder")
-    @Unsecured
     public Response moveFolder(JsonFolder folderParameters) throws Throwable
     {
         //get the organisation from the server token
@@ -147,7 +145,6 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteFolder")
-    @Unsecured
     public Response deleteFolder(JsonFolder folderParameters) throws Exception
     {
         return null;
@@ -157,7 +154,6 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolders")
-    @Unsecured
     public Response getFolders(JsonFolder folderParameters) throws Exception
     {
         return null;
@@ -188,13 +184,4 @@ public class FolderEndpoint extends Endpoint {
         return folder;
     }
 
-    private UUID getOrganisationUuidFromToken() throws Exception
-    {
-               /* UserContext context = this.getUserContext();
-        UUID orgUuid = context.getOrganisationUuid();*/
-
-
-        UUID orgUuid = UUID.randomUUID();
-        return orgUuid;
-    }
 }

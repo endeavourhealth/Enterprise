@@ -7,7 +7,7 @@ import java.util.UUID;
  * Created by Drew on 17/02/2016.
  * JSON object used to manipulaate folders, such as creating, moving and renaming
  */
-public class JsonFolder implements Serializable {
+public final class JsonFolder implements Serializable {
 
     private UUID folderUuid = null;
     private String folderName = null;

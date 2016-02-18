@@ -2,6 +2,8 @@ package org.endeavour.enterprise.entity.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -9,7 +11,6 @@ import java.util.UUID;
  */
 public final class DbOrganisation extends DbAbstractTable {
 
-    private UUID organisationUuid = null;
     private String name = null;
     private String nationalId = null;
 
@@ -28,18 +29,34 @@ public final class DbOrganisation extends DbAbstractTable {
         return adapter;
     }
 
+    @Override
+    public void writeForDb(InsertBuilder builder)
+    {
+        builder.add(getPrimaryUuid());
+        builder.add(name);
+        builder.add(nationalId);
+    }
+
+    @Override
+    public void readFromDb(ResultReader reader) throws SQLException
+    {
+        setPrimaryUuid(reader.readUuid());
+        name = reader.readString();
+        nationalId = reader.readString();
+    }
+
+    public static List<DbAbstractTable> retrieveForAll() throws Throwable
+    {
+        return adapter.retrieveEntities("Administration.Organisation_SelectForAll");
+    }
+    public static DbOrganisation retrieveForUuid(UUID uuid) throws Throwable
+    {
+        return (DbOrganisation)adapter.retrieveSingleEntity("Administration.Organisation_SelectForUuid", uuid);
+    }
 
     /**
      * gets/sets
      */
-    public UUID getOrganisationUuid() {
-        return organisationUuid;
-    }
-
-    public void setOrganisationUuid(UUID organisationUuid) {
-        this.organisationUuid = organisationUuid;
-    }
-
     public String getName() {
         return name;
     }

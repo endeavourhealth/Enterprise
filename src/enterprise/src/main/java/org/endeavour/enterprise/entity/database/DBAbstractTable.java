@@ -23,14 +23,19 @@ public abstract class DbAbstractTable
     private UUID primaryUuid = null;
 
     public abstract TableAdapter getAdapter();
+    public abstract void writeForDb(InsertBuilder builder);
+    public abstract void readFromDb(ResultReader reader) throws SQLException;
 
     /**
-     * get method only
+     * get/sets method only
      */
     public UUID getPrimaryUuid() {
         return primaryUuid;
     }
 
+    public void setPrimaryUuid(UUID primaryUuid) {
+        this.primaryUuid = primaryUuid;
+    }
 
     /**
      * convenience method to insert/update an entity on the DB

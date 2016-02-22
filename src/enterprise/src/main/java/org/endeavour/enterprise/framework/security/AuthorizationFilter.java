@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.framework.security;
 
 import org.endeavour.enterprise.framework.exceptions.NotAuthorizedException;
-import org.endeavour.enterprise.model.Role;
+import org.endeavour.enterprise.model.EndUserRole;
 import org.endeavour.enterprise.model.UserContext;
 
 import javax.annotation.Priority;
@@ -33,17 +33,17 @@ public class AuthorizationFilter implements ContainerRequestFilter
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException
     {
-        List<Role> classRoles = extractRoles(resourceInfo.getResourceClass());
-        List<Role> methodRoles = extractRoles(resourceInfo.getResourceMethod());
+        List<EndUserRole> classEndUserRoles = extractRoles(resourceInfo.getResourceClass());
+        List<EndUserRole> methodEndUserRoles = extractRoles(resourceInfo.getResourceMethod());
 
         UserContext userContext = UserContext.fromSecurityContext(securityContext);
 
         try
         {
-            if (methodRoles.isEmpty())
-                checkPermissions(userContext, classRoles);
+            if (methodEndUserRoles.isEmpty())
+                checkPermissions(userContext, classEndUserRoles);
             else
-                checkPermissions(userContext, methodRoles);
+                checkPermissions(userContext, methodEndUserRoles);
 
         }
         catch (Exception e)
@@ -52,7 +52,7 @@ public class AuthorizationFilter implements ContainerRequestFilter
         }
     }
 
-    private List<Role> extractRoles(AnnotatedElement annotatedElement)
+    private List<EndUserRole> extractRoles(AnnotatedElement annotatedElement)
     {
         if (annotatedElement == null)
             return new ArrayList<>();
@@ -62,23 +62,23 @@ public class AuthorizationFilter implements ContainerRequestFilter
         if (roles == null)
             return new ArrayList<>();
 
-        Role[] allowedRoles = roles.value();
-        return Arrays.asList(allowedRoles);
+        EndUserRole[] allowedEndUserRoles = roles.value();
+        return Arrays.asList(allowedEndUserRoles);
     }
 
-    private void checkPermissions(UserContext userContext, List<Role> allowedRoles) throws Exception
+    private void checkPermissions(UserContext userContext, List<EndUserRole> allowedEndUserRoles) throws Exception
     {
         if (userContext == null)
             throw new NotAuthorizedException("Could not find userContext");
 
-        if (!isAllowedIn(userContext.getRole(), allowedRoles))
-            throw new NotAuthorizedException("Role not allowed");
+        if (!isAllowedIn(userContext.getEndUserRole(), allowedEndUserRoles))
+            throw new NotAuthorizedException("EndUserRole not allowed");
     }
 
-    private static boolean isAllowedIn(Role userRole, List<Role> allowedRoles)
+    private static boolean isAllowedIn(EndUserRole userEndUserRole, List<EndUserRole> allowedEndUserRoles)
     {
-        for (Role allowedRole : allowedRoles)
-            if (userRole.isGreaterThanOrEqualTo(allowedRole))
+        for (EndUserRole allowedEndUserRole : allowedEndUserRoles)
+            if (userEndUserRole.isGreaterThanOrEqualTo(allowedEndUserRole))
                 return true;
 
         return false;

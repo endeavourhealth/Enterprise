@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.entity.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
+import org.endeavour.enterprise.model.EndUserRole;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -31,9 +32,27 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     {
         return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForEndUserNotExpired", endUserUuid);
     }
+    public static DbOrganisationEndUserLink retrieveForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Throwable
+    {
+        //TODO: 2016-02-22 DL - should really move this into a SP that takes two parameters
+        List<DbAbstractTable> v = retrieveForEndUserNotExpired(endUserUuid);
+        for (int i=0; i<v.size(); i++)
+        {
+            DbOrganisationEndUserLink link = (DbOrganisationEndUserLink)v.get(i);
+            if (link.getOrganisationUuid().equals(organisationUuid))
+            {
+                return link;
+            }
+        }
+        return null;
+    }
+    public static List<DbAbstractTable> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Throwable
+    {
+        return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForOrganisationNotExpired", organisationUuid);
+    }
     public static DbOrganisationEndUserLink retrieveForUuid(UUID uuid) throws Throwable
     {
-        return (DbOrganisationEndUserLink)adapter.retrieveSingleEntity("Administration.OrganisationEndUserLink_SelectForUuid", uuid);
+        return (DbOrganisationEndUserLink)adapter.retrieveSingleEntity("Administration._OrganisationEndUserLink_SelectForUuid", uuid);
     }
 
     @Override
@@ -60,6 +79,15 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
         permissions = reader.readInt();
         dtExpired = reader.readDateTime();
     }
+
+    /**
+     * non-db gets/sets
+     */
+    public EndUserRole getRole()
+    {
+        return EndUserRole.values()[permissions];
+    }
+
 
     /**
      * gets/sets

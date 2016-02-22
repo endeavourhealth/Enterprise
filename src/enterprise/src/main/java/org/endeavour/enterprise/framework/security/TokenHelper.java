@@ -5,8 +5,9 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.endeavour.enterprise.entity.database.DbEndUser;
+import org.endeavour.enterprise.entity.database.DbOrganisation;
 import org.endeavour.enterprise.framework.configuration.Configuration;
-import org.endeavour.enterprise.model.Role;
+import org.endeavour.enterprise.model.EndUserRole;
 import org.endeavour.enterprise.model.UserContext;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
@@ -37,7 +38,7 @@ public class TokenHelper
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_USER, user.getUserUuid());
         bodyParameterMap.put(TOKEN_ORGANISATION, userInRole.getOrganisationUuid());
-        bodyParameterMap.put(TOKEN_ROLE, userInRole.getRole().name());
+        bodyParameterMap.put(TOKEN_ROLE, userInRole.getEndUserRole().name());
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
 
         JwtBuilder builder = Jwts.builder()
@@ -48,16 +49,23 @@ public class TokenHelper
         return builder.compact();
     }
 
-    public static NewCookie createTokenAsCookie(DbEndUser person)
+    public static NewCookie createTokenAsCookie(DbEndUser person, DbOrganisation org, EndUserRole endUserRole)
     {
-        String token = createToken(person);
+        String token = createToken(person, org, endUserRole);
         return createCookie(token);
     }
-    private static String createToken(DbEndUser person)
+    private static String createToken(DbEndUser person, DbOrganisation org, EndUserRole endUserRole)
     {
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_USER, person.getPrimaryUuid());
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
+
+        //if the person has multiple orgs they can log on to, then we may pass in null until they select one
+        if (org != null)
+        {
+            bodyParameterMap.put(TOKEN_ORGANISATION, org.getPrimaryUuid());
+            bodyParameterMap.put(TOKEN_ROLE, endUserRole.name());
+        }
 
         JwtBuilder builder = Jwts.builder()
                 .setHeaderParam(TOKEN_TYPE, TOKEN_TYPE_JWT)
@@ -91,7 +99,7 @@ public class TokenHelper
 
         UUID userUuid = UUID.fromString((String)claims.get(TOKEN_USER));
         UUID organisationUuid = UUID.fromString((String) claims.get(TOKEN_ORGANISATION));
-        Role role = Enum.valueOf(Role.class, (String)claims.get(TOKEN_ROLE));
+        EndUserRole endUserRole = Enum.valueOf(EndUserRole.class, (String)claims.get(TOKEN_ROLE));
         long tokenIssuedMilliseconds = Long.parseLong((String) claims.get(TOKEN_ISSUED_AT)) * 1000L;
         Date tokenIssued = new Date(tokenIssuedMilliseconds);
 
@@ -100,6 +108,6 @@ public class TokenHelper
         if (Calendar.getInstance().getTime().after(tokenExpiry))
             throw new AuthenticationException("Token expired");
 
-        return new UserContext(userUuid, organisationUuid, role, tokenIssued);
+        return new UserContext(userUuid, organisationUuid, endUserRole, tokenIssued);
     }
 }

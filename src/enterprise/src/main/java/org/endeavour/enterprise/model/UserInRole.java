@@ -22,7 +22,7 @@ public class UserInRole implements Serializable
 
     public UUID organisationUuid;
     public String organisationName;
-    public Role role;
+    public EndUserRole endUserRole;
 
     public UUID getOrganisationUuid()
     {
@@ -44,13 +44,13 @@ public class UserInRole implements Serializable
         this.organisationName = organisationName;
     }
 
-    public Role getRole()
+    public EndUserRole getEndUserRole()
     {
-        return role;
+        return endUserRole;
     }
 
-    public void setRole(Role role)
+    public void setEndUserRole(EndUserRole endUserRole)
     {
-        this.role = role;
+        this.endUserRole = endUserRole;
     }
 }

@@ -1,5 +1,7 @@
 package org.endeavour.enterprise.entity.json;
 
+import org.endeavour.enterprise.entity.database.DbFolder;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -12,9 +14,20 @@ public final class JsonFolder implements Serializable {
     private UUID folderUuid = null;
     private String folderName = null;
     private UUID parentFolderUuid = null;
+    private Integer contentCount = null;
 
     public JsonFolder()
     {
+    }
+    public JsonFolder(DbFolder folder, int count)
+    {
+        this.folderUuid = folder.getPrimaryUuid();
+        this.folderName = folder.getTitle();
+        this.parentFolderUuid = folder.getParentFolderUuid();
+        if (count > -1)
+        {
+            contentCount = new Integer(count);
+        }
     }
 
     /**
@@ -42,5 +55,13 @@ public final class JsonFolder implements Serializable {
 
     public void setParentFolderUuid(UUID parentUuid) {
         this.parentFolderUuid = parentUuid;
+    }
+
+    public Integer getContentCount() {
+        return contentCount;
+    }
+
+    public void setContentCount(Integer contentCount) {
+        this.contentCount = contentCount;
     }
 }

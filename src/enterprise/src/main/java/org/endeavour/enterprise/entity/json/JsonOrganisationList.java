@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.entity.json;
 
 import org.endeavour.enterprise.entity.database.DbOrganisation;
+import org.endeavour.enterprise.model.EndUserRole;
 
 import java.io.Serializable;
 
@@ -30,9 +31,9 @@ public final class JsonOrganisationList implements Serializable
 
         throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");
     }
-    public void add(DbOrganisation org)
+    public void add(DbOrganisation org, EndUserRole permissions)
     {
-        JsonOrganisation jsonOrg = new JsonOrganisation(org);
+        JsonOrganisation jsonOrg = new JsonOrganisation(org, permissions);
         add(jsonOrg);
     }
 

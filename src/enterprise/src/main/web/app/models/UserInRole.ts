@@ -7,6 +7,6 @@ module app.models {
 		userInRoleUuid:string;
 		organisationUuid:string;
 		organisationName:string;
-		role:Role;
+		endUserRole:Role;
 	}
 }

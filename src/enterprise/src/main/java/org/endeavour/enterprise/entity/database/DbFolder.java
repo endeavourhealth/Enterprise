@@ -3,6 +3,7 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -31,7 +32,7 @@ public final class DbFolder extends DbAbstractTable {
     public void writeForDb(InsertBuilder builder)
     {
         builder.add(getPrimaryUuid());
-        builder.add(getOrganisationUuid());
+        builder.add(organisationUuid);
         builder.add(parentFolderUuid);
         builder.add(title);
     }
@@ -45,13 +46,21 @@ public final class DbFolder extends DbAbstractTable {
         title = reader.readString();
     }
 
+    public static List<DbAbstractTable> retrieveForOrganisationParent(UUID organisationUuid, UUID parentUuid) throws Throwable
+    {
+        return adapter.retrieveEntities("Administration.Folder_SelectForOrganisationParentOrganisation", organisationUuid, parentUuid);
+    }
     public static DbFolder retrieveForOrganisationTitleParent(UUID organisationUuid, String title, UUID parentUuid) throws Throwable
     {
         return (DbFolder)adapter.retrieveSingleEntity("Administration.Folder_SelectForOrganisationTitleParentOrganisation", organisationUuid, title, parentUuid);
     }
+    public static List<DbAbstractTable> retrieveForOrganisation(UUID organisationUuid) throws Throwable
+    {
+        return adapter.retrieveEntities("Administration.Folder_SelectForOrganisation", organisationUuid);
+    }
     public static DbFolder retrieveForUuid(UUID uuid) throws Throwable
     {
-        return (DbFolder)adapter.retrieveSingleEntity("Administration.Folder_SelectForUuid", uuid);
+        return (DbFolder)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
     }
 
     /**

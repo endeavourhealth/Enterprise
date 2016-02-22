@@ -5,7 +5,7 @@ GO
 DROP TABLE [Administration].[EndUserPwd]
 GO
 
-/****** Object:  Table [Administration].[EndUserEmailInvite]    Script Date: 22/02/2016 11:59:12 ******/
+/****** Object:  Table [Administration].[DbEndUserEmailInvite]    Script Date: 22/02/2016 11:59:12 ******/
 DROP TABLE [Administration].[EndUserEmailInvite]
 GO
 
@@ -148,7 +148,7 @@ GO
 SET ANSI_PADDING OFF
 GO
 
-/****** Object:  Table [Administration].[EndUserEmailInvite]    Script Date: 22/02/2016 11:59:12 ******/
+/****** Object:  Table [Administration].[DbEndUserEmailInvite]    Script Date: 22/02/2016 11:59:12 ******/
 SET ANSI_NULLS ON
 GO
 

@@ -32,7 +32,7 @@ public final class DbEndUser extends DbAbstractTable {
     }
     public static DbEndUser retrieveForUuid(UUID uuid) throws Throwable
     {
-        return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForUuid", uuid);
+        return (DbEndUser)adapter.retrieveSingleEntity("Administration._EndUser_SelectForUuid", uuid);
     }
 
     @Override

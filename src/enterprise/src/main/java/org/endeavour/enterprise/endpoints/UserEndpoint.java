@@ -1,23 +1,12 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.data.AdministrationData;
-import org.endeavour.enterprise.framework.exceptions.InvalidParameterException;
-import org.endeavour.enterprise.framework.security.Roles;
-import org.endeavour.enterprise.framework.security.Unsecured;
-import org.endeavour.enterprise.model.UserSummary;
-import org.endeavour.enterprise.model.Role;
-import org.endeavour.enterprise.model.User;
-import org.endeavour.enterprise.model.UserContext;
-
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("/user")
 public class UserEndpoint extends Endpoint
 {
+	//2016-02-22 DL - removed these fns, since replaced with fns in SecurityEndpoint
+	/*
 	//
 	// Example unsecure GET
 	// (uses the @Unsecured attribute)
@@ -56,9 +45,9 @@ public class UserEndpoint extends Endpoint
 	}
 
 	//
-	// Example secure GET with restriction to role of ADMIN
+	// Example secure GET with restriction to endUserRole of ADMIN
 	// (absence of @Unsecured attribute)
-	// (and use of @Roles({Role.ADMIN}))
+	// (and use of @Roles({EndUserRole.ADMIN}))
 	//
 	// And use of context in token
 	// (Endpoint.getUserContext())
@@ -66,7 +55,7 @@ public class UserEndpoint extends Endpoint
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/securedAdmin")
-	@Roles({Role.ADMIN})
+	@Roles({EndUserRole.ADMIN})
 	public Response getSecuredWithAdminRole()
 	{
 		UserContext context = this.getUserContext();
@@ -79,9 +68,9 @@ public class UserEndpoint extends Endpoint
 	}
 
 	//
-	// Example secure GET with restriction to role of SUPER
+	// Example secure GET with restriction to endUserRole of SUPER
 	// (absence of @Unsecured attribute)
-	// (and use of @Roles({Role.SUPER}))
+	// (and use of @Roles({EndUserRole.SUPER}))
 	//
 	// And use of context in token
 	// (Endpoint.getUserContext())
@@ -89,7 +78,7 @@ public class UserEndpoint extends Endpoint
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/securedSuper")
-	@Roles({Role.SUPER})
+	@Roles({EndUserRole.SUPER})
 	public Response getSecuredWithSuperRole()
 	{
 		UserContext context = this.getUserContext();
@@ -134,5 +123,5 @@ public class UserEndpoint extends Endpoint
 				.ok(userSummaryList)
 				.build();
 	}
-
+	*/
 }

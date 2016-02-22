@@ -14,6 +14,7 @@ public class DbEndUserPwd extends DbAbstractTable {
     private UUID endUserUuid = null;
     private String pwdHash = null;
     private Date dtExpired = null;
+    //TODO: 2016-02-22 DL - should have number of lives and expiry date for passwords?
 
     //register as a DB entity
     private static TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
@@ -31,7 +32,7 @@ public class DbEndUserPwd extends DbAbstractTable {
     }
     public static DbEndUserPwd retrieveForUuid(UUID uuid) throws Throwable
     {
-        return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration.EndUserPwd_SelectForUuid", uuid);
+        return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration._EndUserPwd_SelectForUuid", uuid);
     }
 
     @Override

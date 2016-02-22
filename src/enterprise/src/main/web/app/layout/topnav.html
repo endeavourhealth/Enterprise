@@ -13,9 +13,9 @@
 			<span class="caret"></span>
 		</a>
 			<ul uib-dropdown-menu>
-				<li ng-repeat="role in topnav.currentUser.userInRoles">
-					<a href="#" ng-click="topnav.updateRole(role.userInRoleUuid)">
-						{{ role.organisationName }}
+				<li ng-repeat="endUserRole in topnav.currentUser.userInRoles">
+					<a href="#" ng-click="topnav.updateRole(endUserRole.userInRoleUuid)">
+						{{ endUserRole.organisationName }}
 					</a>
 				</li>
 			</ul>

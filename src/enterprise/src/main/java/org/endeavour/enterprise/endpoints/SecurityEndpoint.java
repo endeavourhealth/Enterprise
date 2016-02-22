@@ -1,14 +1,15 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.data.AdministrationData;
 import org.endeavour.enterprise.entity.database.*;
+import org.endeavour.enterprise.entity.json.JsonEmailInviteParameters;
+import org.endeavour.enterprise.entity.json.JsonOrganisation;
 import org.endeavour.enterprise.entity.json.JsonOrganisationList;
 import org.endeavour.enterprise.entity.json.JsonEndUser;
 import org.endeavour.enterprise.framework.security.*;
-import org.endeavour.enterprise.model.User;
-import org.endeavour.enterprise.model.UserInRole;
+import org.endeavour.enterprise.model.EndUserRole;
 
 import javax.ws.rs.*;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.*;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +52,7 @@ public class SecurityEndpoint extends Endpoint
 
         JsonOrganisationList ret = null;
         DbOrganisation orgToAutoSelect = null;
+        EndUserRole endUserRoleToAutoSelect = null;
 
         //now see what organisations the person can access
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
@@ -59,15 +61,20 @@ public class SecurityEndpoint extends Endpoint
             List<DbAbstractTable> orgs = DbOrganisation.retrieveForAll();
             ret = new JsonOrganisationList(orgs.size());
 
+            //super-users are assumed to be admins at every organisation
+            EndUserRole endUserRole = EndUserRole.ADMIN;
+
             for (int i=0; i<orgs.size(); i++)
             {
-                DbOrganisation org = (DbOrganisation)orgs.get(i);
-                ret.add(org);
+                DbOrganisation o = (DbOrganisation)orgs.get(i);
+
+                ret.add(o, endUserRole);
 
                 //if there's only one organisation, automatically select it
                 if (orgs.size() == 1)
                 {
-                    orgToAutoSelect = org;
+                    orgToAutoSelect = o;
+                    endUserRoleToAutoSelect = endUserRole;
                 }
             }
         }
@@ -85,23 +92,19 @@ public class SecurityEndpoint extends Endpoint
             {
                 DbOrganisationEndUserLink orgLink = (DbOrganisationEndUserLink)orgLinks.get(i);
                 UUID orgUuid = orgLink.getOrganisationUuid();
-                DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
-                ret.add(org);
+                DbOrganisation o = DbOrganisation.retrieveForUuid(orgUuid);
+                EndUserRole role = orgLink.getRole();
+                ret.add(o, role);
 
                 //if there's only one organisation, automatically select it
                 if (orgLinks.size() == 1)
                 {
-                    orgToAutoSelect = org;
+                    orgToAutoSelect = o;
                 }
             }
         }
 
-        if (orgToAutoSelect != null)
-        {
-            //orgToAutoSelect
-        }
-
-        NewCookie cookie = TokenHelper.createTokenAsCookie(person);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(person, orgToAutoSelect, endUserRoleToAutoSelect);
 
         return Response
                 .ok()
@@ -111,6 +114,158 @@ public class SecurityEndpoint extends Endpoint
     }
 
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/selectOrganisation")
+    public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Throwable
+    {
+        DbEndUser endUser = getEndUserFromSession(sc);
+        UUID endUserUuid = endUser.getPrimaryUuid();
+
+        //the only parameter is the org UUID
+        UUID orgUuid = orgParameters.getOrganisationUuid();
+
+        //validate the organisation exists
+        DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
+        if (org == null)
+        {
+            throw new org.endeavour.enterprise.framework.exceptions.BadRequestException("Invalid organisation " + orgUuid);
+        }
+
+        //validate the person can log on there
+        DbOrganisationEndUserLink link = null;
+        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
+        for (int i=0; i<links.size(); i++)
+        {
+            DbOrganisationEndUserLink l = (DbOrganisationEndUserLink)links.get(i);
+            if (l.getOrganisationUuid().equals(orgUuid))
+            {
+                link = l;
+                break;
+            }
+        }
+
+        if (link == null)
+        {
+            throw new org.endeavour.enterprise.framework.exceptions.BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
+        }
+
+        EndUserRole role = link.getRole();
+
+        //issue a new cookie, with the newly selected organisation
+        NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, role);
+
+        return Response
+                .ok()
+                //.entity(ret)
+                .cookie(cookie)
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/logoff")
+    @Unsecured
+    public Response logoff(@Context SecurityContext sc) throws Throwable
+    {
+        //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
+
+        return Response
+                .ok()
+                .build();
+    }
+
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/changePassword")
+    public Response changePassword(JsonEndUser parameters) throws Throwable
+    {
+        //validate token
+        DbEndUser person = new DbEndUser();
+
+        String newPwd = parameters.getPassword();
+        String hash = PasswordHash.createHash(newPwd);
+
+        //retrieve the most recent password for the person
+        UUID uuid = person.getPrimaryUuid();
+        DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
+
+        //create the new password entity
+        DbEndUserPwd p = new DbEndUserPwd();
+        p.setEndUserUuid(uuid);
+        p.setPwdHash(hash);
+        p.setDtExpired(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
+
+        //save
+        p.saveToDb();
+
+        //once we've successfully save the new password entity, make the old one as expired
+        if (oldPwd != null)
+        {
+            p.setDtExpired(new Date());
+            p.saveToDb();
+        }
+
+        return Response
+                .ok()
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/setPasswordFromInviteEmail")
+    @Unsecured
+    public Response setPasswordFromInviteEmail(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Throwable
+    {
+        String token = parameters.getToken();
+        String password = parameters.getPassword();
+
+        //find the invite for the token
+        DbEndUserEmailInvite invite = DbEndUserEmailInvite.retrieveForToken(token);
+        if (invite == null)
+        {
+            throw new javax.ws.rs.BadRequestException("No invite found for token");
+        }
+
+        UUID userUuid = invite.getEndUserUuid();
+        String hash = PasswordHash.createHash(password);
+
+        //now we've found the invite, we can set up the new password for the user
+        DbEndUserPwd p = new DbEndUserPwd();
+        p.setEndUserUuid(userUuid);
+        p.setPwdHash(hash);
+        p.setDtExpired(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
+
+        //save
+        p.saveToDb();
+
+        //now we've correctly set up the new password for the user, we can delete the invite
+        invite.setDtCompleted(new Date());
+        invite.saveToDb();
+
+        //retrieve the link entity for the org and person
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        DbOrganisationEndUserLink link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, userUuid);
+        EndUserRole role = link.getRole();
+
+        //create cookie
+        DbEndUser user = DbEndUser.retrieveForUuid(userUuid);
+        DbOrganisation org = getOrganisationFromSession(sc);
+
+        NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, role);
+
+        return Response
+                .ok()
+                .cookie(cookie)
+                .build();
+    }
+
+
+/*    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/switchUserInRole")
@@ -140,43 +295,5 @@ public class SecurityEndpoint extends Endpoint
                 .entity(user)
                 .cookie(cookie)
                 .build();
-    }
-
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/changePassword")
-    public Response changePassword(JsonEndUser parameters) throws Throwable
-    {
-        //validate token
-        DbEndUser person = new DbEndUser();
-
-        String newPwd = parameters.getPassword();
-        String hash = PasswordHash.createHash(newPwd);
-
-        //retrieve the most recent password for the person
-        UUID uuid = person.getPrimaryUuid();
-        DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
-
-        //create the new password entity
-        DbEndUserPwd p = new DbEndUserPwd();
-        p.setEndUserUuid(uuid);
-        p.setPwdHash(hash);
-        p.setDtExpired(new Date(Long.MAX_VALUE)); //should really encapsulate this...
-
-        //save
-        p.saveToDb();
-
-        //once we've successfully save the new password entity, make the old one as expired
-        if (oldPwd != null)
-        {
-            p.setDtExpired(new Date());
-            p.saveToDb();
-        }
-
-        return Response
-                .ok()
-                .build();
-    }
+    }*/
 }

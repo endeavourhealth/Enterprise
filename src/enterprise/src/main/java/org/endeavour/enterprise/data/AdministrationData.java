@@ -58,7 +58,7 @@ public class AdministrationData
         userInRole.setUserInRoleUuid(UUID.fromString("50ded6cd-17a1-4a05-9079-c176468ff90b"));
         userInRole.setOrganisationUuid(UUID.fromString("e9f71c8a-be36-42ff-8cd7-f2ab9f188a4f"));
         userInRole.setOrganisationName("Alpha Surgery");
-        userInRole.setRole(Role.ADMIN);
+        userInRole.setEndUserRole(EndUserRole.ADMIN);
 
         user.addUserInRole(userInRole);
 
@@ -66,7 +66,7 @@ public class AdministrationData
         userInRole2.setUserInRoleUuid(UUID.fromString("19d402a6-30f1-4175-acac-340d73a2ffb2"));
         userInRole2.setOrganisationUuid(UUID.fromString("31287afa-a5b9-4a0e-ac70-0646d0508adb"));
         userInRole2.setOrganisationName("Bravo Hospital");
-        userInRole2.setRole(Role.USER);
+        userInRole2.setEndUserRole(EndUserRole.USER);
 
         user.addUserInRole(userInRole2);
 
@@ -86,7 +86,7 @@ public class AdministrationData
         userInRole3.setUserInRoleUuid(UUID.fromString("D2364591-B473-4CE7-89CB-5DB7BEA30536"));
         userInRole3.setOrganisationUuid(UUID.fromString("e9f71c8a-be36-42ff-8cd7-f2ab9f188a4f"));
         userInRole3.setOrganisationName("Alpha Surgery");
-        userInRole3.setRole(Role.ADMIN);
+        userInRole3.setEndUserRole(EndUserRole.ADMIN);
 
         user2.addUserInRole(userInRole3);
 
@@ -94,7 +94,7 @@ public class AdministrationData
         userInRole4.setUserInRoleUuid(UUID.fromString("4E415BDE-FE23-4348-8435-E564F37C2A65"));
         userInRole4.setOrganisationUuid(UUID.fromString("31287afa-a5b9-4a0e-ac70-0646d0508adb"));
         userInRole4.setOrganisationName("Bravo Hospital");
-        userInRole4.setRole(Role.USER);
+        userInRole4.setEndUserRole(EndUserRole.USER);
 
         user2.addUserInRole(userInRole4);
 

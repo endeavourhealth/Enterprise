@@ -43,14 +43,16 @@ public class UserSummary implements Serializable {
 	public boolean getIsSuper() { return isSuper; }
 	public void setIsSuper(boolean aSuper) { isSuper = aSuper; }
 
+/*
 	public static UserSummary createFromUser(User user) {
 		UserSummary userSummary = new UserSummary();
 		userSummary.userUuid = user.getUserUuid();
 		userSummary.name = user.getTitle() + ' ' + user.getForename() + ' ' + user.getSurname();
 		userSummary.email = user.getEmail();
 		userSummary.isActive = true;
-		userSummary.isAdmin = (user.getUserInRoles().stream().filter(uir -> uir.getRole().equals(Role.ADMIN)).findFirst().orElse(null) != null);
-		userSummary.isSuper = (user.getUserInRoles().stream().filter(uir -> uir.getRole().equals(Role.SUPER)).findFirst().orElse(null) != null);
+		userSummary.isAdmin = (user.getUserInRoles().stream().filter(uir -> uir.getEndUserRole().equals(EndUserRole.ADMIN)).findFirst().orElse(null) != null);
+		userSummary.isSuper = (user.getUserInRoles().stream().filter(uir -> uir.getEndUserRole().equals(EndUserRole.SUPER)).findFirst().orElse(null) != null);
 		return userSummary;
 	}
+*/
 }

@@ -1,5 +1,8 @@
 package org.endeavour.enterprise.entity.json;
 
+import org.endeavour.enterprise.entity.database.DbEndUser;
+import org.endeavour.enterprise.model.EndUserRole;
+
 import java.io.Serializable;
 
 /**
@@ -12,9 +15,23 @@ public final class JsonEndUser implements Serializable {
     private String forename = null;
     private String surname = null;
     private boolean isSuperUser = false;
+    private Integer permissions = -1;
 
     public JsonEndUser()
     {}
+    public JsonEndUser(DbEndUser endUser, EndUserRole role)
+    {
+        this.username = endUser.getEmail();
+        this.title = endUser.getTitle();
+        this.forename = endUser.getForename();
+        this.surname = endUser.getSurname();
+        this.isSuperUser = endUser.getIsSuperUser();
+
+        if (role != null)
+        {
+            this.permissions = role.getValue();
+        }
+    }
 
     /**
      * gets/sets
@@ -59,11 +76,19 @@ public final class JsonEndUser implements Serializable {
         this.surname = surname;
     }
 
-    public boolean isSuperUser() {
+    public boolean getIsSuperUser() {
         return isSuperUser;
     }
 
-    public void setSuperUser(boolean superUser) {
+    public void setIsSuperUser(boolean superUser) {
         isSuperUser = superUser;
+    }
+
+    public Integer getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Integer permissions) {
+        this.permissions = permissions;
     }
 }

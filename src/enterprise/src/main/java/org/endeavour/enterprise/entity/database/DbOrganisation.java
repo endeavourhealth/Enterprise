@@ -49,7 +49,7 @@ public final class DbOrganisation extends DbAbstractTable {
     }
     public static DbOrganisation retrieveForUuid(UUID uuid) throws Throwable
     {
-        return (DbOrganisation)adapter.retrieveSingleEntity("Administration.Organisation_SelectForUuid", uuid);
+        return (DbOrganisation)adapter.retrieveSingleEntity("Administration._Organisation_SelectForUuid", uuid);
     }
 
     /**

@@ -10,14 +10,14 @@ public class UserContext
 {
     private UUID userUuid;
     private UUID organisationUuid;
-    private Role role;
+    private EndUserRole endUserRole;
     private Date tokenIssued;
 
-    public UserContext(UUID userUuid, UUID organisationUuid, Role role, Date tokenIssued)
+    public UserContext(UUID userUuid, UUID organisationUuid, EndUserRole endUserRole, Date tokenIssued)
     {
         this.userUuid = userUuid;
         this.organisationUuid = organisationUuid;
-        this.role = role;
+        this.endUserRole = endUserRole;
         this.tokenIssued = tokenIssued;
     }
 
@@ -31,9 +31,9 @@ public class UserContext
         return organisationUuid;
     }
 
-    public Role getRole()
+    public EndUserRole getEndUserRole()
     {
-        return role;
+        return endUserRole;
     }
 
     public Date getTokenIssued()

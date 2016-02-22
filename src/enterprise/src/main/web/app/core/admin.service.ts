@@ -6,6 +6,7 @@
 
 module app.core {
 	import IPromise = angular.IPromise;
+	import LoginResponse = app.models.LoginResponse;
 	'use strict';
 
 	export interface IAdminService {
@@ -55,8 +56,9 @@ module app.core {
 			};
 			vm.http.post('/api/security/login', request)
 				.then(function (response) {
-					vm.currentUser = <app.models.User>response.data;
-					defer.resolve(response.data);
+					var loginResponse = <app.models.LoginResponse>response.data;
+					vm.currentUser = loginResponse.user;
+					defer.resolve(vm.currentUser);
 				})
 				.catch(function (exception) {
 					defer.reject(exception);

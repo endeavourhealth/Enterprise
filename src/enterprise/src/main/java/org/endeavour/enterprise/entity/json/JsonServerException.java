@@ -1,10 +1,13 @@
 package org.endeavour.enterprise.entity.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Created by Drew on 17/02/2016.
  * JSON object to allow sending back an exception message to clients after
  * a request has gone wrong on the server
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonServerException
 {
     private String message = null;

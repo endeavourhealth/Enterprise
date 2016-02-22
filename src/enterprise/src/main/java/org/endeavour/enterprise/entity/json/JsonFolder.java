@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.entity.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavour.enterprise.entity.database.DbFolder;
 
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.util.UUID;
  * Created by Drew on 17/02/2016.
  * JSON object used to manipulaate folders, such as creating, moving and renaming
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolder implements Serializable {
 
     private UUID folderUuid = null;

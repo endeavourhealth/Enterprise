@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.entity.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.model.EndUserRole;
 

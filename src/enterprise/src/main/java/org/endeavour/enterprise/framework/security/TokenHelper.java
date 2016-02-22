@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.framework.configuration.Configuration;
 import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.UserContext;
@@ -37,6 +38,25 @@ public class TokenHelper
         bodyParameterMap.put(TOKEN_USER, user.getUserUuid());
         bodyParameterMap.put(TOKEN_ORGANISATION, userInRole.getOrganisationUuid());
         bodyParameterMap.put(TOKEN_ROLE, userInRole.getRole().name());
+        bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
+
+        JwtBuilder builder = Jwts.builder()
+                .setHeaderParam(TOKEN_TYPE, TOKEN_TYPE_JWT)
+                .setClaims(bodyParameterMap)
+                .signWith(SignatureAlgorithm.HS256, Configuration.TOKEN_SIGNING_SECRET);
+
+        return builder.compact();
+    }
+
+    public static NewCookie createTokenAsCookie(DbEndUser person)
+    {
+        String token = createToken(person);
+        return createCookie(token);
+    }
+    private static String createToken(DbEndUser person)
+    {
+        Map<String, Object> bodyParameterMap = new HashMap<>();
+        bodyParameterMap.put(TOKEN_USER, person.getPrimaryUuid());
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
 
         JwtBuilder builder = Jwts.builder()

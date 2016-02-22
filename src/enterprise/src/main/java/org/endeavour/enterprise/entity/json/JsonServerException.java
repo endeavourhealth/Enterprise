@@ -1,0 +1,27 @@
+package org.endeavour.enterprise.entity.json;
+
+/**
+ * Created by Drew on 17/02/2016.
+ * JSON object to allow sending back an exception message to clients after
+ * a request has gone wrong on the server
+ */
+public final class JsonServerException
+{
+    private String message = null;
+
+    public JsonServerException(String message)
+    {
+        this.message = message;
+    }
+
+    /**
+     * gets/sets
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

@@ -28,14 +28,14 @@ public class SecurityEndpoint extends Endpoint
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
 
-        DbEndUser person = DbEndUser.retrieveForEmail(email);
-        if (person == null)
+        DbEndUser user = DbEndUser.retrieveForEmail(email);
+        if (user == null)
         {
             throw new NotAuthorizedException("No user found for email");
         }
 
         //retrieve the most recent password for the person
-        UUID uuid = person.getPrimaryUuid();
+        UUID uuid = user.getPrimaryUuid();
 
         DbEndUserPwd pwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
         if (pwd == null)
@@ -56,7 +56,7 @@ public class SecurityEndpoint extends Endpoint
 
         //now see what organisations the person can access
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
-        if (person.getIsSuperUser())
+        if (user.getIsSuperUser())
         {
             List<DbAbstractTable> orgs = DbOrganisation.retrieveForAll();
             ret = new JsonOrganisationList(orgs.size());
@@ -104,7 +104,10 @@ public class SecurityEndpoint extends Endpoint
             }
         }
 
-        NewCookie cookie = TokenHelper.createTokenAsCookie(person, orgToAutoSelect, endUserRoleToAutoSelect);
+        //set the user details in the return object as well
+        ret.setUser(new JsonEndUser(user, null));
+
+        NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, endUserRoleToAutoSelect);
 
         return Response
                 .ok()
@@ -213,6 +216,23 @@ public class SecurityEndpoint extends Endpoint
                 .ok()
                 .build();
     }
+
+    /**
+     @Path("customer")
+     public class CustomerResource {
+     @GET
+     @Path("id/{id}")
+     @Produces(MediaType.APPLICATION_JSON)
+     public Customer getCustomer(@PathParam("id") String id) {
+     Customer customer = new Customer();
+     customer.setId(id);
+     customer.setCity("Austin");
+     customer.setState("TX");
+     customer.setName("Mighty Pulpo");
+     return customer;
+     }
+     }
+     */
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

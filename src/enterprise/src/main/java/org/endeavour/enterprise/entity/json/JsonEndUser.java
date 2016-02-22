@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.entity.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.model.EndUserRole;
 
@@ -8,6 +9,7 @@ import java.io.Serializable;
 /**
  * Created by Drew on 18/02/2016.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonEndUser implements Serializable {
     private String username = null;
     private String password = null;
@@ -15,7 +17,7 @@ public final class JsonEndUser implements Serializable {
     private String forename = null;
     private String surname = null;
     private boolean isSuperUser = false;
-    private Integer permissions = -1;
+    private Integer permissions = null;
 
     public JsonEndUser()
     {}

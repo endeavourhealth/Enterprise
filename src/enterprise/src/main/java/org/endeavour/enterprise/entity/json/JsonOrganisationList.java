@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.entity.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavour.enterprise.entity.database.DbOrganisation;
 import org.endeavour.enterprise.model.EndUserRole;
 
@@ -8,8 +9,10 @@ import java.io.Serializable;
 /**
  * Created by Drew on 18/02/2016.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonOrganisationList implements Serializable
 {
+    private JsonEndUser user = null;
     private JsonOrganisation[] organisations = null;
 
     public JsonOrganisationList(int size)
@@ -41,6 +44,14 @@ public final class JsonOrganisationList implements Serializable
     /**
      * gets/sets
      */
+    public JsonEndUser getUser() {
+        return user;
+    }
+
+    public void setUser(JsonEndUser user) {
+        this.user = user;
+    }
+
     public JsonOrganisation[] getOrganisations() {
         return organisations;
     }

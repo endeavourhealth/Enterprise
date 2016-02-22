@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.entity.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavour.enterprise.entity.database.DbOrganisation;
 import org.endeavour.enterprise.model.EndUserRole;
 
@@ -9,6 +10,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 18/02/2016.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonOrganisation implements Serializable
 {
 

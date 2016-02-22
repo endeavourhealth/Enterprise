@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 17/02/2016.
  */
-public final class DbPerson extends DbAbstractTable {
+public final class DbEndUser extends DbAbstractTable {
 
     private String title = null;
     private String forename = null;
@@ -17,23 +17,22 @@ public final class DbPerson extends DbAbstractTable {
     private boolean isSuperUser = false;
 
     //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbPerson.class,
-                                        "Person", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
-                                        new String[] {"PersonUuid", "Title", "Forename", "Surname", "Email", "IsSuperUser"});
+    private static TableAdapter adapter = new TableAdapter(DbEndUser.class,
+                                        "EndUser", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
-    public DbPerson()
+    public DbEndUser()
     {
 
     }
 
-    public static DbPerson retrieveForEmail(String email) throws Throwable
+    public static DbEndUser retrieveForEmail(String email) throws Throwable
     {
-        return (DbPerson)adapter.retrieveSingleEntity("Administration.Person_SelectForEmail", email);
+        return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForEmail", email);
     }
-    public static DbPerson retrieveForUuid(UUID uuid) throws Throwable
+    public static DbEndUser retrieveForUuid(UUID uuid) throws Throwable
     {
-        return (DbPerson)adapter.retrieveSingleEntity("Administration.Person_SelectForUuid", uuid);
+        return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForUuid", uuid);
     }
 
     @Override

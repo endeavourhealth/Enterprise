@@ -16,8 +16,7 @@ public final class DbFolder extends DbAbstractTable {
 
     //register as a DB entity
     private static TableAdapter adapter = new TableAdapter(DbFolder.class,
-                                        "Folder", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
-                                        new String[]{"FolderUuid", "OrganisationUuid", "ParentFolderUuid", "Title"});
+                                        "Folder", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
     public DbFolder()
     {}

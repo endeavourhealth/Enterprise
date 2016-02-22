@@ -24,19 +24,20 @@ public class TableAdapter
     private String tableName = null;
     private String schema = null;
     private String database = null;
-    private String[] columns = null;
+    //private String[] columns = null; //2016-02-22 DL - removed
 
     //lazily derived
 /*    private List<Method> cachedGetMethods = null;
     private List<Method> cachedSetMethods = null;*/
 
-    public TableAdapter(Class cls, String tableName, String schema, String database, String[] columns)
+    //public TableAdapter(Class cls, String tableName, String schema, String database, String[] columns)
+    public TableAdapter(Class cls, String tableName, String schema, String database)
     {
         this.cls = cls;
         this.tableName = tableName;
         this.schema = schema;
         this.database = database;
-        this.columns = columns;
+        //this.columns = columns; //2016-02-22 DL - removed
     }
 
     /**
@@ -58,9 +59,9 @@ public class TableAdapter
         return database;
     }
 
-    public String[] getColumns() {
+    /*public String[] getColumns() {
         return columns;
-    }
+    }*/
 
     /**
      * creates a new instance of our database class

@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavour.enterprise.entity.database.DbPerson;
+import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.framework.configuration.Configuration;
 import org.endeavour.enterprise.model.Role;
 import org.endeavour.enterprise.model.UserContext;
@@ -48,12 +48,12 @@ public class TokenHelper
         return builder.compact();
     }
 
-    public static NewCookie createTokenAsCookie(DbPerson person)
+    public static NewCookie createTokenAsCookie(DbEndUser person)
     {
         String token = createToken(person);
         return createCookie(token);
     }
-    private static String createToken(DbPerson person)
+    private static String createToken(DbEndUser person)
     {
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_USER, person.getPrimaryUuid());

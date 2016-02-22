@@ -1,6 +1,5 @@
 package org.endeavour.enterprise.entity.database;
 
-import net.sourceforge.jtds.jdbc.DateTime;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
@@ -10,30 +9,29 @@ import java.util.UUID;
 /**
  * Created by Drew on 18/02/2016.
  */
-public class DbPersonPwd extends DbAbstractTable {
+public class DbEndUserPwd extends DbAbstractTable {
 
-    private UUID personUuid = null;
+    private UUID endUserUuid = null;
     private String pwdHash = null;
     private Date dtExpired = null;
 
     //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbPersonPwd.class,
-            "PersonPwd", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
-            new String[] {"PersonPwdUuid", "PersonUuid", "PwdHash", "DtExpired"});
+    private static TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
+            "EndUserPwd", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
-    public DbPersonPwd()
+    public DbEndUserPwd()
     {
 
     }
 
-    public static DbPersonPwd retrieveForPersonNotExpired(UUID personUuid) throws Throwable
+    public static DbEndUserPwd retrieveForEndUserNotExpired(UUID endUserUuid) throws Throwable
     {
-        return (DbPersonPwd)adapter.retrieveSingleEntity("Administration.PersonPwd_SelectForPersonNotExpired", personUuid);
+        return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration.EndUserPwd_SelectForEndUserNotExpired", endUserUuid);
     }
-    public static DbPersonPwd retrieveForUuid(UUID uuid) throws Throwable
+    public static DbEndUserPwd retrieveForUuid(UUID uuid) throws Throwable
     {
-        return (DbPersonPwd)adapter.retrieveSingleEntity("Administration.PersonPwd_SelectForUuid", uuid);
+        return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration.EndUserPwd_SelectForUuid", uuid);
     }
 
     @Override
@@ -45,7 +43,7 @@ public class DbPersonPwd extends DbAbstractTable {
     public void writeForDb(InsertBuilder builder)
     {
         builder.add(getPrimaryUuid());
-        builder.add(personUuid);
+        builder.add(endUserUuid);
         builder.add(pwdHash);
         builder.add(dtExpired);
     }
@@ -54,7 +52,7 @@ public class DbPersonPwd extends DbAbstractTable {
     public void readFromDb(ResultReader reader) throws SQLException
     {
         setPrimaryUuid(reader.readUuid());
-        personUuid = reader.readUuid();
+        endUserUuid = reader.readUuid();
         pwdHash = reader.readString();
         dtExpired = reader.readDateTime();
     }
@@ -63,12 +61,12 @@ public class DbPersonPwd extends DbAbstractTable {
     /**
      * gets/sets
      */
-    public UUID getPersonUuid() {
-        return personUuid;
+    public UUID getEndUserUuid() {
+        return endUserUuid;
     }
 
-    public void setPersonUuid(UUID personUuid) {
-        this.personUuid = personUuid;
+    public void setEndUserUuid(UUID endUserUuid) {
+        this.endUserUuid = endUserUuid;
     }
 
     public String getPwdHash() {

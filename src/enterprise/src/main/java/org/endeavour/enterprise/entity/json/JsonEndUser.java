@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by Drew on 18/02/2016.
  */
-public final class JsonPerson implements Serializable {
+public final class JsonEndUser implements Serializable {
     private String username = null;
     private String password = null;
     private String title = null;
@@ -13,7 +13,7 @@ public final class JsonPerson implements Serializable {
     private String surname = null;
     private boolean isSuperUser = false;
 
-    public JsonPerson()
+    public JsonEndUser()
     {}
 
     /**

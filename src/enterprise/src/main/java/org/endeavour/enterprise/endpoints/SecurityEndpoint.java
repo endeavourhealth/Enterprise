@@ -2,11 +2,9 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.data.AdministrationData;
 import org.endeavour.enterprise.entity.database.*;
-import org.endeavour.enterprise.entity.json.JsonOrganisation;
 import org.endeavour.enterprise.entity.json.JsonOrganisationList;
-import org.endeavour.enterprise.entity.json.JsonPerson;
+import org.endeavour.enterprise.entity.json.JsonEndUser;
 import org.endeavour.enterprise.framework.security.*;
-import org.endeavour.enterprise.model.Credentials;
 import org.endeavour.enterprise.model.User;
 import org.endeavour.enterprise.model.UserInRole;
 
@@ -24,12 +22,12 @@ public class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
     @Unsecured
-    public Response login(@Context SecurityContext sc, JsonPerson personParameters) throws Throwable
+    public Response login(@Context SecurityContext sc, JsonEndUser personParameters) throws Throwable
     {
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
 
-        DbPerson person = DbPerson.retrieveForEmail(email);
+        DbEndUser person = DbEndUser.retrieveForEmail(email);
         if (person == null)
         {
             throw new NotAuthorizedException("No user found for email");
@@ -38,7 +36,7 @@ public class SecurityEndpoint extends Endpoint
         //retrieve the most recent password for the person
         UUID uuid = person.getPrimaryUuid();
 
-        DbPersonPwd pwd = DbPersonPwd.retrieveForPersonNotExpired(uuid);
+        DbEndUserPwd pwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
         if (pwd == null)
         {
             throw new NotAuthorizedException("No active password for email");
@@ -50,7 +48,6 @@ public class SecurityEndpoint extends Endpoint
         {
             throw new NotAuthorizedException("Invalid password");
         }
-
 
         JsonOrganisationList ret = null;
         DbOrganisation orgToAutoSelect = null;
@@ -76,7 +73,7 @@ public class SecurityEndpoint extends Endpoint
         }
         //if the person ISN'T a superUser, then we look at the person/org link, so see where they can log on to
         else {
-            List<DbAbstractTable> orgLinks = DbOrganisationPersonLink.retrieveForPersonNotExpired(uuid);
+            List<DbAbstractTable> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(uuid);
             if (orgLinks.isEmpty())
             {
                 throw new NotAuthorizedException("No organisations to log on to");
@@ -86,7 +83,7 @@ public class SecurityEndpoint extends Endpoint
 
             for (int i=0; i<orgLinks.size(); i++)
             {
-                DbOrganisationPersonLink orgLink = (DbOrganisationPersonLink)orgLinks.get(i);
+                DbOrganisationEndUserLink orgLink = (DbOrganisationEndUserLink)orgLinks.get(i);
                 UUID orgUuid = orgLink.getOrganisationUuid();
                 DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
                 ret.add(org);
@@ -150,21 +147,21 @@ public class SecurityEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/changePassword")
-    public Response changePassword(JsonPerson parameters) throws Throwable
+    public Response changePassword(JsonEndUser parameters) throws Throwable
     {
         //validate token
-        DbPerson person = new DbPerson();
+        DbEndUser person = new DbEndUser();
 
         String newPwd = parameters.getPassword();
         String hash = PasswordHash.createHash(newPwd);
 
         //retrieve the most recent password for the person
         UUID uuid = person.getPrimaryUuid();
-        DbPersonPwd oldPwd = DbPersonPwd.retrieveForPersonNotExpired(uuid);
+        DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
 
         //create the new password entity
-        DbPersonPwd p = new DbPersonPwd();
-        p.setPersonUuid(uuid);
+        DbEndUserPwd p = new DbEndUserPwd();
+        p.setEndUserUuid(uuid);
         p.setPwdHash(hash);
         p.setDtExpired(new Date(Long.MAX_VALUE)); //should really encapsulate this...
 

@@ -16,9 +16,7 @@ public final class DbOrganisation extends DbAbstractTable {
 
     //register as a DB entity
     private static TableAdapter adapter = new TableAdapter(DbOrganisation.class,
-                                                "Organisation", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
-                                                new String[] { "OrganisationUuid", "Name", "NationalId"});
-
+                                                "Organisation", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
     public DbOrganisation()

@@ -33,8 +33,11 @@ public abstract class Endpoint
     }
     protected UUID getEndUserUuidFromToken(SecurityContext sc)
     {
-        UserSecurityContext usc = (UserSecurityContext)sc;
-        UserPrincipal up = (UserPrincipal)usc.getUserPrincipal();
+        //2016-02-23 DL - bug waiting to happen
+        UserPrincipal up = (UserPrincipal)sc.getUserPrincipal();
+        /*UserSecurityContext usc = (UserSecurityContext)sc;
+        UserPrincipal up = (UserPrincipal)usc.getUserPrincipal();*/
+
         UserContext uc = up.getUserContext();
         return uc.getUserUuid();
     }

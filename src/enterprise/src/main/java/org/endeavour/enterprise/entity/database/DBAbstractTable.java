@@ -71,6 +71,21 @@ public abstract class DbAbstractTable
         getAdapter().deleteFromDb(this);
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o instanceof DbAbstractTable)
+        {
+            DbAbstractTable other = (DbAbstractTable)o;
+            if (getPrimaryUuid() != null
+                    && other.getPrimaryUuid() != null
+                    && getPrimaryUuid().equals(other.getPrimaryUuid()))
+            {
+                return true;
+            }
+        }
+        return super.equals(o);
+    }
 
 
 }

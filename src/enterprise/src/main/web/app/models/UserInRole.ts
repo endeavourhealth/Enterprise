@@ -5,7 +5,7 @@ module app.models {
 
 	export class UserInRole {
 		userInRoleUuid:string;
-		organisationUuid:string;
+		uuid:string;
 		organisationName:string;
 		endUserRole:Role;
 	}

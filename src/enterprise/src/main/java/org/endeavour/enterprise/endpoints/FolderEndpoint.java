@@ -1,18 +1,10 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.data.AdministrationData;
 import org.endeavour.enterprise.entity.database.DbAbstractTable;
 import org.endeavour.enterprise.entity.database.DbFolder;
 import org.endeavour.enterprise.entity.database.DbFolderItemLink;
 import org.endeavour.enterprise.entity.json.JsonFolder;
 import org.endeavour.enterprise.entity.json.JsonFolderList;
-import org.endeavour.enterprise.framework.exceptions.*;
-import org.endeavour.enterprise.framework.security.PasswordHash;
-import org.endeavour.enterprise.framework.security.TokenHelper;
-import org.endeavour.enterprise.framework.security.Unsecured;
-import org.endeavour.enterprise.model.Credentials;
-import org.endeavour.enterprise.model.User;
-import org.endeavour.enterprise.model.UserContext;
 
 import javax.ws.rs.*;
 import javax.ws.rs.BadRequestException;
@@ -27,8 +19,137 @@ import java.util.UUID;
 @Path("/folder")
 public class FolderEndpoint extends Endpoint {
 
-
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/saveFolder")
+    public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable
+    {
+        //get the parameters out
+        UUID folderUuid = folderParameters.getUuid();
+        String folderName = folderParameters.getFolderName();
+        Integer folderType = folderParameters.getFolderType();
+        UUID parentUuid = folderParameters.getParentFolderUuid();
+
+        //validate the minimum requirements
+        if (folderName == null || folderName.length() == 0)
+        {
+            throw new BadRequestException("Missing or empty folder name");
+        }
+        if (folderType == null)
+        {
+            throw new BadRequestException("Missing folder type");
+        }
+
+        //get the organisation from the server token
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        DbFolder f = null;
+
+        //if we have no UUID then we're creating a new folder
+        if (folderUuid == null)
+        {
+            //validate name isn't a duplicate
+            DbFolder existingFolder = DbFolder.retrieveForOrganisationTitleParentType(orgUuid, folderName, parentUuid, folderType);
+            if (existingFolder != null)
+            {
+                throw new BadRequestException("Folder already exists");
+            }
+
+            //validate parent is at same org
+            if (parentUuid != null)
+            {
+                DbFolder parent = DbFolder.retrieveForUuid(parentUuid);
+                if (parent != null
+                    || !parent.getOrganisationUuid().equals(orgUuid))
+                {
+                    throw new BadRequestException("Invalid or missing parent folder");
+                }
+            }
+
+            //create the new folder
+            f = new DbFolder();
+            f.setTitle(folderName);
+            f.setFolderType(folderType);
+            f.setParentFolderUuid(parentUuid);
+            f.setOrganisationUuid(orgUuid);
+
+        }
+        //if we have a UUID then we're updating an existing folder
+        else
+        {
+            f = getFolderForUuidAndValidateOrganisation(sc, folderUuid);
+
+            String existingName = f.getTitle();
+            int existingType = f.getFolderType();
+            UUID existingParentUuid = f.getParentFolderUuid();
+
+            //we don't permit changing of a folder type
+            if (existingType != folderType.intValue())
+            {
+                throw new BadRequestException("Folder already exists");
+            }
+
+            //validate if there's a duplicate folder with our new name/parent
+            DbFolder existingFolder = DbFolder.retrieveForOrganisationTitleParentType(orgUuid, folderName, parentUuid, folderType);
+            if (existingFolder != null
+                    && !existingFolder.equals(f))
+            {
+                throw new BadRequestException("Folder already exists");
+            }
+
+            //if we're changing the parent UUID to a non-null value, we need to validate that we're not
+            //moving the folder to be a child of itself
+            if (existingParentUuid != parentUuid
+                    && parentUuid != null)
+            {
+                UUID nextParent = parentUuid;
+                while (nextParent != null)
+                {
+                    DbFolder parentFolder = DbFolder.retrieveForUuid(nextParent);
+                    if (parentFolder.equals(f))
+                    {
+                        throw new BadRequestException("Cannot make a folder a child of itself");
+                    }
+
+                    nextParent = parentFolder.getParentFolderUuid();
+                }
+            }
+
+            //set the new parameters in the folder
+            f.setTitle(folderName);
+            f.setParentFolderUuid(parentUuid);
+        }
+
+        //now validate that the parent folder actually exists
+        if (parentUuid != null)
+        {
+            DbFolder parent = DbFolder.retrieveForUuid(parentUuid);
+            if (parent == null)
+            {
+                throw new BadRequestException("Parent folder doesn't exist");
+            }
+
+            UUID existingOrganisationUuid = parent.getOrganisationUuid();
+            if (!existingOrganisationUuid.equals(orgUuid)) {
+                throw new BadRequestException("Parent folder is for different organisation");
+            }
+        }
+
+        //save
+        f.saveToDb();
+
+        //return the UUID of the folder we just saved or updated
+        JsonFolder ret = new JsonFolder();
+        ret.setUuid(f.getPrimaryUuid());
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+
+    /* @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/createFolder")
@@ -85,7 +206,7 @@ public class FolderEndpoint extends Endpoint {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         //get the parameters out
-        UUID folderUuid = folderParameters.getFolderUuid();
+        UUID folderUuid = folderParameters.getUuid();
         String newFolderName = folderParameters.getFolderName();
 
         System.out.println("Renaming folder " + folderUuid + " to [" + newFolderName + "]");
@@ -119,7 +240,7 @@ public class FolderEndpoint extends Endpoint {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         //get the parameters out
-        UUID folderUuid = folderParameters.getFolderUuid();
+        UUID folderUuid = folderParameters.getUuid();
         UUID newParentFolderUuid = folderParameters.getParentFolderUuid();
 
         //System.out.println("Moving folder " + folderUuid + " to [" + newParentFolderUuid + "]");
@@ -144,17 +265,17 @@ public class FolderEndpoint extends Endpoint {
 
         return Response.ok().build();
     }
-
+*/
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteFolder")
     public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable {
         //get the organisation from the server token
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        //UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         //get the parameters out
-        UUID folderUuid = folderParameters.getFolderUuid();
+        UUID folderUuid = folderParameters.getUuid();
 
         DbFolder folder = getFolderForUuidAndValidateOrganisation(sc, folderUuid);
         if (folder == null)
@@ -163,20 +284,21 @@ public class FolderEndpoint extends Endpoint {
         }
 
         //delete the lot
-        deleteFolder(folder);
+        deleteFolderAndContents(folder);
 
         return Response.ok().build();
     }
-    private static void deleteFolder(DbFolder folder) throws Throwable
+    private static void deleteFolderAndContents(DbFolder folder) throws Throwable
     {
         //see if we have any child folders, which we should delete first
         UUID orgUuid = folder.getOrganisationUuid();
         UUID parentUuid = folder.getPrimaryUuid();
-        List<DbAbstractTable> childFolders = DbFolder.retrieveForOrganisationParent(orgUuid, parentUuid);
+        int folderType = folder.getFolderType();
+        List<DbAbstractTable> childFolders = DbFolder.retrieveForOrganisationParentType(orgUuid, parentUuid, folderType);
         for (int i=0; i<childFolders.size(); i++)
         {
             DbFolder childFolder = (DbFolder)childFolders.get(i);
-            deleteFolder(childFolder);
+            deleteFolderAndContents(childFolder);
         }
 
         //retrieve the link entities for the folder and delete them
@@ -198,10 +320,38 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolders")
-    public Response getFolders(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable
+    public Response getFolders(@Context SecurityContext sc, @PathParam("folderType") int folderType, @PathParam("parentUuid") String uuidStr) throws Throwable
     {
         //TODO: 2016-02-22 DL - this would be a lot more efficient to join Folder and FolderItemLink in SQL
+        UUID uuid = null;
+        if (uuidStr != null
+                && uuidStr.length() > 0)
+        {
+            uuid = UUID.fromString(uuidStr);
+        }
 
+        //get all our folders at the desired level
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        List<DbAbstractTable> folders = DbFolder.retrieveForOrganisationParentType(orgUuid, uuid, folderType);
+        JsonFolderList ret = new JsonFolderList(folders.size());
+
+        for (int i=0; i<folders.size(); i++)
+        {
+            DbFolder folder = (DbFolder)folders.get(i);
+            UUID folderUuid = folder.getPrimaryUuid();
+            List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
+            int contentCount = items.size();
+
+            ret.add(folder, contentCount);
+        }
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+/*    public Response getFolders(@Context SecurityContext sc, @PathParam("folderType") String folderType, @PathParam("parentUuid") String id) throws Throwable
+    {
         //get all our folders
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         List<DbAbstractTable> folders = DbFolder.retrieveForOrganisation(orgUuid);
@@ -221,7 +371,7 @@ public class FolderEndpoint extends Endpoint {
                 .ok()
                 .entity(ret)
                 .build();
-    }
+    }*/
 
     /**
      * several of our functions perform the same checks, so refactored out to here

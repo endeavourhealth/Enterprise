@@ -126,7 +126,7 @@ public class SecurityEndpoint extends Endpoint
         UUID endUserUuid = endUser.getPrimaryUuid();
 
         //the only parameter is the org UUID
-        UUID orgUuid = orgParameters.getOrganisationUuid();
+        UUID orgUuid = orgParameters.getUuid();
 
         //validate the organisation exists
         DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
@@ -174,8 +174,12 @@ public class SecurityEndpoint extends Endpoint
     {
         //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
 
+        //replace the cookie on the client with an empty one
+        NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, null);
+
         return Response
                 .ok()
+                .cookie(cookie)
                 .build();
     }
 

@@ -11,9 +11,13 @@ import java.util.UUID;
  */
 public final class DbFolder extends DbAbstractTable {
 
+    public static final int FOLDER_TYPE_LIBRARY = 1;
+    public static final int FOLDER_TYPE_REPORTS = 2;
+
     private UUID organisationUuid = null;
     private UUID parentFolderUuid = null;
     private String title = null;
+    private int folderType = -1;
 
     //register as a DB entity
     private static TableAdapter adapter = new TableAdapter(DbFolder.class,
@@ -35,6 +39,7 @@ public final class DbFolder extends DbAbstractTable {
         builder.add(organisationUuid);
         builder.add(parentFolderUuid);
         builder.add(title);
+        builder.add(folderType);
     }
 
     @Override
@@ -44,20 +49,23 @@ public final class DbFolder extends DbAbstractTable {
         organisationUuid = reader.readUuid();
         parentFolderUuid = reader.readUuid();
         title = reader.readString();
+        folderType = reader.readInt();
     }
 
-    public static List<DbAbstractTable> retrieveForOrganisationParent(UUID organisationUuid, UUID parentUuid) throws Throwable
+    public static List<DbAbstractTable> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Throwable
     {
-        return adapter.retrieveEntities("Administration.Folder_SelectForOrganisationParentOrganisation", organisationUuid, parentUuid);
+        return adapter.retrieveEntities("Administration.Folder_SelectForOrganisationParentType", organisationUuid, parentUuid, folderType);
     }
-    public static DbFolder retrieveForOrganisationTitleParent(UUID organisationUuid, String title, UUID parentUuid) throws Throwable
+    public static DbFolder retrieveForOrganisationTitleParentType(UUID organisationUuid, String title, UUID parentUuid, int folderType) throws Throwable
     {
-        return (DbFolder)adapter.retrieveSingleEntity("Administration.Folder_SelectForOrganisationTitleParentOrganisation", organisationUuid, title, parentUuid);
+        return (DbFolder)adapter.retrieveSingleEntity("Administration.Folder_SelectForOrganisationTitleParentType", organisationUuid, title, parentUuid, folderType);
     }
+/*
     public static List<DbAbstractTable> retrieveForOrganisation(UUID organisationUuid) throws Throwable
     {
         return adapter.retrieveEntities("Administration.Folder_SelectForOrganisation", organisationUuid);
     }
+*/
     public static DbFolder retrieveForUuid(UUID uuid) throws Throwable
     {
         return (DbFolder)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
@@ -90,4 +98,11 @@ public final class DbFolder extends DbAbstractTable {
         this.title = title;
     }
 
+    public int getFolderType() {
+        return folderType;
+    }
+
+    public void setFolderType(int folderType) {
+        this.folderType = folderType;
+    }
 }

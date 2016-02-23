@@ -2,10 +2,7 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.entity.database.*;
 import org.endeavour.enterprise.entity.json.*;
-import org.endeavour.enterprise.framework.exceptions.*;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
-import org.endeavour.enterprise.framework.security.PasswordHash;
-import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.model.EndUserRole;
 
 import javax.ws.rs.*;
@@ -28,8 +25,8 @@ public class AdminEndpoint extends Endpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/createOrganisation")
-    public Response createOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Throwable
+    @Path("/saveOrganisation")
+    public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Throwable
     {
         //validate our user is a super user
         DbEndUser user = getEndUserFromSession(sc);
@@ -39,19 +36,34 @@ public class AdminEndpoint extends Endpoint {
         }
 
         //get the parameters passed up
+        UUID uuid = organisationParameters.getUuid();
         String name = organisationParameters.getName();
-        String id = organisationParameters.getNationanId();
+        String id = organisationParameters.getNationalId();
 
-        //create and save the new one
-        DbOrganisation org = new DbOrganisation();
-        org.setName(name);
-        org.setNationalId(id);
+        DbOrganisation org = null;
+
+        //if no UUID was passed, then we're creating a new org
+        if (uuid == null)
+        {
+            org = new DbOrganisation();
+            org.setName(name);
+            org.setNationalId(id);
+
+            //TODO; 2016-02-23 DL - validate we're not creating a duplicate organisation by name and/or ID
+        }
+        else
+        {
+            org = DbOrganisation.retrieveForUuid(uuid);
+            org.setName(name);
+            org.setNationalId(id);
+        }
 
         //save to db
         org.saveToDb();
 
-        //return the new organisation
-        JsonOrganisation ret = new JsonOrganisation(org, null);
+        //return the organisation UUID
+        JsonOrganisation ret = new JsonOrganisation();
+        ret.setUuid(org.getPrimaryUuid());
 
         return Response
                 .ok()
@@ -62,8 +74,8 @@ public class AdminEndpoint extends Endpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/createUser")
-    public Response createUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Throwable
+    @Path("/saveUser")
+    public Response saveUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Throwable
     {
         //first, verify the user is an admin
         EndUserRole currentRole = super.getRoleFromSession(sc);
@@ -73,6 +85,7 @@ public class AdminEndpoint extends Endpoint {
         }
 
         //userParameters
+        UUID uuid = userParameters.getUuid();
         String email = userParameters.getUsername();
         String title = userParameters.getTitle();
         String forename = userParameters.getForename();
@@ -80,7 +93,10 @@ public class AdminEndpoint extends Endpoint {
         int permissions = userParameters.getPermissions();
         boolean isSuperUser = userParameters.getIsSuperUser();
 
-        //if trying to create a super user, verify the current user is a super-user
+        DbOrganisation org = getOrganisationFromSession(sc);
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        //if doing anything to a super user, verify the current user is a super-user
         if (isSuperUser)
         {
             DbEndUser user = getEndUserFromSession(sc);
@@ -90,49 +106,99 @@ public class AdminEndpoint extends Endpoint {
             }
         }
 
-        //verify if we have a person for this email address
-        boolean createdNewPerson = false;
-        DbEndUser user = DbEndUser.retrieveForEmail(email);
-        if (user == null)
-        {
-            //if the user doesn't already exist, create it and save to the DB
-            createdNewPerson = true;
+        DbEndUser user = null;
+        DbOrganisationEndUserLink link = null;
+        Boolean createdNewPerson = null;
 
-            user = new DbEndUser();
+        //if the uuid is null, we're creating a new person
+        if (uuid == null)
+        {
+            //see if we have a person for this email address, that the admin user couldn't see, which we can just use
+            user = DbEndUser.retrieveForEmail(email);
+            if (user == null)
+            {
+                //if the user doesn't already exist, create it and save to the DB
+                createdNewPerson = new Boolean(true);
+
+                user = new DbEndUser();
+                user.setEmail(email);
+                user.setTitle(title);
+                user.setForename(forename);
+                user.setSurname(surname);
+                user.setIsSuperUser(isSuperUser);
+
+                //we need the UUID of this person, so save right now to generate it
+                user.saveToDb();
+                uuid = user.getPrimaryUuid();
+            }
+            //if we're trying to create a new user, but they already exist at another org,
+            //then we can just use that same user record and link it to the new organisation
+            else
+            {
+                createdNewPerson = new Boolean(false);
+
+                //validate the name matches what's already on the DB
+                if (!user.getForename().equals(forename)
+                    || !user.getForename().equals(surname))
+                {
+                    throw new BadRequestException("User already exists but with different name");
+                }
+
+                //validate the person isn't already a user at our org
+                uuid = user.getPrimaryUuid();
+                link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
+                if (link != null)
+                {
+                    throw new BadRequestException("User already is registered here");
+                }
+            }
+
+            //create the user/org link
+            link = new DbOrganisationEndUserLink();
+            link.setOrganisationUuid(orgUuid);
+            link.setEndUserUuid(uuid);
+            link.setPermissions(permissions);
+            link.setDtExpired(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
+
+        }
+        //if we have a uuid, we're updating an existing person
+        else
+        {
+            user = DbEndUser.retrieveForUuid(uuid);
+
+            //if we're changing the email, validate that the email isn't already on the DB
+            String existingEmail = user.getEmail();
+            if (!existingEmail.equals(email))
+            {
+                DbEndUser duplicateEmail = DbEndUser.retrieveForEmail(email);
+                if (duplicateEmail != null)
+                {
+                    throw new javax.ws.rs.BadRequestException("New email address already in use");
+                }
+            }
+
+            user.setEmail(email);
             user.setTitle(title);
             user.setForename(forename);
             user.setSurname(surname);
             user.setIsSuperUser(isSuperUser);
-
             user.saveToDb();
+
+            //retrieve the link entity, as we may want to change the permissions on there
+            link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
+            link.setPermissions(permissions);
         }
 
-        //verify there's not already a link between this person and organisation
-        UUID userUuid = user.getPrimaryUuid();
-        DbOrganisation org = getOrganisationFromSession(sc);
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-
-        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
-        for (int i=0; i<links.size(); i++)
-        {
-            DbOrganisationEndUserLink link = (DbOrganisationEndUserLink)links.get(i);
-            if (link.getOrganisationUuid().equals(orgUuid))
-            {
-                throw new BadRequestException("User already is a registered user here");
-            }
-        }
-
-        //we now need to create the link between the user and the organisation
-        DbOrganisationEndUserLink link = new DbOrganisationEndUserLink();
-        link.setOrganisationUuid(orgUuid);
-        link.setEndUserUuid(userUuid);
-        link.setPermissions(permissions);
-        link.setDtExpired(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
-
+        user.saveToDb();
         link.saveToDb();
 
-        //generate the invite email if we created a new person
-        if (createdNewPerson)
+        //if we just updated a person, then we don't want to generate any invite email
+        if (createdNewPerson == null)
+        {
+            //do nothing
+        }
+        //if we created a new person, generate the invite email
+        else if (createdNewPerson.booleanValue())
         {
             createAndSendInvite(user, org);
         }
@@ -143,19 +209,14 @@ public class AdminEndpoint extends Endpoint {
             DbEndUserEmailInvite.sendNewAccessGrantedEmail(user, org);
         }
 
-        //don't bother returning anything to the client
-        return Response
-                .ok()
-                .build();
-
-        //return the new person to the client
-/*        EndUserRole role = link.getRole();
-        JsonEndUser ret = new JsonEndUser(user, role);
+        //return the UUID of the person back to the client
+        JsonEndUser ret = new JsonEndUser();
+        ret.setUuid(uuid);
 
         return Response
                 .ok()
                 .entity(ret)
-                .build();*/
+                .build();
     }
     private static void createAndSendInvite(DbEndUser user, DbOrganisation org) throws Throwable
     {

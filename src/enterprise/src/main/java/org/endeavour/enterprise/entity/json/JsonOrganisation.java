@@ -13,19 +13,18 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonOrganisation implements Serializable
 {
-
-    private UUID organisationUuid = null;
+    private UUID uuid = null;
     private String name = null;
-    private String nationanId = null;
+    private String nationalId = null;
     private Integer permissions = null;
 
     public JsonOrganisation()
     {}
     public JsonOrganisation(DbOrganisation org, EndUserRole permissions)
     {
-        this.organisationUuid = org.getPrimaryUuid();
+        this.uuid = org.getPrimaryUuid();
         this.name = org.getName();
-        this.nationanId = org.getNationalId();
+        this.nationalId = org.getNationalId();
         if (permissions != null)
         {
             this.permissions = new Integer(permissions.getValue());
@@ -35,12 +34,12 @@ public final class JsonOrganisation implements Serializable
     /**
      * gets/sets
      */
-    public UUID getOrganisationUuid() {
-        return organisationUuid;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setOrganisationUuid(UUID organisationUuid) {
-        this.organisationUuid = organisationUuid;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -51,12 +50,12 @@ public final class JsonOrganisation implements Serializable
         this.name = name;
     }
 
-    public String getNationanId() {
-        return nationanId;
+    public String getNationalId() {
+        return nationalId;
     }
 
-    public void setNationanId(String nationanId) {
-        this.nationanId = nationanId;
+    public void setNationalId(String nationalId) {
+        this.nationalId = nationalId;
     }
 
     public Integer getPermissions() {

@@ -8,13 +8,14 @@ import java.util.UUID;
 
 /**
  * Created by Drew on 17/02/2016.
- * JSON object used to manipulaate folders, such as creating, moving and renaming
+ * JSON object used to manipulate folders, such as creating, moving and renaming
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolder implements Serializable {
 
-    private UUID folderUuid = null;
+    private UUID uuid = null;
     private String folderName = null;
+    private Integer folderType = null;
     private UUID parentFolderUuid = null;
     private Integer contentCount = null;
 
@@ -23,8 +24,9 @@ public final class JsonFolder implements Serializable {
     }
     public JsonFolder(DbFolder folder, int count)
     {
-        this.folderUuid = folder.getPrimaryUuid();
+        this.uuid = folder.getPrimaryUuid();
         this.folderName = folder.getTitle();
+        this.folderType = new Integer(folder.getFolderType());
         this.parentFolderUuid = folder.getParentFolderUuid();
         if (count > -1)
         {
@@ -35,12 +37,12 @@ public final class JsonFolder implements Serializable {
     /**
      * gets/sets
      */
-    public UUID getFolderUuid() {
-        return folderUuid;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setFolderUuid(UUID folderUuid) {
-        this.folderUuid = folderUuid;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getFolderName() {
@@ -49,6 +51,14 @@ public final class JsonFolder implements Serializable {
 
     public void setFolderName(String folderName) {
         this.folderName = folderName;
+    }
+
+    public Integer getFolderType() {
+        return folderType;
+    }
+
+    public void setFolderType(Integer folderType) {
+        this.folderType = folderType;
     }
 
     public UUID getParentFolderUuid() {

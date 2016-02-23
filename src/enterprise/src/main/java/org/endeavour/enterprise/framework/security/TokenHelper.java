@@ -77,7 +77,23 @@ public class TokenHelper
 
     private static NewCookie createCookie(String token)
     {
+        int maxAge = 60 * 60 * 24; //a day
+        long now = System.currentTimeMillis() + (1000 * maxAge);
+        Date d = new Date(now);
+        token = "DrewTest";
+
+
         return new NewCookie(Configuration.AUTH_COOKIE_NAME,
+                token,
+                Configuration.AUTH_COOKIE_VALID_PATH,
+                Configuration.AUTH_COOKIE_VALID_DOMAIN,
+                1,
+                null,
+                maxAge,
+                d,
+                Configuration.AUTH_COOKIE_REQUIRES_HTTPS,
+                false);
+/*        return new NewCookie(Configuration.AUTH_COOKIE_NAME,
                 token,
                 Configuration.AUTH_COOKIE_VALID_PATH,
                 Configuration.AUTH_COOKIE_VALID_DOMAIN,
@@ -86,7 +102,7 @@ public class TokenHelper
                 -1,
                 null,
                 Configuration.AUTH_COOKIE_REQUIRES_HTTPS,
-                false);
+                false);*/
     }
 
     public static UserContext validateToken(String token) throws Exception

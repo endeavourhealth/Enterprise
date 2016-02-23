@@ -15,7 +15,7 @@ module app.core {
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
 		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]>;
 		getTreeData(code : string):ng.IPromise<ITreeNode[]>;
-		getRootFolders(organisationUuid : string, moduleId : number):ng.IPromise<any[]>;
+		getRootFolders(uuid : string, moduleId : number):ng.IPromise<any[]>;
 		getChildFolders(folderId : string):ng.IPromise<any[]>;
 		getFolderContents(folderId : string):ng.IPromise<any[]>;
 	}
@@ -104,11 +104,11 @@ module app.core {
 			return defer.promise;
 		}
 
-		getRootFolders(organisationUuid : string, moduleId : number):ng.IPromise<any[]> {
+		getRootFolders(uuid : string, moduleId : number):ng.IPromise<any[]> {
 			var vm = this;
 			var defer = vm.promise.defer();
 			var request = {
-				'organisationUuid' : organisationUuid,
+				'uuid' : uuid,
 				'moduleId' : moduleId
 			};
 

@@ -3,8 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.entity.database.DbAbstractTable;
 import org.endeavour.enterprise.entity.database.DbFolder;
 import org.endeavour.enterprise.entity.database.DbFolderItemLink;
-import org.endeavour.enterprise.entity.json.JsonFolder;
-import org.endeavour.enterprise.entity.json.JsonFolderList;
+import org.endeavour.enterprise.entity.json.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.BadRequestException;
@@ -398,4 +397,89 @@ public class FolderEndpoint extends Endpoint {
         return folder;
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getFolderContents")
+    public Response getFolderContents(@Context SecurityContext sc, @PathParam("folderUuid") String uuidStr) throws Throwable
+    {
+        UUID folderUuid = UUID.fromString(uuidStr);
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        //retrieve the folder and validate it's for our org
+        DbFolder folder = DbFolder.retrieveForUuid(folderUuid);
+        if (!folder.getOrganisationUuid().equals(orgUuid))
+        {
+            throw new BadRequestException("Folder at different organisation");
+        }
+
+        JsonFolderContentsList ret = new JsonFolderContentsList();
+
+        //TODO: 2016-02-23 DL - need proper implementation of getting folder contents
+
+        /*List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
+        for (int i=0; i<items.size(); i++)
+        {
+            DbFolderItemLink item = (DbFolderItemLink)items.get(i);
+        }*/
+
+        if (folder.getFolderType() == DbFolder.FOLDER_TYPE_REPORTS)
+        {
+            JsonReport r = new JsonReport();
+            r.setName("Report 1");
+            r.setUuid(UUID.randomUUID());
+            ret.addReport(r);
+
+            r = new JsonReport();
+            r.setName("Report 2");
+            r.setUuid(UUID.randomUUID());
+            ret.addReport(r);
+
+            r = new JsonReport();
+            r.setName("Report 3");
+            r.setUuid(UUID.randomUUID());
+            ret.addReport(r);
+        }
+        else if (folder.getFolderType() == DbFolder.FOLDER_TYPE_LIBRARY)
+        {
+            JsonListOutput l = new JsonListOutput();
+            l.setName("List Output 1");
+            l.setUuid(UUID.randomUUID());
+            ret.addListOutput(l);
+
+            l = new JsonListOutput();
+            l.setName("List Output 2");
+            l.setUuid(UUID.randomUUID());
+            ret.addListOutput(l);
+
+            l = new JsonListOutput();
+            l.setName("List Output 3");
+            l.setUuid(UUID.randomUUID());
+            ret.addListOutput(l);
+
+            JsonQuery q = new JsonQuery();
+            q.setName("Query 1");
+            q.setUuid(UUID.randomUUID());
+            ret.addQuery(q);
+
+            q = new JsonQuery();
+            q.setName("Query 2");
+            q.setUuid(UUID.randomUUID());
+            ret.addQuery(q);
+
+            q = new JsonQuery();
+            q.setName("Query 3");
+            q.setUuid(UUID.randomUUID());
+            ret.addQuery(q);
+        }
+        else
+        {
+            throw new BadRequestException("Unsupported folder type");
+        }
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
 }

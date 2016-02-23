@@ -17,10 +17,10 @@ public abstract class Endpoint
     @Context
     protected SecurityContext securityContext;
 
-    protected UserContext getUserContext()
+    /*protected UserContext getUserContext()
     {
         return UserContext.fromSecurityContext(securityContext);
-    }
+    }*/
 
     /*
     * 2016-02-22 DL - gets session data from the Token passed up

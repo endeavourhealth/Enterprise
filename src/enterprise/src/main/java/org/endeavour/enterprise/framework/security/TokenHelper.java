@@ -9,8 +9,6 @@ import org.endeavour.enterprise.entity.database.DbOrganisation;
 import org.endeavour.enterprise.framework.configuration.Configuration;
 import org.endeavour.enterprise.model.EndUserRole;
 import org.endeavour.enterprise.model.UserContext;
-import org.endeavour.enterprise.model.User;
-import org.endeavour.enterprise.model.UserInRole;
 
 import javax.naming.AuthenticationException;
 import javax.ws.rs.core.NewCookie;
@@ -26,7 +24,8 @@ public class TokenHelper
     private static final String TOKEN_ROLE = "rol";
     private static final String TOKEN_ORGANISATION = "org";
 
-    public static NewCookie createTokenAsCookie(User user)
+    //2016-02-23 DL - moved to user the DbEndUser and DbOrganisation entities
+    /*public static NewCookie createTokenAsCookie(User user)
     {
         return createCookie(createToken(user));
     }
@@ -47,7 +46,7 @@ public class TokenHelper
                 .signWith(SignatureAlgorithm.HS256, Configuration.TOKEN_SIGNING_SECRET);
 
         return builder.compact();
-    }
+    }*/
 
     public static NewCookie createTokenAsCookie(DbEndUser person, DbOrganisation org, EndUserRole endUserRole)
     {

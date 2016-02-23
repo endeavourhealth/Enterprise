@@ -85,7 +85,7 @@ module app.core {
 		getUserList() : IPromise<app.models.User[]> {
 			var vm = this;
 			var defer = vm.promise.defer();
-			vm.http.get('/api/user/getUserList')
+			vm.http.get('/api/admin/getUsers')
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

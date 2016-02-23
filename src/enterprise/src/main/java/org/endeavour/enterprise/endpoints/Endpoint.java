@@ -46,8 +46,7 @@ public abstract class Endpoint
     }
     protected UUID getOrganisationUuidFromToken(SecurityContext sc) throws Throwable
     {
-        UserSecurityContext usc = (UserSecurityContext)sc;
-        UserPrincipal up = (UserPrincipal)usc.getUserPrincipal();
+        UserPrincipal up = (UserPrincipal)sc.getUserPrincipal();
         UserContext uc = up.getUserContext();
 
         //an authenticated user MUST have a EndUser UUID, but they may not have an organisation selected yet

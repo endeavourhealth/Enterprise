@@ -15,8 +15,7 @@ module app.core {
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
 		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]>;
 		getTreeData(code : string):ng.IPromise<ITreeNode[]>;
-		getRootFolders(uuid : string, moduleId : number):ng.IPromise<any[]>;
-		getChildFolders(folderId : string):ng.IPromise<any[]>;
+		getFolders(moduleId : number, folderUuid : string):ng.IPromise<any[]>;
 		getFolderContents(folderId : string):ng.IPromise<any[]>;
 	}
 
@@ -104,32 +103,19 @@ module app.core {
 			return defer.promise;
 		}
 
-		getRootFolders(uuid : string, moduleId : number):ng.IPromise<any[]> {
+		getFolders(moduleId : number, folderUuid : string):ng.IPromise<any[]> {
 			var vm = this;
 			var defer = vm.promise.defer();
 			var request = {
-				'uuid' : uuid,
-				'moduleId' : moduleId
+				params: {
+					'folderType': moduleId,
+					'parentUuid': folderUuid
+				}
 			};
 
-			vm.http.post('api/definition/getRootFolders', request)
+			vm.http.get<any>('api/folder/getFolders', {params: {'folderType': moduleId, 'parentUuid': folderUuid}})
 				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
-		}
-
-		getChildFolders(itemUuid : string):ng.IPromise<any[]> {
-			var vm = this;
-			var defer = vm.promise.defer();
-			var request = '"' + itemUuid + '"';
-			vm.http.post('api/definition/getChildFolders', request)
-				.then(function (response) {
-					defer.resolve(response.data);
+					defer.resolve(response.data.folders);
 				})
 				.catch(function (exception) {
 					defer.reject(exception);

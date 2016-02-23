@@ -319,7 +319,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolders")
-    public Response getFolders(@Context SecurityContext sc, @PathParam("folderType") int folderType, @PathParam("parentUuid") String uuidStr) throws Throwable
+    public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String uuidStr) throws Throwable
     {
         //TODO: 2016-02-22 DL - this would be a lot more efficient to join Folder and FolderItemLink in SQL
         UUID uuid = null;

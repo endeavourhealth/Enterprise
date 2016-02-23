@@ -41,6 +41,11 @@
     justify-content: center;
 }
 
+.glyphicon-blank:before {
+    content: "\2122";
+    color: transparent !important;
+}
+
 .content-area {
     padding-top: 45px;
     padding-left: 35px;

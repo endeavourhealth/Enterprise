@@ -80,8 +80,6 @@ public class TokenHelper
         int maxAge = 60 * 60 * 24; //a day
         long now = System.currentTimeMillis() + (1000 * maxAge);
         Date d = new Date(now);
-        token = "DrewTest";
-
 
         return new NewCookie(Configuration.AUTH_COOKIE_NAME,
                 token,

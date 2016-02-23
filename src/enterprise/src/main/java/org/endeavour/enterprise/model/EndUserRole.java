@@ -22,13 +22,13 @@ public enum EndUserRole
     {
         return (value >= endUserRole.getValue());
     }
-/*
-    EndUserRole getValue(int value) {
+
+    public static EndUserRole getValue(int value) {
         for(EndUserRole e: EndUserRole.values()) {
             if(e.value == value) {
                 return e;
             }
         }
         return null;// not found
-    }*/
+    }
 }

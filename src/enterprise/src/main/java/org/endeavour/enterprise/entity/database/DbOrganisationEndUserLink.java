@@ -20,7 +20,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     private Date dtExpired = null;
 
     //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbOrganisation.class,
+    private static TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class,
             "OrganisationEndUserLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
@@ -85,7 +85,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
      */
     public EndUserRole getRole()
     {
-        return EndUserRole.values()[permissions];
+        return EndUserRole.getValue(permissions);
     }
 
 

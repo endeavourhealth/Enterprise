@@ -20,7 +20,7 @@ module app.layout {
 		getCurrentUser() {
 			var vm:TopnavController = this;
 			vm.currentUser = vm.adminService.getCurrentUser();
-			vm.updateRole(vm.currentUser.currentUserInRoleUuid);
+			//vm.updateRole(vm.currentUser.currentUserInRoleUuid);
 		}
 
 		updateRole(userInRoleUuid : string) {

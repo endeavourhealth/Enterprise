@@ -1,12 +1,12 @@
 <div>
 	<script type="text/ng-template" id="node_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content">
-				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-unchecked text-muted"></span>
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
 				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon text-muted"
-							ng-class="{'glyphicon-expand': !node.isExpanded,'glyphicon-collapse-down': node.isExpanded}"
+							ng-class="{'glyphicon-triangle-right': !node.isExpanded,'glyphicon-triangle-bottom': node.isExpanded}"
 							ng-click="library.toggleExpansion(node)"></span>
 			<span	class="glyphicon glyphicon-folder-open text-primary"></span>
-			{{node.title}}
+			{{node.folderName}}
 		</div>
 		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">
 			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
@@ -21,7 +21,6 @@
 				Library items
 			</div>
 			<div class="panel-body">
-
 				<form>
 					<div class="form-group">
 						<div class="row">

@@ -33,7 +33,8 @@ public final class ResultReader {
 
     public UUID readUuid() throws SQLException
     {
-        return UUID.fromString(rs.getString(currentCol++));
+			String uuidString = rs.getString(currentCol++);
+        return uuidString == null ? null : UUID.fromString(uuidString);
 
 /*
         byte[] bytes = rs.getBytes(currentCol);

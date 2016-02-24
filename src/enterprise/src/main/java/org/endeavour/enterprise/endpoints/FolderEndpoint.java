@@ -6,10 +6,8 @@ import org.endeavour.enterprise.entity.database.DbFolderItemLink;
 import org.endeavour.enterprise.entity.json.*;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.core.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +22,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveFolder")
-    public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
+    public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable
     {
         //get the parameters out
         UUID folderUuid = folderParameters.getUuid();
@@ -154,7 +152,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/createFolder")
-    public Response createFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
+    public Response createFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable
     {
         //get the organisation from the server token
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -201,7 +199,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/renameFolder")
-    public Response renameFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
+    public Response renameFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable
     {
         //get the organisation from the server token
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -235,7 +233,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/moveFolder")
-    public Response moveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
+    public Response moveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable
     {
         //get the organisation from the server token
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -271,7 +269,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteFolder")
-    public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception {
+    public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Throwable {
         //get the organisation from the server token
         //UUID orgUuid = getOrganisationUuidFromToken(sc);
 
@@ -289,7 +287,7 @@ public class FolderEndpoint extends Endpoint {
 
         return Response.ok().build();
     }
-    private static void deleteFolderAndContents(DbFolder folder) throws Exception
+    private static void deleteFolderAndContents(DbFolder folder) throws Throwable
     {
         //see if we have any child folders, which we should delete first
         UUID orgUuid = folder.getOrganisationUuid();
@@ -321,7 +319,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolders")
-    public Response getFolders(@Context SecurityContext sc, @PathParam("folderType") int folderType, @PathParam("parentUuid") String uuidStr) throws Exception
+    public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String uuidStr) throws Throwable
     {
         //TODO: 2016-02-22 DL - this would be a lot more efficient to join Folder and FolderItemLink in SQL
         UUID uuid = null;
@@ -351,7 +349,7 @@ public class FolderEndpoint extends Endpoint {
                 .entity(ret)
                 .build();
     }
-/*    public Response getFolders(@Context SecurityContext sc, @PathParam("folderType") String folderType, @PathParam("parentUuid") String id) throws Exception
+/*    public Response getFolders(@Context SecurityContext sc, @PathParam("folderType") String folderType, @PathParam("parentUuid") String id) throws Throwable
     {
         //get all our folders
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -377,7 +375,7 @@ public class FolderEndpoint extends Endpoint {
     /**
      * several of our functions perform the same checks, so refactored out to here
      */
-    private DbFolder getFolderForUuidAndValidateOrganisation(SecurityContext sc, UUID folderUuid) throws Exception
+    private DbFolder getFolderForUuidAndValidateOrganisation(SecurityContext sc, UUID folderUuid) throws Throwable
     {
         //get the organisation from the server token
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -403,7 +401,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolderContents")
-    public Response getFolderContents(@Context SecurityContext sc, @PathParam("folderUuid") String uuidStr) throws Exception
+    public Response getFolderContents(@Context SecurityContext sc, @PathParam("folderUuid") String uuidStr) throws Throwable
     {
         UUID folderUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);

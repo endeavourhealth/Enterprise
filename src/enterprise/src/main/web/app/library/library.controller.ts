@@ -3,11 +3,13 @@
 
 module app.library {
 	import TreeNode = app.models.TreeNode;
+	import ItemSummaryList = app.models.ItemSummaryList;
 	'use strict';
 
 	class LibraryController {
 		treeData : TreeNode[];
-		itemSummaryList : any[]; // DefinitionItemSummary[];
+		selectedNode : TreeNode = null;
+		itemSummaryList : ItemSummaryList;
 
 		static $inject = ['LibraryService', '$scope'];
 
@@ -17,9 +19,25 @@ module app.library {
 
 		getLibraryRootFolders() {
 			var vm = this;
-			this.libraryService.getFolders(1, null)
+			vm.libraryService.getFolders(1, null)
 				.then(function (data) {
 					vm.treeData = data;
+				});
+		}
+
+		selectNode(node : TreeNode) {
+			if (node === this.selectedNode) { return; }
+			var vm = this;
+
+			if (vm.selectedNode !== null) {
+				vm.selectedNode.isSelected = false;
+			}
+			node.isSelected = true;
+			vm.selectedNode = node;
+
+			vm.libraryService.getFolderContents(node.uuid)
+				.then(function(data) {
+					vm.itemSummaryList = data;
 				});
 		}
 

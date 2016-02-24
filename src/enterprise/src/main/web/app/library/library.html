@@ -6,7 +6,8 @@
 							ng-class="{'glyphicon-triangle-right': !node.isExpanded,'glyphicon-triangle-bottom': node.isExpanded}"
 							ng-click="library.toggleExpansion(node)"></span>
 			<span	class="glyphicon glyphicon-folder-open text-primary"></span>
-			{{node.folderName}}
+			<span ng-class="{'bg-primary': node.isSelected}"
+						ng-click="library.selectNode(node)">{{node.folderName}}</span>
 		</div>
 		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">
 			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
@@ -44,10 +45,15 @@
 											</tr>
 										</thead>
 										<tbody>
-											<tr ng-repeat="item in library.itemSummaryList">
-												<td>{{item.title}}</td>
-												<td>{{item.dateModified}}</td>
-												<td>{{item.itemUuid}}</td>
+											<tr ng-repeat="item in library.itemSummaryList.queries">
+												<td>{{item.name}}</td>
+												<td>{{item.uuid}}</td>
+												<td>Query</td>
+											</tr>
+											<tr ng-repeat="item in library.itemSummaryList.listOutputs">
+												<td>{{item.name}}</td>
+												<td>{{item.uuid}}</td>
+												<td>List Output</td>
 											</tr>
 										</tbody>
 									</table>

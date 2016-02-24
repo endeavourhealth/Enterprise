@@ -403,7 +403,7 @@ public class FolderEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolderContents")
-    public Response getFolderContents(@Context SecurityContext sc, @PathParam("folderUuid") String uuidStr) throws Exception
+    public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception
     {
         UUID folderUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);

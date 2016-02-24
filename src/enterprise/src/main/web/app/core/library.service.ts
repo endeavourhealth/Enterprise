@@ -124,10 +124,15 @@ module app.core {
 			return defer.promise;
 		}
 
-		getFolderContents(folderId : string):ng.IPromise<any[]> {
+		getFolderContents(folderUuid : string):ng.IPromise<any[]> {
 			var vm = this;
 			var defer = vm.promise.defer();
-			vm.http.post('api/definition/getFolderContents', folderId)
+			var request = {
+				params: {
+					'folderUuid': folderUuid
+				}
+			};
+			vm.http.get('api/folder/getFolderContents', request)
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

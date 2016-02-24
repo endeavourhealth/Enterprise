@@ -365,9 +365,13 @@ GO
 CREATE PROCEDURE [Administration].[_Folder_SelectForUuid]
 @FolderUuid uniqueidentifier
  AS BEGIN
-SELECT FolderUuid, OrganisationUuid, ParentFolderUuid, Title, FolderType FROM [Administration].[Folder] WHERE FolderUuid = @FolderUuid
+SELECT f.FolderUuid, f.OrganisationUuid, f.ParentFolderUuid, f.Title, f.FolderType,
+CASE WHEN exists (SELECT NULL FROM [Administration].[Folder] AS cf WHERE cf.ParentFolderUuid = f.FolderUuid)
+      THEN 1
+      ELSE 0
+    END AS HasChildren
+FROM [Administration].[Folder] f WHERE f.FolderUuid = @FolderUuid
 END
-GO
 
 /****** Object:  StoredProcedure [Administration].[_Folder_Update]    Script Date: 23/02/2016 14:35:46 ******/
 SET ANSI_NULLS ON

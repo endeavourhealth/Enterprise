@@ -9,6 +9,7 @@ module app.models {
 		contentCount:number;
 
 		isExpanded:boolean;
+		isSelected:boolean;
 		nodes:TreeNode[];
 	}
 }

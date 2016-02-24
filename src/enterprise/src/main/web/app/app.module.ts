@@ -17,6 +17,7 @@ angular.module('app', [
 		'app.dialogs',
 		'app.dashboard',
 		'app.library',
+		'app.reports',
 		'app.admin',
 		'app.query',
 		'flowChart',

@@ -26,7 +26,7 @@ public abstract class Endpoint
     * 2016-02-22 DL - gets session data from the Token passed up
     * TODO: change to use server-side stored session data, rather than use the token
     * */
-    protected DbEndUser getEndUserFromSession(SecurityContext sc) throws Throwable
+    protected DbEndUser getEndUserFromSession(SecurityContext sc) throws Exception
     {
         UUID uuid = getEndUserUuidFromToken(sc);
         return DbEndUser.retrieveForUuid(uuid);
@@ -42,12 +42,12 @@ public abstract class Endpoint
         return uc.getUserUuid();
     }
 
-    protected DbOrganisation getOrganisationFromSession(SecurityContext sc) throws Throwable
+    protected DbOrganisation getOrganisationFromSession(SecurityContext sc) throws Exception
     {
         UUID uuid = getOrganisationUuidFromToken(sc);
         return DbOrganisation.retrieveForUuid(uuid);
     }
-    protected UUID getOrganisationUuidFromToken(SecurityContext sc) throws Throwable
+    protected UUID getOrganisationUuidFromToken(SecurityContext sc) throws Exception
     {
         UserPrincipal up = (UserPrincipal)sc.getUserPrincipal();
         UserContext uc = up.getUserContext();
@@ -61,7 +61,7 @@ public abstract class Endpoint
         return orgUuid;
     }
 
-    protected EndUserRole getRoleFromSession(SecurityContext sc) throws Throwable
+    protected EndUserRole getRoleFromSession(SecurityContext sc) throws Exception
     {
         UserSecurityContext usc = (UserSecurityContext)sc;
         UserPrincipal up = (UserPrincipal)usc.getUserPrincipal();

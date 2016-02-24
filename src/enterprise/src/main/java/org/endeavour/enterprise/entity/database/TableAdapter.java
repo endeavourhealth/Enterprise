@@ -60,7 +60,7 @@ public class TableAdapter
     /**
      * creates a new instance of our database class
      */
-    public DbAbstractTable newEntity() throws Throwable
+    public DbAbstractTable newEntity() throws Exception
     {
         return (DbAbstractTable) getCls().newInstance();
     }
@@ -169,7 +169,7 @@ public class TableAdapter
     }*/
 
 
-  /*  public static DbAbstractTable retrieveSingleEntityForUuid(TableAdapter adapter, UUID uuid) throws Throwable
+  /*  public static DbAbstractTable retrieveSingleEntityForUuid(TableAdapter adapter, UUID uuid) throws Exception
     {
         //the retrieve for UUID has a standard name for all entities
         String spName = adapter.getSchema() + "." + adapter.getTableName() + "_SelectForUuidUUId";
@@ -177,7 +177,7 @@ public class TableAdapter
     }*/
 
 
-    public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Throwable
+    public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Exception
     {
         List<? extends DbAbstractTable> v = retrieveEntities(spName, parameters);
         //List<DbAbstractTable> v = retrieveEntities(spName, parameters);
@@ -196,7 +196,7 @@ public class TableAdapter
             throw new RuntimeException("Retrieved multiple results from " + spName);
         }
     }
-    public List<DbAbstractTable> retrieveEntities(String spName, Object... spParameters) throws Throwable
+    public List<DbAbstractTable> retrieveEntities(String spName, Object... spParameters) throws Exception
     {
         Connection connection = DatabaseConnection.get(getDatabase());
 
@@ -224,7 +224,7 @@ public class TableAdapter
 
         return readFromResultSet(rs);
     }
-    /*public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Throwable
+    /*public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Exception
     {
         try {
             Connection connection = DatabaseConnection.get(getDatabase());
@@ -268,7 +268,7 @@ public class TableAdapter
             }
 
 
-        } catch (Throwable t) {
+        } catch (Exception t) {
             t.printStackTrace(System.err);
         }
 
@@ -305,7 +305,7 @@ public class TableAdapter
     }
 
 
-    private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Throwable
+    private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Exception
     {
         List<DbAbstractTable> ret = new ArrayList<DbAbstractTable>();
         ResultReader rr = new ResultReader(rs);
@@ -319,7 +319,7 @@ public class TableAdapter
 
         return ret;
     }
-/*    private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Throwable
+/*    private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Exception
     {
         List<DbAbstractTable> ret = new ArrayList<DbAbstractTable>();
 
@@ -344,7 +344,7 @@ public class TableAdapter
         return ret;
     }*/
 
-    public void saveToDb(boolean insert, DbAbstractTable entity) throws Throwable
+    public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception
     {
 
         String spName = getSchema() + "." + getTableName();
@@ -364,7 +364,7 @@ public class TableAdapter
         s.execute(sql);
     }
 
-/*    public void saveToDb(boolean insert, DbAbstractTable entity) throws Throwable {
+/*    public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception {
 
         String spName = getSchema() + "." + getTableName();
         if (insert) {

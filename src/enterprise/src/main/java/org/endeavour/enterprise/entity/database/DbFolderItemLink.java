@@ -42,11 +42,11 @@ public final class DbFolderItemLink extends DbAbstractTable
         itemUuid = reader.readUuid();
     }
 
-    public static List<DbAbstractTable> retrieveForFolder(UUID folderUuid) throws Throwable
+    public static List<DbAbstractTable> retrieveForFolder(UUID folderUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.FolderItemLink_SelectForFolder", folderUuid);
     }
-    public static DbFolder retrieveForUuid(UUID uuid) throws Throwable
+    public static DbFolder retrieveForUuid(UUID uuid) throws Exception
     {
         return (DbFolder)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
     }

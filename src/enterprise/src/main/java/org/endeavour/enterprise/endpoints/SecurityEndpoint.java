@@ -1,12 +1,16 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.entity.database.*;
-import org.endeavour.enterprise.entity.json.*;
-import org.endeavour.enterprise.framework.security.*;
+import org.endeavour.enterprise.entity.json.JsonEmailInviteParameters;
+import org.endeavour.enterprise.entity.json.JsonEndUser;
+import org.endeavour.enterprise.entity.json.JsonOrganisation;
+import org.endeavour.enterprise.entity.json.JsonOrganisationList;
+import org.endeavour.enterprise.framework.security.PasswordHash;
+import org.endeavour.enterprise.framework.security.TokenHelper;
+import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.model.EndUserRole;
 
 import javax.ws.rs.*;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.*;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +24,7 @@ public class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
     @Unsecured
-    public Response login(@Context SecurityContext sc, JsonEndUser personParameters) throws Throwable
+    public Response login(@Context SecurityContext sc, JsonEndUser personParameters) throws Exception
     {
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
@@ -117,7 +121,7 @@ public class SecurityEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/selectOrganisation")
-    public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Throwable
+    public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Exception
     {
         DbEndUser endUser = getEndUserFromSession(sc);
         UUID endUserUuid = endUser.getPrimaryUuid();
@@ -167,7 +171,7 @@ public class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/logoff")
     @Unsecured
-    public Response logoff(@Context SecurityContext sc) throws Throwable
+    public Response logoff(@Context SecurityContext sc) throws Exception
     {
         //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
 
@@ -185,7 +189,7 @@ public class SecurityEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/changePassword")
-    public Response changePassword(JsonEndUser parameters) throws Throwable
+    public Response changePassword(JsonEndUser parameters) throws Exception
     {
         //validate token
         DbEndUser person = new DbEndUser();
@@ -240,7 +244,7 @@ public class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/setPasswordFromInviteEmail")
     @Unsecured
-    public Response setPasswordFromInviteEmail(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Throwable
+    public Response setPasswordFromInviteEmail(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Exception
     {
         String token = parameters.getToken();
         String password = parameters.getPassword();

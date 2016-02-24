@@ -30,7 +30,7 @@ public abstract class DbAbstractTable
     /**
      * convenience method to insert/update an entity on the DB
      */
-    public void saveToDb() throws Throwable
+    public void saveToDb() throws Exception
     {
         //if we're saving a brand NEW entity, then we won't have a primary uuid, so generate it
         //and use the INSERT stored procedure
@@ -50,7 +50,7 @@ public abstract class DbAbstractTable
     /**
      * convenience method to delete an entity from the DB
      */
-    public void deleteFromDb() throws Throwable
+    public void deleteFromDb() throws Exception
     {
         //if no primary UUID has been assigned, then it's never been saved, so just return out
         if (primaryUuid == null)

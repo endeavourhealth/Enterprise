@@ -11,13 +11,26 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonQuery implements Serializable
 {
+    //requirements from Darren
+    /*Id uniqueidentifier not null,
+    Content varchar(max) null,
+    IsDeleted bit not null,
+    OwnerOrganisationUuid uniqueidentifier not null,
+    Title varchar(100) not null,
+    [Description] varchar(max) null,*/
+
     private UUID uuid = null;
     private String name = null;
+    private String description = null;
+    private String xmlContent = null;
+    private boolean isDeleted = false;
 
     public JsonQuery()
     {
 
     }
+
+
 
     /**
      * gets/sets
@@ -37,4 +50,30 @@ public final class JsonQuery implements Serializable
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getXmlContent() {
+        return xmlContent;
+    }
+
+    public void setXmlContent(String xmlContent) {
+        this.xmlContent = xmlContent;
+    }
+
+    public boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+
 }

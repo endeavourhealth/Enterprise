@@ -43,11 +43,11 @@ public final class DbOrganisation extends DbAbstractTable {
         nationalId = reader.readString();
     }
 
-    public static List<DbAbstractTable> retrieveForAll() throws Throwable
+    public static List<DbAbstractTable> retrieveForAll() throws Exception
     {
         return adapter.retrieveEntities("Administration.Organisation_SelectForAll");
     }
-    public static DbOrganisation retrieveForUuid(UUID uuid) throws Throwable
+    public static DbOrganisation retrieveForUuid(UUID uuid) throws Exception
     {
         return (DbOrganisation)adapter.retrieveSingleEntity("Administration._Organisation_SelectForUuid", uuid);
     }

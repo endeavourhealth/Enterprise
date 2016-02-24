@@ -26,11 +26,11 @@ public final class DbEndUser extends DbAbstractTable {
 
     }
 
-    public static DbEndUser retrieveForEmail(String email) throws Throwable
+    public static DbEndUser retrieveForEmail(String email) throws Exception
     {
         return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForEmail", email);
     }
-    public static DbEndUser retrieveForUuid(UUID uuid) throws Throwable
+    public static DbEndUser retrieveForUuid(UUID uuid) throws Exception
     {
         return (DbEndUser)adapter.retrieveSingleEntity("Administration._EndUser_SelectForUuid", uuid);
     }

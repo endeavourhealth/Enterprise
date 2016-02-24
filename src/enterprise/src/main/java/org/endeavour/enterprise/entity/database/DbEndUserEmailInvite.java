@@ -24,15 +24,15 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     public DbEndUserEmailInvite()
     {}
 
-    public static List<DbAbstractTable> retrieveForEndUserNotCompleted(UUID userUuid) throws Throwable
+    public static List<DbAbstractTable> retrieveForEndUserNotCompleted(UUID userUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.EndUserEmailInvite_SelectForEndUserNotCompleted", userUuid);
     }
-    public static DbEndUserEmailInvite retrieveForToken(String token) throws Throwable
+    public static DbEndUserEmailInvite retrieveForToken(String token) throws Exception
     {
         return (DbEndUserEmailInvite)adapter.retrieveSingleEntity("Administration.EndUserEmailInvite_SelectForTokenNotCompleted", token);
     }
-    public static DbEndUserEmailInvite retrieveForUuid(UUID uuid) throws Throwable
+    public static DbEndUserEmailInvite retrieveForUuid(UUID uuid) throws Exception
     {
         return (DbEndUserEmailInvite)adapter.retrieveSingleEntity("Administration._EndUserEmailInvite_SelectForUuid", uuid);
     }

@@ -20,7 +20,7 @@ public class QueryEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getQuery")
-    public Response getQuery(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Throwable
+    public Response getQuery(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Exception
     {
         UUID queryUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -41,7 +41,7 @@ public class QueryEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveQuery")
-    public Response saveQuery(@Context SecurityContext sc, JsonQuery queryParameters) throws Throwable {
+    public Response saveQuery(@Context SecurityContext sc, JsonQuery queryParameters) throws Exception {
 
         UUID queryUuid = queryParameters.getUuid();
 
@@ -62,7 +62,7 @@ public class QueryEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteQuery")
-    public Response deleteQuery(@Context SecurityContext sc, JsonQuery queryParameters) throws Throwable {
+    public Response deleteQuery(@Context SecurityContext sc, JsonQuery queryParameters) throws Exception {
 
         UUID queryUuid = queryParameters.getUuid();
 

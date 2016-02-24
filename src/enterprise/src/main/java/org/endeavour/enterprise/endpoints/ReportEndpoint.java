@@ -20,7 +20,7 @@ public class ReportEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReport")
-    public Response getReport(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Throwable
+    public Response getReport(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Exception
     {
         UUID reportUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -41,7 +41,7 @@ public class ReportEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveReport")
-    public Response saveReport(@Context SecurityContext sc, JsonReport reportParameters) throws Throwable {
+    public Response saveReport(@Context SecurityContext sc, JsonReport reportParameters) throws Exception {
 
         UUID reportUuid = reportParameters.getUuid();
 
@@ -62,7 +62,7 @@ public class ReportEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteReport")
-    public Response deleteReport(@Context SecurityContext sc, JsonReport reportParameters) throws Throwable {
+    public Response deleteReport(@Context SecurityContext sc, JsonReport reportParameters) throws Exception {
 
         UUID reportUuid = reportParameters.getUuid();
 

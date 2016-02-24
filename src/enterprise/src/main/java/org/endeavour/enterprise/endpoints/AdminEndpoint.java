@@ -1,7 +1,9 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.entity.database.*;
-import org.endeavour.enterprise.entity.json.*;
+import org.endeavour.enterprise.entity.json.JsonEndUser;
+import org.endeavour.enterprise.entity.json.JsonEndUserList;
+import org.endeavour.enterprise.entity.json.JsonOrganisation;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.model.EndUserRole;
 
@@ -26,7 +28,7 @@ public class AdminEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveOrganisation")
-    public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Throwable
+    public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Exception
     {
         //validate our user is a super user
         DbEndUser user = getEndUserFromSession(sc);
@@ -75,7 +77,7 @@ public class AdminEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveUser")
-    public Response saveUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Throwable
+    public Response saveUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception
     {
         //first, verify the user is an admin
         EndUserRole currentRole = super.getRoleFromSession(sc);
@@ -218,7 +220,7 @@ public class AdminEndpoint extends Endpoint {
                 .entity(ret)
                 .build();
     }
-    private static void createAndSendInvite(DbEndUser user, DbOrganisation org) throws Throwable
+    private static void createAndSendInvite(DbEndUser user, DbOrganisation org) throws Exception
     {
         UUID userUuid = user.getPrimaryUuid();
 
@@ -238,7 +240,7 @@ public class AdminEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteUser")
-    public Response deleteUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Throwable
+    public Response deleteUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception
     {
         //first, verify the user is an admin
         EndUserRole currentRole = super.getRoleFromSession(sc);
@@ -288,7 +290,7 @@ public class AdminEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getUsers")
-    public Response getUsers(@Context SecurityContext sc) throws Throwable
+    public Response getUsers(@Context SecurityContext sc) throws Exception
     {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
@@ -316,7 +318,7 @@ public class AdminEndpoint extends Endpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/resendInviteEmail")
-    public Response resendInviteEmail(@Context SecurityContext sc, JsonEndUser userParameters) throws Throwable
+    public Response resendInviteEmail(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception
     {
         //first, verify the user is an admin
         EndUserRole currentRole = super.getRoleFromSession(sc);

@@ -1,9 +1,7 @@
 package org.endeavour.enterprise.entity.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.entity.database.DbFolder;
-import org.endeavour.enterprise.model.EndUserRole;
 
 import java.io.Serializable;
 
@@ -11,7 +9,7 @@ import java.io.Serializable;
  * Created by Drew on 22/02/2016.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class JsonFolderList implements Serializable {
+public final class JsonFolderList implements Serializable {
 
     private JsonFolder[] folders = null;
 

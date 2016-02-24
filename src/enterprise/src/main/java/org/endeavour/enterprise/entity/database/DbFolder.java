@@ -52,21 +52,21 @@ public final class DbFolder extends DbAbstractTable {
         folderType = reader.readInt();
     }
 
-    public static List<DbAbstractTable> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Throwable
+    public static List<DbAbstractTable> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Exception
     {
         return adapter.retrieveEntities("Administration.Folder_SelectForOrganisationParentType", organisationUuid, parentUuid, folderType);
     }
-    public static DbFolder retrieveForOrganisationTitleParentType(UUID organisationUuid, String title, UUID parentUuid, int folderType) throws Throwable
+    public static DbFolder retrieveForOrganisationTitleParentType(UUID organisationUuid, String title, UUID parentUuid, int folderType) throws Exception
     {
         return (DbFolder)adapter.retrieveSingleEntity("Administration.Folder_SelectForOrganisationTitleParentType", organisationUuid, title, parentUuid, folderType);
     }
 /*
-    public static List<DbAbstractTable> retrieveForOrganisation(UUID organisationUuid) throws Throwable
+    public static List<DbAbstractTable> retrieveForOrganisation(UUID organisationUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.Folder_SelectForOrganisation", organisationUuid);
     }
 */
-    public static DbFolder retrieveForUuid(UUID uuid) throws Throwable
+    public static DbFolder retrieveForUuid(UUID uuid) throws Exception
     {
         return (DbFolder)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
     }

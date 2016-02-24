@@ -28,11 +28,11 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     public DbOrganisationEndUserLink()
     {}
 
-    public static List<DbAbstractTable> retrieveForEndUserNotExpired(UUID endUserUuid) throws Throwable
+    public static List<DbAbstractTable> retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForEndUserNotExpired", endUserUuid);
     }
-    public static DbOrganisationEndUserLink retrieveForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Throwable
+    public static DbOrganisationEndUserLink retrieveForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception
     {
         //TODO: 2016-02-22 DL - should really move this into a SP that takes two parameters
         List<DbAbstractTable> v = retrieveForEndUserNotExpired(endUserUuid);
@@ -46,11 +46,11 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
         }
         return null;
     }
-    public static List<DbAbstractTable> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Throwable
+    public static List<DbAbstractTable> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForOrganisationNotExpired", organisationUuid);
     }
-    public static DbOrganisationEndUserLink retrieveForUuid(UUID uuid) throws Throwable
+    public static DbOrganisationEndUserLink retrieveForUuid(UUID uuid) throws Exception
     {
         return (DbOrganisationEndUserLink)adapter.retrieveSingleEntity("Administration._OrganisationEndUserLink_SelectForUuid", uuid);
     }

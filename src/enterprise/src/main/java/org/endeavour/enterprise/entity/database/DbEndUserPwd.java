@@ -26,11 +26,11 @@ public class DbEndUserPwd extends DbAbstractTable {
 
     }
 
-    public static DbEndUserPwd retrieveForEndUserNotExpired(UUID endUserUuid) throws Throwable
+    public static DbEndUserPwd retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception
     {
         return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration.EndUserPwd_SelectForEndUserNotExpired", endUserUuid);
     }
-    public static DbEndUserPwd retrieveForUuid(UUID uuid) throws Throwable
+    public static DbEndUserPwd retrieveForUuid(UUID uuid) throws Exception
     {
         return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration._EndUserPwd_SelectForUuid", uuid);
     }

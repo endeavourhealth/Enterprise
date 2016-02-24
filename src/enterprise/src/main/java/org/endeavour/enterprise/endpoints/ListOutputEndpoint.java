@@ -20,7 +20,7 @@ public class ListOutputEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getListOutput")
-    public Response getListOutput(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Throwable
+    public Response getListOutput(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Exception
     {
         UUID listOutputUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -41,7 +41,7 @@ public class ListOutputEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveListOutput")
-    public Response saveListOutput(@Context SecurityContext sc, JsonListOutput listOutputParameters) throws Throwable {
+    public Response saveListOutput(@Context SecurityContext sc, JsonListOutput listOutputParameters) throws Exception {
 
         UUID listOutputUuid = listOutputParameters.getUuid();
 
@@ -62,7 +62,7 @@ public class ListOutputEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteListOutput")
-    public Response deleteListOutput(@Context SecurityContext sc, JsonListOutput listOutputParameters) throws Throwable {
+    public Response deleteListOutput(@Context SecurityContext sc, JsonListOutput listOutputParameters) throws Exception {
 
         UUID listOutputUuid = listOutputParameters.getUuid();
 

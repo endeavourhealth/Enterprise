@@ -2,13 +2,13 @@
 /// <reference path="../core/library.service.ts" />
 
 module app.library {
-	import TreeNode = app.models.TreeNode;
+	import FolderNode = app.models.FolderNode;
 	import ItemSummaryList = app.models.ItemSummaryList;
 	'use strict';
 
 	class LibraryController {
-		treeData : TreeNode[];
-		selectedNode : TreeNode = null;
+		treeData : FolderNode[];
+		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
 
 		static $inject = ['LibraryService', '$scope'];
@@ -25,7 +25,7 @@ module app.library {
 				});
 		}
 
-		selectNode(node : TreeNode) {
+		selectNode(node : FolderNode) {
 			if (node === this.selectedNode) { return; }
 			var vm = this;
 
@@ -41,7 +41,7 @@ module app.library {
 				});
 		}
 
-		toggleExpansion(node : TreeNode) {
+		toggleExpansion(node : FolderNode) {
 			if (!node.hasChildren) { return; }
 
 			node.isExpanded = !node.isExpanded;

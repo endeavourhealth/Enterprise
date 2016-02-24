@@ -5,6 +5,8 @@
 /// <reference path="../models/ReportActivityItem.ts" />
 
 module app.core {
+	import ItemSummaryList = app.models.ItemSummaryList;
+	import FolderNode = app.models.FolderNode;
 	import ITreeNode = AngularUITree.ITreeNode;
 	'use strict';
 
@@ -14,9 +16,9 @@ module app.core {
 		getEngineState() : ng.IPromise<app.models.EngineState>;
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
 		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]>;
-		getTreeData(code : string):ng.IPromise<ITreeNode[]>;
-		getFolders(moduleId : number, folderUuid : string):ng.IPromise<any[]>;
-		getFolderContents(folderId : string):ng.IPromise<any[]>;
+		getCodeTreeData(code : string):ng.IPromise<ITreeNode[]>;
+		getFolders(moduleId : number, folderUuid : string):ng.IPromise<FolderNode[]>;
+		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -90,7 +92,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getTreeData(code : string):ng.IPromise<ITreeNode[]> {
+		getCodeTreeData(code : string):ng.IPromise<ITreeNode[]> {
 			var defer = this.promise.defer();
 			this.http.get('app/core/data/treeResults.json')
 				.then(function (response) {
@@ -103,7 +105,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getFolders(moduleId : number, folderUuid : string):ng.IPromise<any[]> {
+		getFolders(moduleId : number, folderUuid : string):ng.IPromise<FolderNode[]> {
 			var vm = this;
 			var defer = vm.promise.defer();
 			var request = {
@@ -124,7 +126,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getFolderContents(folderUuid : string):ng.IPromise<any[]> {
+		getFolderContents(folderUuid : string):ng.IPromise<ItemSummaryList> {
 			var vm = this;
 			var defer = vm.promise.defer();
 			var request = {

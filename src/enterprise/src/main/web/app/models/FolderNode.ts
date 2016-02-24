@@ -1,7 +1,7 @@
 module app.models {
 	'use strict';
 
-	export class TreeNode {
+	export class FolderNode {
 		uuid:string;
 		folderName:string;
 		folderType:number;
@@ -10,6 +10,6 @@ module app.models {
 
 		isExpanded:boolean;
 		isSelected:boolean;
-		nodes:TreeNode[];
+		nodes:FolderNode[];
 	}
 }

@@ -51,9 +51,9 @@ module app.dialogs {
 				});
 		}
 
-		getTreeData(match : CodeSearchMatch) {
+		getCodeTreeData(match : CodeSearchMatch) {
 			var vm = this;
-			vm.libraryService.getTreeData(match.code)
+			vm.libraryService.getCodeTreeData(match.code)
 				.then(function(result:ITreeNode[]) {
 					vm.treeData = result;
 				});

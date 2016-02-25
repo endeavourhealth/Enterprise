@@ -50,7 +50,11 @@
 												<td>{{item.name}}</td>
 												<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 												<td>{{item.type | itemTypeIdToString}}</td>
-												<td>{{item.uuid}}</td>
+												<td>
+													<label class="btn btn-info btn-xs" ng-click="reports.viewItem(item)">View</label>
+													<label class="btn btn-success btn-xs" ng-click="reports.editItem(item)">Edit</label>
+													<label class="btn btn-danger btn-xs" ng-click="reports.deleteItem(item)">Delete</label>
+												</td>
 											</tr>
 										</tbody>
 									</table>

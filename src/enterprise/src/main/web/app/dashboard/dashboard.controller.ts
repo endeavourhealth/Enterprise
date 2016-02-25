@@ -23,7 +23,6 @@ module app.dashboard {
 			this.getRecentDocumentsData();
 			this.getEngineState();
 			this.getReportActivityData();
-			logger.success('Dashboard constructed', 'DashData', 'Dashboard');
 		}
 
 		getEngineHistory() {

@@ -28,7 +28,7 @@
 
 							<div class="col-md-3">
 								<div id="tree-root" class="angular-ui-tree">
-									<ol ng-model="codePicker.searchResults" class="angular-ui-tree-nodes">
+									<ol class="angular-ui-tree-nodes">
 										<li ng-repeat="node in library.treeData" ng-include="'node_template.html'" class="angular-ui-tree-node"></li>
 									</ol>
 								</div>
@@ -42,18 +42,15 @@
 												<th>Title</th>
 												<th>Date modified</th>
 												<th>Type</th>
+												<th>Actions</th>
 											</tr>
 										</thead>
 										<tbody>
-											<tr ng-repeat="item in library.itemSummaryList.queries">
+											<tr ng-repeat="item in library.itemSummaryList.contents">
 												<td>{{item.name}}</td>
+												<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
+												<td>{{item.type | itemTypeIdToString}}</td>
 												<td>{{item.uuid}}</td>
-												<td>Query</td>
-											</tr>
-											<tr ng-repeat="item in library.itemSummaryList.listOutputs">
-												<td>{{item.name}}</td>
-												<td>{{item.uuid}}</td>
-												<td>List Output</td>
 											</tr>
 										</tbody>
 									</table>

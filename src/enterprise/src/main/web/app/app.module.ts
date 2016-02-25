@@ -11,6 +11,7 @@ angular.module('app', [
 
 		'app.core',
 		'app.blocks',
+		'app.models',
 		'app.layout',
 		'app.login',
 

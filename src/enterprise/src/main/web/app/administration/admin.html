@@ -38,20 +38,20 @@
 								<tr>
 									<th>Name</th>
 									<th>EMail</th>
-									<th>Active</th>
-									<th>Admin</th>
 									<th>Super</th>
 									<th>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr ng-repeat="user in admin.userList">
-									<td>{{user.name}}</td>
-									<td>{{user.email}}</td>
-									<td><span class="glyphicon" ng-class="{'glyphicon-ok': user.isActive,'glyphicon-remove': !user.isActive}"></span></td>
-									<td><span class="glyphicon" ng-class="{'glyphicon-ok': user.isAdmin,'glyphicon-remove': !user.isAdmin}"></span></td>
-									<td><span class="glyphicon" ng-class="{'glyphicon-ok': user.isSuper,'glyphicon-remove': !user.isSuper}"></span></td>
-									<td><label class="btn btn-default btn-xs">Edit</label> <label class="btn btn-danger btn-xs">Delete</label></td>
+									<td>{{user.title}} {{user.forename}} {{user.surname}}</td>
+									<td>{{user.username}}</td>
+									<td><span class="glyphicon" ng-class="{'glyphicon-ok text-success': user.isSuperUser,'glyphicon-remove text-danger': !user.isSuperUser}"></span></td>
+									<td>
+										<label class="btn btn-info btn-xs" ng-click="admin.viewUser(user)">View</label>
+										<label class="btn btn-success btn-xs" ng-click="admin.editUser(user)">Edit</label>
+										<label class="btn btn-danger btn-xs" ng-click="admin.deleteUser(user)">Delete</label>
+									</td>
 								</tr>
 							</tbody>
 						</table>

@@ -4,11 +4,14 @@ module app.models {
 	'use strict';
 
 	export class User {
-		userUuid:string;
+		uuid:string;
 		title:string;
 		forename:string;
 		surname:string;
-		email:string;
+		username:string;	// email
+		isSuperUser:boolean;
+		permissions:number;
+
 		userInRoles:UserInRole[];
 		currentUserInRoleUuid:string;
 	}

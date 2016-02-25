@@ -11,14 +11,6 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonQuery implements Serializable
 {
-    //requirements from Darren
-    /*Id uniqueidentifier not null,
-    Content varchar(max) null,
-    IsDeleted bit not null,
-    OwnerOrganisationUuid uniqueidentifier not null,
-    Title varchar(100) not null,
-    [Description] varchar(max) null,*/
-
     private UUID uuid = null;
     private String name = null;
     private String description = null;

@@ -38,11 +38,6 @@ public final class SecurityEndpoint extends Endpoint
             throw new BadRequestException("Missing username or password in request");
         }
 
-        if (true)
-        {
-            throw new RuntimeException("Testing logging");
-        }
-
         DbEndUser user = DbEndUser.retrieveForEmail(email);
         if (user == null)
         {

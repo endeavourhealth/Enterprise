@@ -17,7 +17,7 @@ public final class JsonFolder implements Serializable {
     private String folderName = null;
     private Integer folderType = null;
     private UUID parentFolderUuid = null;
-		private Boolean hasChildren = null;
+    private Boolean hasChildren = null;
     private Integer contentCount = null;
 
     public JsonFolder()
@@ -29,7 +29,7 @@ public final class JsonFolder implements Serializable {
         this.folderName = folder.getTitle();
         this.folderType = new Integer(folder.getFolderType());
         this.parentFolderUuid = folder.getParentFolderUuid();
-				this.hasChildren = folder.getHasChildren();
+        this.hasChildren = folder.getHasChildren();
         if (count > -1)
         {
             contentCount = new Integer(count);

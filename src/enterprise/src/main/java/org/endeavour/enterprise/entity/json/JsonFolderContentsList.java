@@ -12,19 +12,22 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolderContentsList implements Serializable
 {
+    private List<JsonFolderContent> contents = null;
+/*
     private List<JsonQuery> queries = null;
     private List<JsonListOutput> listOutputs = null;
     private List<JsonReport> reports = null;
+*/
 
     public JsonFolderContentsList()
     {}
 
 
-    public void addQuery(JsonQuery query)
+    /*public void addQuery(JsonQuery query)
     {
-        if (queries == null)
+        if (contents == null)
         {
-            queries = new ArrayList<JsonQuery>();
+            contents = new List<JsonFolderContent>();
         }
         queries.add(query);
     }
@@ -43,12 +46,29 @@ public final class JsonFolderContentsList implements Serializable
             reports = new ArrayList<JsonReport>();
         }
         reports.add(report);
+    }*/
+    public void addContent(JsonFolderContent content)
+    {
+        if (contents == null)
+        {
+            contents = new ArrayList<JsonFolderContent>();
+        }
+        contents.add(content);
     }
+
 
     /**
      * gets/sets
      */
-    public List<JsonQuery> getQueries() {
+    public List<JsonFolderContent> getContents() {
+        return contents;
+    }
+
+    public void setContents(List<JsonFolderContent> contents) {
+        this.contents = contents;
+    }
+
+    /*public List<JsonQuery> getQueries() {
         return queries;
     }
 
@@ -70,5 +90,5 @@ public final class JsonFolderContentsList implements Serializable
 
     public void setReports(List<JsonReport> reports) {
         this.reports = reports;
-    }
+    }*/
 }

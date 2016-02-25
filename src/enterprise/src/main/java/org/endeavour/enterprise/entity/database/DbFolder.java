@@ -18,7 +18,7 @@ public final class DbFolder extends DbAbstractTable {
     private UUID parentFolderUuid = null;
     private String title = null;
     private int folderType = -1;
-		private Boolean hasChildren = null;
+    private Boolean hasChildren = null;
 
     //register as a DB entity
     private static TableAdapter adapter = new TableAdapter(DbFolder.class,
@@ -41,7 +41,7 @@ public final class DbFolder extends DbAbstractTable {
         builder.add(parentFolderUuid);
         builder.add(title);
         builder.add(folderType);
-				builder.add(hasChildren);
+		builder.add(hasChildren);
     }
 
     @Override
@@ -52,7 +52,7 @@ public final class DbFolder extends DbAbstractTable {
         parentFolderUuid = reader.readUuid();
         title = reader.readString();
         folderType = reader.readInt();
-				hasChildren = reader.readBoolean();
+		hasChildren = reader.readBoolean();
     }
 
     public static List<DbAbstractTable> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Exception

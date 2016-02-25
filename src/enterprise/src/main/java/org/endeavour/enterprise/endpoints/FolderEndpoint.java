@@ -3,13 +3,18 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.entity.database.DbAbstractTable;
 import org.endeavour.enterprise.entity.database.DbFolder;
 import org.endeavour.enterprise.entity.database.DbFolderItemLink;
-import org.endeavour.enterprise.entity.json.*;
+import org.endeavour.enterprise.entity.json.JsonFolder;
+import org.endeavour.enterprise.entity.json.JsonFolderContent;
+import org.endeavour.enterprise.entity.json.JsonFolderContentsList;
+import org.endeavour.enterprise.entity.json.JsonFolderList;
+import org.endeavour.enterprise.model.DefinitionItemType;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -427,52 +432,74 @@ public final class FolderEndpoint extends Endpoint {
 
         if (folder.getFolderType() == DbFolder.FOLDER_TYPE_REPORTS)
         {
-            JsonReport r = new JsonReport();
-            r.setName("Report 1");
-            r.setUuid(UUID.randomUUID());
-            ret.addReport(r);
+            JsonFolderContent c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("Report 1");
+            c.setTypeEnum(DefinitionItemType.Report);
+            c.setLastModified(new Date());
+            c.setLastRun(new Date());
+            c.setIsScheduled(true);
+            ret.addContent(c);
 
-            r = new JsonReport();
-            r.setName("Report 2");
-            r.setUuid(UUID.randomUUID());
-            ret.addReport(r);
+            c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("Report 2");
+            c.setTypeEnum(DefinitionItemType.Report);
+            c.setLastModified(new Date());
+            c.setIsScheduled(false);
+            ret.addContent(c);
 
-            r = new JsonReport();
-            r.setName("Report 3");
-            r.setUuid(UUID.randomUUID());
-            ret.addReport(r);
+            c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("Report 3");
+            c.setTypeEnum(DefinitionItemType.Report);
+            c.setLastModified(new Date());
+            c.setIsScheduled(false);
+            ret.addContent(c);
         }
         else if (folder.getFolderType() == DbFolder.FOLDER_TYPE_LIBRARY)
         {
-            JsonListOutput l = new JsonListOutput();
-            l.setName("List Output 1");
-            l.setUuid(UUID.randomUUID());
-            ret.addListOutput(l);
+            JsonFolderContent c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("List Output 1");
+            c.setTypeEnum(DefinitionItemType.ListOutput);
+            c.setLastModified(new Date());
+            ret.addContent(c);
 
-            l = new JsonListOutput();
-            l.setName("List Output 2");
-            l.setUuid(UUID.randomUUID());
-            ret.addListOutput(l);
+            c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("List Output 2");
+            c.setTypeEnum(DefinitionItemType.ListOutput);
+            c.setLastModified(new Date());
+            ret.addContent(c);
 
-            l = new JsonListOutput();
-            l.setName("List Output 3");
-            l.setUuid(UUID.randomUUID());
-            ret.addListOutput(l);
+            c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("List Output 3");
+            c.setTypeEnum(DefinitionItemType.ListOutput);
+            c.setLastModified(new Date());
+            ret.addContent(c);
 
-            JsonQuery q = new JsonQuery();
-            q.setName("Query 1");
-            q.setUuid(UUID.randomUUID());
-            ret.addQuery(q);
+            c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("Query 1");
+            c.setTypeEnum(DefinitionItemType.Query);
+            c.setLastModified(new Date());
+            ret.addContent(c);
 
-            q = new JsonQuery();
-            q.setName("Query 2");
-            q.setUuid(UUID.randomUUID());
-            ret.addQuery(q);
+            c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("Query 2");
+            c.setTypeEnum(DefinitionItemType.Query);
+            c.setLastModified(new Date());
+            ret.addContent(c);
 
-            q = new JsonQuery();
-            q.setName("Query 3");
-            q.setUuid(UUID.randomUUID());
-            ret.addQuery(q);
+            c = new JsonFolderContent();
+            c.setUuid(UUID.randomUUID());
+            c.setName("Query 3");
+            c.setTypeEnum(DefinitionItemType.Query);
+            c.setLastModified(new Date());
+            ret.addContent(c);
         }
         else
         {

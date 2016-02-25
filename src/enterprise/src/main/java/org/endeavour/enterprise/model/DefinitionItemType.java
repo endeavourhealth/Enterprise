@@ -9,7 +9,8 @@ public enum DefinitionItemType {
 	Query(2),
 	Test(3),
 	Datasource(4),
-	CodeSet(5);
+	CodeSet(5),
+	ListOutput(6); //2016-02-25 DL - added
 
 	private int value;
 	DefinitionItemType(final int value)

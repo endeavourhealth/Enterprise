@@ -4,6 +4,9 @@
 module app.library {
 	import FolderNode = app.models.FolderNode;
 	import ItemSummaryList = app.models.ItemSummaryList;
+	import FolderContent = app.models.FolderContent;
+	import ILoggerService = app.blocks.ILoggerService;
+	import itemTypeIdToString = app.models.itemTypeIdToString;
 	'use strict';
 
 	class LibraryController {
@@ -11,9 +14,9 @@ module app.library {
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
 
-		static $inject = ['LibraryService', '$scope'];
+		static $inject = ['LibraryService', 'LoggerService', '$scope'];
 
-		constructor(private libraryService:app.core.ILibraryService, private $scope : any) {
+		constructor(private libraryService:app.core.ILibraryService, private logger:ILoggerService, private $scope : any) {
 			this.getLibraryRootFolders();
 		}
 
@@ -39,6 +42,18 @@ module app.library {
 				.then(function(data) {
 					vm.itemSummaryList = data;
 				});
+		}
+
+		editItem(item:FolderContent) {
+			this.logger.success('Edit ' + itemTypeIdToString()(item.type) + ':' + item.name);
+		}
+
+		viewItem(item:FolderContent) {
+			this.logger.info('View ' + itemTypeIdToString()(item.type) + ':' + item.name);
+		}
+
+		deleteItem(item:FolderContent) {
+			this.logger.error('Delete ' + itemTypeIdToString()(item.type) + ':' + item.name);
 		}
 
 		toggleExpansion(node : FolderNode) {

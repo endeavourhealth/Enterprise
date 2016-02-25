@@ -16,7 +16,7 @@ module app.core {
 		isAuthenticated() : boolean;
 		login(username:string, password:string) : IPromise<app.models.User>;
 		logout() : void;
-		getUserList() : IPromise<app.models.User[]>;
+		getUserList() : IPromise<app.models.UserList>;
 	}
 
 	export class AdminService implements IAdminService {
@@ -82,7 +82,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getUserList() : IPromise<app.models.User[]> {
+		getUserList() : IPromise<app.models.UserList> {
 			var vm = this;
 			var defer = vm.promise.defer();
 			vm.http.get('/api/admin/getUsers')

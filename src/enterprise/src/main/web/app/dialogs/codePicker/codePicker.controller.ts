@@ -24,7 +24,6 @@ module app.dialogs {
 								private $uibModal : IModalService) {
 			this.showModal = false;
 			this.searchData = '"Asthma","Angina","Diabetes","Hadache","Glaucoma","Ankle"';
-			logger.success('CodePicker constructed', 'CodePickerData', 'CodePicker');
 		}
 
 		open() {

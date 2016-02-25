@@ -20,7 +20,6 @@ module app.login {
 								private AdminService:IAdminService) {
 			Idle.unwatch();
 			AdminService.logout();
-			logger.success('Login constructed', 'LoginData', 'Login');
 		}
 
 		login() {

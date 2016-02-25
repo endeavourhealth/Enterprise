@@ -4,7 +4,6 @@ import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.entity.database.DbOrganisation;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.framework.security.UserPrincipal;
-import org.endeavour.enterprise.framework.security.UserSecurityContext;
 import org.endeavour.enterprise.model.EndUserRole;
 import org.endeavour.enterprise.model.UserContext;
 
@@ -63,8 +62,11 @@ public abstract class Endpoint
 
     protected EndUserRole getRoleFromSession(SecurityContext sc) throws Exception
     {
-        UserSecurityContext usc = (UserSecurityContext)sc;
-        UserPrincipal up = (UserPrincipal)usc.getUserPrincipal();
+        //2016-02-26 DL - bug waiting to happen
+        UserPrincipal up = (UserPrincipal)sc.getUserPrincipal();
+        /*UserSecurityContext usc = (UserSecurityContext)sc;
+        UserPrincipal up = (UserPrincipal)usc.getUserPrincipal();*/
+
         UserContext uc = up.getUserContext();
         return uc.getEndUserRole();
     }

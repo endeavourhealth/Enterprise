@@ -1,6 +1,10 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavour.enterprise.entity.database.DbActiveItem;
+import org.endeavour.enterprise.entity.database.DbItem;
+import org.endeavour.enterprise.entity.json.JsonQuery;
 import org.endeavour.enterprise.entity.json.JsonReport;
+import org.endeavour.enterprise.model.DefinitionItemType;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -13,7 +17,7 @@ import java.util.UUID;
  * Created by Drew on 23/02/2016.
  */
 @Path("/report")
-public final class ReportEndpoint extends Endpoint
+public final class ReportEndpoint extends ItemEndpoint
 {
 
     @GET
@@ -25,11 +29,11 @@ public final class ReportEndpoint extends Endpoint
         UUID reportUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        JsonReport ret = new JsonReport();
+        //retrieve the activeItem, so we know the latest version
+        DbActiveItem activeItem = super.retrieveActiveItem(reportUuid, orgUuid, DefinitionItemType.ListOutput);
+        DbItem item = super.retrieveItem(activeItem);
 
-        //TODO: 2016-02-23 DL - get report from DB
-        ret.setUuid(reportUuid);
-        ret.setName("Dummy report");
+        JsonReport ret = new JsonReport(item);
 
         return Response
                 .ok()
@@ -41,21 +45,27 @@ public final class ReportEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveReport")
-    public Response saveReport(@Context SecurityContext sc, JsonReport reportParameters) throws Exception {
+    public Response saveReport(@Context SecurityContext sc, JsonReport reportParameters) throws Exception
+    {
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
 
         UUID reportUuid = reportParameters.getUuid();
+        String name = reportParameters.getName();
+        String description = reportParameters.getDescription();
+        String xmlContent = reportParameters.getXmlContent();
+        Boolean isDeleted = reportParameters.getIsDeleted();
 
-        if (reportUuid == null)
-        {
-            //TODO: 2016-02-23 DL - save report to DB
-        }
-        else
-        {
-            //TODO: 2016-02-23 DL - update report on DB
+        reportUuid = super.saveItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, xmlContent, isDeleted);
 
-        }
+        //return the UUID of the query
+        JsonQuery ret = new JsonQuery();
+        ret.setUuid(reportUuid);
 
-        return Response.ok().build();
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
     }
 
     @POST
@@ -65,8 +75,10 @@ public final class ReportEndpoint extends Endpoint
     public Response deleteReport(@Context SecurityContext sc, JsonReport reportParameters) throws Exception {
 
         UUID reportUuid = reportParameters.getUuid();
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
 
-        //TODO: 2016-02-23 DL - delete report from DB
+        super.deleteItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report);
 
         return Response.ok().build();
     }

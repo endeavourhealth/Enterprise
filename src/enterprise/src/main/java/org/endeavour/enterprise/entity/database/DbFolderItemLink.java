@@ -15,8 +15,7 @@ public final class DbFolderItemLink extends DbAbstractTable
     private UUID itemUuid = null;
 
     //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbFolderItemLink.class,
-            "FolderItemLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
+    private static final TableAdapter adapter = new TableAdapter(DbFolderItemLink.class, "FolderItemLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
     public DbFolderItemLink()
     {}

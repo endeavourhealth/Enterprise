@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.entity.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.endeavour.enterprise.entity.database.DbItem;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -15,11 +16,17 @@ public final class JsonQuery implements Serializable
     private String name = null;
     private String description = null;
     private String xmlContent = null;
-    private boolean isDeleted = false;
+    private Boolean isDeleted = null;
 
     public JsonQuery()
+    {}
+    public JsonQuery(DbItem item)
     {
-
+        this.uuid = item.getPrimaryUuid();
+        this.name = item.getTitle();
+        this.description = item.getDescription();
+        this.xmlContent = item.getXmlContent();
+        this.isDeleted = item.getIsDeleted();
     }
 
 
@@ -59,11 +66,11 @@ public final class JsonQuery implements Serializable
         this.xmlContent = xmlContent;
     }
 
-    public boolean getIsDeleted() {
+    public Boolean getIsDeleted() {
         return isDeleted;
     }
 
-    public void setIsDeleted(boolean deleted) {
+    public void setIsDeleted(Boolean deleted) {
         isDeleted = deleted;
     }
 

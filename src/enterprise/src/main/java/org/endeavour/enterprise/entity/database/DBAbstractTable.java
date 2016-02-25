@@ -37,15 +37,24 @@ public abstract class DbAbstractTable
         if (primaryUuid == null)
         {
             primaryUuid = UUID.randomUUID();
-            getAdapter().saveToDb(true, this);
+            saveToDbInsert();
         }
         //if we already have a UUID then we're updating an existing entity,
         //so use the UPDATE stored procedure
         else
         {
-            getAdapter().saveToDb(false, this);
+            saveToDbUpdate();
         }
     }
+    public void saveToDbInsert() throws Exception
+    {
+        getAdapter().saveToDb(true, this);
+    }
+    public void saveToDbUpdate() throws Exception
+    {
+        getAdapter().saveToDb(false, this);
+    }
+
 
     /**
      * convenience method to delete an entity from the DB

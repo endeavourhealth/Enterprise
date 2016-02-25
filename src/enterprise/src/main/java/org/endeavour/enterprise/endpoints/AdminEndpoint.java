@@ -4,6 +4,7 @@ import org.endeavour.enterprise.entity.database.*;
 import org.endeavour.enterprise.entity.json.JsonEndUser;
 import org.endeavour.enterprise.entity.json.JsonEndUserList;
 import org.endeavour.enterprise.entity.json.JsonOrganisation;
+import org.endeavour.enterprise.framework.database.DatabaseConnection;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.model.EndUserRole;
 
@@ -92,14 +93,19 @@ public final class AdminEndpoint extends Endpoint {
         String title = userParameters.getTitle();
         String forename = userParameters.getForename();
         String surname = userParameters.getSurname();
-        int permissions = userParameters.getPermissions();
-        boolean isSuperUser = userParameters.getIsSuperUser();
+        Integer permissions = userParameters.getPermissions();
+        Boolean isSuperUser = userParameters.getIsSuperUser();
 
         DbOrganisation org = getOrganisationFromSession(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
+        if (isSuperUser == null)
+        {
+            isSuperUser = new Boolean(false);
+        }
+
         //if doing anything to a super user, verify the current user is a super-user
-        if (isSuperUser)
+        if (isSuperUser.booleanValue())
         {
             DbEndUser user = getEndUserFromSession(sc);
             if (!user.getIsSuperUser())
@@ -160,7 +166,7 @@ public final class AdminEndpoint extends Endpoint {
             link.setOrganisationUuid(orgUuid);
             link.setEndUserUuid(uuid);
             link.setPermissions(permissions);
-            link.setDtExpired(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
+            link.setDtExpired(DatabaseConnection.getEndOfTime());
 
         }
         //if we have a uuid, we're updating an existing person

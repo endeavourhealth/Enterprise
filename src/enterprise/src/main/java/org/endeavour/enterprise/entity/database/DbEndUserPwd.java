@@ -11,14 +11,15 @@ import java.util.UUID;
  */
 public class DbEndUserPwd extends DbAbstractTable {
 
+    //register as a DB entity
+    private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
+            "EndUserPwd", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
+
+
     private UUID endUserUuid = null;
     private String pwdHash = null;
     private Date dtExpired = null;
     //TODO: 2016-02-22 DL - should have number of lives and expiry date for passwords?
-
-    //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
-            "EndUserPwd", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
     public DbEndUserPwd()

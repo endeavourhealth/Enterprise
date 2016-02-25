@@ -78,7 +78,8 @@ values
 	(2, 'Query'),
 	(3, 'Test'),
 	(4, 'Datasource'),
-	(5, 'CodeSet');
+	(5, 'CodeSet'),
+	(6, 'ListOutput');
 
 create table [Definition].Module
 (

@@ -17,7 +17,7 @@ public final class DbEndUser extends DbAbstractTable {
     private boolean isSuperUser = false;
 
     //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbEndUser.class,
+    private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
                                         "EndUser", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 

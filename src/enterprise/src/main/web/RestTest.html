@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta charset="UTF-8"> 
+
+	<title>Enterprise REST Test</title>
+
+<script>
+
+
+	function post(url, params)
+	{
+		var para = appendHeadingToResults(url);
+
+		if(typeof(params)!='undefined')
+		{
+			var jsonStr = JSON.stringify(params);
+			appendResult(para, "request", jsonStr);
+		}
+	
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.DisableHeaderCheck = true;
+
+		xmlhttp.onreadystatechange = function()
+		{
+			if (xmlhttp.readyState == 4) //request complete
+			{
+				var status = xmlhttp.status;
+				var statusText = xmlhttp.statusText;
+				appendResult(para, "response status", status + " " + statusText);
+
+				/*var headers = xmlhttp.getAllResponseHeaders();
+				appendResult(para, "headers", headers);*/
+
+				/*var cookie = xmlhttp.getResponseHeader('Set-Cookie');
+				appendResult(para, "cookie", cookie);*/
+
+				var response = xmlhttp.responseText;
+				appendResult(para, "response", response);
+
+				/*if (status == 200) //http ok
+				{
+					var response = xmlhttp.responseText;
+					appendResult(para, "response", response);
+				}*/
+
+				scrollToEnd();
+			}
+		};
+
+		xmlhttp.open("POST", url, true);
+
+		xmlhttp.setRequestHeader('Accept', 'application/json');
+		xmlhttp.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+		if(typeof(params)!='undefined')
+		{
+			xmlhttp.setRequestHeader('Content-Length', params.length);
+		}
+
+		//if (params == null)
+		if(typeof(params)=='undefined')
+		{
+			xmlhttp.send();
+		}
+		else
+		{
+			var jsonStr = JSON.stringify(params);
+			xmlhttp.send(jsonStr);
+		}
+
+
+	}
+
+	function get(url)
+	{
+		var para = appendHeadingToResults(url);
+
+		var xmlhttp = new XMLHttpRequest();
+
+		xmlhttp.onreadystatechange = function() {
+		    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+		    {
+				var response = xmlhttp.responseText;
+				appendResult(para, "response", response);
+	   		}
+		};
+
+		xmlhttp.open("GET", url, true);
+		xmlhttp.setRequestHeader('Accept', 'application/json');
+
+		xmlhttp.send();
+
+		scrollToEnd();
+	}
+
+	function appendHeadingToResults(title)
+	{
+		var d = new Date();
+		var titleWithTime = "" + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + " -> " + title;
+
+		var para = document.createElement("p");
+		var heading = document.createElement("strong");
+		var textNode = document.createTextNode(titleWithTime);
+		var resultsElement = document.getElementById("results");
+
+		heading.appendChild(textNode);
+		para.appendChild(heading);
+		resultsElement.appendChild(para);
+
+		return para;
+	}
+
+	function appendResult(para, name, value)
+	{
+		//var para = document.createElement("p");
+		var brElement = document.createElement("br");
+		var codeElement = document.createElement("code");
+		var nameTextNode = document.createTextNode(name + ": ");
+		var valueTextNode = document.createTextNode(value);
+		var resultsElement = document.getElementById("results");
+
+
+		codeElement.appendChild(valueTextNode);
+
+		para.appendChild(brElement);
+		para.appendChild(nameTextNode);
+		para.appendChild(codeElement);
+		//resultsElement.appendChild(para);
+	}
+
+	function scrollToEnd()
+	{
+		window.scrollTo(0,document.body.scrollHeight);
+	}
+
+
+
+
+</script>
+
+</head>
+
+<body>
+
+<h2>/api/security/login</h2>
+
+	Username: <input type="text" id="username" value="drewlittler@hotmail.com">
+	<br/>
+	Password: <input type="text" id="password" value="test">
+	<br/>
+	<button type="button" onclick="performLogin()">Submit</button>
+
+	<script>
+		function performLogin() {
+
+			var usernameStr = document.getElementById('username').value;
+			var passwordStr = document.getElementById('password').value;
+
+			var params = {username:usernameStr, password:passwordStr};
+			var jsonStr = JSON.stringify(params);
+
+			post('/api/security/login/', params);
+
+		}
+	</script>
+
+<hr/>
+<h2>/api/security/selectOrganisation</h2>
+
+	Organisation UUID: <input type="text" id="uuid" value="">
+	<br/>
+	<button type="button" onclick="selectOrganisation()">Submit</button>
+
+	<script>
+		function selectOrganisation() {
+
+			var orgUuid = document.getElementById('uuid').value;
+			var params = {uuid:orgUuid};
+
+			post('/api/security/selectOrganisation/', params);
+	
+		}
+	</script>
+
+<hr/>
+<h2>/api/security/changePassword</h2>
+
+	New password: <input type="text" id="changePasswordNewPassword" value="">
+	<br/>
+	<button type="button" onclick="changePassword()">Submit</button>
+
+	<script>
+		function changePassword() {
+
+			var newPassword = document.getElementById('changePasswordNewPassword').value;
+			var params = {password:newPassword};
+
+			post('/api/security/changePassword/', params);
+	
+		}
+	</script>
+
+<hr/>
+<h2>/api/security/logoff</h2>
+
+	<button type="button" onclick="logoff()">Submit</button>
+
+	<script>
+		function logoff() {
+
+			post('/api/security/logoff/');
+	
+		}
+	</script>
+
+<hr/>
+<h2>/api/security/setPasswordFromInviteEmail</h2>
+
+	Token: <input type="text" id="inviteToken" value="">
+	<br/>
+	Password: <input type="text" id="invitePassword" value="test">
+	<br/>
+	<button type="button" onclick="setPasswordFromInvite()">Submit</button>
+
+	<script>
+		function setPasswordFromInvite() {
+
+			var emailToken = document.getElementById('inviteToken').value;
+			var newPassword = document.getElementById('invitePassword').value;
+
+			var params = {token:emailToken, password:newPassword};
+
+			post('/api/security/setPasswordFromInviteEmail/', params);
+	
+		}
+	</script>
+
+<hr/>
+<h2>/api/admin/getUsers</h2>
+
+	<button type="button" onclick="getUsers()">Submit</button>
+
+	<script>
+		function getUsers() {
+
+			get('/api/admin/getUsers/');
+	
+		}
+	</script>
+
+<hr/>
+<h2>/api/admin/saveUser</h2>
+
+User UUID: <input type="text" id="saveUserUuid" value="">(leave blank to create a new user)
+<br/>
+Email: <input type="text" id="saveUserEmail" value="">
+<br/>
+Title: <input type="text" id="saveUserTitle" value="test">
+<br/>
+Forename: <input type="text" id="saveUserForename" value="">
+<br/>
+Surname: <input type="text" id="saveUserSurname" value="test">
+<br/>
+Permissions:
+<select id="saveUserPermissions">
+	<option value="1">User</option>
+	<option value="2">Admin</option>
+</select>
+<br/>
+Super user: <input type="checkbox" id="saveUserSuperUser" value="test">
+<br/>
+
+<button type="button" onclick="saveUser()">Submit</button>
+
+<script>
+		function saveUser() {
+
+			var params = {};
+
+			var s = document.getElementById('saveUserUuid').value;
+			if (s.length > 0)
+			{
+				params["uuid"] = s;
+			}
+
+			s = document.getElementById('saveUserEmail').value;
+			if (s.length > 0)
+			{
+				params["username"] = s;
+			}
+
+			s = document.getElementById('saveUserTitle').value;
+			if (s.length > 0)
+			{
+				params["title"] = s;
+			}
+
+			s = document.getElementById('saveUserForename').value;
+			if (s.length > 0)
+			{
+				params["forename"] = s;
+			}
+
+			s = document.getElementById('saveUserSurname').value;
+			if (s.length > 0)
+			{
+				params["surname"] = s;
+			}
+
+			var s = document.getElementById('saveUserPermissions').value;
+			alert("Selected permis = " + s);
+			if (s.length > 0)
+			{
+				params["permissions"] = s;
+			}
+
+			if (document.getElementById("saveUserSuperUser").checked)
+			{
+				params["isSuperUser"] = 'true';
+			}
+
+			post('/api/admin/saveUser/', params);
+
+		}
+	</script>
+
+<hr/>
+<h2>/api/admin/saveUser</h2>
+
+User UUID: <input type="text" id="deleteUserUuid" value="">
+<br/>
+<button type="button" onclick="deleteUser()">Submit</button>
+
+
+<script>
+		function deleteUser() {
+
+			var s = document.getElementById('deleteUserUuid').value;
+			var params = {uuid:s};
+
+			post('/api/admin/deleteUser/', params);
+		}
+	</script>
+
+
+
+
+<hr/>
+<h2>/api/admin/resendInviteEmail</h2>
+
+	Email: <input type="text" id="resendInviteEmail" value="">
+	<br/>
+	<button type="button" onclick="resendInviteEmail()">Submit</button>
+
+
+	<script>
+		function resendInviteEmail() {
+
+			var s = document.getElementById('resendInviteEmail').value;
+			var params = {username:s};
+
+			post('/api/admin/resendInviteEmail/', params);
+		}
+	</script>
+
+<hr/>
+<h2>/api/admin/saveOrganisation</h2>
+
+Organisation UUID: <input type="text" id="saveOrganisationUuid">(Leave empty to create new one)
+<br/>
+Organisation name: <input type="text" id="saveOrganisationName">
+<br/>
+National ID: <input type="text" id="saveOrganisationId">
+<br/>
+<button type="button" onclick="saveOrganisation()">Submit</button>
+
+<script>
+		function saveOrganisation() {
+
+			var params = {};
+
+			var s = document.getElementById('saveOrganisationUuid').value;
+			if (s.length > 0)
+			{
+				params["uuid"] = s;
+			}
+
+			s = document.getElementById('saveOrganisationName').value;
+			if (s.length > 0)
+			{
+				params["name"] = s;
+			}
+
+			s = document.getElementById('saveOrganisationId').value;
+			if (s.length > 0)
+			{
+				params["nationalId"] = s;
+			}
+
+			post('/api/admin/saveOrganisation/', params);
+
+		}
+	</script>
+
+<hr/>
+<h2>/api/folder/getFolders</h2>
+
+
+<button type="button" onclick="getFolders()">Submit</button>
+
+
+<script>
+		function getFolders() {
+
+			get('/api/folder/getFolders/');
+		}
+	</script>
+
+<hr/>
+<h2>/api/folder/saveFolder</h2>
+
+	Folder UUID: <input type="text" id="saveFolderUuid" value="">(leave blank to create a new folder)
+	<br/>
+	Folder name: <input type="text" id="saveFolderName" value="">
+	<br/>
+	optional parent UUID: <input type="text" id="saveFolderParentUuid" value="">
+	<br/>
+	<button type="button" onclick="saveFolder()">Submit</button>
+
+
+	<script>
+		function saveFolder() {
+
+			var params = {};
+
+			var s = document.getElementById('saveFolderUuid').value;
+			if (s.length > 0)
+			{
+				params["uuid"] = s;
+			}
+			s = document.getElementById('saveFolderName').value;
+			if (s.length > 0)
+			{
+				params["folderName"] = s;
+			}
+			s = document.getElementById('saveFolderParentUuid').value;
+			if (s.length > 0)
+			{
+				params["parentFolderUuid"] = s;
+			}
+
+			post('/api/folder/saveFolder/', params);
+		}
+	</script>
+
+<hr/>
+<h2>/api/folder/deleteFolder</h2>
+
+	Folder UUID: <input type="text" id="deleteFolderUuid" value="">
+	<br/>
+	<button type="button" onclick="deleteFolder()">Submit</button>
+
+
+	<script>
+		function deleteFolder() {
+
+			var s = document.getElementById('deleteFolderUuid').value;
+
+			var params = {uuid:s};
+			post('/api/folder/deleteFolder/', params);
+
+		}
+	</script>
+
+
+
+<hr/>
+<h2>Results</h2>
+
+
+<div id="results"></div>
+
+
+
+
+</body>
+</html> 

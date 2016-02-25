@@ -17,7 +17,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     private Date dtCompleted = null;
 
     //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbEndUserEmailInvite.class,
+    private static final TableAdapter adapter = new TableAdapter(DbEndUserEmailInvite.class,
             "EndUserEmailInvite", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 

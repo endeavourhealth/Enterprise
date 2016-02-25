@@ -1,6 +1,5 @@
 package org.endeavour.enterprise.entity.database;
 
-import java.nio.ByteBuffer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -11,7 +10,7 @@ import java.util.UUID;
  */
 public final class ResultReader {
 
-    private static final int FIRST_COL = 1; //keep forgetting this, so made a constant
+    private static final int FIRST_COL = 1; //keep forgetting this, as it's not zero, so made a constant
 
     private ResultSet rs = null;
     private int currentCol = FIRST_COL;
@@ -33,21 +32,10 @@ public final class ResultReader {
 
     public UUID readUuid() throws SQLException
     {
-			String uuidString = rs.getString(currentCol++);
-        return uuidString == null ? null : UUID.fromString(uuidString);
+        String uuidString = rs.getString(currentCol++);
 
-/*
-        byte[] bytes = rs.getBytes(currentCol);
-        String s = rs.getString(currentCol++);
-        System.out.println("UUID = " + s);
-*/
-/*
-        byte[] bytes = rs.getBytes(currentCol++);
-        ByteBuffer bb = ByteBuffer.wrap(bytes);
-        long high = bb.getLong();
-        long low = bb.getLong();
-        return new UUID(high, low);
-*/
+        //UUID may be null
+        return uuidString == null ? null : UUID.fromString(uuidString);
     }
 
     public boolean readBoolean() throws SQLException

@@ -1,9 +1,12 @@
 package org.endeavour.enterprise.entity.database;
 
 import org.endeavour.enterprise.framework.database.DatabaseConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +15,10 @@ import java.util.UUID;
 /**
  * Created by Drew on 17/02/2016.
  */
-public class TableAdapter
+public final class TableAdapter
 {
+    private static final Logger LOG = LoggerFactory.getLogger(TableAdapter.class); //2016-02-26 DL - logging
+
     private Class cls = null;
     private String tableName = null;
     private String schema = null;
@@ -346,8 +351,7 @@ public class TableAdapter
 
     public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception
     {
-
-        String spName = getSchema() + "." + getTableName();
+        String spName = getSchema() + "._" + getTableName();
         if (insert) {
             spName += "_Insert";
         } else {
@@ -361,7 +365,16 @@ public class TableAdapter
 
         Connection connection = DatabaseConnection.get(getDatabase());
         Statement s = connection.createStatement();
-        s.execute(sql);
+
+        try {
+            s.execute(sql);
+        }
+        catch (SQLException sqlExc)
+        {
+            //if we get an error with the SQL, at least log it out
+            LOG.error("Error with SQL " + sql);
+            throw sqlExc;
+        }
     }
 
 /*    public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception {
@@ -402,7 +415,7 @@ public class TableAdapter
      */
     public void deleteFromDb(DbAbstractTable entity) throws Exception
     {
-        String spName = getSchema() + "." + getTableName() + "_Delete";
+        String spName = getSchema() + "._" + getTableName() + "_Delete";
         String sql = spName + " " + entity.getPrimaryUuid();
 
         Connection connection = DatabaseConnection.get(getDatabase());

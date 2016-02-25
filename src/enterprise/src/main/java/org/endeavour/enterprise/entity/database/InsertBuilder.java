@@ -1,7 +1,5 @@
 package org.endeavour.enterprise.entity.database;
 
-import net.sourceforge.jtds.jdbc.DateTime;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -14,6 +12,7 @@ public final class InsertBuilder {
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private StringBuilder sb = new StringBuilder();
+    private boolean firstAppend = true;
 
     public InsertBuilder()
     {}
@@ -39,13 +38,23 @@ public final class InsertBuilder {
     public void add(UUID uuid)
     {
         addCommaIfRequired();
-        sb.append("'" + uuid.toString() + "'");
+
+        //we allow some null UUIDs on the DB
+        if (uuid == null)
+        {
+            sb.append("'null'");
+        }
+        else
+        {
+            sb.append("'" + uuid.toString() + "'");
+        }
     }
 
     public void add(boolean b)
     {
         addCommaIfRequired();
-        if (b) {
+        if (b)
+        {
             sb.append(1);
         }
         else
@@ -58,12 +67,16 @@ public final class InsertBuilder {
     {
         addCommaIfRequired();
 
-        sb.append(dateFormatter.format(dt));
+        sb.append("'" + dateFormatter.format(dt) + "'");
     }
 
     private void addCommaIfRequired()
     {
-        if (sb.length() > 0)
+        if (firstAppend)
+        {
+            firstAppend = false;
+        }
+        else
         {
             sb.append(", ");
         }

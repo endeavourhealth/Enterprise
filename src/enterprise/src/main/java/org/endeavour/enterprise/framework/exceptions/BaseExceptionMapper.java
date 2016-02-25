@@ -12,7 +12,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public final class BaseExceptionMapper implements ExceptionMapper<Exception>
 {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseExceptionMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseExceptionMapper.class); //2016-02-24 DL - logging
 
     /**
      * 2016-02-17 DL - rewriting to be a bit more concise

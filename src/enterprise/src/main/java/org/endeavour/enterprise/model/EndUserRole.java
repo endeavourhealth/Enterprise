@@ -13,17 +13,18 @@ public enum EndUserRole
         this.value = value;
     }
 
-    public int getValue()
+    public int get()
     {
         return value;
     }
 
-    public boolean isGreaterThanOrEqualTo(EndUserRole endUserRole)
+    //2016-02-25 DL - not used
+/*    public boolean isGreaterThanOrEqualTo(EndUserRole endUserRole)
     {
-        return (value >= endUserRole.getValue());
-    }
+        return (value >= endUserRole.get());
+    }*/
 
-    public static EndUserRole getValue(int value) {
+    public static EndUserRole get(int value) {
         for(EndUserRole e: EndUserRole.values()) {
             if(e.value == value) {
                 return e;

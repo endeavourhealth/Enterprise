@@ -14,15 +14,15 @@ public final class DbFolder extends DbAbstractTable {
     public static final int FOLDER_TYPE_LIBRARY = 1;
     public static final int FOLDER_TYPE_REPORTS = 2;
 
+    //register as a DB entity
+    private static final TableAdapter adapter = new TableAdapter(DbFolder.class, "Folder", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
+
+
     private UUID organisationUuid = null;
     private UUID parentFolderUuid = null;
     private String title = null;
     private int folderType = -1;
     private Boolean hasChildren = null;
-
-    //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbFolder.class,
-                                        "Folder", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
     public DbFolder()
     {}

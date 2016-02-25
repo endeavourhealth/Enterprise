@@ -14,14 +14,15 @@ import java.util.UUID;
  */
 public final class DbOrganisationEndUserLink extends DbAbstractTable {
 
+
+    //register as a DB entity
+    private static final TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class, "OrganisationEndUserLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
+
+
     private UUID organisationUuid = null;
     private UUID endUserUuid = null;
     private int permissions = -1;
     private Date dtExpired = null;
-
-    //register as a DB entity
-    private static TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class,
-            "OrganisationEndUserLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
 
@@ -85,7 +86,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
      */
     public EndUserRole getRole()
     {
-        return EndUserRole.getValue(permissions);
+        return EndUserRole.get(permissions);
     }
 
 

@@ -56,8 +56,13 @@ public class TokenHelper
     private static String createToken(DbEndUser person, DbOrganisation org, EndUserRole endUserRole)
     {
         Map<String, Object> bodyParameterMap = new HashMap<>();
-        bodyParameterMap.put(TOKEN_USER, person.getPrimaryUuid());
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
+
+        //when logging a user off, we create a token with a null person
+        if (person != null)
+        {
+            bodyParameterMap.put(TOKEN_USER, person.getPrimaryUuid());
+        }
 
         //if the person has multiple orgs they can log on to, then we may pass in null until they select one
         if (org != null)
@@ -76,7 +81,7 @@ public class TokenHelper
 
     private static NewCookie createCookie(String token)
     {
-        int maxAge = 60 * 60 * 24; //a day
+        int maxAge = (int)(60L * Configuration.TOKEN_EXPIRY_MINUTES); //a day
         long now = System.currentTimeMillis() + (1000 * maxAge);
         Date d = new Date(now);
 

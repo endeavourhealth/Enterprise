@@ -1,8 +1,5 @@
 package org.endeavour.enterprise.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum DefinitionItemType {
 	Folder(0),
 	Report(1),
@@ -13,6 +10,7 @@ public enum DefinitionItemType {
 	ListOutput(6); //2016-02-25 DL - added
 
 	private int value;
+
 	DefinitionItemType(final int value)
 	{
 		this.value = value;
@@ -23,14 +21,24 @@ public enum DefinitionItemType {
 		return value;
 	}
 
-	private static Map<Integer, DefinitionItemType> map = new HashMap();
+	//2016-02-25 DL - not used
+	/*private static Map<Integer, DefinitionItemType> map = new HashMap();
 
 	static {
 		for (DefinitionItemType definitionItemType : DefinitionItemType.values())
-			map.put(definitionItemType.getValue(), definitionItemType);
+			map.put(definitionItemType.get(), definitionItemType);
 	}
 
 	public static DefinitionItemType valueOf(int definitionItemType) {
 		return map.get(definitionItemType);
+	}*/
+
+	public static DefinitionItemType get(int value) {
+		for(DefinitionItemType e: DefinitionItemType.values()) {
+			if(e.value == value) {
+				return e;
+			}
+		}
+		return null; // not found
 	}
 }

@@ -27,7 +27,7 @@ public final class JsonOrganisation implements Serializable
         this.nationalId = org.getNationalId();
         if (permissions != null)
         {
-            this.permissions = new Integer(permissions.getValue());
+            this.permissions = new Integer(permissions.get());
         }
     }
 

@@ -1,6 +1,9 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavour.enterprise.entity.database.DbActiveItem;
+import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.entity.json.JsonQuery;
+import org.endeavour.enterprise.model.DefinitionItemType;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -13,7 +16,7 @@ import java.util.UUID;
  * Created by Drew on 23/02/2016.
  */
 @Path("/query")
-public final class QueryEndpoint extends Endpoint
+public final class QueryEndpoint extends ItemEndpoint
 {
 
     @GET
@@ -25,11 +28,11 @@ public final class QueryEndpoint extends Endpoint
         UUID queryUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        JsonQuery ret = new JsonQuery();
+        //retrieve the activeItem, so we know the latest version
+        DbActiveItem activeItem = super.retrieveActiveItem(queryUuid, orgUuid, DefinitionItemType.Query);
+        DbItem item = super.retrieveItem(activeItem);
 
-        //TODO: 2016-02-23 DL - get query from DB
-        ret.setUuid(queryUuid);
-        ret.setName("Dummy query");
+        JsonQuery ret = new JsonQuery(item);
 
         return Response
                 .ok()
@@ -41,21 +44,27 @@ public final class QueryEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveQuery")
-    public Response saveQuery(@Context SecurityContext sc, JsonQuery queryParameters) throws Exception {
+    public Response saveQuery(@Context SecurityContext sc, JsonQuery queryParameters) throws Exception
+    {
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
 
         UUID queryUuid = queryParameters.getUuid();
+        String name = queryParameters.getName();
+        String description = queryParameters.getDescription();
+        String xmlContent = queryParameters.getXmlContent();
+        Boolean isDeleted = queryParameters.getIsDeleted();
 
-        if (queryUuid == null)
-        {
-            //TODO: 2016-02-23 DL - save query to DB
-        }
-        else
-        {
-            //TODO: 2016-02-23 DL - update query on DB
+        queryUuid = super.saveItem(queryUuid, orgUuid, userUuid, DefinitionItemType.Query, name, description, xmlContent, isDeleted);
 
-        }
+        //return the UUID of the query
+        JsonQuery ret = new JsonQuery();
+        ret.setUuid(queryUuid);
 
-        return Response.ok().build();
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
     }
 
     @POST
@@ -65,8 +74,10 @@ public final class QueryEndpoint extends Endpoint
     public Response deleteQuery(@Context SecurityContext sc, JsonQuery queryParameters) throws Exception {
 
         UUID queryUuid = queryParameters.getUuid();
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
 
-        //TODO: 2016-02-23 DL - delete query from DB
+        super.deleteItem(queryUuid, orgUuid, userUuid, DefinitionItemType.Query);
 
         return Response.ok().build();
     }

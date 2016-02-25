@@ -5,6 +5,7 @@ import org.endeavour.enterprise.entity.json.JsonEmailInviteParameters;
 import org.endeavour.enterprise.entity.json.JsonEndUser;
 import org.endeavour.enterprise.entity.json.JsonOrganisation;
 import org.endeavour.enterprise.entity.json.JsonOrganisationList;
+import org.endeavour.enterprise.framework.database.DatabaseConnection;
 import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
@@ -198,23 +199,31 @@ public final class SecurityEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/changePassword")
-    public Response changePassword(JsonEndUser parameters) throws Exception
+    public Response changePassword(@Context SecurityContext sc, JsonEndUser parameters) throws Exception
     {
         //validate token
-        DbEndUser person = new DbEndUser();
+        DbEndUser user = getEndUserFromSession(sc);
 
         String newPwd = parameters.getPassword();
+
+        //validate we have a new password
+        if (newPwd == null
+                || newPwd.length() == 0)
+        {
+            throw new BadRequestException("No new password provided");
+        }
+
         String hash = PasswordHash.createHash(newPwd);
 
         //retrieve the most recent password for the person
-        UUID uuid = person.getPrimaryUuid();
+        UUID uuid = user.getPrimaryUuid();
         DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
 
         //create the new password entity
         DbEndUserPwd p = new DbEndUserPwd();
         p.setEndUserUuid(uuid);
         p.setPwdHash(hash);
-        p.setDtExpired(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
+        p.setDtExpired(DatabaseConnection.getEndOfTime());
 
         //save
         p.saveToDb();
@@ -222,8 +231,8 @@ public final class SecurityEndpoint extends Endpoint
         //once we've successfully save the new password entity, make the old one as expired
         if (oldPwd != null)
         {
-            p.setDtExpired(new Date());
-            p.saveToDb();
+            oldPwd.setDtExpired(new Date());
+            oldPwd.saveToDb();
         }
 
         return Response
@@ -272,7 +281,7 @@ public final class SecurityEndpoint extends Endpoint
         DbEndUserPwd p = new DbEndUserPwd();
         p.setEndUserUuid(userUuid);
         p.setPwdHash(hash);
-        p.setDtExpired(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
+        p.setDtExpired(DatabaseConnection.getEndOfTime());
 
         //save
         p.saveToDb();

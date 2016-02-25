@@ -13,7 +13,7 @@ import java.util.UUID;
  * Created by Drew on 23/02/2016.
  */
 @Path("/query")
-public class QueryEndpoint extends Endpoint
+public final class QueryEndpoint extends Endpoint
 {
 
     @GET

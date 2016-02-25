@@ -21,7 +21,7 @@ import java.util.UUID;
  * Endpoint for the functions related to managing person and organisation entities
  */
 @Path("/admin")
-public class AdminEndpoint extends Endpoint {
+public final class AdminEndpoint extends Endpoint {
 
 
     @POST

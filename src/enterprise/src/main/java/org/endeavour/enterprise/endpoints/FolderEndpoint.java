@@ -18,7 +18,7 @@ import java.util.UUID;
  * Endpoint for functions related to creating and managing folders
  */
 @Path("/folder")
-public class FolderEndpoint extends Endpoint {
+public final class FolderEndpoint extends Endpoint {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- appender for console -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- old format for console appender, which isn't supported now -->
+  <!--<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+    </layout>
+  </appender>-->
+
+  <!-- appender for database -->
+  <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
+    <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+      <driverClass>net.sourceforge.jtds.jdbc.Driver</driverClass>
+      <url>jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise</url>
+      <user>Endeavour_Enterprise_ApplicationUser</user>
+      <password>TheQuickBrownFox1234%^&amp;*</password>
+    </connectionSource>
+  </appender>
+
+  <!-- appender for log file-->
+  <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>EnterpriseWebServer.log</file>
+    <encoder>
+      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+    </encoder>
+  </appender>-->
+
+
+  <logger name="org.endeavour.enterprise" level="TRACE"/>
+  
+
+  <root level="debug">
+    <appender-ref ref="STDOUT" />
+    <!--<appender-ref ref="FILE" />-->
+    <!--<appender-ref ref="DB" />-->
+  </root>
+</configuration>

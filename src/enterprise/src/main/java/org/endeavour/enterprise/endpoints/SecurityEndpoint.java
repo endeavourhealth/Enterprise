@@ -17,8 +17,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("/security")
-public class SecurityEndpoint extends Endpoint
+public final class SecurityEndpoint extends Endpoint
 {
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -28,6 +29,19 @@ public class SecurityEndpoint extends Endpoint
     {
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
+
+        if (email == null
+                || email.length() == 0
+                || password == null
+                || password.length() == 0)
+        {
+            throw new BadRequestException("Missing username or password in request");
+        }
+
+        if (true)
+        {
+            throw new RuntimeException("Testing logging");
+        }
 
         DbEndUser user = DbEndUser.retrieveForEmail(email);
         if (user == null)

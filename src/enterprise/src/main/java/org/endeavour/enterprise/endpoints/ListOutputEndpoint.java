@@ -13,7 +13,7 @@ import java.util.UUID;
  * Created by Drew on 23/02/2016.
  */
 @Path("/listOutput")
-public class ListOutputEndpoint extends Endpoint
+public final class ListOutputEndpoint extends Endpoint
 {
 
     @GET

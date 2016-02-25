@@ -13,7 +13,7 @@ import java.util.UUID;
  * Created by Drew on 23/02/2016.
  */
 @Path("/report")
-public class ReportEndpoint extends Endpoint
+public final class ReportEndpoint extends Endpoint
 {
 
     @GET

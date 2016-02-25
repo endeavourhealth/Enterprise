@@ -1,16 +1,19 @@
 package org.endeavour.enterprise.framework.exceptions;
 
 import org.endeavour.enterprise.entity.json.JsonServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import javax.ws.rs.WebApplicationException;
 
 @Provider
-public class BaseExceptionMapper implements ExceptionMapper<Exception>
+public final class BaseExceptionMapper implements ExceptionMapper<Exception>
 {
+    private static final Logger LOG = LoggerFactory.getLogger(BaseExceptionMapper.class);
+
     /**
      * 2016-02-17 DL - rewriting to be a bit more concise
      * and also to pass the exception message back with the error code
@@ -35,12 +38,14 @@ public class BaseExceptionMapper implements ExceptionMapper<Exception>
         else
         {
             //log on the server too, since these are unexpected
-            exception.printStackTrace(System.err);
+            //2016-02-24 DL - use logback now
+            LOG.error(null, exception);
 
             r = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
-        //if our exception has a message, then send this in the reponse too
+        //if our exception has a message, then send this in the response too
+        //so even if there's an error, we can give some feedback as to what it is
         String message = exception.getMessage();
         if (message != null)
         {
@@ -48,28 +53,27 @@ public class BaseExceptionMapper implements ExceptionMapper<Exception>
             r = r.entity(wrapper);
         }
 
-
         return r.build();
     }
-    /*public Response toResponse(Exception exception)
-    {
-        if (MappedException.class.isInstance(exception))
-        {
-            return Response
-                    .status(((MappedException)exception).getResponseStatus())
-                    .build();
-        }
-        else if (javax.ws.rs.WebApplicationException.class.isInstance(exception))
-        {
-            return Response
-                    .status(((WebApplicationException)exception).getResponse().getStatus())
-                    .build();
-        }
-        else
-        {
-            return Response
-                    .status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .build();
-        }
-    }*/
+
+
+    /**
+     * TODO: 2016-02-25 DL - get the DB appender for log back working
+     Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+     DBAppender appender = new DBAppender();
+     appender.setConnectionSource();
+
+     ConnectionSource cs = new Co
+     *
+     xxx 1) test logging exceptions
+     xxx 4) what are the two XML files
+     xxxx 5) delete one of the xml files
+     6) move logback.xml to an existing folder
+
+
+     2) get logging to db
+     3) understand SQL timestamp?
+     5) Add two xml files to repo
+     6) commit to GitHub
+     */
 }

@@ -1,0 +1,22 @@
+<nav class="sidebar" ng-controller="SidebarController as sidebar">
+	<ul>
+		<li ng-repeat="menuItem in sidebar.menuOptions">
+			<div ui-sref="{{menuItem.state}}" class="menuItem">
+				<span class="glyphicon glyphicon-2x {{menuItem.icon}}"></span>
+				<span class="nav-text">
+						{{menuItem.caption}}
+				</span>
+			</div>
+		</li>
+	</ul>
+	<ul class="logout">
+		<li>
+			<div ui-sref="login" class="menuItem">
+				<i class="glyphicon glyphicon-2x glyphicon-off"></i>
+				<span class="nav-text">
+						Logout
+				</span>
+			</div>
+		</li>
+	</ul>
+</nav>

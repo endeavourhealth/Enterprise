@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html ng-app="app" ng-strict-di>
+	<head>
+		<title>Endeavour : Enterprise</title>
+		<link rel="stylesheet" href="/bower_components/bootstrap-css/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/bower_components/bootstrap-css/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="/bower_components/toastr/toastr.css"/>
+		<link rel="stylesheet" href="/bower_components/angular-ui-tree/dist/angular-ui-tree.css">
+		<link rel="stylesheet" href="/content/css/sidebar.css">
+		<link rel="stylesheet" href="/content/css/bootstrap-extensions.css">
+		<link rel="stylesheet" href="/content/css/endeavour.css">
+		<link rel="stylesheet" href="/content/css/query.flowchart.css">
+	</head>
+	<body>
+		<div ui-view></div>
+
+		<!-- 3rd Party Scripts-->
+		<script src="/bower_components/angular/angular.js"></script>
+		<script src="/bower_components/ng-idle/angular-idle.js"></script>
+		<script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+		<script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+		<script src="/bower_components/jquery/dist/jquery.js"></script>
+		<script src="/bower_components/toastr/toastr.js"></script>
+		<script src="/bower_components/angular-ui-tree/dist/angular-ui-tree.js"></script>
+
+		<!-- Main application script -->
+		<script src="app/app.module.js"></script>
+		<script src="app/app.route.js"></script>
+
+		<!-- Core (i.e. config/constants/services) -->
+		<script src="app/core/core.module.js"></script>
+		<script src="app/core/core.config.js"></script>
+		<script src="app/core/library.service.js"></script>
+		<script src="app/core/admin.service.js"></script>
+
+		<!-- Blocks -->
+		<script src="app/blocks/blocks.module.js"></script>
+		<script src="app/blocks/logger.service.js"></script>
+
+		<!-- Models -->
+		<script src="app/models/models.module.js"></script>
+		<script src="app/models/ItemType.js"></script>
+
+		<!-- Layout -->
+		<script src="app/layout/layout.module.js"></script>
+		<script src="app/layout/sidebar.controller.js"></script>
+		<script src="app/layout/topnav.controller.js"></script>
+		<script src="app/layout/shell.controller.js"></script>
+
+		<!-- Login -->
+		<script src="app/login/login.module.js"></script>
+		<script src="app/login/login.route.js"></script>
+		<script src="app/login/login.controller.js"></script>
+
+		<!-- Dialogs -->
+		<script src="app/dialogs/codePicker/codePicker.module.js"></script>
+		<script src="app/dialogs/codePicker/codePicker.route.js"></script>
+		<script src="app/dialogs/codePicker/codePicker.controller.js"></script>
+
+		<!-- Modules -->
+
+		<!-- Dashboard -->
+		<script src="app/dashboard/dashboard.module.js"></script>
+		<script src="app/dashboard/dashboard.route.js"></script>
+		<script src="app/dashboard/dashboard.controller.js"></script>
+		<!-- Library -->
+		<script src="app/library/library.module.js"></script>
+		<script src="app/library/library.route.js"></script>
+		<script src="app/library/library.controller.js"></script>
+		<!-- Library -->
+		<script src="app/reports/reports.module.js"></script>
+		<script src="app/reports/reports.route.js"></script>
+		<script src="app/reports/reports.controller.js"></script>
+		<!-- Admin -->
+		<script src="app/administration/admin.module.js"></script>
+		<script src="app/administration/admin.route.js"></script>
+		<script src="app/administration/admin.controller.js"></script>
+		<!-- Query -->
+		<script src="app/query/query.module.js"></script>
+		<script src="app/query/query.route.js"></script>
+		<script src="app/query/query.controller.js"></script>
+		<!-- Query Flowchart -->
+		<script src="app/query/flowchart/svgclass.js"></script>
+		<script src="app/query/flowchart/mousecapture.service.js"></script>
+		<script src="app/query/flowchart/dragging.service.js"></script>
+		<script src="app/query/flowchart/flowchart.viewmodel.js"></script>
+		<script src="app/query/flowchart/flowchart.directive.js"></script>
+
+	</body>
+</html>
+

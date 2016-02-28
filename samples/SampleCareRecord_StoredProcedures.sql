@@ -74,7 +74,8 @@ begin
 		p.PatientId,
 		p.DateOfBirth,
 		p.Sex,
-		p.CallingName
+		p.CallingName,
+		p.DateOfRegistration
 	from dbo.Patient as p
 	inner join @Patients as j on j.PatientId = p.PatientId;
 

@@ -3,6 +3,7 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,11 +12,13 @@ import java.util.UUID;
  */
 public final class DbFolderItemLink extends DbAbstractTable
 {
+    //register as a DB entity
+    private static final TableAdapter adapter = new TableAdapter(DbFolderItemLink.class, "FolderItemLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
+            "FolderItemLinkUuid,FolderUuid,ItemUuid", "FolderItemLinkUuid");
+
+
     private UUID folderUuid = null;
     private UUID itemUuid = null;
-
-    //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbFolderItemLink.class, "FolderItemLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
     public DbFolderItemLink()
     {}
@@ -26,7 +29,7 @@ public final class DbFolderItemLink extends DbAbstractTable
     }
 
     @Override
-    public void writeForDb(InsertBuilder builder)
+    public void writeForDb(ArrayList<Object> builder)
     {
         builder.add(getPrimaryUuid());
         builder.add(folderUuid);
@@ -41,13 +44,17 @@ public final class DbFolderItemLink extends DbAbstractTable
         itemUuid = reader.readUuid();
     }
 
-    public static List<DbAbstractTable> retrieveForFolder(UUID folderUuid) throws Exception
+    public static List<DbFolderItemLink> retrieveForFolder(UUID folderUuid) throws Exception
     {
-        return adapter.retrieveEntities("Administration.FolderItemLink_SelectForFolder", folderUuid);
+        //2016-02-29 DL - changed how we connect to db
+        return DatabaseManager.db().retrieveFolderItemLinksForFolder(folderUuid);
+        //return adapter.retrieveEntities("Administration.FolderItemLink_SelectForFolder", folderUuid);
     }
-    public static DbFolder retrieveForUuid(UUID uuid) throws Exception
+    public static DbFolderItemLink retrieveForUuid(UUID uuid) throws Exception
     {
-        return (DbFolder)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbFolderItemLink)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        //return (DbFolderItemLink)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
     }
 
 

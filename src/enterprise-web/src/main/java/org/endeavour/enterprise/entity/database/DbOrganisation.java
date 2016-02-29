@@ -3,6 +3,7 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,11 +12,12 @@ import java.util.UUID;
  */
 public final class DbOrganisation extends DbAbstractTable {
 
+    //register as a DB entity
+    private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class, "Organisation", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
+            "OrganisationUuid,Name,NationalId", "OrganisationUuid");
+
     private String name = null;
     private String nationalId = null;
-
-    //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class, "Organisation", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
     public DbOrganisation()
@@ -27,7 +29,7 @@ public final class DbOrganisation extends DbAbstractTable {
     }
 
     @Override
-    public void writeForDb(InsertBuilder builder)
+    public void writeForDb(ArrayList<Object> builder)
     {
         builder.add(getPrimaryUuid());
         builder.add(name);
@@ -42,14 +44,23 @@ public final class DbOrganisation extends DbAbstractTable {
         nationalId = reader.readString();
     }
 
-    public static List<DbAbstractTable> retrieveForAll() throws Exception
+    public static List<DbOrganisation> retrieveForAll() throws Exception
     {
-        return adapter.retrieveEntities("Administration.Organisation_SelectForAll");
+        //2016-02-29 DL - changed how we connect to db
+        return DatabaseManager.db().retrieveAllOrganisations();
+        //return adapter.retrieveEntities("Administration.Organisation_SelectForAll");
     }
     public static DbOrganisation retrieveForUuid(UUID uuid) throws Exception
     {
-        return (DbOrganisation)adapter.retrieveSingleEntity("Administration._Organisation_SelectForUuid", uuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbOrganisation)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        //return (DbOrganisation)adapter.retrieveSingleEntity("Administration._Organisation_SelectForUuid", uuid);
     }
+    public static DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception
+    {
+        return DatabaseManager.db().retrieveOrganisationForNameNationalId(name, nationalId);
+    }
+
 
     /**
      * gets/sets

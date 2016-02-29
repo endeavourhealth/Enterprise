@@ -3,22 +3,25 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
  * Created by Drew on 17/02/2016.
  */
-public final class DbEndUser extends DbAbstractTable {
+public final class DbEndUser extends DbAbstractTable
+{
+
+    //register as a DB entity
+    private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
+            "EndUser", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
+            "EndUserUuid,Title,Forename,Surname,Email,IsSuperUser", "EndUserUuid");
 
     private String title = null;
     private String forename = null;
     private String surname = null;
     private String email = null;
     private boolean isSuperUser = false;
-
-    //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
-                                        "EndUser", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
 
 
     public DbEndUser()
@@ -28,11 +31,15 @@ public final class DbEndUser extends DbAbstractTable {
 
     public static DbEndUser retrieveForEmail(String email) throws Exception
     {
-        return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForEmail", email);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbEndUser)DatabaseManager.db().retrieveEndUserForEmail(email);
+        //return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForEmail", email);
     }
     public static DbEndUser retrieveForUuid(UUID uuid) throws Exception
     {
-        return (DbEndUser)adapter.retrieveSingleEntity("Administration._EndUser_SelectForUuid", uuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbEndUser)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        //return (DbEndUser)adapter.retrieveSingleEntity("Administration._EndUser_SelectForUuid", uuid);
     }
 
     @Override
@@ -41,7 +48,7 @@ public final class DbEndUser extends DbAbstractTable {
     }
 
     @Override
-    public void writeForDb(InsertBuilder builder)
+    public void writeForDb(ArrayList<Object> builder)
     {
         builder.add(getPrimaryUuid());
         builder.add(title);

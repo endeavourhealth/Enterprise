@@ -3,6 +3,7 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +16,8 @@ public final class DbFolder extends DbAbstractTable {
     public static final int FOLDER_TYPE_REPORTS = 2;
 
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbFolder.class, "Folder", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
+    private static final TableAdapter adapter = new TableAdapter(DbFolder.class, "Folder", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
+            "FolderUuid,OrganisationUuid,ParentFolderUuid,Title,FolderType,HasChildren", "FolderUuid");
 
 
     private UUID organisationUuid = null;
@@ -34,7 +36,7 @@ public final class DbFolder extends DbAbstractTable {
     }
 
     @Override
-    public void writeForDb(InsertBuilder builder)
+    public void writeForDb(ArrayList<Object> builder)
     {
         builder.add(getPrimaryUuid());
         builder.add(organisationUuid);
@@ -55,13 +57,17 @@ public final class DbFolder extends DbAbstractTable {
 		hasChildren = reader.readBoolean();
     }
 
-    public static List<DbAbstractTable> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Exception
+    public static List<DbFolder> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Exception
     {
-        return adapter.retrieveEntities("Administration.Folder_SelectForOrganisationParentType", organisationUuid, parentUuid, folderType);
+        //2016-02-29 DL - changed how we connect to db
+        return DatabaseManager.db().retrieveFoldersForOrganisationParentType(organisationUuid, parentUuid, folderType);
+        //return adapter.retrieveEntities("Administration.Folder_SelectForOrganisationParentType", organisationUuid, parentUuid, folderType);
     }
     public static DbFolder retrieveForOrganisationTitleParentType(UUID organisationUuid, String title, UUID parentUuid, int folderType) throws Exception
     {
-        return (DbFolder)adapter.retrieveSingleEntity("Administration.Folder_SelectForOrganisationTitleParentType", organisationUuid, title, parentUuid, folderType);
+        //2016-02-29 DL - changed how we connect to db
+        return DatabaseManager.db().retrieveFolderForOrganisationTitleParentType(organisationUuid, title, parentUuid, folderType);
+        //return (DbFolder)adapter.retrieveSingleEntity("Administration.Folder_SelectForOrganisationTitleParentType", organisationUuid, title, parentUuid, folderType);
     }
 /*
     public static List<DbAbstractTable> retrieveForOrganisation(UUID organisationUuid) throws Exception
@@ -71,7 +77,9 @@ public final class DbFolder extends DbAbstractTable {
 */
     public static DbFolder retrieveForUuid(UUID uuid) throws Exception
     {
-        return (DbFolder)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbFolder)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        //return (DbFolder)adapter.retrieveSingleEntity("Administration._Folder_SelectForUuid", uuid);
     }
 
     /**

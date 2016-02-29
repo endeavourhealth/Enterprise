@@ -5,7 +5,6 @@ import org.endeavour.enterprise.entity.json.JsonEmailInviteParameters;
 import org.endeavour.enterprise.entity.json.JsonEndUser;
 import org.endeavour.enterprise.entity.json.JsonOrganisation;
 import org.endeavour.enterprise.entity.json.JsonOrganisationList;
-import org.endeavour.enterprise.framework.database.DatabaseConnection;
 import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
@@ -69,7 +68,7 @@ public final class SecurityEndpoint extends Endpoint
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
         if (user.getIsSuperUser())
         {
-            List<DbAbstractTable> orgs = DbOrganisation.retrieveForAll();
+            List<DbOrganisation> orgs = DbOrganisation.retrieveForAll();
             ret = new JsonOrganisationList(orgs.size());
 
             //super-users are assumed to be admins at every organisation
@@ -77,7 +76,7 @@ public final class SecurityEndpoint extends Endpoint
 
             for (int i=0; i<orgs.size(); i++)
             {
-                DbOrganisation o = (DbOrganisation)orgs.get(i);
+                DbOrganisation o = orgs.get(i);
 
                 ret.add(o, endUserRole);
 
@@ -91,7 +90,7 @@ public final class SecurityEndpoint extends Endpoint
         }
         //if the person ISN'T a superUser, then we look at the person/org link, so see where they can log on to
         else {
-            List<DbAbstractTable> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(uuid);
+            List<DbOrganisationEndUserLink> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(uuid);
             if (orgLinks.isEmpty())
             {
                 throw new NotAuthorizedException("No organisations to log on to");
@@ -101,7 +100,7 @@ public final class SecurityEndpoint extends Endpoint
 
             for (int i=0; i<orgLinks.size(); i++)
             {
-                DbOrganisationEndUserLink orgLink = (DbOrganisationEndUserLink)orgLinks.get(i);
+                DbOrganisationEndUserLink orgLink = orgLinks.get(i);
                 UUID orgUuid = orgLink.getOrganisationUuid();
                 DbOrganisation o = DbOrganisation.retrieveForUuid(orgUuid);
                 EndUserRole role = orgLink.getRole();
@@ -148,10 +147,10 @@ public final class SecurityEndpoint extends Endpoint
 
         //validate the person can log on there
         DbOrganisationEndUserLink link = null;
-        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
+        List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
         for (int i=0; i<links.size(); i++)
         {
-            DbOrganisationEndUserLink l = (DbOrganisationEndUserLink)links.get(i);
+            DbOrganisationEndUserLink l = links.get(i);
             if (l.getOrganisationUuid().equals(orgUuid))
             {
                 link = l;
@@ -223,7 +222,7 @@ public final class SecurityEndpoint extends Endpoint
         DbEndUserPwd p = new DbEndUserPwd();
         p.setEndUserUuid(uuid);
         p.setPwdHash(hash);
-        p.setDtExpired(DatabaseConnection.getEndOfTime());
+        p.setDtExpired(DatabaseManager.getEndOfTime());
 
         //save
         p.saveToDb();
@@ -281,7 +280,7 @@ public final class SecurityEndpoint extends Endpoint
         DbEndUserPwd p = new DbEndUserPwd();
         p.setEndUserUuid(userUuid);
         p.setPwdHash(hash);
-        p.setDtExpired(DatabaseConnection.getEndOfTime());
+        p.setDtExpired(DatabaseManager.getEndOfTime());
 
         //save
         p.saveToDb();

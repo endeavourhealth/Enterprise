@@ -1,31 +1,36 @@
-package org.endeavour.enterprise.framework.database;
+package org.endeavour.enterprise.entity.database;
 
-import org.endeavour.enterprise.framework.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public abstract class DatabaseConnection
+/**
+ * Created by Drew on 29/02/2016.
+ */
+public final class DatabaseManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DatabaseConnection.class); //2016-02-24 DL - logging
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class); //2016-02-24 DL - logging
+
+    //singleton
+    private static DatabaseManager ourInstance = new DatabaseManager();
+    public static DatabaseManager getInstance()
+    {
+        return ourInstance;
+    }
 
     private static Date endOfTime = null;
 
-    public static Connection get(String databaseName) throws ClassNotFoundException, SQLException
+    private DatabaseI databaseImplementation = null;
+
+    private DatabaseManager()
     {
-        // databaseName not used at present
-
-        Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
-        return DriverManager.getConnection(Configuration.DB_CONNECTION_STRING);
+        //this would be where we plug in support for different databases
+        databaseImplementation = new SqlServerDatabase();
     }
-
 
     /**
      * 2016-02-25 DL - haven't got anywhere good to put these, but leaving with other DB stuff
@@ -44,5 +49,10 @@ public abstract class DatabaseConnection
             }
         }
         return endOfTime;
+    }
+
+    public static DatabaseI db()
+    {
+        return getInstance().databaseImplementation;
     }
 }

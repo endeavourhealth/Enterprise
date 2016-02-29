@@ -3,7 +3,9 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 import org.endeavour.enterprise.model.DefinitionItemType;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -12,7 +14,8 @@ import java.util.UUID;
 public final class DbActiveItem extends DbAbstractTable
 {
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItems", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE);
+    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItems", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
+            "ActiveItemUuid,OrganisationUuid,ItemUuid,Version,ItemType", "ActiveItemUuid");
 
     private UUID organisationUuid = null;
     private UUID itemUuid = null;
@@ -24,11 +27,14 @@ public final class DbActiveItem extends DbAbstractTable
 
     public static DbActiveItem retrieveForItemUuid(UUID itemUuid) throws Exception
     {
-        return (DbActiveItem)adapter.retrieveSingleEntity("Definition.ActiveItem_SelectForItemUuid", itemUuid);
+        return (DbActiveItem)DatabaseManager.db().retrieveActiveItemForItemUuid(itemUuid);
+        //return (DbActiveItem)adapter.retrieveSingleEntity("Definition.ActiveItem_SelectForItemUuid", itemUuid);
     }
     public static DbActiveItem retrieveForUuid(UUID uuid) throws Exception
     {
-        return (DbActiveItem)adapter.retrieveSingleEntity("Definition._ActiveItem_SelectForUuid", uuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbActiveItem)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        //return (DbActiveItem)adapter.retrieveSingleEntity("Definition._ActiveItem_SelectForUuid", uuid);
     }
 
     @Override
@@ -38,7 +44,7 @@ public final class DbActiveItem extends DbAbstractTable
     }
 
     @Override
-    public void writeForDb(InsertBuilder builder)
+    public void writeForDb(ArrayList<Object> builder)
     {
         builder.add(getPrimaryUuid());
         builder.add(organisationUuid);

@@ -300,19 +300,19 @@ public final class FolderEndpoint extends Endpoint {
         UUID orgUuid = folder.getOrganisationUuid();
         UUID parentUuid = folder.getPrimaryUuid();
         int folderType = folder.getFolderType();
-        List<DbAbstractTable> childFolders = DbFolder.retrieveForOrganisationParentType(orgUuid, parentUuid, folderType);
+        List<DbFolder> childFolders = DbFolder.retrieveForOrganisationParentType(orgUuid, parentUuid, folderType);
         for (int i=0; i<childFolders.size(); i++)
         {
-            DbFolder childFolder = (DbFolder)childFolders.get(i);
+            DbFolder childFolder = childFolders.get(i);
             deleteFolderAndContents(childFolder);
         }
 
         //retrieve the link entities for the folder and delete them
         UUID folderUuid = folder.getPrimaryUuid();
-        List<DbAbstractTable> links = DbFolderItemLink.retrieveForFolder(folderUuid);
+        List<DbFolderItemLink> links = DbFolderItemLink.retrieveForFolder(folderUuid);
         for (int i=0; i<links.size(); i++)
         {
-            DbFolderItemLink link = (DbFolderItemLink)links.get(i);
+            DbFolderItemLink link = links.get(i);
             link.deleteFromDb();
 
             //TODO: 2016-02-22 DL - actually delete item after delting folderItemLink
@@ -338,14 +338,14 @@ public final class FolderEndpoint extends Endpoint {
 
         //get all our folders at the desired level
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        List<DbAbstractTable> folders = DbFolder.retrieveForOrganisationParentType(orgUuid, uuid, folderType);
+        List<DbFolder> folders = DbFolder.retrieveForOrganisationParentType(orgUuid, uuid, folderType);
         JsonFolderList ret = new JsonFolderList(folders.size());
 
         for (int i=0; i<folders.size(); i++)
         {
-            DbFolder folder = (DbFolder)folders.get(i);
+            DbFolder folder = folders.get(i);
             UUID folderUuid = folder.getPrimaryUuid();
-            List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
+            List<DbFolderItemLink> items = DbFolderItemLink.retrieveForFolder(folderUuid);
             int contentCount = items.size();
 
             ret.add(folder, contentCount);

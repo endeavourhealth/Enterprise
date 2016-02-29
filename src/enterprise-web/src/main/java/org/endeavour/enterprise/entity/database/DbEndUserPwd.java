@@ -3,6 +3,7 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,7 +14,8 @@ public class DbEndUserPwd extends DbAbstractTable {
 
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
-            "EndUserPwd", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE);
+            "EndUserPwd", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
+            "EndUserPwdUuid,EndUserUuid,PwdHash,DtExpired", "EndUserPwdUuid");
 
 
     private UUID endUserUuid = null;
@@ -29,11 +31,15 @@ public class DbEndUserPwd extends DbAbstractTable {
 
     public static DbEndUserPwd retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception
     {
-        return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration.EndUserPwd_SelectForEndUserNotExpired", endUserUuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbEndUserPwd)DatabaseManager.db().retrieveEndUserPwdForUserNotExpired(endUserUuid);
+        //return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration.EndUserPwd_SelectForEndUserNotExpired", endUserUuid);
     }
     public static DbEndUserPwd retrieveForUuid(UUID uuid) throws Exception
     {
-        return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration._EndUserPwd_SelectForUuid", uuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbEndUserPwd)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        //return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration._EndUserPwd_SelectForUuid", uuid);
     }
 
     @Override
@@ -42,7 +48,7 @@ public class DbEndUserPwd extends DbAbstractTable {
     }
 
     @Override
-    public void writeForDb(InsertBuilder builder)
+    public void writeForDb(ArrayList<Object> builder)
     {
         builder.add(getPrimaryUuid());
         builder.add(endUserUuid);

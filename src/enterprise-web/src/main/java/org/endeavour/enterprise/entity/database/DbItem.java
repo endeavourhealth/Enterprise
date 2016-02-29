@@ -3,6 +3,7 @@ package org.endeavour.enterprise.entity.database;
 import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -12,7 +13,8 @@ import java.util.UUID;
 public final class DbItem extends DbAbstractTable
 {
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbItem.class, "Items", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE);
+    private static final TableAdapter adapter = new TableAdapter(DbItem.class, "Items", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
+            "ItemUuid,Version,XmlContent,Title,Description,EndUserUuid,TimeStamp,IsDeleted", "ItemUuid,Version");
 
     private int version = -1;
     private String xmlContent = null; //xml
@@ -25,13 +27,15 @@ public final class DbItem extends DbAbstractTable
     public DbItem()
     {}
 
-    public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception
+    /*public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception
     {
         return (DbItem)adapter.retrieveSingleEntity("Definition.Item_SelectForUuidVersion", uuid, version);
-    }
-    public static DbItem retrieveForUuid(UUID uuid) throws Exception
+    }*/
+    public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception
     {
-        return (DbItem)adapter.retrieveSingleEntity("Definition._Item_SelectForUuid", uuid);
+        //2016-02-29 DL - changed how we connect to db
+        return (DbItem)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid, new Integer(version));
+        //return (DbItem)adapter.retrieveSingleEntity("Definition._Item_SelectForUuid", uuid);
     }
 
     @Override
@@ -41,7 +45,7 @@ public final class DbItem extends DbAbstractTable
     }
 
     @Override
-    public void writeForDb(InsertBuilder builder)
+    public void writeForDb(ArrayList<Object> builder)
     {
         builder.add(getPrimaryUuid());
         builder.add(version);

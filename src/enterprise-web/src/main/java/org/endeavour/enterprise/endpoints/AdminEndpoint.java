@@ -4,7 +4,6 @@ import org.endeavour.enterprise.entity.database.*;
 import org.endeavour.enterprise.entity.json.JsonEndUser;
 import org.endeavour.enterprise.entity.json.JsonEndUserList;
 import org.endeavour.enterprise.entity.json.JsonOrganisation;
-import org.endeavour.enterprise.framework.database.DatabaseConnection;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.model.EndUserRole;
 
@@ -43,20 +42,34 @@ public final class AdminEndpoint extends Endpoint {
         String name = organisationParameters.getName();
         String id = organisationParameters.getNationalId();
 
+        DbOrganisation duplicate = DbOrganisation.retrieveOrganisationForNameNationalId(name, id);
+
         DbOrganisation org = null;
 
         //if no UUID was passed, then we're creating a new org
         if (uuid == null)
         {
+            //ensure we're not creating a duplicate
+            if (duplicate != null)
+            {
+                throw new BadRequestException("Organisation already exists with that name and ID");
+            }
+
             org = new DbOrganisation();
             org.setName(name);
             org.setNationalId(id);
-
-            //TODO; 2016-02-23 DL - validate we're not creating a duplicate organisation by name and/or ID
         }
         else
         {
             org = DbOrganisation.retrieveForUuid(uuid);
+
+            //ensure we're not creating a new duplicate
+            if (duplicate != null
+                    && !duplicate.equals(org))
+            {
+                throw new BadRequestException("Organisation already exists with that name and ID");
+            }
+
             org.setName(name);
             org.setNationalId(id);
         }
@@ -166,7 +179,7 @@ public final class AdminEndpoint extends Endpoint {
             link.setOrganisationUuid(orgUuid);
             link.setEndUserUuid(uuid);
             link.setPermissions(permissions);
-            link.setDtExpired(DatabaseConnection.getEndOfTime());
+            link.setDtExpired(DatabaseManager.getEndOfTime());
 
         }
         //if we have a uuid, we're updating an existing person
@@ -273,10 +286,10 @@ public final class AdminEndpoint extends Endpoint {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = user.getPrimaryUuid();
 
-        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
+        List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
         for (int i=0; i<links.size(); i++)
         {
-            DbOrganisationEndUserLink link = (DbOrganisationEndUserLink)links.get(i);
+            DbOrganisationEndUserLink link = links.get(i);
             if (link.getOrganisationUuid().equals(orgUuid))
             {
                 link.setDtExpired(new Date());
@@ -301,12 +314,12 @@ public final class AdminEndpoint extends Endpoint {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         //retrieve all users at this organisation
-        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForOrganisationNotExpired(orgUuid);
+        List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForOrganisationNotExpired(orgUuid);
         JsonEndUserList ret = new JsonEndUserList(links.size());
 
         for (int i=0; i<links.size(); i++)
         {
-            DbOrganisationEndUserLink link = (DbOrganisationEndUserLink)links.get(i);
+            DbOrganisationEndUserLink link = links.get(i);
             UUID endUserUuid = link.getEndUserUuid();
             EndUserRole role = link.getRole();
             DbEndUser endUser = DbEndUser.retrieveForUuid(endUserUuid);
@@ -339,10 +352,10 @@ public final class AdminEndpoint extends Endpoint {
 
         //retrieve any existing invite for this person and mark it as completed,
         //so clicking the link in the old email will no longer work
-        List<DbAbstractTable> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
+        List<DbEndUserEmailInvite> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
         for (int i=0; i<invites.size(); i++)
         {
-            DbEndUserEmailInvite invite = (DbEndUserEmailInvite)invites.get(i);
+            DbEndUserEmailInvite invite = invites.get(i);
             invite.setDtCompleted(new Date());
             invite.saveToDb();
         }

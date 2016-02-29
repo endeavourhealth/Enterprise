@@ -1,6 +1,5 @@
 package org.endeavour.enterprise.entity.database;
 
-import org.endeavour.enterprise.framework.database.DatabaseConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,20 +22,21 @@ public final class TableAdapter
     private String tableName = null;
     private String schema = null;
     private String database = null;
-    //private String[] columns = null; //2016-02-22 DL - removed
+    private String[] columns = null;
+    private String[] primaryKeyColumns = null;
 
     //lazily derived
 /*    private List<Method> cachedGetMethods = null;
     private List<Method> cachedSetMethods = null;*/
 
-    //public TableAdapter(Class cls, String tableName, String schema, String database, String[] columns)
-    public TableAdapter(Class cls, String tableName, String schema, String database)
+    public TableAdapter(Class cls, String tableName, String schema, String database, String columns, String primaryKeyColumns)
     {
         this.cls = cls;
         this.tableName = tableName;
         this.schema = schema;
         this.database = database;
-        //this.columns = columns; //2016-02-22 DL - removed
+        this.columns = columns.split(",");
+        this.primaryKeyColumns = primaryKeyColumns.split(",");
     }
 
     /**
@@ -58,9 +58,13 @@ public final class TableAdapter
         return database;
     }
 
-    /*public String[] getColumns() {
+    public String[] getColumns() {
         return columns;
-    }*/
+    }
+
+    public String[] getPrimaryKeyColumns() {
+        return primaryKeyColumns;
+    }
 
     /**
      * creates a new instance of our database class
@@ -182,7 +186,7 @@ public final class TableAdapter
     }*/
 
 
-    public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Exception
+   /* public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Exception
     {
         List<? extends DbAbstractTable> v = retrieveEntities(spName, parameters);
         //List<DbAbstractTable> v = retrieveEntities(spName, parameters);
@@ -228,7 +232,7 @@ public final class TableAdapter
         ResultSet rs = s.getResultSet();
 
         return readFromResultSet(rs);
-    }
+    }*/
     /*public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Exception
     {
         try {
@@ -281,7 +285,7 @@ public final class TableAdapter
         return null;
     }*/
 
-    private static Object quoteAndEscapeString(Object obj)
+    /*private static Object quoteAndEscapeString(Object obj)
     {
         if (obj instanceof String)
         {
@@ -297,11 +301,11 @@ public final class TableAdapter
 
             //2016-02-17 DL - JTDS doesn't seem to handle conversion of UUID objects
             //to SQL uniqueIdentifier types, so we need to convert to byte[] here
-/*            ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+*//*            ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
             bb.putLong(uuid.getMostSignificantBits());
             bb.putLong(uuid.getLeastSignificantBits());
             byte[] bytes = bb.array();
-            value = bytes;*/
+            value = bytes;*//*
         }
         else
         {
@@ -323,7 +327,7 @@ public final class TableAdapter
         }
 
         return ret;
-    }
+    }*/
 /*    private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Exception
     {
         List<DbAbstractTable> ret = new ArrayList<DbAbstractTable>();
@@ -349,7 +353,7 @@ public final class TableAdapter
         return ret;
     }*/
 
-    public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception
+    /*public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception
     {
         String spName = getSchema() + "._" + getTableName();
         if (insert) {
@@ -358,7 +362,7 @@ public final class TableAdapter
             spName += "_Update";
         }
 
-        InsertBuilder ib = new InsertBuilder(spName + " ");
+        ArrayList<Object> ib = new InsertBuilder(spName + " ");
         entity.writeForDb(ib);
 
         String sql = ib.toString();
@@ -375,7 +379,7 @@ public final class TableAdapter
             LOG.error("Error with SQL " + sql);
             throw sqlExc;
         }
-    }
+    }*/
 
 /*    public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception {
 
@@ -413,7 +417,7 @@ public final class TableAdapter
     /**
      * calls the ...delete SP for the given entity to remove from the DB
      */
-    public void deleteFromDb(DbAbstractTable entity) throws Exception
+/*    public void deleteFromDb(DbAbstractTable entity) throws Exception
     {
         String spName = getSchema() + "._" + getTableName() + "_Delete";
         String sql = spName + " " + entity.getPrimaryUuid();
@@ -421,5 +425,5 @@ public final class TableAdapter
         Connection connection = DatabaseConnection.get(getDatabase());
         Statement s = connection.createStatement();
         s.execute(sql);
-    }
+    }*/
 }

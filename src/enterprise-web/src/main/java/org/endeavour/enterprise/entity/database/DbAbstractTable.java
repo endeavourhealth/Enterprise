@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.entity.database;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -13,7 +14,7 @@ public abstract class DbAbstractTable
     private UUID primaryUuid = null;
 
     public abstract TableAdapter getAdapter();
-    public abstract void writeForDb(InsertBuilder builder);
+    public abstract void writeForDb(ArrayList<Object> builder);
     public abstract void readFromDb(ResultReader reader) throws SQLException;
 
     /**
@@ -48,11 +49,15 @@ public abstract class DbAbstractTable
     }
     public void saveToDbInsert() throws Exception
     {
-        getAdapter().saveToDb(true, this);
+        //2016-02-29 DL - changed how we write
+        DatabaseManager.db().writeInsert(this);
+        //getAdapter().saveToDb(true, this);
     }
     public void saveToDbUpdate() throws Exception
     {
-        getAdapter().saveToDb(false, this);
+        //2016-02-29 DL - changed how we write
+        DatabaseManager.db().writeDpdate(this);
+        //getAdapter().saveToDb(false, this);
     }
 
 
@@ -67,7 +72,9 @@ public abstract class DbAbstractTable
             return;
         }
 
-        getAdapter().deleteFromDb(this);
+        //2016-02-29 DL - changed how we write
+        DatabaseManager.db().writeDelete(this);
+        //getAdapter().deleteFromDb(this);
     }
 
     @Override

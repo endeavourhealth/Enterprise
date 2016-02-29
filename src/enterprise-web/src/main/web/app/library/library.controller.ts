@@ -44,18 +44,6 @@ module app.library {
 				});
 		}
 
-		editItem(item:FolderContent) {
-			this.logger.success('Edit ' + itemTypeIdToString()(item.type) + ':' + item.name);
-		}
-
-		viewItem(item:FolderContent) {
-			this.logger.info('View ' + itemTypeIdToString()(item.type) + ':' + item.name);
-		}
-
-		deleteItem(item:FolderContent) {
-			this.logger.error('Delete ' + itemTypeIdToString()(item.type) + ':' + item.name);
-		}
-
 		toggleExpansion(node : FolderNode) {
 			if (!node.hasChildren) { return; }
 

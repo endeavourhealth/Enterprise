@@ -69,7 +69,7 @@ public final class SecurityEndpoint extends Endpoint
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
         if (user.getIsSuperUser())
         {
-            List<DbAbstractTableX> orgs = DbOrganisation.retrieveForAll();
+            List<DbAbstractTable> orgs = DbOrganisation.retrieveForAll();
             ret = new JsonOrganisationList(orgs.size());
 
             //super-users are assumed to be admins at every organisation
@@ -91,7 +91,7 @@ public final class SecurityEndpoint extends Endpoint
         }
         //if the person ISN'T a superUser, then we look at the person/org link, so see where they can log on to
         else {
-            List<DbAbstractTableX> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(uuid);
+            List<DbAbstractTable> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(uuid);
             if (orgLinks.isEmpty())
             {
                 throw new NotAuthorizedException("No organisations to log on to");
@@ -148,7 +148,7 @@ public final class SecurityEndpoint extends Endpoint
 
         //validate the person can log on there
         DbOrganisationEndUserLink link = null;
-        List<DbAbstractTableX> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
+        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
         for (int i=0; i<links.size(); i++)
         {
             DbOrganisationEndUserLink l = (DbOrganisationEndUserLink)links.get(i);

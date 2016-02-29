@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 17/02/2016.
  */
-public final class DbOrganisation extends DbAbstractTableX {
+public final class DbOrganisation extends DbAbstractTable {
 
     private String name = null;
     private String nationalId = null;
@@ -42,7 +42,7 @@ public final class DbOrganisation extends DbAbstractTableX {
         nationalId = reader.readString();
     }
 
-    public static List<DbAbstractTableX> retrieveForAll() throws Exception
+    public static List<DbAbstractTable> retrieveForAll() throws Exception
     {
         return adapter.retrieveEntities("Administration.Organisation_SelectForAll");
     }

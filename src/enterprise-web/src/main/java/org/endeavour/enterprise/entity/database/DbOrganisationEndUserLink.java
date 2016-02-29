@@ -12,7 +12,7 @@ import java.util.UUID;
  * Created by Drew on 18/02/2016.
  * DB entity linking endUsers to organisations
  */
-public final class DbOrganisationEndUserLink extends DbAbstractTableX {
+public final class DbOrganisationEndUserLink extends DbAbstractTable {
 
 
     //register as a DB entity
@@ -29,14 +29,14 @@ public final class DbOrganisationEndUserLink extends DbAbstractTableX {
     public DbOrganisationEndUserLink()
     {}
 
-    public static List<DbAbstractTableX> retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception
+    public static List<DbAbstractTable> retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForEndUserNotExpired", endUserUuid);
     }
     public static DbOrganisationEndUserLink retrieveForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception
     {
         //TODO: 2016-02-22 DL - should really move this into a SP that takes two parameters
-        List<DbAbstractTableX> v = retrieveForEndUserNotExpired(endUserUuid);
+        List<DbAbstractTable> v = retrieveForEndUserNotExpired(endUserUuid);
         for (int i=0; i<v.size(); i++)
         {
             DbOrganisationEndUserLink link = (DbOrganisationEndUserLink)v.get(i);
@@ -47,7 +47,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTableX {
         }
         return null;
     }
-    public static List<DbAbstractTableX> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Exception
+    public static List<DbAbstractTable> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForOrganisationNotExpired", organisationUuid);
     }

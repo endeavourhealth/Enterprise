@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 22/02/2016.
  */
-public final class DbFolderItemLink extends DbAbstractTableX
+public final class DbFolderItemLink extends DbAbstractTable
 {
     private UUID folderUuid = null;
     private UUID itemUuid = null;
@@ -41,7 +41,7 @@ public final class DbFolderItemLink extends DbAbstractTableX
         itemUuid = reader.readUuid();
     }
 
-    public static List<DbAbstractTableX> retrieveForFolder(UUID folderUuid) throws Exception
+    public static List<DbAbstractTable> retrieveForFolder(UUID folderUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.FolderItemLink_SelectForFolder", folderUuid);
     }

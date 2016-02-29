@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 25/02/2016.
  */
-public final class DbActiveItem extends DbAbstractTable
+public final class DbActiveItem extends DbAbstractTableX
 {
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItems", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE);

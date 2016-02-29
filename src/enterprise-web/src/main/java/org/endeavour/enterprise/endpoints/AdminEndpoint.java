@@ -273,7 +273,7 @@ public final class AdminEndpoint extends Endpoint {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = user.getPrimaryUuid();
 
-        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
+        List<DbAbstractTableX> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
         for (int i=0; i<links.size(); i++)
         {
             DbOrganisationEndUserLink link = (DbOrganisationEndUserLink)links.get(i);
@@ -301,7 +301,7 @@ public final class AdminEndpoint extends Endpoint {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         //retrieve all users at this organisation
-        List<DbAbstractTable> links = DbOrganisationEndUserLink.retrieveForOrganisationNotExpired(orgUuid);
+        List<DbAbstractTableX> links = DbOrganisationEndUserLink.retrieveForOrganisationNotExpired(orgUuid);
         JsonEndUserList ret = new JsonEndUserList(links.size());
 
         for (int i=0; i<links.size(); i++)
@@ -339,7 +339,7 @@ public final class AdminEndpoint extends Endpoint {
 
         //retrieve any existing invite for this person and mark it as completed,
         //so clicking the link in the old email will no longer work
-        List<DbAbstractTable> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
+        List<DbAbstractTableX> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
         for (int i=0; i<invites.size(); i++)
         {
             DbEndUserEmailInvite invite = (DbEndUserEmailInvite)invites.get(i);

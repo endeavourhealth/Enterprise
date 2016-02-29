@@ -13,10 +13,7 @@ public class Configuration
     public static final String AUTH_COOKIE_VALID_PATH = "/";
     public static final boolean AUTH_COOKIE_REQUIRES_HTTPS = false;
 
-    //2016-02-16 DL - test against local DB
-    //public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver:server=(local)\\SQLEXPRESS;Network Library=dbmslpcn;integrated Security=SSPI";
-    //jdbc:jtds:sqlserver://MYPC:1433/Blog;instance=SQLEXPRESS;user=sa;password=s3cr3t
-    // public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise;instance=SQLEXPRESS;Network Library=dbmslpcn;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
-
-    public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
+    //2016-02-29 DL - need to run against local again
+    public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise;instance=SQLEXPRESS;Network Library=dbmslpcn;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
+    //public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
 }

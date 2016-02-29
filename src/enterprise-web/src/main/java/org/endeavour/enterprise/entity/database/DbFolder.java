@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 17/02/2016.
  */
-public final class DbFolder extends DbAbstractTable {
+public final class DbFolder extends DbAbstractTableX {
 
     public static final int FOLDER_TYPE_LIBRARY = 1;
     public static final int FOLDER_TYPE_REPORTS = 2;
@@ -55,7 +55,7 @@ public final class DbFolder extends DbAbstractTable {
 		hasChildren = reader.readBoolean();
     }
 
-    public static List<DbAbstractTable> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Exception
+    public static List<DbAbstractTableX> retrieveForOrganisationParentType(UUID organisationUuid, UUID parentUuid, int folderType) throws Exception
     {
         return adapter.retrieveEntities("Administration.Folder_SelectForOrganisationParentType", organisationUuid, parentUuid, folderType);
     }

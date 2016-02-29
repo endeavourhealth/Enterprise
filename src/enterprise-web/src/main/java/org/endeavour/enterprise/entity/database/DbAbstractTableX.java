@@ -8,7 +8,7 @@ import java.util.UUID;
  * Base class for all DB entities, containing common methods for saving and retrieving. All actual
  * persistence is done in the TableAdapter class
  */
-public abstract class DbAbstractTable
+public abstract class DbAbstractTableX
 {
     private UUID primaryUuid = null;
 
@@ -73,9 +73,9 @@ public abstract class DbAbstractTable
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof DbAbstractTable)
+        if (o instanceof DbAbstractTableX)
         {
-            DbAbstractTable other = (DbAbstractTable)o;
+            DbAbstractTableX other = (DbAbstractTableX)o;
             if (getPrimaryUuid() != null
                     && other.getPrimaryUuid() != null
                     && getPrimaryUuid().equals(other.getPrimaryUuid()))

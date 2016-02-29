@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 18/02/2016.
  */
-public class DbEndUserPwd extends DbAbstractTable {
+public class DbEndUserPwd extends DbAbstractTableX {
 
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,

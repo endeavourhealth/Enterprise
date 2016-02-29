@@ -65,9 +65,9 @@ public final class TableAdapter
     /**
      * creates a new instance of our database class
      */
-    public DbAbstractTable newEntity() throws Exception
+    public DbAbstractTableX newEntity() throws Exception
     {
-        return (DbAbstractTable) getCls().newInstance();
+        return (DbAbstractTableX) getCls().newInstance();
     }
 
     /**
@@ -182,9 +182,9 @@ public final class TableAdapter
     }*/
 
 
-    public DbAbstractTable retrieveSingleEntity(String spName, Object... parameters) throws Exception
+    public DbAbstractTableX retrieveSingleEntity(String spName, Object... parameters) throws Exception
     {
-        List<? extends DbAbstractTable> v = retrieveEntities(spName, parameters);
+        List<? extends DbAbstractTableX> v = retrieveEntities(spName, parameters);
         //List<DbAbstractTable> v = retrieveEntities(spName, parameters);
 
         if (v.size() == 1)
@@ -201,7 +201,7 @@ public final class TableAdapter
             throw new RuntimeException("Retrieved multiple results from " + spName);
         }
     }
-    public List<DbAbstractTable> retrieveEntities(String spName, Object... spParameters) throws Exception
+    public List<DbAbstractTableX> retrieveEntities(String spName, Object... spParameters) throws Exception
     {
         Connection connection = DatabaseConnection.get(getDatabase());
 
@@ -310,14 +310,14 @@ public final class TableAdapter
     }
 
 
-    private List<DbAbstractTable> readFromResultSet(ResultSet rs) throws Exception
+    private List<DbAbstractTableX> readFromResultSet(ResultSet rs) throws Exception
     {
-        List<DbAbstractTable> ret = new ArrayList<DbAbstractTable>();
+        List<DbAbstractTableX> ret = new ArrayList<DbAbstractTableX>();
         ResultReader rr = new ResultReader(rs);
 
         while (rr.nextResult())
         {
-            DbAbstractTable entity = newEntity();
+            DbAbstractTableX entity = newEntity();
             entity.readFromDb(rr);
             ret.add(entity);
         }
@@ -349,7 +349,7 @@ public final class TableAdapter
         return ret;
     }*/
 
-    public void saveToDb(boolean insert, DbAbstractTable entity) throws Exception
+    public void saveToDb(boolean insert, DbAbstractTableX entity) throws Exception
     {
         String spName = getSchema() + "._" + getTableName();
         if (insert) {
@@ -413,7 +413,7 @@ public final class TableAdapter
     /**
      * calls the ...delete SP for the given entity to remove from the DB
      */
-    public void deleteFromDb(DbAbstractTable entity) throws Exception
+    public void deleteFromDb(DbAbstractTableX entity) throws Exception
     {
         String spName = getSchema() + "._" + getTableName() + "_Delete";
         String sql = spName + " " + entity.getPrimaryUuid();

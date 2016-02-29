@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 22/02/2016.
  */
-public final class DbEndUserEmailInvite extends DbAbstractTable {
+public final class DbEndUserEmailInvite extends DbAbstractTableX {
 
     private UUID endUserUuid = null;
     private String uniqueToken = null;
@@ -24,7 +24,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     public DbEndUserEmailInvite()
     {}
 
-    public static List<DbAbstractTable> retrieveForEndUserNotCompleted(UUID userUuid) throws Exception
+    public static List<DbAbstractTableX> retrieveForEndUserNotCompleted(UUID userUuid) throws Exception
     {
         return adapter.retrieveEntities("Administration.EndUserEmailInvite_SelectForEndUserNotCompleted", userUuid);
     }

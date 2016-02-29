@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 17/02/2016.
  */
-public final class DbEndUser extends DbAbstractTable {
+public final class DbEndUser extends DbAbstractTableX {
 
     private String title = null;
     private String forename = null;

@@ -1,6 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.entity.database.DbAbstractTable;
+import org.endeavour.enterprise.entity.database.DbAbstractTableX;
 import org.endeavour.enterprise.entity.database.DbFolder;
 import org.endeavour.enterprise.entity.database.DbFolderItemLink;
 import org.endeavour.enterprise.entity.json.JsonFolder;
@@ -300,7 +300,7 @@ public final class FolderEndpoint extends Endpoint {
         UUID orgUuid = folder.getOrganisationUuid();
         UUID parentUuid = folder.getPrimaryUuid();
         int folderType = folder.getFolderType();
-        List<DbAbstractTable> childFolders = DbFolder.retrieveForOrganisationParentType(orgUuid, parentUuid, folderType);
+        List<DbAbstractTableX> childFolders = DbFolder.retrieveForOrganisationParentType(orgUuid, parentUuid, folderType);
         for (int i=0; i<childFolders.size(); i++)
         {
             DbFolder childFolder = (DbFolder)childFolders.get(i);
@@ -309,7 +309,7 @@ public final class FolderEndpoint extends Endpoint {
 
         //retrieve the link entities for the folder and delete them
         UUID folderUuid = folder.getPrimaryUuid();
-        List<DbAbstractTable> links = DbFolderItemLink.retrieveForFolder(folderUuid);
+        List<DbAbstractTableX> links = DbFolderItemLink.retrieveForFolder(folderUuid);
         for (int i=0; i<links.size(); i++)
         {
             DbFolderItemLink link = (DbFolderItemLink)links.get(i);
@@ -338,14 +338,14 @@ public final class FolderEndpoint extends Endpoint {
 
         //get all our folders at the desired level
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        List<DbAbstractTable> folders = DbFolder.retrieveForOrganisationParentType(orgUuid, uuid, folderType);
+        List<DbAbstractTableX> folders = DbFolder.retrieveForOrganisationParentType(orgUuid, uuid, folderType);
         JsonFolderList ret = new JsonFolderList(folders.size());
 
         for (int i=0; i<folders.size(); i++)
         {
             DbFolder folder = (DbFolder)folders.get(i);
             UUID folderUuid = folder.getPrimaryUuid();
-            List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
+            List<DbAbstractTableX> items = DbFolderItemLink.retrieveForFolder(folderUuid);
             int contentCount = items.size();
 
             ret.add(folder, contentCount);

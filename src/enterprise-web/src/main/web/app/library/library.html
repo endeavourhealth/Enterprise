@@ -1,13 +1,31 @@
 <div>
 	<script type="text/ng-template" id="node_template.html">
-		<div ui-tree-handle class="tree-node tree-node-content">
-				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
-				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon text-muted"
-							ng-class="{'glyphicon-triangle-right': !node.isExpanded,'glyphicon-triangle-bottom': node.isExpanded}"
-							ng-click="library.toggleExpansion(node)"></span>
+		<div ui-tree-handle class="tree-node tree-node-content show-child-on-hover">
+			<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+			<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+						ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+						ng-click="ctrl.toggleExpansion(node)"></span>
 			<span	class="glyphicon glyphicon-folder-open text-primary"></span>
 			<span ng-class="{'bg-primary': node.isSelected}"
-						ng-click="library.selectNode(node)">{{node.folderName}}</span>
+						ng-click="ctrl.selectNode(node)">{{node.folderName}}</span>
+			<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+			<span uib-dropdown>
+				<button class="btn btn-xs child-to-show" uib-dropdown-toggle>...</button>
+				<ul uib-dropdown-menu>
+					<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
+					<li><a href="#">Add list output</a></li>
+					<li><a href="#">Add code set</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a href="#">Add child folder</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a href="#">Rename</a></li>
+					<li><a href="#">Delete</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a href="#">Cut</a></li>
+					<li><a href="#">Copy</a></li>
+					<li><a href="#">Paste</a></li>
+				</ul>
+			</span>
 		</div>
 		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">
 			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
@@ -18,11 +36,6 @@
 	<div class="col-md-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<button
-					class="btn btn-xs btn-success pull-right"
-					ng-show="library.selectedNode"
-					ui-sref="app.queryAction({itemUuid: library.selectedNode.uuid, itemAction: 'add'})">Add new
-				</button>
 				Library items
 			</div>
 			<div class="panel-body">
@@ -33,7 +46,7 @@
 							<div class="col-md-3">
 								<div id="tree-root" class="angular-ui-tree">
 									<ol class="angular-ui-tree-nodes">
-										<li ng-repeat="node in library.treeData" ng-include="'node_template.html'" class="angular-ui-tree-node"></li>
+										<li ng-repeat="node in ctrl.treeData" ng-include="'node_template.html'" class="angular-ui-tree-node"></li>
 									</ol>
 								</div>
 							</div>
@@ -62,15 +75,25 @@
 											</tr>
 										</thead>
 										<tbody>
-											<tr class="show-child-on-hover" ng-repeat="item in library.itemSummaryList.contents | orderBy:sortField:sortReverse">
-												<td>{{item.name}}</td>
+											<tr class="show-child-on-hover" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
+												<td><a ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'view'})">{{item.name}}</a></td>
 												<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 												<td>{{item.type | itemTypeIdToString}}</td>
 												<td>
 													<div class="child-to-show">
 														<button class="btn btn-info btn-xs" ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'view'})">View</button>
 														<button class="btn btn-success btn-xs" ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'edit'})">Edit</button>
-														<button class="btn btn-danger btn-xs" ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'delete'})">Delete</button>
+														<span uib-dropdown>
+															<button class="btn btn-xs" uib-dropdown-toggle>...</button>
+															<ul uib-dropdown-menu>
+																<li><a href="#">Rename</a></li>
+																<li><a href="#">Delete</a></li>
+																<li role="separator" class="divider"></li>
+																<li><a href="#">Cut</a></li>
+																<li><a href="#">Copy</a></li>
+																<li><a href="#">Paste</a></li>
+															</ul>
+														</span>
 													</div>
 												</td>
 											</tr>

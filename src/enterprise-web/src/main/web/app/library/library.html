@@ -63,9 +63,9 @@
 												<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 												<td>{{item.type | itemTypeIdToString}}</td>
 												<td>
-													<label class="btn btn-info btn-xs" ng-click="library.viewItem(item)">View</label>
-													<label class="btn btn-success btn-xs" ng-click="library.editItem(item)">Edit</label>
-													<label class="btn btn-danger btn-xs" ng-click="library.deleteItem(item)">Delete</label>
+													<label class="btn btn-info btn-xs"><a ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'view'})">View</a></label>
+													<label class="btn btn-success btn-xs"><a ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'edit'})">Edit</a></label>
+													<label class="btn btn-danger btn-xs"><a ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'delete'})">Delet</a></label>
 												</td>
 											</tr>
 										</tbody>

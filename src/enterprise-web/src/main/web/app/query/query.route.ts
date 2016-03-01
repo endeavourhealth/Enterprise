@@ -24,6 +24,15 @@ module app.query {
 						controller: 'QueryController',
 						controllerAs: 'query'
 					}
+				},
+				{
+					state: 'app.queryAction',
+					config: {
+						url: '/query/:itemUuid/:itemAction',
+						templateUrl: 'app/query/query.html',
+						controller: 'QueryController',
+						controllerAs: 'query'
+					}
 				}
 			];
 		}

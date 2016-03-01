@@ -17,7 +17,7 @@ module app.query {
 			// Return the browsers prompt function.
 			return prompt;
 		})
-		.controller('QueryController', ['$scope', 'prompt', function QueryController ($scope : any, prompt : any) {
+		.controller('QueryController', ['$scope', '$stateParams', 'prompt', function QueryController ($scope : any, $stateParams : any, prompt : any) {
 			//
 			// Selects the next node id.
 			//
@@ -215,7 +215,10 @@ module app.query {
 
 			};
 
-			//
+			// TODO: Parameter based routing actions
+			// alert($stateParams.itemAction + ':' + $stateParams.itemUuid);
+
+
 
 			//
 			// Add a new node to the chart.

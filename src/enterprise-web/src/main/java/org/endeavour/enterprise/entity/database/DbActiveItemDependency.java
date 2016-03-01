@@ -15,11 +15,11 @@ public final class DbActiveItemDependency extends DbAbstractTable
 {
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbActiveItemDependency.class, "ActiveItemDependency", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
-            "ActiveItemDependencyUuid,ItemUuid,DependentItemUuid,DependencyType", "ActiveItemDependencyUuid");
+            "ActiveItemDependencyUuid,ItemUuid,DependentItemUuid,DependencyTypeId", "ActiveItemDependencyUuid");
 
     private UUID itemUuid = null;
     private UUID dependentItemUuid = null;
-    private DependencyType dependencyType = null;
+    private DependencyType dependencyTypeId = null;
 
     public DbActiveItemDependency()
     {}
@@ -72,7 +72,7 @@ public final class DbActiveItemDependency extends DbAbstractTable
         builder.add(getPrimaryUuid());
         builder.add(itemUuid);
         builder.add(dependentItemUuid);
-        builder.add(dependencyType.getValue());
+        builder.add(dependencyTypeId.getValue());
     }
 
     @Override
@@ -81,7 +81,7 @@ public final class DbActiveItemDependency extends DbAbstractTable
         setPrimaryUuid(reader.readUuid());
         itemUuid = reader.readUuid();
         dependentItemUuid = reader.readUuid();
-        dependencyType = DependencyType.get(reader.readInt());
+        dependencyTypeId = DependencyType.get(reader.readInt());
     }
 
     /**
@@ -103,11 +103,11 @@ public final class DbActiveItemDependency extends DbAbstractTable
         this.dependentItemUuid = dependentItemUuid;
     }
 
-    public DependencyType getDependencyType() {
-        return dependencyType;
+    public DependencyType getDependencyTypeId() {
+        return dependencyTypeId;
     }
 
-    public void setDependencyType(DependencyType dependencyType) {
-        this.dependencyType = dependencyType;
+    public void setDependencyTypeId(DependencyType dependencyType) {
+        this.dependencyTypeId = dependencyType;
     }
 }

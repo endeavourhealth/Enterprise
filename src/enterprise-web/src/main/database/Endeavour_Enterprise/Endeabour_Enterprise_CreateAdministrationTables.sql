@@ -237,7 +237,7 @@ CREATE TABLE [Definition].[ActiveItem](
 	[OrganisationUuid] [uniqueidentifier] NOT NULL,
 	[ItemUuid] [uniqueidentifier] NOT NULL,
 	[Version] [int] NOT NULL,
-	[ItemType] [int] NOT NULL,
+	[ItemTypeId] [int] NOT NULL,
  CONSTRAINT [PK_ActiveItem] PRIMARY KEY CLUSTERED
 (
 	[ActiveItemUuid] ASC
@@ -257,7 +257,7 @@ CREATE TABLE [Definition].[ActiveItemDependency](
 	[ActiveItemDependencyUuid] [uniqueidentifier] NOT NULL,
 	[ItemUuid] [uniqueidentifier] NOT NULL,
 	[DependentItemUuid] [uniqueidentifier] NOT NULL,
-	[DependencyType] [int] NOT NULL,
+	[DependencyTypeId] [int] NOT NULL,
  CONSTRAINT [PK_ActiveItemDependency] PRIMARY KEY CLUSTERED
 (
 	[ActiveItemDependencyUuid] ASC

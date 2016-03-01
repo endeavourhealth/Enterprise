@@ -16,12 +16,12 @@ public final class DbActiveItem extends DbAbstractTable
 {
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItem", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
-            "ActiveItemUuid,OrganisationUuid,ItemUuid,Version,ItemType", "ActiveItemUuid");
+            "ActiveItemUuid,OrganisationUuid,ItemUuid,Version,ItemTypeId", "ActiveItemUuid");
 
     private UUID organisationUuid = null;
     private UUID itemUuid = null;
     private int version = -1;
-    private DefinitionItemType itemType = null;
+    private DefinitionItemType itemTypeId = null;
 
     public DbActiveItem()
     {}
@@ -39,7 +39,7 @@ public final class DbActiveItem extends DbAbstractTable
         ret.setOrganisationUuid(organisationUuid);
         ret.setItemUuid(itemUuid);
         ret.setVersion(version);
-        ret.setItemType(itemType);
+        ret.setItemTypeId(itemType);
 
         return ret;
     }
@@ -77,7 +77,7 @@ public final class DbActiveItem extends DbAbstractTable
         builder.add(organisationUuid);
         builder.add(itemUuid);
         builder.add(version);
-        builder.add(itemType.getValue());
+        builder.add(itemTypeId.getValue());
     }
 
     @Override
@@ -87,7 +87,7 @@ public final class DbActiveItem extends DbAbstractTable
         organisationUuid = reader.readUuid();
         itemUuid = reader.readUuid();
         version = reader.readInt();
-        itemType = DefinitionItemType.get(reader.readInt());
+        itemTypeId = DefinitionItemType.get(reader.readInt());
     }
 
     /**
@@ -117,11 +117,11 @@ public final class DbActiveItem extends DbAbstractTable
         this.version = version;
     }
 
-    public DefinitionItemType getItemType() {
-        return itemType;
+    public DefinitionItemType getItemTypeId() {
+        return itemTypeId;
     }
 
-    public void setItemType(DefinitionItemType itemType) {
-        this.itemType = itemType;
+    public void setItemTypeId(DefinitionItemType itemType) {
+        this.itemTypeId = itemType;
     }
 }

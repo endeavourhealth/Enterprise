@@ -26,9 +26,9 @@ public abstract class ItemEndpoint extends Endpoint
         {
             throw new BadRequestException("Item for another organisation");
         }
-        if (activeItem.getItemType() != itemTypeDesired)
+        if (activeItem.getItemTypeId() != itemTypeDesired)
         {
-            throw new RuntimeException("Trying to retrieve a " + itemTypeDesired + " but item is a " + activeItem.getItemType());
+            throw new RuntimeException("Trying to retrieve a " + itemTypeDesired + " but item is a " + activeItem.getItemTypeId());
         }
         return activeItem;
     }
@@ -52,9 +52,9 @@ public abstract class ItemEndpoint extends Endpoint
         DbActiveItem activeItem = retrieveActiveItem(itemUuid, orgUuid, itemTypeDesired);
         DbItem item = retrieveItem(activeItem);
 
-        if (activeItem.getItemType() != itemTypeDesired)
+        if (activeItem.getItemTypeId() != itemTypeDesired)
         {
-            throw new RuntimeException("Trying to delete a " + itemTypeDesired + " but item is a " + activeItem.getItemType());
+            throw new RuntimeException("Trying to delete a " + itemTypeDesired + " but item is a " + activeItem.getItemTypeId());
         }
 
         //recursively build up the full list of items we want to delete
@@ -183,7 +183,7 @@ public abstract class ItemEndpoint extends Endpoint
             activeItem.setOrganisationUuid(orgUuid);
             //activeItem.setItemUuid(); //done after saving the item
             activeItem.setVersion(firstVersion);
-            activeItem.setItemType(itemType);
+            activeItem.setItemTypeId(itemType);
 
             item = new DbItem();
             item.setVersion(firstVersion);
@@ -272,7 +272,7 @@ public abstract class ItemEndpoint extends Endpoint
             {
                 linkToParent = new DbActiveItemDependency();
                 linkToParent.setDependentItemUuid(itemUuid);
-                linkToParent.setDependencyType(dependencyType);
+                linkToParent.setDependencyTypeId(dependencyType);
             }
 
             linkToParent.setItemUuid(containingFolderUuid);

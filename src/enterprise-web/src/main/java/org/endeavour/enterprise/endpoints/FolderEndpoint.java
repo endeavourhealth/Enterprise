@@ -223,7 +223,7 @@ public final class FolderEndpoint extends ItemEndpoint
 
         //to delete it, we need to find out the item type
         DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(folderUuid);
-        DefinitionItemType itemType = activeItem.getItemType();
+        DefinitionItemType itemType = activeItem.getItemTypeId();
         if (itemType != DefinitionItemType.LibraryFolder
                 && itemType != DefinitionItemType.ReportFolder)
         {
@@ -435,7 +435,7 @@ public final class FolderEndpoint extends ItemEndpoint
             UUID uuid = activeItem.getItemUuid();
             int version = activeItem.getVersion();
             DbItem item = DbItem.retrieveForUuidVersion(uuid, version);
-            DefinitionItemType itemType = activeItem.getItemType();
+            DefinitionItemType itemType = activeItem.getItemTypeId();
 
             JsonFolderContent c = new JsonFolderContent();
             c.setUuid(uuid);

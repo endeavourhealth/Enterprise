@@ -87,7 +87,7 @@ public final class SqlServerDatabase implements DatabaseI
         }
         catch (SQLException sqlEx)
         {
-            LOG.error("Error with SQL " + sql);
+            LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
 
@@ -195,7 +195,7 @@ public final class SqlServerDatabase implements DatabaseI
         }
         catch (SQLException sqlEx)
         {
-            LOG.error("Error with SQL " + sql);
+            LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
     }
@@ -242,7 +242,7 @@ public final class SqlServerDatabase implements DatabaseI
         }
         catch (SQLException sqlEx)
         {
-            LOG.error("Error with SQL " + sql);
+            LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
     }
@@ -303,7 +303,7 @@ public final class SqlServerDatabase implements DatabaseI
         }
         catch (SQLException sqlEx)
         {
-            LOG.error("Error with SQL " + sql);
+            LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
 
@@ -406,7 +406,7 @@ public final class SqlServerDatabase implements DatabaseI
         }
         catch (SQLException sqlEx)
         {
-            LOG.error("Error with SQL " + sql);
+            LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
     }
@@ -510,7 +510,7 @@ public final class SqlServerDatabase implements DatabaseI
 
         String where = "INNER JOIN Definition.ActiveItemDependency d"
                      + " ON d.ItemUuid = " + convertToString(itemUuid)
-                     + " AND d.DependencyType = " + convertToString(dependencyType)
+                     + " AND d.DependencyTypeId = " + convertToString(dependencyType)
                      + " AND d.DependentItemUuid = " + ALIAS + ".ItemUuid"
                      + " INNER JOIN Definition.ActiveItem a"
                      + " ON a.ItemUuid = d.ItemUuid"
@@ -529,12 +529,12 @@ public final class SqlServerDatabase implements DatabaseI
         String where = "INNER JOIN Definition.ActiveItem a"
                      + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
                      + " AND a.Version = " + ALIAS + ".version"
-                     + " AND a.ItemType = " + convertToString(itemType)
+                     + " AND a.ItemTypeId = " + convertToString(itemType)
                      + " AND a.OrganisationUuid = " + convertToString(organisationUuid)
                      + " WHERE NOT EXISTS ("
                      + "SELECT 1 FROM Definition.ActiveItemDependency d"
                      + " WHERE d.DependentItemUuid = " + ALIAS + ".ItemUuid"
-                     + " AND d.DependencyType = " + convertToString(dependencyType)
+                     + " AND d.DependencyTypeId = " + convertToString(dependencyType)
                      + ")";
 
         retrieveForWhere(new DbItem().getAdapter(), where, ret);
@@ -547,7 +547,7 @@ public final class SqlServerDatabase implements DatabaseI
         String sql = "SELECT COUNT(1)"
                 + " FROM Definition.ActiveItemDependency"
                 + " WHERE ItemUuid = " + convertToString(itemUuid)
-                + " AND DependencyType = " + convertToString(dependencyType);
+                + " AND DependencyTypeId = " + convertToString(dependencyType);
 
         return executeScalarCountQuery(sql, DatabaseName.ENDEAVOUR_ENTERPRISE);
     }
@@ -569,7 +569,7 @@ public final class SqlServerDatabase implements DatabaseI
         List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
 
         String where = "WHERE DependentItemUuid = " + convertToString(dependentItemUuid)
-                     + " AND DependencyType = " + convertToString(dependencyType);
+                     + " AND DependencyTypeId = " + convertToString(dependencyType);
         retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
         return ret;
     }
@@ -581,7 +581,7 @@ public final class SqlServerDatabase implements DatabaseI
 
         String where = "INNER JOIN Definition.ActiveItemDependency d"
                 + " ON d.ItemUuid = " + convertToString(itemUuid)
-                + " AND d.DependencyType = " + convertToString(dependencyType)
+                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
                 + " AND d.DependentItemUuid = " + ALIAS + ".ItemUuid"
                 + " WHERE " + ALIAS + ".OrganisationUuid = " + convertToString(organisationUuid);
 

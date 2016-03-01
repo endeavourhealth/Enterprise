@@ -18,7 +18,6 @@ create user Endeavour_Enterprise_ApplicationUser for login Endeavour_Enterprise_
 grant connect to Endeavour_Enterprise_ApplicationUser
 grant execute to Endeavour_Enterprise_ApplicationUser
 
-
 --DL 01/03/2016 - user needs to be able to read and write SQL
 ALTER ROLE [db_datareader] ADD MEMBER [Endeavour_Enterprise_ApplicationUser]
 ALTER ROLE [db_datawriter] ADD MEMBER [Endeavour_Enterprise_ApplicationUser]

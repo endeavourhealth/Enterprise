@@ -15,6 +15,7 @@ public final class JsonFolderContent implements Serializable
 {
     private UUID uuid = null;
     private Integer type = null;
+    private String typeDesc = null; //2016-03-01 DL - to make it easier to display
     private String name = null;
     private Date lastModified = null;
     private Date lastRun = null; //only applicable when showing reports
@@ -28,6 +29,7 @@ public final class JsonFolderContent implements Serializable
     public void setTypeEnum(DefinitionItemType t)
     {
         setType(t.getValue());
+        setTypeDesc(t.toString());
     }
 
 
@@ -48,6 +50,14 @@ public final class JsonFolderContent implements Serializable
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String getTypeDesc() {
+        return typeDesc;
+    }
+
+    public void setTypeDesc(String typeDesc) {
+        this.typeDesc = typeDesc;
     }
 
     public String getName() {

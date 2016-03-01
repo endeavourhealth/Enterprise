@@ -7,7 +7,7 @@
 	<title>Enterprise REST Test</title>
 
 	<style>
-		body {background-color:lightgrey;}
+		body {background-color:lightgrey; }
 		input {width: 300px;}
 	</style>
 
@@ -156,7 +156,7 @@
 
 <body>
 
-<h2>/api/security/login</h2>
+<h3>/api/security/login</h3>
 
 	Username: <input type="text" id="username" value="drewlittler@hotmail.com">
 	<br/>
@@ -179,7 +179,7 @@
 	</script>
 
 <hr/>
-<h2>/api/security/selectOrganisation</h2>
+<h3>/api/security/selectOrganisation</h3>
 
 	Organisation UUID: <input type="text" id="uuid">
 	<br/>
@@ -197,7 +197,7 @@
 	</script>
 
 <hr/>
-<h2>/api/security/changePassword</h2>
+<h3>/api/security/changePassword</h3>
 
 	New password: <input type="text" id="changePasswordNewPassword">
 	<br/>
@@ -215,7 +215,7 @@
 	</script>
 
 <hr/>
-<h2>/api/security/logoff</h2>
+<h3>/api/security/logoff</h3>
 
 	<button type="button" onclick="logoff()">Submit</button>
 
@@ -228,7 +228,7 @@
 	</script>
 
 <hr/>
-<h2>/api/security/setPasswordFromInviteEmail</h2>
+<h3>/api/security/setPasswordFromInviteEmail</h3>
 
 	Token: <input type="text" id="inviteToken">
 	<br/>
@@ -250,7 +250,7 @@
 	</script>
 
 <hr/>
-<h2>/api/admin/getUsers</h2>
+<h3>/api/admin/getUsers</h3>
 
 	<button type="button" onclick="getUsers()">Submit</button>
 
@@ -263,7 +263,7 @@
 	</script>
 
 <hr/>
-<h2>/api/admin/saveUser</h2>
+<h3>/api/admin/saveUser</h3>
 
 	User UUID: <input type="text" id="saveUserUuid">(leave blank to create a new user)
 	<br/>
@@ -338,7 +338,7 @@
 		</script>
 
 <hr/>
-<h2>/api/admin/deleteUser</h2>
+<h3>/api/admin/deleteUser</h3>
 
 	User UUID: <input type="text" id="deleteUserUuid">
 	<br/>
@@ -359,7 +359,7 @@
 
 
 <hr/>
-<h2>/api/admin/resendInviteEmail</h2>
+<h3>/api/admin/resendInviteEmail</h3>
 
 	Email: <input type="text" id="resendInviteEmail">
 	<br/>
@@ -377,7 +377,7 @@
 	</script>
 
 <hr/>
-<h2>/api/admin/saveOrganisation</h2>
+<h3>/api/admin/saveOrganisation</h3>
 
 	Organisation UUID: <input type="text" id="saveOrganisationUuid">(Leave blank to create new one)
 	<br/>
@@ -417,7 +417,7 @@
 
 
 <hr/>
-<h2>/api/folder/saveFolder</h2>
+<h3>/api/folder/saveFolder</h3>
 
 	Folder UUID: <input type="text" id="saveFolderUuid">(leave blank to create a new folder)
 	<br/>
@@ -465,7 +465,7 @@
 	</script>
 
 <hr/>
-<h2>/api/folder/deleteFolder</h2>
+<h3>/api/folder/deleteFolder</h3>
 
 	Folder UUID: <input type="text" id="deleteFolderUuid">
 	<br/>
@@ -485,7 +485,7 @@
 
 
 <hr/>
-<h2>/api/folder/getFolders</h2>
+<h3>/api/folder/getFolders</h3>
 
 	Folder type <select id="getFoldersType">
 		<option value="1">Library</option>
@@ -514,7 +514,7 @@
 
 
 <hr/>
-<h2>/api/folder/getFolderContents</h2>
+<h3>/api/folder/getFolderContents</h3>
 
 	Folder UUID: <input type="text" id="getFolderContentsUuid">
 	<br/>
@@ -532,7 +532,7 @@
 
 
 <hr/>
-<h2>/api/report/getReport</h2>
+<h3>/api/report/getReport</h3>
 
 	UUID: <input type="text" id="getReportUuid">
 	<br/>
@@ -548,7 +548,7 @@
 	</script>
 
 <hr/>
-<h2>/api/report/saveReport</h2>
+<h3>/api/report/saveReport</h3>
 
 
 	UUID: <input type="text" id="saveReportUuid">(leave blank to create a new one)
@@ -611,7 +611,7 @@
 	</script>
 
 <hr/>
-<h2>/api/report/deleteReport</h2>
+<h3>/api/report/deleteReport</h3>
 
 	UUID: <input type="text" id="deleteReportUuid">
 	<br/>
@@ -629,7 +629,7 @@
 	</script>
 
 <hr/>
-<h2>/api/query/getQuery</h2>
+<h3>/api/query/getQuery</h3>
 
 	UUID: <input type="text" id="getQueryUuid">
 	<br/>
@@ -645,7 +645,7 @@
 	</script>
 
 <hr/>
-<h2>/api/query/saveQuery</h2>
+<h3>/api/query/saveQuery</h3>
 
 	
 	UUID: <input type="text" id="saveQueryUuid">(leave blank to create a new one)
@@ -708,7 +708,7 @@
 	</script>
 
 <hr/>
-<h2>/api/query/deleteQuery</h2>
+<h3>/api/query/deleteQuery</h3>
 
 	UUID: <input type="text" id="deleteQueryUuid">
 	<br/>
@@ -726,7 +726,7 @@
 	</script>
 
 <hr/>
-<h2>/api/listOutput/getListOutput</h2>
+<h3>/api/listOutput/getListOutput</h3>
 
 	UUID: <input type="text" id="getListOutputUuid">
 	<br/>
@@ -743,7 +743,7 @@
 
 
 <hr/>
-<h2>/api/listOutput/saveListOutput</h2>
+<h3>/api/listOutput/saveListOutput</h3>
 
 	UUID: <input type="text" id="saveListOutputUuid">(leave blank to create a new one)
 	<br/>
@@ -805,7 +805,7 @@
 	</script>
 
 <hr/>
-<h2>/api/listOutput/deleteListOutput</h2>
+<h3>/api/listOutput/deleteListOutput</h3>
 
 	UUID: <input type="text" id="deleteListOutputUuid">
 	<br/>
@@ -823,7 +823,7 @@
 	</script>
 
 <hr/>
-<h2>Results</h2>
+<h3>Results</h3>
 
 
 <div id="results"></div>

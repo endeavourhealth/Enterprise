@@ -106,7 +106,7 @@ public final class SqlServerDatabase implements DatabaseI
 
 
     @Override
-    public void writeDpdate(DbAbstractTable entity) throws Exception
+    public void writeUpdate(DbAbstractTable entity) throws Exception
     {
         TableAdapter a = entity.getAdapter();
 

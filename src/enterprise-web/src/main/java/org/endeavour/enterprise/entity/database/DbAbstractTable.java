@@ -60,7 +60,7 @@ public abstract class DbAbstractTable
     public void saveToDbUpdate() throws Exception
     {
         //2016-02-29 DL - changed how we write
-        DatabaseManager.db().writeDpdate(this);
+        DatabaseManager.db().writeUpdate(this);
         //getAdapter().saveToDb(false, this);
     }
 

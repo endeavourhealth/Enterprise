@@ -35,7 +35,7 @@ module app.core {
 			return [
 				{caption: 'Dashboard', state: 'app.dashboard', icon: 'glyphicon-dashboard'},
 				{caption: 'Library', state: 'app.library', icon: 'glyphicon-book'},
-				{caption: 'Reports', state: 'app.reports', icon: 'glyphicon-file'},
+				{caption: 'Reports', state: 'app.reportList', icon: 'glyphicon-file'},
 				{caption: 'Query Builder', state: 'app.query', icon: 'glyphicon-question-sign'},
 				{caption: 'Administration', state: 'app.admin', icon: 'glyphicon-cog'},
 				{caption: 'Audit', state: 'app.audit', icon: 'glyphicon-check'}

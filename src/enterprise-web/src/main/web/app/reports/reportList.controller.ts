@@ -9,7 +9,7 @@ module app.reports {
 	import itemTypeIdToString = app.models.itemTypeIdToString;
 	'use strict';
 
-	class ReportsController {
+	class ReportListController {
 		treeData : FolderNode[];
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
@@ -74,5 +74,5 @@ module app.reports {
 
 	angular
 		.module('app.reports')
-		.controller('ReportsController', ReportsController);
+		.controller('ReportListController', ReportListController);
 }

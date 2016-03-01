@@ -422,7 +422,7 @@ public final class FolderEndpoint extends ItemEndpoint
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         //retrieve the folder and validate it's for our org
-        DbItem folder = DbItem.retrieveForUuidLatestVersion(orgUuid, folderUuid);
+        //DbItem folder = DbItem.retrieveForUuidLatestVersion(orgUuid, folderUuid);
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
@@ -460,6 +460,10 @@ public final class FolderEndpoint extends ItemEndpoint
             else if (itemType == DefinitionItemType.ListOutput)
             {
 
+
+            }
+            else if (itemType == DefinitionItemType.CodeSet)
+            {
 
             }
             else

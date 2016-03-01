@@ -1,5 +1,13 @@
 /* Endeavour specific CSS */
 
+.show-child-on-hover .child-to-show {
+    display: none;
+}
+
+.show-child-on-hover:hover .child-to-show {
+    display: inline;
+}
+
 .logo {
     font-size: 18px;
     color: gray;

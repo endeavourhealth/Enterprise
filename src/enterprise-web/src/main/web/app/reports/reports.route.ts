@@ -17,12 +17,21 @@ module app.reports {
 		static getRoutes() {
 			return [
 				{
-					state: 'app.reports',
+					state: 'app.reportList',
 					config: {
-						url: '/reports',
-						templateUrl: 'app/reports/reports.html',
-						controller: 'ReportsController',
-						controllerAs: 'reports'
+						url: '/reportList',
+						templateUrl: 'app/reports/reportList.html',
+						controller: 'ReportListController',
+						controllerAs: 'ctrl'
+					}
+				},
+				{
+					state: 'app.reportAction',
+					config: {
+						url: '/report/:itemUuid/:itemAction',
+						templateUrl: 'app/reports/report.html',
+						controller: 'ReportController',
+						controllerAs: 'ctrl'
 					}
 				}
 			];

@@ -589,5 +589,25 @@ public final class SqlServerDatabase implements DatabaseI
         return ret;
     }
 
+    @Override
+    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItem(UUID itemUuid) throws Exception
+    {
+        List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
+
+        String where = "WHERE ItemUuid = " + convertToString(itemUuid);
+        retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItem(UUID dependentItemUuid) throws Exception
+    {
+        List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
+
+        String where = "WHERE DependentItemUuid = " + convertToString(dependentItemUuid);
+        retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
+        return ret;
+    }
+
 
 }

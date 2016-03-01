@@ -74,11 +74,7 @@ public abstract class ItemEndpoint extends Endpoint
     private void reallyDeleteItem(DbItem itemToDelete, UUID userUuid) throws Exception
     {
         UUID itemUuid = itemToDelete.getPrimaryUuid();
-        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
-        int version = activeItem.getVersion()+1;
-
-        //update the activeItem
-        activeItem.setVersion(version);
+        int version = itemToDelete.getVersion()+1;
 
         //update the item
         itemToDelete.setVersion(version);
@@ -88,7 +84,26 @@ public abstract class ItemEndpoint extends Endpoint
 
         //save
         itemToDelete.saveToDbInsert(); //remember to always force an insert for items
-        activeItem.saveToDb();
+
+        //2016-03-01 DL - delete the ActiveItem
+        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
+        activeItem.deleteFromDb();
+        //activeItem.saveToDb();
+
+        //2016-03-01 DL - delete the ActiveItemDependencies too
+        List<DbActiveItemDependency> dependencies = DbActiveItemDependency.retrieveForItem(itemUuid);
+        for (int i=0; i<dependencies.size(); i++)
+        {
+            DbActiveItemDependency dependency = dependencies.get(i);
+            dependency.deleteFromDb();
+        }
+
+        dependencies = DbActiveItemDependency.retrieveForDependentItem(itemUuid);
+        for (int i=0; i<dependencies.size(); i++)
+        {
+            DbActiveItemDependency dependency = dependencies.get(i);
+            dependency.deleteFromDb();
+        }
     }
     private void findItemsToDelete(List<DbItem> itemsToDelete, UUID orgUuid, DbItem item) throws Exception
     {
@@ -125,7 +140,7 @@ public abstract class ItemEndpoint extends Endpoint
         {
             DbItem item = itemsToDelete.get(i);
             UUID itemUuid = item.getPrimaryUuid();
-            List<DbActiveItemDependency> dependencies = DbActiveItemDependency.retrieveForDependentItem(itemUuid, DependencyType.Uses);
+            List<DbActiveItemDependency> dependencies = DbActiveItemDependency.retrieveForDependentItemType(itemUuid, DependencyType.Uses);
             for (int j=0; j<dependencies.size(); j++)
             {
                 DbActiveItemDependency dependency = dependencies.get(i);
@@ -232,7 +247,7 @@ public abstract class ItemEndpoint extends Endpoint
         }
 
         DbActiveItemDependency linkToParent = null;
-        List<DbActiveItemDependency> parents = DbActiveItemDependency.retrieveForDependentItem(itemUuid, dependencyType);
+        List<DbActiveItemDependency> parents = DbActiveItemDependency.retrieveForDependentItemType(itemUuid, dependencyType);
         if (parents.size() == 1)
         {
             linkToParent = parents.get(0);

@@ -529,23 +529,196 @@
 <hr/>
 <h2>/api/report/getReport</h2>
 
+	UUID: <input type="text" id="getReportUuid">
+	<br/>
+	<button type="button" onclick="getReport()">Submit</button>
+
+	<script>
+		function getReport() {
+
+			var s = document.getElementById('getReportUuid').value;
+
+			get('/api/report/getReport', 'uuid=' + s);
+		}
+	</script>
+
 <hr/>
 <h2>/api/report/saveReport</h2>
+
+
+	UUID: <input type="text" id="saveReportUuid">(leave blank to create a new one)
+	<br/>
+	Name: <input type="text" id="saveReportName">
+	<br/>
+	Description: <input type="text" id="saveReportDescription">
+	<br/>
+	XML Content: <input type="text" id="saveReportXml">
+	<br/>
+	Is Deleted: <input type="checkbox" id="saveReportDeleted">
+	<br/>
+	Folder UUID: <input type="text" id="saveReportFolderUuid">
+	<br/>
+	<button type="button" onclick="saveReport()">Submit</button>
+	
+	<script>
+		function saveReport() {
+
+			var params = {};
+
+			var s = document.getElementById('saveReportUuid').value;
+			if (s.length > 0)
+			{
+				params['uuid'] = s;
+			}
+
+			s = document.getElementById('saveReportName').value;
+			if (s.length > 0)
+			{
+				params['name'] = s;
+			}
+
+			s = document.getElementById('saveReportDescription').value;
+			if (s.length > 0)
+			{
+				params['description'] = s;
+			}
+
+			s = document.getElementById('saveReportXml').value;
+			if (s.length > 0)
+			{
+				params['xmlContent'] = s;
+			}
+
+			if (document.getElementById("saveReportDeleted").checked)
+			{
+				params['isDeleted'] = s;
+			}
+
+			s = document.getElementById('saveReportFolderUuid').value;
+			if (s.length > 0)
+			{
+				params['folderUuid'] = s;
+			}
+
+			post('/api/report/saveReport/', params);
+
+		}
+	</script>
 
 <hr/>
 <h2>/api/report/deleteReport</h2>
 
+	UUID: <input type="text" id="deleteReportUuid">
+	<br/>
+	<button type="button" onclick="deleteReport()">Submit</button>
+
+	<script>
+		function deleteReport() {
+
+			var s = document.getElementById('deleteReportUuid').value;
+			var params = {uuid:s};
+
+			post('/api/report/deleteReport/', params);
+
+		}
+	</script>
 
 <hr/>
 <h2>/api/query/getQuery</h2>
 
+	UUID: <input type="text" id="getQueryUuid">
+	<br/>
+	<button type="button" onclick="getQuery()">Submit</button>
+
+	<script>
+		function getQuery() {
+
+			var s = document.getElementById('getQueryUuid').value;
+
+			get('/api/query/getQuery', 'uuid=' + s);
+		}
+	</script>
+
 <hr/>
 <h2>/api/query/saveQuery</h2>
+
+	
+	UUID: <input type="text" id="saveQueryUuid">(leave blank to create a new one)
+	<br/>
+	Name: <input type="text" id="saveQueryName">
+	<br/>
+	Description: <input type="text" id="saveQueryDescription">
+	<br/>
+	XML Content: <input type="text" id="saveQueryXml">
+	<br/>
+	Is Deleted: <input type="checkbox" id="saveQueryDeleted">
+	<br/>
+	Folder UUID: <input type="text" id="saveQueryFolderUuid">
+	<br/>
+	<button type="button" onclick="saveQuery()">Submit</button>
+	
+	<script>
+		function saveQuery() {
+
+			var params = {};
+
+			var s = document.getElementById('saveQueryUuid').value;
+			if (s.length > 0)
+			{
+				params['uuid'] = s;
+			}
+
+			s = document.getElementById('saveQueryName').value;
+			if (s.length > 0)
+			{
+				params['name'] = s;
+			}
+
+			s = document.getElementById('saveQueryDescription').value;
+			if (s.length > 0)
+			{
+				params['description'] = s;
+			}
+
+			s = document.getElementById('saveQueryXml').value;
+			if (s.length > 0)
+			{
+				params['xmlContent'] = s;
+			}
+
+			if (document.getElementById("saveQueryDeleted").checked)
+			{
+				params['isDeleted'] = s;
+			}
+
+			s = document.getElementById('saveQueryFolderUuid').value;
+			if (s.length > 0)
+			{
+				params['folderUuid'] = s;
+			}
+
+			post('/api/query/saveQuery/', params);
+
+		}
+	</script>
 
 <hr/>
 <h2>/api/query/deleteQuery</h2>
 
+	UUID: <input type="text" id="deleteQueryUuid">
+	<br/>
+	<button type="button" onclick="deleteQuery()">Submit</button>
 
+	<script>
+		function deleteQuery() {
+
+			var s = document.getElementById('deleteQueryUuid').value;
+			var params = {uuid:s};
+
+			post('/api/query/deleteQuery/', params);
+
+		}
+	</script>
 
 <hr/>
 <h2>/api/listOutput/getListOutput</h2>

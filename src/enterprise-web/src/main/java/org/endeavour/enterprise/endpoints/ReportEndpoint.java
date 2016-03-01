@@ -30,7 +30,7 @@ public final class ReportEndpoint extends ItemEndpoint
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         //retrieve the activeItem, so we know the latest version
-        DbActiveItem activeItem = super.retrieveActiveItem(reportUuid, orgUuid, DefinitionItemType.ListOutput);
+        DbActiveItem activeItem = super.retrieveActiveItem(reportUuid, orgUuid, DefinitionItemType.Report);
         DbItem item = super.retrieveItem(activeItem);
 
         JsonReport ret = new JsonReport(item, null);

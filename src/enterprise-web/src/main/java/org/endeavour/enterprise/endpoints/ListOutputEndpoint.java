@@ -5,6 +5,8 @@ import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.entity.json.JsonListOutput;
 import org.endeavour.enterprise.entity.json.JsonQuery;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @Path("/listOutput")
 public final class ListOutputEndpoint extends ItemEndpoint
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ListOutputEndpoint.class);
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -28,6 +31,8 @@ public final class ListOutputEndpoint extends ItemEndpoint
     {
         UUID listOutputUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        LOG.trace("GettingListOutput for UUID {}", listOutputUuid);
 
         //retrieve the activeItem, so we know the latest version
         DbActiveItem activeItem = super.retrieveActiveItem(listOutputUuid, orgUuid, DefinitionItemType.ListOutput);
@@ -57,6 +62,8 @@ public final class ListOutputEndpoint extends ItemEndpoint
         Boolean isDeleted = listOutputParameters.getIsDeleted();
         UUID folderUuid = listOutputParameters.getFolderUuid();
 
+        LOG.trace("SavingListOutput UUID {}, Name {} IsDeleted {} FolderUuid", listOutputUuid, name, isDeleted, folderUuid);
+
         listOutputUuid = super.saveItem(listOutputUuid, orgUuid, userUuid, DefinitionItemType.ListOutput, name, description, xmlContent, isDeleted, folderUuid);
 
         //return the UUID of the query
@@ -78,6 +85,8 @@ public final class ListOutputEndpoint extends ItemEndpoint
         UUID listOutputUuid = listOutputParameters.getUuid();
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
+
+        LOG.trace("DeletingListOutput UUID {}", listOutputUuid);
 
         super.deleteItem(listOutputUuid, orgUuid, userUuid, DefinitionItemType.ListOutput);
 

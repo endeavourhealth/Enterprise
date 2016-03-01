@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.entity.database.DbActiveItem;
+import org.endeavour.enterprise.entity.database.DbActiveItemDependency;
 import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.entity.json.JsonFolder;
 import org.endeavour.enterprise.entity.json.JsonFolderContent;
@@ -44,31 +45,70 @@ public final class FolderEndpoint extends ItemEndpoint
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
 
-        //validate the minimum requirements
-        if (folderName == null || folderName.length() == 0)
-        {
-            throw new BadRequestException("Missing or empty folder name");
-        }
-        if (folderType == null)
-        {
-            throw new BadRequestException("Missing folder type");
-        }
-
+        //work out the ItemType, either from the parameters passed up or from our parent folder
+        //if the folder type wasn't specified, see if we can derive it from our parent
         DefinitionItemType itemType = null;
-        if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY)
+
+        //if folder type was passed up from client
+        if (folderType != null)
         {
-            itemType = DefinitionItemType.LibraryFolder;
+            if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY)
+            {
+                itemType = DefinitionItemType.LibraryFolder;
+            }
+            else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS)
+            {
+                itemType = DefinitionItemType.ReportFolder;
+            }
+            else
+            {
+                throw new BadRequestException("Invalid folder type " + folderType);
+            }
         }
-        else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS)
+        //if we're amending an existing folder, we can use its item type
+        else if (folderUuid != null)
         {
-            itemType = DefinitionItemType.ReportFolder;
+            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(folderUuid);
+            itemType = activeItem.getItemTypeId();
+        }
+        //if we're creating a new folder, we can get the item type from our parent
+        else if (parentUuid != null)
+        {
+            DbActiveItem parentActiveItem = DbActiveItem.retrieveForItemUuid(parentUuid);
+            itemType = parentActiveItem.getItemTypeId();
         }
         else
         {
-            throw new BadRequestException("Invalid folder type " + folderType);
+            throw new BadRequestException("Must specify folder type");
         }
 
         LOG.trace("SavingFolder FolderUUID {}, FolderName {} FolderType {} ParentUUID {} ItemType {}", folderUuid, folderName, folderType, parentUuid, itemType);
+
+        //before letting our superclass do the normal item saving,
+        //validate that we're not making a folder a child of itself
+        if (parentUuid != null
+                && folderUuid != null)
+        {
+            UUID currentParentUuid = parentUuid;
+            while (currentParentUuid != null)
+            {
+                if (currentParentUuid.equals(folderUuid))
+                {
+                    throw new BadRequestException("Cannot move a folder to be a child of itself");
+                }
+
+                List<DbActiveItemDependency> parents = DbActiveItemDependency.retrieveForDependentItemType(currentParentUuid, DependencyType.IsChildOf);
+                if (parents.isEmpty())
+                {
+                    currentParentUuid = null;
+                }
+                else
+                {
+                    DbActiveItemDependency parent = parents.get(0);
+                    currentParentUuid = parent.getItemUuid();
+                }
+            }
+        }
 
         folderUuid = super.saveItem(folderUuid, orgUuid, userUuid, itemType, folderName, "", "", false, parentUuid);
 
@@ -221,6 +261,8 @@ public final class FolderEndpoint extends ItemEndpoint
         //get the parameters out
         UUID folderUuid = folderParameters.getUuid();
 
+        LOG.trace("DeletingFolder FolderUUID {}", folderUuid);
+
         //to delete it, we need to find out the item type
         DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(folderUuid);
         DefinitionItemType itemType = activeItem.getItemTypeId();
@@ -285,7 +327,7 @@ public final class FolderEndpoint extends ItemEndpoint
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        LOG.trace("Getting folders under parent UUID {} and folderType {}, which is itemType {}", parentUuidStr, folderType, itemType);
+        LOG.trace("GettingFolders under parent UUID {} and folderType {}, which is itemType {}", parentUuidStr, folderType, itemType);
 
         List<DbItem> items = null;
 
@@ -336,6 +378,8 @@ public final class FolderEndpoint extends ItemEndpoint
     }
     public static void createTopLevelFolder(UUID organisationUuid, UUID userUuid, DefinitionItemType itemType) throws Exception
     {
+        LOG.trace("Creating top-level folder of type {}", itemType);
+
         String title = null;
         if (itemType == DefinitionItemType.LibraryFolder)
         {
@@ -426,7 +470,7 @@ public final class FolderEndpoint extends ItemEndpoint
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
-        LOG.trace("Getting folder contents for folder {}", folderUuid);
+        LOG.trace("GettingFolderContents for folder {}", folderUuid);
 
         List<DbActiveItem> childActiveItems = DbActiveItem.retrieveDependentItems(orgUuid, folderUuid, DependencyType.IsContainedWithin);
         for (int i=0; i<childActiveItems.size(); i++)

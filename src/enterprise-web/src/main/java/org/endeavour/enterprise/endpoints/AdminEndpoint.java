@@ -7,6 +7,8 @@ import org.endeavour.enterprise.entity.json.JsonOrganisation;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.EndUserRole;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -22,8 +24,9 @@ import java.util.UUID;
  * Endpoint for the functions related to managing person and organisation entities
  */
 @Path("/admin")
-public final class AdminEndpoint extends Endpoint {
-
+public final class AdminEndpoint extends Endpoint
+{
+    private static final Logger LOG = LoggerFactory.getLogger(AdminEndpoint.class);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -42,6 +45,8 @@ public final class AdminEndpoint extends Endpoint {
         UUID uuid = organisationParameters.getUuid();
         String name = organisationParameters.getName();
         String id = organisationParameters.getNationalId();
+
+        LOG.trace("SavingOrganisation OrgUUID {}, Name {} ID {}", uuid, name, id);
 
         DbOrganisation duplicate = DbOrganisation.retrieveOrganisationForNameNationalId(name, id);
 
@@ -123,6 +128,8 @@ public final class AdminEndpoint extends Endpoint {
         String surname = userParameters.getSurname();
         Integer permissions = userParameters.getPermissions();
         Boolean isSuperUser = userParameters.getIsSuperUser();
+
+        LOG.trace("SavingUser UserUUID {}, Email {} Title {} Forename {} Surname {} Permissions {} IsSuperUser", uuid, email, title, forename, surname, permissions, isSuperUser);
 
         DbOrganisation org = getOrganisationFromSession(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -325,14 +332,12 @@ public final class AdminEndpoint extends Endpoint {
         }
 
         //userParameters
-        String email = userParameters.getUsername();
-        DbEndUser user = DbEndUser.retrieveForEmail(email);
+        UUID userUuid = userParameters.getUuid();
 
-        //verify they're not trying to delete themselves
-        DbEndUser currentUser = super.getEndUserFromSession(sc);
-        String currentEmail = currentUser.getEmail();
+        LOG.trace("DeletingUser UserUUID {}", userUuid);
 
-        if (currentEmail.equalsIgnoreCase(email))
+        UUID currentUserUuid = getEndUserUuidFromToken(sc);
+        if (userUuid.equals(currentUserUuid))
         {
             throw new BadRequestException("Cannot delete your own account");
         }
@@ -340,7 +345,6 @@ public final class AdminEndpoint extends Endpoint {
         //rather than actually deleting the user record, we mark their link
         //at the current organisation as expired
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = user.getPrimaryUuid();
 
         List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
         for (int i=0; i<links.size(); i++)
@@ -368,6 +372,8 @@ public final class AdminEndpoint extends Endpoint {
     public Response getUsers(@Context SecurityContext sc) throws Exception
     {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        LOG.trace("GettingUsers");
 
         JsonEndUserList ret = new JsonEndUserList();
 
@@ -416,9 +422,11 @@ public final class AdminEndpoint extends Endpoint {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
 
-        String email = userParameters.getUsername();
-        DbEndUser user = DbEndUser.retrieveForEmail(email);
-        UUID userUuid = user.getPrimaryUuid();
+        //userParameters
+        UUID userUuid = userParameters.getUuid();
+        DbEndUser user = DbEndUser.retrieveForUuid(userUuid);
+
+        LOG.trace("ResendingInviteEmail UserUUID {}", userUuid);
 
         //retrieve any existing invite for this person and mark it as completed,
         //so clicking the link in the old email will no longer work

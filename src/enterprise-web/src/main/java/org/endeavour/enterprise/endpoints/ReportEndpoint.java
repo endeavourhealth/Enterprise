@@ -5,6 +5,8 @@ import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.entity.json.JsonQuery;
 import org.endeavour.enterprise.entity.json.JsonReport;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @Path("/report")
 public final class ReportEndpoint extends ItemEndpoint
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ReportEndpoint.class);
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -28,6 +31,8 @@ public final class ReportEndpoint extends ItemEndpoint
     {
         UUID reportUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        LOG.trace("GettingReport for UUID {}", reportUuid);
 
         //retrieve the activeItem, so we know the latest version
         DbActiveItem activeItem = super.retrieveActiveItem(reportUuid, orgUuid, DefinitionItemType.Report);
@@ -57,6 +62,8 @@ public final class ReportEndpoint extends ItemEndpoint
         Boolean isDeleted = reportParameters.getIsDeleted();
         UUID folderUuid = reportParameters.getFolderUuid();
 
+        LOG.trace("SavingReport UUID {}, Name {} IsDeleted {} FolderUuid", reportUuid, name, isDeleted, folderUuid);
+
         reportUuid = super.saveItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, xmlContent, isDeleted, folderUuid);
 
         //return the UUID of the query
@@ -78,6 +85,8 @@ public final class ReportEndpoint extends ItemEndpoint
         UUID reportUuid = reportParameters.getUuid();
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
+
+        LOG.trace("DeletingReport UUID {}", reportUuid);
 
         super.deleteItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report);
 

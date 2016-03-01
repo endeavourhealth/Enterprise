@@ -13,9 +13,12 @@ public class Configuration
     public static final String AUTH_COOKIE_VALID_PATH = "/";
     public static final boolean AUTH_COOKIE_REQUIRES_HTTPS = false;
 
-    //2016-02-29 DL - need to run against local again
+    //to run against Azure
     public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise;user=devuser@mpydpvsu61;password=7oaG7FVsvK08sE9T5NEe";
+
+    //to run against local SQL Server
     //public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise;instance=SQLEXPRESS;Network Library=dbmslpcn;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
 
+    //????
     //public static final String DB_CONNECTION_STRING = "jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise;user=Endeavour_Enterprise_ApplicationUser;password=TheQuickBrownFox1234%^&*";
 }

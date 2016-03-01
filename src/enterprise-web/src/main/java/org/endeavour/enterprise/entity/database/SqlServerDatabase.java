@@ -513,7 +513,7 @@ public final class SqlServerDatabase implements DatabaseI
                      + " AND d.DependencyTypeId = " + convertToString(dependencyType)
                      + " AND d.DependentItemUuid = " + ALIAS + ".ItemUuid"
                      + " INNER JOIN Definition.ActiveItem a"
-                     + " ON a.ItemUuid = d.ItemUuid"
+                     + " ON a.ItemUuid = d.DependentItemUuid"
                      + " AND a.Version = " + ALIAS + ".version"
                      + " AND a.OrganisationUuid = " + convertToString(organisationUuid);
 
@@ -595,6 +595,17 @@ public final class SqlServerDatabase implements DatabaseI
         List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
 
         String where = "WHERE ItemUuid = " + convertToString(itemUuid);
+        retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItemType(UUID itemUuid, DependencyType dependencyType) throws Exception
+    {
+        List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
+
+        String where = "WHERE ItemUuid = " + convertToString(itemUuid)
+                     + " AND DependencyTypeId = " + convertToString(dependencyType);
         retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
         return ret;
     }

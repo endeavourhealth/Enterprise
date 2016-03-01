@@ -6,6 +6,11 @@
 
 	<title>Enterprise REST Test</title>
 
+	<style>
+		body {background-color:lightgrey;}
+		input {width: 300px;}
+	</style>
+
 <script>
 
 
@@ -374,7 +379,7 @@
 <hr/>
 <h2>/api/admin/saveOrganisation</h2>
 
-	Organisation UUID: <input type="text" id="saveOrganisationUuid">(Leave empty to create new one)
+	Organisation UUID: <input type="text" id="saveOrganisationUuid">(Leave blank to create new one)
 	<br/>
 	Organisation name: <input type="text" id="saveOrganisationName">
 	<br/>
@@ -591,7 +596,7 @@
 
 			if (document.getElementById("saveReportDeleted").checked)
 			{
-				params['isDeleted'] = s;
+				params['isDeleted'] = 'true';
 			}
 
 			s = document.getElementById('saveReportFolderUuid').value;
@@ -688,7 +693,7 @@
 
 			if (document.getElementById("saveQueryDeleted").checked)
 			{
-				params['isDeleted'] = s;
+				params['isDeleted'] = 'true';
 			}
 
 			s = document.getElementById('saveQueryFolderUuid').value;
@@ -785,7 +790,7 @@
 
 			if (document.getElementById("saveListOutputDeleted").checked)
 			{
-				params['isDeleted'] = s;
+				params['isDeleted'] = 'true';
 			}
 
 			s = document.getElementById('saveListOutputFolderUuid').value;

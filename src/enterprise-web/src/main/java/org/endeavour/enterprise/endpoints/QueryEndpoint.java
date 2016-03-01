@@ -4,6 +4,8 @@ import org.endeavour.enterprise.entity.database.DbActiveItem;
 import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.entity.json.JsonQuery;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -18,6 +20,7 @@ import java.util.UUID;
 @Path("/query")
 public final class QueryEndpoint extends ItemEndpoint
 {
+    private static final Logger LOG = LoggerFactory.getLogger(QueryEndpoint.class);
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -27,6 +30,8 @@ public final class QueryEndpoint extends ItemEndpoint
     {
         UUID queryUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        LOG.trace("GettingQuery for UUID {}", queryUuid);
 
         //retrieve the activeItem, so we know the latest version
         DbActiveItem activeItem = super.retrieveActiveItem(queryUuid, orgUuid, DefinitionItemType.Query);
@@ -56,6 +61,8 @@ public final class QueryEndpoint extends ItemEndpoint
         Boolean isDeleted = queryParameters.getIsDeleted();
         UUID folderUuid = queryParameters.getFolderUuid();
 
+        LOG.trace("SavingQuery UUID {}, Name {} IsDeleted {} FolderUuid", queryUuid, name, isDeleted, folderUuid);
+
         queryUuid = super.saveItem(queryUuid, orgUuid, userUuid, DefinitionItemType.Query, name, description, xmlContent, isDeleted, folderUuid);
 
         //return the UUID of the query
@@ -77,6 +84,8 @@ public final class QueryEndpoint extends ItemEndpoint
         UUID queryUuid = queryParameters.getUuid();
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
+
+        LOG.trace("DeletingQuery UUID {}", queryUuid);
 
         super.deleteItem(queryUuid, orgUuid, userUuid, DefinitionItemType.Query);
 

@@ -9,6 +9,8 @@ import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.model.EndUserRole;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @Path("/security")
 public final class SecurityEndpoint extends Endpoint
 {
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityEndpoint.class);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -29,6 +32,8 @@ public final class SecurityEndpoint extends Endpoint
     {
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
+
+        LOG.trace("Login for {}", email);
 
         if (email == null
                 || email.length() == 0
@@ -139,6 +144,8 @@ public final class SecurityEndpoint extends Endpoint
         //the only parameter is the org UUID
         UUID orgUuid = orgParameters.getUuid();
 
+        LOG.trace("Selecting organisationUUID {}", orgUuid);
+
         //validate the organisation exists
         DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
         if (org == null)
@@ -197,6 +204,8 @@ public final class SecurityEndpoint extends Endpoint
     @Unsecured
     public Response logoff(@Context SecurityContext sc) throws Exception
     {
+        LOG.trace("Logoff");
+
         //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
 
         //replace the cookie on the client with an empty one
@@ -219,6 +228,8 @@ public final class SecurityEndpoint extends Endpoint
         DbEndUser user = getEndUserFromSession(sc);
 
         String newPwd = parameters.getPassword();
+
+        LOG.trace("Changing password");
 
         //validate we have a new password
         if (newPwd == null
@@ -280,6 +291,8 @@ public final class SecurityEndpoint extends Endpoint
     {
         String token = parameters.getToken();
         String password = parameters.getPassword();
+
+        LOG.trace("SettingPasswordFromInviteEmail");
 
         //find the invite for the token
         DbEndUserEmailInvite invite = DbEndUserEmailInvite.retrieveForToken(token);

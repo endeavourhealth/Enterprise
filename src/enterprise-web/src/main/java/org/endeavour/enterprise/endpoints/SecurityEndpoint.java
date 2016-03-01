@@ -110,6 +110,7 @@ public final class SecurityEndpoint extends Endpoint
                 if (orgLinks.size() == 1)
                 {
                     orgToAutoSelect = o;
+                    endUserRoleToAutoSelect = role;
                 }
             }
         }

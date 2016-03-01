@@ -1,9 +1,10 @@
 package org.endeavour.enterprise.entity.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavour.enterprise.entity.database.DbFolder;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Drew on 22/02/2016.
@@ -11,17 +12,17 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolderList implements Serializable {
 
-    private JsonFolder[] folders = null;
+    private List<JsonFolder> folders = new ArrayList<JsonFolder>();
 
-    public JsonFolderList(int size)
-    {
-        folders = new JsonFolder[size];
-    }
+    public JsonFolderList()
+    {}
 
     public void add(JsonFolder jsonFolder)
     {
+        folders.add(jsonFolder);
+
         //find the next non-null index
-        for (int i=0; i<folders.length; i++)
+        /*for (int i=0; i<folders.length; i++)
         {
             if (folders[i] == null)
             {
@@ -30,23 +31,23 @@ public final class JsonFolderList implements Serializable {
             }
         }
 
-        throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");
+        throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");*/
     }
-    public void add(DbFolder folder, int count)
+    /*public void add(DbFolder folder, int count)
     {
         JsonFolder jsonFolder = new JsonFolder(folder, count);
         add(jsonFolder);
-    }
+    }*/
 
 
     /**
      * gets/sets
      */
-    public JsonFolder[] getFolders() {
+    public List<JsonFolder> getFolders() {
         return folders;
     }
 
-    public void setFolders(JsonFolder[] folders) {
+    public void setFolders(List<JsonFolder> folders) {
         this.folders = folders;
     }
 }

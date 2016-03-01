@@ -15,7 +15,7 @@
 
 		var para = appendHeadingToResults(url);
 
-		if(typeof(params)!='undefined')
+		if (typeof(params)!='undefined')
 		{
 			var jsonStr = JSON.stringify(params);
 			appendResult(para, "request", jsonStr);
@@ -40,12 +40,6 @@
 
 				var response = xmlhttp.responseText;
 				appendResult(para, "response", response);
-
-				/*if (status == 200) //http ok
-				{
-					var response = xmlhttp.responseText;
-					appendResult(para, "response", response);
-				}*/
 
 				scrollToEnd();
 			}
@@ -74,15 +68,27 @@
 
 	}
 
-	function get(url)
+	function get(url, params)
 	{
 		var para = appendHeadingToResults(url);
+
+		if (typeof(params)!='undefined')
+		{
+			appendResult(para, "params", params);
+
+			url += '?' + params;
+		}
 
 		var xmlhttp = new XMLHttpRequest();
 
 		xmlhttp.onreadystatechange = function() {
-		    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
-		    {
+		
+			if (xmlhttp.readyState == 4) //request complete
+			{
+				var status = xmlhttp.status;
+				var statusText = xmlhttp.statusText;
+				appendResult(para, "response status", status + " " + statusText);
+			
 				var response = xmlhttp.responseText;
 				appendResult(para, "response", response);
 	   		}
@@ -170,7 +176,7 @@
 <hr/>
 <h2>/api/security/selectOrganisation</h2>
 
-	Organisation UUID: <input type="text" id="uuid" value="">
+	Organisation UUID: <input type="text" id="uuid">
 	<br/>
 	<button type="button" onclick="selectOrganisation()">Submit</button>
 
@@ -188,7 +194,7 @@
 <hr/>
 <h2>/api/security/changePassword</h2>
 
-	New password: <input type="text" id="changePasswordNewPassword" value="">
+	New password: <input type="text" id="changePasswordNewPassword">
 	<br/>
 	<button type="button" onclick="changePassword()">Submit</button>
 
@@ -219,9 +225,9 @@
 <hr/>
 <h2>/api/security/setPasswordFromInviteEmail</h2>
 
-	Token: <input type="text" id="inviteToken" value="">
+	Token: <input type="text" id="inviteToken">
 	<br/>
-	Password: <input type="text" id="invitePassword" value="test">
+	Password: <input type="text" id="invitePassword">
 	<br/>
 	<button type="button" onclick="setPasswordFromInvite()">Submit</button>
 
@@ -254,96 +260,95 @@
 <hr/>
 <h2>/api/admin/saveUser</h2>
 
-User UUID: <input type="text" id="saveUserUuid" value="">(leave blank to create a new user)
-<br/>
-Email: <input type="text" id="saveUserEmail" value="">
-<br/>
-Title: <input type="text" id="saveUserTitle" value="test">
-<br/>
-Forename: <input type="text" id="saveUserForename" value="">
-<br/>
-Surname: <input type="text" id="saveUserSurname" value="test">
-<br/>
-Permissions:
-<select id="saveUserPermissions">
-	<option value="1">User</option>
-	<option value="2">Admin</option>
-</select>
-<br/>
-Super user: <input type="checkbox" id="saveUserSuperUser" value="test">
-<br/>
+	User UUID: <input type="text" id="saveUserUuid">(leave blank to create a new user)
+	<br/>
+	Email: <input type="text" id="saveUserEmail">
+	<br/>
+	Title: <input type="text" id="saveUserTitle"">
+	<br/>
+	Forename: <input type="text" id="saveUserForename">
+	<br/>
+	Surname: <input type="text" id="saveUserSurname"">
+	<br/>
+	Permissions:
+	<select id="saveUserPermissions">
+		<option value="1">User</option>
+		<option value="2">Admin</option>
+	</select>
+	<br/>
+	Super user: <input type="checkbox" id="saveUserSuperUser"">
+	<br/>
 
-<button type="button" onclick="saveUser()">Submit</button>
+	<button type="button" onclick="saveUser()">Submit</button>
 
-<script>
-		function saveUser() {
+	<script>
+			function saveUser() {
 
-			var params = {};
+				var params = {};
 
-			var s = document.getElementById('saveUserUuid').value;
-			if (s.length > 0)
-			{
-				params["uuid"] = s;
+				var s = document.getElementById('saveUserUuid').value;
+				if (s.length > 0)
+				{
+					params["uuid"] = s;
+				}
+
+				s = document.getElementById('saveUserEmail').value;
+				if (s.length > 0)
+				{
+					params["username"] = s;
+				}
+
+				s = document.getElementById('saveUserTitle').value;
+				if (s.length > 0)
+				{
+					params["title"] = s;
+				}
+
+				s = document.getElementById('saveUserForename').value;
+				if (s.length > 0)
+				{
+					params["forename"] = s;
+				}
+
+				s = document.getElementById('saveUserSurname').value;
+				if (s.length > 0)
+				{
+					params["surname"] = s;
+				}
+
+				var s = document.getElementById('saveUserPermissions').value;
+				if (s.length > 0)
+				{
+					params["permissions"] = s;
+				}
+
+				if (document.getElementById("saveUserSuperUser").checked)
+				{
+					params["isSuperUser"] = 'true';
+				}
+
+				post('/api/admin/saveUser/', params);
+
 			}
-
-			s = document.getElementById('saveUserEmail').value;
-			if (s.length > 0)
-			{
-				params["username"] = s;
-			}
-
-			s = document.getElementById('saveUserTitle').value;
-			if (s.length > 0)
-			{
-				params["title"] = s;
-			}
-
-			s = document.getElementById('saveUserForename').value;
-			if (s.length > 0)
-			{
-				params["forename"] = s;
-			}
-
-			s = document.getElementById('saveUserSurname').value;
-			if (s.length > 0)
-			{
-				params["surname"] = s;
-			}
-
-			var s = document.getElementById('saveUserPermissions').value;
-			alert("Selected permis = " + s);
-			if (s.length > 0)
-			{
-				params["permissions"] = s;
-			}
-
-			if (document.getElementById("saveUserSuperUser").checked)
-			{
-				params["isSuperUser"] = 'true';
-			}
-
-			post('/api/admin/saveUser/', params);
-
-		}
-	</script>
+		</script>
 
 <hr/>
-<h2>/api/admin/saveUser</h2>
+<h2>/api/admin/deleteUser</h2>
 
-User UUID: <input type="text" id="deleteUserUuid" value="">
-<br/>
-<button type="button" onclick="deleteUser()">Submit</button>
+	User UUID: <input type="text" id="deleteUserUuid">
+	<br/>
+	<button type="button" onclick="deleteUser()">Submit</button>
 
 
-<script>
-		function deleteUser() {
+	<script>
+			function deleteUser() {
 
-			var s = document.getElementById('deleteUserUuid').value;
-			var params = {uuid:s};
+				var s = document.getElementById('deleteUserUuid').value;
+				var params = {uuid:s};
 
-			post('/api/admin/deleteUser/', params);
-		}
-	</script>
+				post('/api/admin/deleteUser/', params);
+			}
+		</script>
 
 
 
@@ -351,7 +356,7 @@ User UUID: <input type="text" id="deleteUserUuid" value="">
 <hr/>
 <h2>/api/admin/resendInviteEmail</h2>
 
-	Email: <input type="text" id="resendInviteEmail" value="">
+	Email: <input type="text" id="resendInviteEmail">
 	<br/>
 	<button type="button" onclick="resendInviteEmail()">Submit</button>
 
@@ -369,64 +374,57 @@ User UUID: <input type="text" id="deleteUserUuid" value="">
 <hr/>
 <h2>/api/admin/saveOrganisation</h2>
 
-Organisation UUID: <input type="text" id="saveOrganisationUuid">(Leave empty to create new one)
-<br/>
-Organisation name: <input type="text" id="saveOrganisationName">
-<br/>
-National ID: <input type="text" id="saveOrganisationId">
-<br/>
-<button type="button" onclick="saveOrganisation()">Submit</button>
+	Organisation UUID: <input type="text" id="saveOrganisationUuid">(Leave empty to create new one)
+	<br/>
+	Organisation name: <input type="text" id="saveOrganisationName">
+	<br/>
+	National ID: <input type="text" id="saveOrganisationId">
+	<br/>
+	<button type="button" onclick="saveOrganisation()">Submit</button>
 
-<script>
-		function saveOrganisation() {
+	<script>
+			function saveOrganisation() {
 
-			var params = {};
+				var params = {};
 
-			var s = document.getElementById('saveOrganisationUuid').value;
-			if (s.length > 0)
-			{
-				params["uuid"] = s;
+				var s = document.getElementById('saveOrganisationUuid').value;
+				if (s.length > 0)
+				{
+					params["uuid"] = s;
+				}
+
+				s = document.getElementById('saveOrganisationName').value;
+				if (s.length > 0)
+				{
+					params["name"] = s;
+				}
+
+				s = document.getElementById('saveOrganisationId').value;
+				if (s.length > 0)
+				{
+					params["nationalId"] = s;
+				}
+
+				post('/api/admin/saveOrganisation/', params);
+
 			}
+		</script>
 
-			s = document.getElementById('saveOrganisationName').value;
-			if (s.length > 0)
-			{
-				params["name"] = s;
-			}
-
-			s = document.getElementById('saveOrganisationId').value;
-			if (s.length > 0)
-			{
-				params["nationalId"] = s;
-			}
-
-			post('/api/admin/saveOrganisation/', params);
-
-		}
-	</script>
-
-<hr/>
-<h2>/api/folder/getFolders</h2>
-
-
-<button type="button" onclick="getFolders()">Submit</button>
-
-
-<script>
-		function getFolders() {
-
-			get('/api/folder/getFolders/');
-		}
-	</script>
 
 <hr/>
 <h2>/api/folder/saveFolder</h2>
 
-	Folder UUID: <input type="text" id="saveFolderUuid" value="">(leave blank to create a new folder)
+	Folder UUID: <input type="text" id="saveFolderUuid">(leave blank to create a new folder)
 	<br/>
-	Folder name: <input type="text" id="saveFolderName" value="">
+	Folder name: <input type="text" id="saveFolderName">
 	<br/>
-	optional parent UUID: <input type="text" id="saveFolderParentUuid" value="">
+	Folder type:
+	<select id="saveFolderType">
+		<option value="1">Library</option>
+		<option value="2">Reports</option>
+	</select>
+	<br/>
+	Parent folder UUID: <input type="text" id="saveFolderParentUuid">
 	<br/>
 	<button type="button" onclick="saveFolder()">Submit</button>
 
@@ -446,6 +444,11 @@ National ID: <input type="text" id="saveOrganisationId">
 			{
 				params["folderName"] = s;
 			}
+			s = document.getElementById('saveFolderType').value;
+			if (s.length > 0)
+			{
+				params["folderType"] = s;
+			}
 			s = document.getElementById('saveFolderParentUuid').value;
 			if (s.length > 0)
 			{
@@ -459,7 +462,7 @@ National ID: <input type="text" id="saveOrganisationId">
 <hr/>
 <h2>/api/folder/deleteFolder</h2>
 
-	Folder UUID: <input type="text" id="deleteFolderUuid" value="">
+	Folder UUID: <input type="text" id="deleteFolderUuid">
 	<br/>
 	<button type="button" onclick="deleteFolder()">Submit</button>
 
@@ -476,6 +479,170 @@ National ID: <input type="text" id="saveOrganisationId">
 	</script>
 
 
+<hr/>
+<h2>/api/folder/getFolders</h2>
+
+	Folder type <select id="getFoldersType">
+		<option value="1">Library</option>
+		<option value="2">Reports</option>
+	</select>
+	<br/>
+	Parent folder UUID: <input type="text" id="getFoldersParentUuid">
+	<br/>
+	<button type="button" onclick="getFolders()">Submit</button>
+
+	<script>
+		function getFolders() {
+
+			var s = document.getElementById('getFoldersType').value;
+			var params = 'folderType=' + s;
+
+			s = document.getElementById('getFoldersParentUuid').value;
+			if (s.length > 0)
+			{
+				params += '&parentUuid=' + s;
+			}
+
+			get('/api/folder/getFolders', params);
+		}
+	</script>
+
+
+<hr/>
+<h2>/api/folder/getFolderContents</h2>
+
+	Folder UUID: <input type="text" id="getFolderContentsUuid">
+	<br/>
+	<button type="button" onclick="getFolderContents()">Submit</button>
+
+	<script>
+		function getFolderContents() {
+
+			var s = document.getElementById('getFolderContentsUuid').value;
+			var params = 'folderUuid=' + s;
+
+			get('/api/folder/getFolderContents', params);
+		}
+	</script>
+
+
+<hr/>
+<h2>/api/report/getReport</h2>
+
+<hr/>
+<h2>/api/report/saveReport</h2>
+
+<hr/>
+<h2>/api/report/deleteReport</h2>
+
+
+<hr/>
+<h2>/api/query/getQuery</h2>
+
+<hr/>
+<h2>/api/query/saveQuery</h2>
+
+<hr/>
+<h2>/api/query/deleteQuery</h2>
+
+
+
+<hr/>
+<h2>/api/listOutput/getListOutput</h2>
+
+	UUID: <input type="text" id="getListOutputUuid">
+	<br/>
+	<button type="button" onclick="getListOutput()">Submit</button>
+
+	<script>
+		function getListOutput() {
+
+			var s = document.getElementById('getListOutputUuid').value;
+
+			get('/api/listOutput/getListOutput', 'uuid=' + s);
+		}
+	</script>
+
+
+<hr/>
+<h2>/api/listOutput/saveListOutput</h2>
+
+	UUID: <input type="text" id="saveListOutputUuid">(leave blank to create a new one)
+	<br/>
+	Name: <input type="text" id="saveListOutputName">
+	<br/>
+	Description: <input type="text" id="saveListOutputDescription">
+	<br/>
+	XML Content: <input type="text" id="saveListOutputXml">
+	<br/>
+	Is Deleted: <input type="checkbox" id="saveListOutputDeleted">
+	<br/>
+	Folder UUID: <input type="text" id="saveListOutputFolderUuid">
+	<br/>
+	<button type="button" onclick="saveListOutput()">Submit</button>
+
+	<script>
+		function saveListOutput() {
+
+			var params = {};
+
+			var s = document.getElementById('saveListOutputUuid').value;
+			if (s.length > 0)
+			{
+				params['uuid'] = s;
+			}
+
+			s = document.getElementById('saveListOutputName').value;
+			if (s.length > 0)
+			{
+				params['name'] = s;
+			}
+
+			s = document.getElementById('saveListOutputDescription').value;
+			if (s.length > 0)
+			{
+				params['description'] = s;
+			}
+
+			s = document.getElementById('saveListOutputXml').value;
+			if (s.length > 0)
+			{
+				params['xmlContent'] = s;
+			}
+
+			if (document.getElementById("saveListOutputDeleted").checked)
+			{
+				params['isDeleted'] = s;
+			}
+
+			s = document.getElementById('saveListOutputFolderUuid').value;
+			if (s.length > 0)
+			{
+				params['folderUuid'] = s;
+			}
+
+			post('/api/listOutput/saveListOutput/', params);
+
+		}
+	</script>
+
+<hr/>
+<h2>/api/listOutput/deleteListOutput</h2>
+
+	UUID: <input type="text" id="deleteListOutputUuid">
+	<br/>
+	<button type="button" onclick="deleteListOutput()">Submit</button>
+
+	<script>
+		function deleteListOutput() {
+
+			var s = document.getElementById('deleteListOutputUuid').value;
+			var params = {uuid:s};
+
+			post('/api/listOutput/deleteListOutput/', params);
+
+		}
+	</script>
 
 <hr/>
 <h2>Results</h2>

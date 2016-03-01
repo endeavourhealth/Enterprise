@@ -4,6 +4,7 @@ import org.endeavour.enterprise.model.DatabaseName;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -41,6 +42,11 @@ public final class DbEndUser extends DbAbstractTable
         return (DbEndUser)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
         //return (DbEndUser)adapter.retrieveSingleEntity("Administration._EndUser_SelectForUuid", uuid);
     }
+    public static List<DbEndUser> retrieveSuperUsers() throws Exception
+    {
+        return DatabaseManager.db().retrieveSuperUsers();
+    }
+
 
     @Override
     public TableAdapter getAdapter() {

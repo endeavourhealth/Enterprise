@@ -23,7 +23,7 @@ public final class QueryEndpoint extends ItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getQuery")
-    public Response getQuery(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Exception
+    public Response getQuery(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception
     {
         UUID queryUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -32,7 +32,7 @@ public final class QueryEndpoint extends ItemEndpoint
         DbActiveItem activeItem = super.retrieveActiveItem(queryUuid, orgUuid, DefinitionItemType.Query);
         DbItem item = super.retrieveItem(activeItem);
 
-        JsonQuery ret = new JsonQuery(item);
+        JsonQuery ret = new JsonQuery(item, null);
 
         return Response
                 .ok()
@@ -54,8 +54,9 @@ public final class QueryEndpoint extends ItemEndpoint
         String description = queryParameters.getDescription();
         String xmlContent = queryParameters.getXmlContent();
         Boolean isDeleted = queryParameters.getIsDeleted();
+        UUID folderUuid = queryParameters.getFolderUuid();
 
-        queryUuid = super.saveItem(queryUuid, orgUuid, userUuid, DefinitionItemType.Query, name, description, xmlContent, isDeleted);
+        queryUuid = super.saveItem(queryUuid, orgUuid, userUuid, DefinitionItemType.Query, name, description, xmlContent, isDeleted, folderUuid);
 
         //return the UUID of the query
         JsonQuery ret = new JsonQuery();

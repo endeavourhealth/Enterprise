@@ -73,13 +73,15 @@ create table [Definition].ItemType
 insert into [Definition].ItemType
 	(ItemTypeId, [Description])
 values
-	(0, 'Folder'),
+	--(0, 'Folder'),
+	(0, 'ReportFolder'), --DL 2016/02/29 - folder containing report
 	(1, 'Report'),
 	(2, 'Query'),
 	(3, 'Test'),
 	(4, 'Datasource'),
 	(5, 'CodeSet'),
-	(6, 'ListOutput');
+	(6, 'ListOutput'),
+	(7, 'LibraryFolder') --DL 2016/02/29 - folder containing library items
 
 create table [Definition].Module
 (

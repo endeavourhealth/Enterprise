@@ -24,7 +24,7 @@ public final class ReportEndpoint extends ItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReport")
-    public Response getReport(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Exception
+    public Response getReport(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception
     {
         UUID reportUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -33,7 +33,7 @@ public final class ReportEndpoint extends ItemEndpoint
         DbActiveItem activeItem = super.retrieveActiveItem(reportUuid, orgUuid, DefinitionItemType.ListOutput);
         DbItem item = super.retrieveItem(activeItem);
 
-        JsonReport ret = new JsonReport(item);
+        JsonReport ret = new JsonReport(item, null);
 
         return Response
                 .ok()
@@ -55,8 +55,9 @@ public final class ReportEndpoint extends ItemEndpoint
         String description = reportParameters.getDescription();
         String xmlContent = reportParameters.getXmlContent();
         Boolean isDeleted = reportParameters.getIsDeleted();
+        UUID folderUuid = reportParameters.getFolderUuid();
 
-        reportUuid = super.saveItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, xmlContent, isDeleted);
+        reportUuid = super.saveItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, xmlContent, isDeleted, folderUuid);
 
         //return the UUID of the query
         JsonQuery ret = new JsonQuery();

@@ -17,16 +17,18 @@ public final class JsonQuery implements Serializable
     private String description = null;
     private String xmlContent = null;
     private Boolean isDeleted = null;
+    private UUID folderUuid = null;
 
     public JsonQuery()
     {}
-    public JsonQuery(DbItem item)
+    public JsonQuery(DbItem item, UUID folderUuid)
     {
         this.uuid = item.getPrimaryUuid();
         this.name = item.getTitle();
         this.description = item.getDescription();
         this.xmlContent = item.getXmlContent();
         this.isDeleted = item.getIsDeleted();
+        this.folderUuid = folderUuid;
     }
 
 
@@ -74,5 +76,11 @@ public final class JsonQuery implements Serializable
         isDeleted = deleted;
     }
 
+    public UUID getFolderUuid() {
+        return folderUuid;
+    }
 
+    public void setFolderUuid(UUID folderUuid) {
+        this.folderUuid = folderUuid;
+    }
 }

@@ -24,7 +24,7 @@ public final class ListOutputEndpoint extends ItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getListOutput")
-    public Response getListOutput(@Context SecurityContext sc, @PathParam("uuid") String uuidStr) throws Exception
+    public Response getListOutput(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception
     {
         UUID listOutputUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -33,7 +33,7 @@ public final class ListOutputEndpoint extends ItemEndpoint
         DbActiveItem activeItem = super.retrieveActiveItem(listOutputUuid, orgUuid, DefinitionItemType.ListOutput);
         DbItem item = super.retrieveItem(activeItem);
 
-        JsonListOutput ret = new JsonListOutput(item);
+        JsonListOutput ret = new JsonListOutput(item, null);
 
         return Response
                 .ok()
@@ -55,8 +55,9 @@ public final class ListOutputEndpoint extends ItemEndpoint
         String description = listOutputParameters.getDescription();
         String xmlContent = listOutputParameters.getXmlContent();
         Boolean isDeleted = listOutputParameters.getIsDeleted();
+        UUID folderUuid = listOutputParameters.getFolderUuid();
 
-        listOutputUuid = super.saveItem(listOutputUuid, orgUuid, userUuid, DefinitionItemType.ListOutput, name, description, xmlContent, isDeleted);
+        listOutputUuid = super.saveItem(listOutputUuid, orgUuid, userUuid, DefinitionItemType.ListOutput, name, description, xmlContent, isDeleted, folderUuid);
 
         //return the UUID of the query
         JsonQuery ret = new JsonQuery();

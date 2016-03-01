@@ -5,6 +5,7 @@ import org.endeavour.enterprise.entity.json.JsonEndUser;
 import org.endeavour.enterprise.entity.json.JsonEndUserList;
 import org.endeavour.enterprise.entity.json.JsonOrganisation;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
+import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.EndUserRole;
 
 import javax.ws.rs.*;
@@ -45,6 +46,7 @@ public final class AdminEndpoint extends Endpoint {
         DbOrganisation duplicate = DbOrganisation.retrieveOrganisationForNameNationalId(name, id);
 
         DbOrganisation org = null;
+        boolean creteRootFolders = false;
 
         //if no UUID was passed, then we're creating a new org
         if (uuid == null)
@@ -58,6 +60,9 @@ public final class AdminEndpoint extends Endpoint {
             org = new DbOrganisation();
             org.setName(name);
             org.setNationalId(id);
+
+            //whenever we create an org, we'll want to create new root folders too
+            creteRootFolders = true;
         }
         else
         {
@@ -76,6 +81,16 @@ public final class AdminEndpoint extends Endpoint {
 
         //save to db
         org.saveToDb();
+
+        //if we've created new root folders, save them now
+        if (creteRootFolders)
+        {
+            UUID userUuid = getEndUserUuidFromToken(sc);
+            UUID orgUuid = org.getPrimaryUuid();
+
+            FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.ReportFolder);
+            FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.LibraryFolder);
+        }
 
         //return the organisation UUID
         JsonOrganisation ret = new JsonOrganisation();
@@ -112,6 +127,28 @@ public final class AdminEndpoint extends Endpoint {
         DbOrganisation org = getOrganisationFromSession(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
+        //validate the parameters passed in
+        if (email == null || email.length() == 0)
+        {
+            throw new BadRequestException("Cannot set blank username");
+        }
+        if (title == null)
+        {
+            //allow a blank title
+            title = "";
+        }
+        if (forename == null || forename.length() == 0)
+        {
+            throw new BadRequestException("Cannot set blank forename");
+        }
+        if (surname == null || surname.length() == 0)
+        {
+            throw new BadRequestException("Cannot set blank surname");
+        }
+        if (permissions == null)
+        {
+            throw new BadRequestException("Cannot set blank permissions");
+        }
         if (isSuperUser == null)
         {
             isSuperUser = new Boolean(false);
@@ -123,7 +160,7 @@ public final class AdminEndpoint extends Endpoint {
             DbEndUser user = getEndUserFromSession(sc);
             if (!user.getIsSuperUser())
             {
-                throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
+                throw new NotAuthorizedException("Non-super user cannot create or modify super users");
             }
         }
 
@@ -174,13 +211,15 @@ public final class AdminEndpoint extends Endpoint {
                 }
             }
 
-            //create the user/org link
-            link = new DbOrganisationEndUserLink();
-            link.setOrganisationUuid(orgUuid);
-            link.setEndUserUuid(uuid);
-            link.setPermissions(permissions);
-            link.setDtExpired(DatabaseManager.getEndOfTime());
-
+            //create the user/org link for non-superusers only, as superusers don't require them
+            if (!isSuperUser.booleanValue())
+            {
+                link = new DbOrganisationEndUserLink();
+                link.setOrganisationUuid(orgUuid);
+                link.setEndUserUuid(uuid);
+                link.setPermissions(permissions);
+                link.setDtExpired(DatabaseManager.getEndOfTime());
+            }
         }
         //if we have a uuid, we're updating an existing person
         else
@@ -194,8 +233,15 @@ public final class AdminEndpoint extends Endpoint {
                 DbEndUser duplicateEmail = DbEndUser.retrieveForEmail(email);
                 if (duplicateEmail != null)
                 {
-                    throw new javax.ws.rs.BadRequestException("New email address already in use");
+                    throw new BadRequestException("New email address already in use");
                 }
+            }
+
+            //we can turn a super-user into a NON-super user, but don't allow going the other way
+            if (!user.getIsSuperUser()
+                    && isSuperUser.booleanValue())
+            {
+                throw new BadRequestException("Cannot promote a user to super-user status");
             }
 
             user.setEmail(email);
@@ -207,11 +253,21 @@ public final class AdminEndpoint extends Endpoint {
 
             //retrieve the link entity, as we may want to change the permissions on there
             link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
-            link.setPermissions(permissions);
+
+            //the link will be null if we're a super-user, so that's fine
+            if (link != null)
+            {
+                link.setPermissions(permissions);
+            }
         }
 
+        //save our things to db
         user.saveToDb();
-        link.saveToDb();
+
+        if (link != null)
+        {
+            link.saveToDb();
+        }
 
         //if we just updated a person, then we don't want to generate any invite email
         if (createdNewPerson == null)
@@ -246,7 +302,7 @@ public final class AdminEndpoint extends Endpoint {
         DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
         invite.setEndUserUuid(userUuid);
         invite.setUniqueToken("" + UUID.randomUUID());
-        invite.setDtCompleted(new Date(Long.MAX_VALUE)); //TODO: 2016-02-22 DL - encapsulate this
+        invite.setDtCompleted(DatabaseManager.getEndOfTime());
 
         //send the invite email before saving to the DB
         invite.sendInviteEmail(user, org);
@@ -313,10 +369,10 @@ public final class AdminEndpoint extends Endpoint {
     {
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
+        JsonEndUserList ret = new JsonEndUserList();
+
         //retrieve all users at this organisation
         List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForOrganisationNotExpired(orgUuid);
-        JsonEndUserList ret = new JsonEndUserList(links.size());
-
         for (int i=0; i<links.size(); i++)
         {
             DbOrganisationEndUserLink link = links.get(i);
@@ -325,6 +381,20 @@ public final class AdminEndpoint extends Endpoint {
             DbEndUser endUser = DbEndUser.retrieveForUuid(endUserUuid);
 
             ret.add(endUser, role);
+        }
+
+        //if we're a super-user then we should also include all other super-users in the result
+        DbEndUser user = getEndUserFromSession(sc);
+        if (user.getIsSuperUser())
+        {
+            List<DbEndUser> superUsers = DbEndUser.retrieveSuperUsers();
+            for (int i=0; i<superUsers.size(); i++)
+            {
+                DbEndUser superUser = superUsers.get(i);
+
+                //super-users are always treated as admins
+                ret.add(superUser, EndUserRole.ADMIN);
+            }
         }
 
         return Response

@@ -5,6 +5,8 @@ import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.model.EndUserRole;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Drew on 22/02/2016.
@@ -12,17 +14,17 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonEndUserList implements Serializable
 {
-    private JsonEndUser[] users = null;
+    private List<JsonEndUser> users = new ArrayList<JsonEndUser>();
 
-    public JsonEndUserList(int size)
-    {
-        users = new JsonEndUser[size];
-    }
+    public JsonEndUserList()
+    {}
 
     public void add(JsonEndUser jsonEndUser)
     {
+        users.add(jsonEndUser);
+
         //find the next non-null index
-        for (int i=0; i<users.length; i++)
+        /*for (int i=0; i<users.length; i++)
         {
             if (users[i] == null)
             {
@@ -31,7 +33,7 @@ public final class JsonEndUserList implements Serializable
             }
         }
 
-        throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");
+        throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");*/
     }
     public void add(DbEndUser endUser, EndUserRole role)
     {
@@ -43,11 +45,11 @@ public final class JsonEndUserList implements Serializable
     /**
      * gets/sets
      */
-    public JsonEndUser[] getUsers() {
+    public List<JsonEndUser> getUsers() {
         return users;
     }
 
-    public void setUsers(JsonEndUser[] users) {
+    public void setUsers(List<JsonEndUser> users) {
         this.users = users;
     }
 }

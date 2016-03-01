@@ -1,13 +1,15 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.entity.database.DbAbstractTable;
-import org.endeavour.enterprise.entity.database.DbFolder;
-import org.endeavour.enterprise.entity.database.DbFolderItemLink;
+import org.endeavour.enterprise.entity.database.DbActiveItem;
+import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.entity.json.JsonFolder;
 import org.endeavour.enterprise.entity.json.JsonFolderContent;
 import org.endeavour.enterprise.entity.json.JsonFolderContentsList;
 import org.endeavour.enterprise.entity.json.JsonFolderList;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.endeavour.enterprise.model.DependencyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -23,13 +25,64 @@ import java.util.UUID;
  * Endpoint for functions related to creating and managing folders
  */
 @Path("/folder")
-public final class FolderEndpoint extends Endpoint {
+public final class FolderEndpoint extends ItemEndpoint
+{
+    private static final Logger LOG = LoggerFactory.getLogger(FolderEndpoint.class);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveFolder")
     public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
+    {
+        //get the parameters out
+        UUID folderUuid = folderParameters.getUuid();
+        String folderName = folderParameters.getFolderName();
+        Integer folderType = folderParameters.getFolderType();
+        UUID parentUuid = folderParameters.getParentFolderUuid();
+
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
+
+        //validate the minimum requirements
+        if (folderName == null || folderName.length() == 0)
+        {
+            throw new BadRequestException("Missing or empty folder name");
+        }
+        if (folderType == null)
+        {
+            throw new BadRequestException("Missing folder type");
+        }
+
+        DefinitionItemType itemType = null;
+        if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY)
+        {
+            itemType = DefinitionItemType.LibraryFolder;
+        }
+        else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS)
+        {
+            itemType = DefinitionItemType.ReportFolder;
+        }
+        else
+        {
+            throw new BadRequestException("Invalid folder type " + folderType);
+        }
+
+        LOG.trace("SavingFolder FolderUUID {}, FolderName {} FolderType {} ParentUUID {} ItemType {}", folderUuid, folderName, folderType, parentUuid, itemType);
+
+        folderUuid = super.saveItem(folderUuid, orgUuid, userUuid, itemType, folderName, "", "", false, parentUuid);
+
+        //return the UUID of the folder we just saved or updated
+        JsonFolder ret = new JsonFolder();
+        ret.setUuid(folderUuid);
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+
+    /*public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
     {
         //get the parameters out
         UUID folderUuid = folderParameters.getUuid();
@@ -67,7 +120,7 @@ public final class FolderEndpoint extends Endpoint {
             {
                 DbFolder parent = DbFolder.retrieveForUuid(parentUuid);
                 if (parent != null
-                    || !parent.getOrganisationUuid().equals(orgUuid))
+                        || !parent.getOrganisationUuid().equals(orgUuid))
                 {
                     throw new BadRequestException("Invalid or missing parent folder");
                 }
@@ -153,148 +206,35 @@ public final class FolderEndpoint extends Endpoint {
                 .ok()
                 .entity(ret)
                 .build();
-    }
+    }*/
 
-    /* @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/createFolder")
-    public Response createFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
-    {
-        //get the organisation from the server token
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-
-        //get the parameters out
-        String newFolderName = folderParameters.getFolderName();
-        UUID parentUuid = folderParameters.getParentFolderUuid();
-
-        //first ensure that there doesn't already exist a folder for that name
-        DbFolder existingFolder = DbFolder.retrieveForOrganisationTitleParent(orgUuid, newFolderName, parentUuid);
-        if (existingFolder != null)
-        {
-            throw new BadRequestException("Folder already exists");
-        }
-
-        //now validate that the parent folder actually exists
-        if (parentUuid != null)
-        {
-            DbFolder parent = DbFolder.retrieveForUuid(parentUuid);
-            if (parent == null)
-            {
-                throw new BadRequestException("Parent folder doesn't exist");
-            }
-
-            UUID existingOrganisationUuid = parent.getOrganisationUuid();
-            if (!existingOrganisationUuid.equals(orgUuid)) {
-                throw new BadRequestException("Parent folder is for different organisation");
-            }
-        }
-
-        //create the new folder
-        DbFolder f = new DbFolder();
-        f.setTitle(newFolderName);
-        f.setParentFolderUuid(parentUuid);
-        f.setOrganisationUuid(orgUuid);
-
-        //save
-        f.saveToDb();
-
-        return Response.ok().build();
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/renameFolder")
-    public Response renameFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
-    {
-        //get the organisation from the server token
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-
-        //get the parameters out
-        UUID folderUuid = folderParameters.getUuid();
-        String newFolderName = folderParameters.getFolderName();
-
-        System.out.println("Renaming folder " + folderUuid + " to [" + newFolderName + "]");
-
-        DbFolder folder = getFolderForUuidAndValidateOrganisation(sc, folderUuid);
-
-        //ensure we're not renaming to a name that already exists
-        UUID parentFolderUuid = folder.getParentFolderUuid();
-        DbFolder duplicate = DbFolder.retrieveForOrganisationTitleParent(orgUuid, newFolderName, parentFolderUuid);
-        if (duplicate != null)
-        {
-            throw new BadRequestException("Folder with that name already exists");
-        }
-
-        //update the entity
-        folder.setTitle(newFolderName);
-
-        //save
-        folder.saveToDb();
-
-        return Response.ok().build();
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/moveFolder")
-    public Response moveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
-    {
-        //get the organisation from the server token
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-
-        //get the parameters out
-        UUID folderUuid = folderParameters.getUuid();
-        UUID newParentFolderUuid = folderParameters.getParentFolderUuid();
-
-        //System.out.println("Moving folder " + folderUuid + " to [" + newParentFolderUuid + "]");
-
-        DbFolder folder = getFolderForUuidAndValidateOrganisation(sc, folderUuid);
-
-        //ensure we're not going to create a duplicate with the move
-        String folderName = folder.getTitle();
-        DbFolder duplicate = DbFolder.retrieveForOrganisationTitleParent(orgUuid, folderName, newParentFolderUuid);
-        if (duplicate != null)
-        {
-            throw new BadRequestException("Folder with that name already exists in new parent folder");
-        }
-
-        //TODO: 2016-02-22 DL - validate that we're not moving a folder to be a child of itself
-
-        //update the entity
-        folder.setParentFolderUuid(newParentFolderUuid);
-
-        //save
-        folder.saveToDb();
-
-        return Response.ok().build();
-    }
-*/
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteFolder")
-    public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception {
+    public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
+    {
         //get the organisation from the server token
-        //UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
 
         //get the parameters out
         UUID folderUuid = folderParameters.getUuid();
 
-        DbFolder folder = getFolderForUuidAndValidateOrganisation(sc, folderUuid);
-        if (folder == null)
+        //to delete it, we need to find out the item type
+        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(folderUuid);
+        DefinitionItemType itemType = activeItem.getItemType();
+        if (itemType != DefinitionItemType.LibraryFolder
+                && itemType != DefinitionItemType.ReportFolder)
         {
-            throw new BadRequestException("No folder for UUID");
+            throw new BadRequestException("UUID is a " + itemType + " not a folder");
         }
 
-        //delete the lot
-        deleteFolderAndContents(folder);
+        deleteItem(folderUuid, orgUuid, userUuid, itemType);
 
         return Response.ok().build();
     }
-    private static void deleteFolderAndContents(DbFolder folder) throws Exception
+    /*private static void deleteFolderAndContents(DbFolder folder) throws Exception
     {
         //see if we have any child folders, which we should delete first
         UUID orgUuid = folder.getOrganisationUuid();
@@ -320,15 +260,104 @@ public final class FolderEndpoint extends Endpoint {
 
         //now our folder is empty
         folder.deleteFromDb();
-    }
+    }*/
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolders")
-    public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String uuidStr) throws Exception
+    public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String parentUuidStr) throws Exception
     {
-        //TODO: 2016-02-22 DL - this would be a lot more efficient to join Folder and FolderItemLink in SQL
+        //convert the nominal folder type to the actual Item DefinitionType
+        DefinitionItemType itemType = null;
+        if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY)
+        {
+            itemType = DefinitionItemType.LibraryFolder;
+        }
+        else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS)
+        {
+            itemType = DefinitionItemType.ReportFolder;
+        }
+        else
+        {
+            throw new BadRequestException("Invalid folder type " + folderType);
+        }
+
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        LOG.trace("Getting folders under parent UUID {} and folderType {}, which is itemType {}", parentUuidStr, folderType, itemType);
+
+        List<DbItem> items = null;
+
+        //if we have no parent, then we're looking for the TOP-LEVEL folder
+        if (parentUuidStr == null)
+        {
+            items = DbItem.retrieveNonDependentItems(orgUuid, DependencyType.IsChildOf, itemType);
+
+            //if we don't have a top-level folder, for some reason, re-create it
+            if (items.size() == 0)
+            {
+                UUID userUuid = getEndUserUuidFromToken(sc);
+                FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, itemType);
+
+                //then re-run the select
+                items = DbItem.retrieveNonDependentItems(orgUuid, DependencyType.IsChildOf, itemType);
+            }
+        }
+        //if we have a parent, then we want the child folders under it
+        else
+        {
+            UUID parentUuid = UUID.fromString(parentUuidStr);
+            items = DbItem.retrieveDependentItems(orgUuid, parentUuid, DependencyType.IsChildOf);
+        }
+
+        LOG.trace("Found {} child folders", items.size());
+
+        JsonFolderList ret = new JsonFolderList();
+
+        for (int i=0; i<items.size(); i++)
+        {
+            DbItem item = items.get(i);
+            UUID itemUuid = item.getPrimaryUuid();
+
+            int childFolders = DbActiveItem.retrieveCountDependencies(itemUuid, DependencyType.IsChildOf);
+            int contentCount = DbActiveItem.retrieveCountDependencies(itemUuid, DependencyType.IsContainedWithin);
+
+            LOG.trace("Child folder {}, UUID {} has {} child folders and {} contents", item.getTitle(), item.getPrimaryUuid(), childFolders, contentCount);
+
+            JsonFolder folder = new JsonFolder(item, contentCount, childFolders > 0);
+            ret.add(folder);
+        }
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+    public static void createTopLevelFolder(UUID organisationUuid, UUID userUuid, DefinitionItemType itemType) throws Exception
+    {
+        String title = null;
+        if (itemType == DefinitionItemType.LibraryFolder)
+        {
+            title = "Library";
+        }
+        else if (itemType == DefinitionItemType.ReportFolder)
+        {
+            title = "Reports";
+        }
+        else
+        {
+            throw new RuntimeException("Trying to create folder for type " + itemType);
+        }
+
+        DbItem item = DbItem.factoryNew(userUuid, title);
+        item.saveToDb();
+
+        DbActiveItem activeItemReports = DbActiveItem.factoryNew(item, organisationUuid, itemType);
+        activeItemReports.saveToDb();
+    }
+    /*public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String uuidStr) throws Exception
+    {
         UUID uuid = null;
         if (uuidStr != null
                 && uuidStr.length() > 0)
@@ -355,34 +384,13 @@ public final class FolderEndpoint extends Endpoint {
                 .ok()
                 .entity(ret)
                 .build();
-    }
-/*    public Response getFolders(@Context SecurityContext sc, @PathParam("folderType") String folderType, @PathParam("parentUuid") String id) throws Exception
-    {
-        //get all our folders
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-        List<DbAbstractTable> folders = DbFolder.retrieveForOrganisation(orgUuid);
-        JsonFolderList ret = new JsonFolderList(folders.size());
-
-        for (int i=0; i<folders.size(); i++)
-        {
-            DbFolder folder = (DbFolder)folders.get(i);
-            UUID folderUuid = folder.getPrimaryUuid();
-            List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
-            int contentCount = items.size();
-
-            ret.add(folder, contentCount);
-        }
-
-        return Response
-                .ok()
-                .entity(ret)
-                .build();
     }*/
+
 
     /**
      * several of our functions perform the same checks, so refactored out to here
      */
-    private DbFolder getFolderForUuidAndValidateOrganisation(SecurityContext sc, UUID folderUuid) throws Exception
+    /*private DbFolder getFolderForUuidAndValidateOrganisation(SecurityContext sc, UUID folderUuid) throws Exception
     {
         //get the organisation from the server token
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -402,13 +410,71 @@ public final class FolderEndpoint extends Endpoint {
         }
 
         return folder;
-    }
+    }*/
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolderContents")
     public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception
+    {
+        UUID folderUuid = UUID.fromString(uuidStr);
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        //retrieve the folder and validate it's for our org
+        DbItem folder = DbItem.retrieveForUuidLatestVersion(orgUuid, folderUuid);
+
+        JsonFolderContentsList ret = new JsonFolderContentsList();
+
+        LOG.trace("Getting folder contents for folder {}", folderUuid);
+
+        List<DbActiveItem> childActiveItems = DbActiveItem.retrieveDependentItems(orgUuid, folderUuid, DependencyType.IsContainedWithin);
+        for (int i=0; i<childActiveItems.size(); i++)
+        {
+            DbActiveItem activeItem = childActiveItems.get(i);
+            UUID uuid = activeItem.getItemUuid();
+            int version = activeItem.getVersion();
+            DbItem item = DbItem.retrieveForUuidVersion(uuid, version);
+            DefinitionItemType itemType = activeItem.getItemType();
+
+            JsonFolderContent c = new JsonFolderContent();
+            c.setUuid(uuid);
+            c.setName(item.getTitle());
+            c.setTypeEnum(itemType);
+            c.setLastModified(item.getTimeStamp());
+
+            ret.addContent(c);
+
+            //and set any extra data we need
+            if (itemType == DefinitionItemType.Report)
+            {
+                //TODO: 2016-03-01 DL - set last run date etc. on folder content
+                c.setLastRun(new Date());
+                c.setIsScheduled(true);
+            }
+            else if (itemType == DefinitionItemType.Query)
+            {
+
+
+            }
+            else if (itemType == DefinitionItemType.ListOutput)
+            {
+
+
+            }
+            else
+            {
+                throw new RuntimeException("Unexpected content " + item + " in folder");
+            }
+        }
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+
+    /*public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception
     {
         UUID folderUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -422,13 +488,11 @@ public final class FolderEndpoint extends Endpoint {
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
-        //TODO: 2016-02-23 DL - need proper implementation of getting folder contents
-
-        /*List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
+        *//*List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
         for (int i=0; i<items.size(); i++)
         {
             DbFolderItemLink item = (DbFolderItemLink)items.get(i);
-        }*/
+        }*//*
 
         if (folder.getFolderType() == DbFolder.FOLDER_TYPE_REPORTS)
         {
@@ -510,5 +574,5 @@ public final class FolderEndpoint extends Endpoint {
                 .ok()
                 .entity(ret)
                 .build();
-    }
+    }*/
 }

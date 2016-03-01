@@ -1,10 +1,13 @@
 package org.endeavour.enterprise.entity.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
+import org.endeavour.enterprise.model.DefinitionItemType;
+import org.endeavour.enterprise.model.DependencyType;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -13,7 +16,7 @@ import java.util.UUID;
 public final class DbItem extends DbAbstractTable
 {
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbItem.class, "Items", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
+    private static final TableAdapter adapter = new TableAdapter(DbItem.class, "Item", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
             "ItemUuid,Version,XmlContent,Title,Description,EndUserUuid,TimeStamp,IsDeleted", "ItemUuid,Version");
 
     private int version = -1;
@@ -23,9 +26,19 @@ public final class DbItem extends DbAbstractTable
     private UUID endUserUuid = null;
     private Date timeStamp = null;
     private boolean isDeleted = false;
+    //private DefinitionItemType itemType = null; //2016-02-29 DL - this can never change, so is on the ActiveItem entity
 
     public DbItem()
     {}
+    public static DbItem factoryNew(UUID endUserUuid, String title)
+    {
+        DbItem ret = new DbItem();
+        ret.setVersion(1); //doesn't really matter, but start somewhere positive
+        ret.setTitle(title);
+        ret.setTimeStamp(new Date());
+        ret.setEndUserUuid(endUserUuid);
+        return ret;
+    }
 
     /*public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception
     {
@@ -36,6 +49,18 @@ public final class DbItem extends DbAbstractTable
         //2016-02-29 DL - changed how we connect to db
         return (DbItem)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid, new Integer(version));
         //return (DbItem)adapter.retrieveSingleEntity("Definition._Item_SelectForUuid", uuid);
+    }
+    public static DbItem retrieveForUuidLatestVersion(UUID organisationUuid, UUID uuid) throws Exception
+    {
+        return DatabaseManager.db().retrieveForUuidLatestVersion(organisationUuid, uuid);
+    }
+    public static List<DbItem> retrieveDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception
+    {
+        return DatabaseManager.db().retrieveDependentItems(organisationUuid, itemUuid, dependencyType);
+    }
+    public static List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception
+    {
+        return DatabaseManager.db().retrieveNonDependentItems(organisationUuid, dependencyType, itemType);
     }
 
     @Override
@@ -55,6 +80,7 @@ public final class DbItem extends DbAbstractTable
         builder.add(endUserUuid);
         builder.add(timeStamp);
         builder.add(isDeleted);
+        //builder.add(itemType.getValue());
     }
 
     @Override
@@ -68,6 +94,7 @@ public final class DbItem extends DbAbstractTable
         endUserUuid = reader.readUuid();
         timeStamp = reader.readDateTime();
         isDeleted = reader.readBoolean();
+        //itemType = DefinitionItemType.get(reader.readInt());
     }
 
     /**
@@ -129,4 +156,11 @@ public final class DbItem extends DbAbstractTable
         isDeleted = deleted;
     }
 
+    /*public DefinitionItemType getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(DefinitionItemType itemType) {
+        this.itemType = itemType;
+    }*/
 }

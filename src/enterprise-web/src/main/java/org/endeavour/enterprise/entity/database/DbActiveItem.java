@@ -2,10 +2,11 @@ package org.endeavour.enterprise.entity.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.endeavour.enterprise.model.DependencyType;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -14,7 +15,7 @@ import java.util.UUID;
 public final class DbActiveItem extends DbAbstractTable
 {
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItems", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
+    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItem", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
             "ActiveItemUuid,OrganisationUuid,ItemUuid,Version,ItemType", "ActiveItemUuid");
 
     private UUID organisationUuid = null;
@@ -24,6 +25,24 @@ public final class DbActiveItem extends DbAbstractTable
 
     public DbActiveItem()
     {}
+    public static DbActiveItem factoryNew(DbItem item, UUID organisationUuid, DefinitionItemType itemType)
+    {
+        UUID itemUuid = item.getPrimaryUuid();
+        int version = item.getVersion();
+
+        if (itemUuid == null)
+        {
+            throw new RuntimeException("Cannot create ActiveItem without first saving Item to DB");
+        }
+
+        DbActiveItem ret = new DbActiveItem();
+        ret.setOrganisationUuid(organisationUuid);
+        ret.setItemUuid(itemUuid);
+        ret.setVersion(version);
+        ret.setItemType(itemType);
+
+        return ret;
+    }
 
     public static DbActiveItem retrieveForItemUuid(UUID itemUuid) throws Exception
     {
@@ -35,6 +54,14 @@ public final class DbActiveItem extends DbAbstractTable
         //2016-02-29 DL - changed how we connect to db
         return (DbActiveItem)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
         //return (DbActiveItem)adapter.retrieveSingleEntity("Definition._ActiveItem_SelectForUuid", uuid);
+    }
+    public static int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception
+    {
+        return DatabaseManager.db().retrieveCountDependencies(itemUuid, dependencyType);
+    }
+    public static List<DbActiveItem> retrieveDependentItems(UUID orgUuid, UUID itemUuid, DependencyType dependencyType) throws Exception
+    {
+        return DatabaseManager.db().retrieveActiveItemDependentItems(orgUuid, itemUuid, dependencyType);
     }
 
     @Override

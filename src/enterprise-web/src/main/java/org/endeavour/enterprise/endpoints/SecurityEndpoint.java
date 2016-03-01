@@ -142,35 +142,49 @@ public final class SecurityEndpoint extends Endpoint
         DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
         if (org == null)
         {
-            throw new org.endeavour.enterprise.framework.exceptions.BadRequestException("Invalid organisation " + orgUuid);
+            throw new BadRequestException("Invalid organisation " + orgUuid);
         }
 
         //validate the person can log on there
-        DbOrganisationEndUserLink link = null;
-        List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
-        for (int i=0; i<links.size(); i++)
+        EndUserRole role = null;
+
+        DbEndUser user = getEndUserFromSession(sc);
+        if (user.getIsSuperUser())
         {
-            DbOrganisationEndUserLink l = links.get(i);
-            if (l.getOrganisationUuid().equals(orgUuid))
+            //super users are always admin
+            role = EndUserRole.ADMIN;
+        }
+        else
+        {
+            DbOrganisationEndUserLink link = null;
+            List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
+            for (int i = 0; i < links.size(); i++)
             {
-                link = l;
-                break;
+                DbOrganisationEndUserLink l = links.get(i);
+                if (l.getOrganisationUuid().equals(orgUuid))
+                {
+                    link = l;
+                    break;
+                }
             }
-        }
 
-        if (link == null)
-        {
-            throw new org.endeavour.enterprise.framework.exceptions.BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
-        }
+            if (link == null)
+            {
+                throw new BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
+            }
 
-        EndUserRole role = link.getRole();
+            role = link.getRole();
+        }
 
         //issue a new cookie, with the newly selected organisation
         NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, role);
 
+        //2016-02-29 DL - may as well return the full org details and the user's role at this place
+        JsonOrganisation ret = new JsonOrganisation(org, role);
+
         return Response
                 .ok()
-                //.entity(ret)
+                .entity(ret)
                 .cookie(cookie)
                 .build();
     }

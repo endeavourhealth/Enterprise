@@ -1,13 +1,14 @@
 package org.endeavour.enterprise.model;
 
 public enum DefinitionItemType {
-	Folder(0),
+	ReportFolder(0), //2016-02-29 DL - changed from just "folder", since we have separate report and library folders
 	Report(1),
 	Query(2),
 	Test(3),
 	Datasource(4),
 	CodeSet(5),
-	ListOutput(6); //2016-02-25 DL - added
+	ListOutput(6), //2016-02-25 DL - added
+	LibraryFolder(7); //2016-02-29 DL - added
 
 	private int value;
 

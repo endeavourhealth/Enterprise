@@ -37,7 +37,6 @@ public abstract class DbAbstractTable
         //and use the INSERT stored procedure
         if (primaryUuid == null)
         {
-            primaryUuid = UUID.randomUUID();
             saveToDbInsert();
         }
         //if we already have a UUID then we're updating an existing entity,
@@ -49,6 +48,11 @@ public abstract class DbAbstractTable
     }
     public void saveToDbInsert() throws Exception
     {
+        if (primaryUuid == null)
+        {
+            primaryUuid = UUID.randomUUID();
+        }
+
         //2016-02-29 DL - changed how we write
         DatabaseManager.db().writeInsert(this);
         //getAdapter().saveToDb(true, this);

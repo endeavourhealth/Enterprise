@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.entity.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavour.enterprise.entity.database.DbFolder;
+import org.endeavour.enterprise.entity.database.DbItem;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -13,6 +13,9 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolder implements Serializable {
 
+    public static final int FOLDER_TYPE_LIBRARY = 1;
+    public static final int FOLDER_TYPE_REPORTS = 2;
+
     private UUID uuid = null;
     private String folderName = null;
     private Integer folderType = null;
@@ -23,7 +26,19 @@ public final class JsonFolder implements Serializable {
     public JsonFolder()
     {
     }
-    public JsonFolder(DbFolder folder, int count)
+    public JsonFolder(DbItem item, int contentCount, boolean hasChildren)
+    {
+        this.uuid = item.getPrimaryUuid();
+        this.folderName = item.getTitle();
+
+        this.hasChildren = hasChildren;
+
+        if (contentCount > 0)
+        {
+            this.contentCount = new Integer(contentCount);
+        }
+    }
+    /*public JsonFolder(DbFolder folder, int count)
     {
         this.uuid = folder.getPrimaryUuid();
         this.folderName = folder.getTitle();
@@ -34,7 +49,7 @@ public final class JsonFolder implements Serializable {
         {
             contentCount = new Integer(count);
         }
-    }
+    }*/
 
     /**
      * gets/sets
@@ -79,7 +94,11 @@ public final class JsonFolder implements Serializable {
         this.contentCount = contentCount;
     }
 
-		public Boolean getHasChildren() { return hasChildren; }
+    public Boolean getHasChildren() {
+        return hasChildren;
+    }
 
-		public void setHasChildren(Boolean hasChildren) { this.hasChildren = hasChildren; }
+    public void setHasChildren(Boolean hasChildren) {
+        this.hasChildren = hasChildren;
+    }
 }

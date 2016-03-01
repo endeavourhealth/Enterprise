@@ -107,7 +107,44 @@ public class TokenHelper
                 false);*/
     }
 
+    /**
+     * 2016-02-29 DL - changed to handle tokens where we haven't selected an organisation yet (i.e. super users)
+     */
     public static UserContext validateToken(String token) throws Exception
+    {
+        Claims claims = Jwts
+                .parser()
+                .setSigningKey(Configuration.TOKEN_SIGNING_SECRET)
+                .parseClaimsJws(token)
+                .getBody();
+
+        long tokenIssuedMilliseconds = Long.parseLong((String) claims.get(TOKEN_ISSUED_AT)) * 1000L;
+        Date tokenIssued = new Date(tokenIssuedMilliseconds);
+        Date tokenExpiry = new Date(tokenIssuedMilliseconds + (Configuration.TOKEN_EXPIRY_MINUTES * 60L * 1000L));
+
+        if (Calendar.getInstance().getTime().after(tokenExpiry)) {
+            throw new AuthenticationException("Token expired");
+        }
+
+        //a token will ALWAYS have a user ID, unless we've logged the user off, in which case this'll cause a
+        //null pointer and fail validation
+        UUID userUuid = UUID.fromString((String)claims.get(TOKEN_USER));
+
+        //a token may not have an orgaisation selected, if they have access to multiple organisations
+        //but haven't selected one to operate at yet
+        UUID organisationUuid = null;
+        EndUserRole endUserRole = null;
+
+        String orgUuidStr = (String)claims.get(TOKEN_ORGANISATION);
+        if (orgUuidStr != null)
+        {
+            organisationUuid = UUID.fromString(orgUuidStr);
+            endUserRole = Enum.valueOf(EndUserRole.class, (String)claims.get(TOKEN_ROLE));
+        }
+
+        return new UserContext(userUuid, organisationUuid, endUserRole, tokenIssued);
+    }
+    /*public static UserContext validateToken(String token) throws Exception
     {
         Claims claims = Jwts
                 .parser()
@@ -127,5 +164,5 @@ public class TokenHelper
             throw new AuthenticationException("Token expired");
 
         return new UserContext(userUuid, organisationUuid, endUserRole, tokenIssued);
-    }
+    }*/
 }

@@ -17,16 +17,18 @@ public final class JsonReport implements Serializable
     private String description = null;
     private String xmlContent = null;
     private Boolean isDeleted = false;
+    private UUID folderUuid = null;
 
     public JsonReport()
     {}
-    public JsonReport(DbItem item)
+    public JsonReport(DbItem item, UUID folderUuid)
     {
         this.uuid = item.getPrimaryUuid();
         this.name = item.getTitle();
         this.description = item.getDescription();
         this.xmlContent = item.getXmlContent();
         this.isDeleted = item.getIsDeleted();
+        this.folderUuid = folderUuid;
     }
 
     /**
@@ -70,5 +72,13 @@ public final class JsonReport implements Serializable
 
     public void setIsDeleted(Boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public UUID getFolderUuid() {
+        return folderUuid;
+    }
+
+    public void setFolderUuid(UUID folderUuid) {
+        this.folderUuid = folderUuid;
     }
 }

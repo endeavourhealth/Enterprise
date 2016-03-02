@@ -22,7 +22,7 @@ module app.library {
 						url: '/library',
 						templateUrl: 'app/library/library.html',
 						controller: 'LibraryController',
-						controllerAs: 'library'
+						controllerAs: 'ctrl'
 					}
 				}
 			];

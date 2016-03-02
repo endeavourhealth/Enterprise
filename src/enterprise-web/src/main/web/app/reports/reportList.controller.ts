@@ -37,23 +37,13 @@ module app.reports {
 			}
 			node.isSelected = true;
 			vm.selectedNode = node;
+			node.loading = true;
 
 			vm.libraryService.getFolderContents(node.uuid)
 				.then(function(data) {
 					vm.itemSummaryList = data;
+					node.loading = false;
 				});
-		}
-
-		editItem(item:FolderContent) {
-			this.logger.success('Edit ' + itemTypeIdToString()(item.type) + ':' + item.name);
-		}
-
-		viewItem(item:FolderContent) {
-			this.logger.info('View ' + itemTypeIdToString()(item.type) + ':' + item.name);
-		}
-
-		deleteItem(item:FolderContent) {
-			this.logger.error('Delete ' + itemTypeIdToString()(item.type) + ':' + item.name);
 		}
 
 		toggleExpansion(node : FolderNode) {
@@ -64,9 +54,11 @@ module app.reports {
 			if (node.isExpanded && (node.nodes == null || node.nodes.length === 0)) {
 				var vm = this;
 				var folderId = node.uuid;
+				node.loading = true;
 				this.libraryService.getFolders(2, folderId)
 					.then(function (data) {
 						node.nodes = data;
+						node.loading = false;
 					});
 			}
 		}

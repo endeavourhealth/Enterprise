@@ -37,10 +37,11 @@ module app.library {
 			}
 			node.isSelected = true;
 			vm.selectedNode = node;
-
+			node.loading = true;
 			vm.libraryService.getFolderContents(node.uuid)
 				.then(function(data) {
 					vm.itemSummaryList = data;
+					node.loading = false;
 				});
 		}
 
@@ -52,9 +53,11 @@ module app.library {
 			if (node.isExpanded && (node.nodes == null || node.nodes.length === 0)) {
 				var vm = this;
 				var folderId = node.uuid;
+				node.loading = true;
 				this.libraryService.getFolders(1, folderId)
 					.then(function (data) {
 						node.nodes = data;
+						node.loading = false;
 					});
 			}
 		}

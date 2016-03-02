@@ -10,6 +10,7 @@ module app.models {
 
 		isExpanded:boolean;
 		isSelected:boolean;
+		loading:boolean;
 		nodes:FolderNode[];
 	}
 }

@@ -11,6 +11,7 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.concurrent.Executor;
 
 /**
  * Created by Drew on 29/02/2016.
@@ -19,10 +20,10 @@ import java.util.Date;
 public final class SqlServerDatabase implements DatabaseI
 {
     private static final Logger LOG = LoggerFactory.getLogger(SqlServerDatabase.class);
-
     private static final String ALIAS = "z";
-
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private LinkedList<PoolableConnection> connectionPool = new LinkedList<>();
 
     /**
      * converts objects to Strings for SQL, escaping as required
@@ -84,25 +85,101 @@ public final class SqlServerDatabase implements DatabaseI
         {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
+
+            ResultSet rs = s.getResultSet();
+            rs.next();
+            int ret = rs.getInt(1);
+
+            returnConnection(connection);
+
+            return ret;
         }
         catch (SQLException sqlEx)
         {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
-
-        ResultSet rs = s.getResultSet();
-        rs.next();
-        return rs.getInt(1);
     }
 
-    private Connection getConnection(String databaseName) throws ClassNotFoundException, SQLException
+    /**
+     * 2016-03-02 DL - very basic connection pooling, as it's way too slow running against Azure when
+     * we keep creating connections
+     */
+    private synchronized Connection getConnection(String databaseName) throws ClassNotFoundException, SQLException
+    {
+        try
+        {
+            while (true) {
+                PoolableConnection connection = connectionPool.pop();
+
+                //quick check on closed state, which could happen for old connections closed by network problems
+                if (!connection.isClosed()) {
+                    return connection;
+                }
+            }
+        }
+        catch (NoSuchElementException nsee)
+        {}
+
+        //if we get here, the pool didn't have one, so just create a new one
+        Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
+        Connection conn = DriverManager.getConnection(Configuration.DB_CONNECTION_STRING);
+
+        long expiry = System.currentTimeMillis() + Configuration.DB_CONNECTION_MAX_AGE_MILLIS;
+        LOG.trace("Created new DB connection");
+
+        return new PoolableConnection(conn, expiry, Configuration.DB_CONNECTION_LIVES);
+    }
+    private synchronized void returnConnection(Connection connection) throws SQLException
+    {
+        //if the connection has been closed discard it
+        if (connection.isClosed()) {
+            LOG.trace("Discarded returning DB connection as it's already closed");
+            return;
+        }
+
+        //if the connection pool is already big enough or it's not a poolable connection, just close and discard
+        if (connectionPool.size() >= Configuration.DB_CONNECTION_POOL_SIZE
+                || !(connection instanceof PoolableConnection)) {
+            LOG.trace("Discarded returning DB connection with pool size {} and connection class {}", connectionPool.size(), connection.getClass());
+            connection.close();
+            return;
+        }
+
+        //if the connection is too old, or has been used too many times, close and discard
+        PoolableConnection poolable = (PoolableConnection)connection;
+        int lives = poolable.getLives();
+        long expiry = poolable.getExpiry();
+
+        //decrement the lives
+        lives --;
+        poolable.setLives(lives);
+
+        if (lives <= 0
+                || expiry < System.currentTimeMillis())
+        {
+            LOG.trace("Discarded returning DB connection with lives {} and expiry {}", lives, expiry);
+            connection.close();
+            return;
+        }
+
+        //if we make it here, add to our pool
+        connectionPool.push(poolable);
+    }
+    /*private Connection getConnection(String databaseName) throws ClassNotFoundException, SQLException
     {
         // databaseName not used at present
 
         Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
         return DriverManager.getConnection(Configuration.DB_CONNECTION_STRING);
     }
+    private void returnConnection(Connection connection) throws SQLException
+    {
+        if (!connection.isClosed())
+        {
+            connection.close();
+        }
+    }*/
 
 
     @Override
@@ -192,6 +269,8 @@ public final class SqlServerDatabase implements DatabaseI
         {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
+
+            returnConnection(connection);
         }
         catch (SQLException sqlEx)
         {
@@ -239,6 +318,8 @@ public final class SqlServerDatabase implements DatabaseI
         {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
+
+            returnConnection(connection);
         }
         catch (SQLException sqlEx)
         {
@@ -300,6 +381,8 @@ public final class SqlServerDatabase implements DatabaseI
         {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
+
+            returnConnection(connection);
         }
         catch (SQLException sqlEx)
         {
@@ -403,6 +486,8 @@ public final class SqlServerDatabase implements DatabaseI
                 entity.readFromDb(rr);
                 ret.add(entity);
             }
+
+            returnConnection(connection);
         }
         catch (SQLException sqlEx)
         {
@@ -622,3 +707,304 @@ public final class SqlServerDatabase implements DatabaseI
 
 
 }
+
+class PoolableConnection implements Connection
+{
+    private Connection innerConnection = null;
+    private long expiry = -1;
+    private int lives = -1;
+
+    public PoolableConnection(Connection connection, long expiry, int lives)
+    {
+        this.innerConnection = connection;
+        this.expiry = expiry;
+        this.lives = lives;
+    }
+
+    public long getExpiry() {
+        return expiry;
+    }
+
+    public void setExpiry(long expiry) {
+        this.expiry = expiry;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
+    @Override
+    public Statement createStatement() throws SQLException {
+        return innerConnection.createStatement();
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(String sql) throws SQLException {
+        return innerConnection.prepareStatement(sql);
+    }
+
+    @Override
+    public CallableStatement prepareCall(String sql) throws SQLException {
+        return innerConnection.prepareCall(sql);
+    }
+
+    @Override
+    public String nativeSQL(String sql) throws SQLException {
+        return innerConnection.nativeSQL(sql);
+    }
+
+    @Override
+    public void setAutoCommit(boolean autoCommit) throws SQLException {
+        innerConnection.setAutoCommit(autoCommit);
+    }
+
+    @Override
+    public boolean getAutoCommit() throws SQLException {
+        return innerConnection.getAutoCommit();
+    }
+
+    @Override
+    public void commit() throws SQLException {
+        innerConnection.commit();
+    }
+
+    @Override
+    public void rollback() throws SQLException {
+        innerConnection.rollback();
+    }
+
+    @Override
+    public void close() throws SQLException {
+        innerConnection.close();
+    }
+
+    @Override
+    public boolean isClosed() throws SQLException {
+        return innerConnection.isClosed();
+    }
+
+    @Override
+    public DatabaseMetaData getMetaData() throws SQLException {
+        return innerConnection.getMetaData();
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) throws SQLException {
+        innerConnection.setReadOnly(readOnly);
+    }
+
+    @Override
+    public boolean isReadOnly() throws SQLException {
+        return innerConnection.isReadOnly();
+    }
+
+    @Override
+    public void setCatalog(String catalog) throws SQLException {
+        innerConnection.setCatalog(catalog);
+    }
+
+    @Override
+    public String getCatalog() throws SQLException {
+        return innerConnection.getCatalog();
+    }
+
+    @Override
+    public void setTransactionIsolation(int level) throws SQLException {
+        innerConnection.setTransactionIsolation(level);
+    }
+
+    @Override
+    public int getTransactionIsolation() throws SQLException {
+        return innerConnection.getTransactionIsolation();
+    }
+
+    @Override
+    public SQLWarning getWarnings() throws SQLException {
+        return innerConnection.getWarnings();
+    }
+
+    @Override
+    public void clearWarnings() throws SQLException {
+        innerConnection.clearWarnings();
+    }
+
+    @Override
+    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+        return innerConnection.createStatement(resultSetType, resultSetConcurrency);
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+        return innerConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
+    }
+
+    @Override
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+        return innerConnection.prepareCall(sql, resultSetType, resultSetConcurrency);
+    }
+
+    @Override
+    public Map<String, Class<?>> getTypeMap() throws SQLException {
+        return innerConnection.getTypeMap();
+    }
+
+    @Override
+    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+        innerConnection.setTypeMap(map);
+    }
+
+    @Override
+    public void setHoldability(int holdability) throws SQLException {
+        innerConnection.setHoldability(holdability);
+    }
+
+    @Override
+    public int getHoldability() throws SQLException {
+        return innerConnection.getHoldability();
+    }
+
+    @Override
+    public Savepoint setSavepoint() throws SQLException {
+        return innerConnection.setSavepoint();
+    }
+
+    @Override
+    public Savepoint setSavepoint(String name) throws SQLException {
+        return innerConnection.setSavepoint(name);
+    }
+
+    @Override
+    public void rollback(Savepoint savepoint) throws SQLException {
+        innerConnection.rollback(savepoint);
+    }
+
+    @Override
+    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+        innerConnection.releaseSavepoint(savepoint);
+    }
+
+    @Override
+    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+        return innerConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+        return innerConnection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    }
+
+    @Override
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+        return innerConnection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+        return innerConnection.prepareStatement(sql, autoGeneratedKeys);
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+        return innerConnection.prepareStatement(sql, columnIndexes);
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+        return innerConnection.prepareStatement(sql, columnNames);
+    }
+
+    @Override
+    public Clob createClob() throws SQLException {
+        return innerConnection.createClob();
+    }
+
+    @Override
+    public Blob createBlob() throws SQLException {
+        return innerConnection.createBlob();
+    }
+
+    @Override
+    public NClob createNClob() throws SQLException {
+        return innerConnection.createNClob();
+    }
+
+    @Override
+    public SQLXML createSQLXML() throws SQLException {
+        return innerConnection.createSQLXML();
+    }
+
+    @Override
+    public boolean isValid(int timeout) throws SQLException {
+        return innerConnection.isValid(timeout);
+    }
+
+    @Override
+    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+        innerConnection.setClientInfo(name, value);
+    }
+
+    @Override
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        innerConnection.setClientInfo(properties);
+    }
+
+    @Override
+    public String getClientInfo(String name) throws SQLException {
+        return innerConnection.getClientInfo(name);
+    }
+
+    @Override
+    public Properties getClientInfo() throws SQLException {
+        return innerConnection.getClientInfo();
+    }
+
+    @Override
+    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+        return innerConnection.createArrayOf(typeName, elements);
+    }
+
+    @Override
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+        return innerConnection.createStruct(typeName, attributes);
+    }
+
+    @Override
+    public void setSchema(String schema) throws SQLException {
+        innerConnection.setSchema(schema);
+    }
+
+    @Override
+    public String getSchema() throws SQLException {
+        return innerConnection.getSchema();
+    }
+
+    @Override
+    public void abort(Executor executor) throws SQLException {
+        innerConnection.abort(executor);
+    }
+
+    @Override
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        innerConnection.setNetworkTimeout(executor, milliseconds);
+    }
+
+    @Override
+    public int getNetworkTimeout() throws SQLException {
+        return innerConnection.getNetworkTimeout();
+    }
+
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return innerConnection.unwrap(iface);
+    }
+
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return innerConnection.isWrapperFor(iface);
+    }
+}
+

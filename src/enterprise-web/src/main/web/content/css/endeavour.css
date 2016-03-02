@@ -8,6 +8,20 @@
     display: inline;
 }
 
+.folder-item {
+    display:inline-block;
+    width: 90%;
+}
+
+.selection {
+    background : #afd9ee !important;
+}
+
+.hover-box:hover {
+    border: 1px solid #dae2ea !important;
+    background: #f8faff !important;
+}
+
 .logo {
     font-size: 18px;
     color: gray;

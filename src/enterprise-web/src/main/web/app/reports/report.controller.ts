@@ -7,21 +7,44 @@ module app.reports {
 	import ILoggerService = app.blocks.ILoggerService;
 	import FolderContent = app.models.FolderContent;
 	import itemTypeIdToString = app.models.itemTypeIdToString;
+	import LibraryController = app.library.LibraryController;
+	import ReportNode = app.models.ReportNode;
 	'use strict';
 
-	class ReportController {
+	class ReportController extends LibraryController {
+		treeData : FolderNode[];
+		selectedNode : FolderNode = null;
+		itemSummaryList : ItemSummaryList;
+		reportData : ReportNode[];
 		itemAction : string;
 		itemUuid : string;
 
-		static $inject = ['LibraryService', 'LoggerService', '$stateParams', '$scope'];
+		static $inject = ['LibraryService', 'LoggerService', '$scope', '$stateParams'];
 
 		constructor(
-			private libraryService:app.core.ILibraryService,
-			private logger : ILoggerService,
-			private $stateParams : any,
-			private $scope : any) {
+			protected libraryService:app.core.ILibraryService,
+			protected logger : ILoggerService,
+			protected $scope : any,
+			protected $stateParams : any) {
+			super(libraryService, logger, $scope);
 			this.itemAction = $stateParams.itemAction;
 			this.itemUuid = $stateParams.itemUuid;
+
+			this.reportData = [
+				{
+					itemName:'Diabetics',
+					nodes: [
+						{	itemName:'Over 50', nodes:[] },
+						{	itemName:'Amputation', nodes:[] },
+						{	itemName:'Decreasing BO', nodes:[] },
+					]},
+				{
+					itemName:'Recent Diabetics',
+					nodes: [
+						{	itemName:'All medication', nodes:[] }
+					]}
+			];
+
 		}
 	}
 

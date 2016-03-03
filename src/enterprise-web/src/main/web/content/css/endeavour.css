@@ -17,8 +17,19 @@
     background : #afd9ee !important;
 }
 
+.dragtarget-over {
+    border: 1px solid #dae2ea !important;
+    padding: 0px;
+    background: #f8faff !important;
+}
+
+.hover-box {
+    padding: 1px;
+}
+
 .hover-box:hover {
     border: 1px solid #dae2ea !important;
+    padding: 0px;
     background: #f8faff !important;
 }
 

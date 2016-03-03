@@ -9,14 +9,17 @@ module app.reports {
 	import itemTypeIdToString = app.models.itemTypeIdToString;
 	'use strict';
 
-	class ReportListController {
+	export class ReportListController {
 		treeData : FolderNode[];
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
 
 		static $inject = ['LibraryService', 'LoggerService', '$scope'];
 
-		constructor(private libraryService:app.core.ILibraryService, private logger : ILoggerService, private $scope : any) {
+		constructor(
+			protected libraryService:app.core.ILibraryService,
+			protected logger : ILoggerService,
+			protected $scope : any) {
 			this.getReportsRootFolders();
 		}
 

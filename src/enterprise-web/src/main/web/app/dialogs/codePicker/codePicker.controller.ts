@@ -13,6 +13,7 @@ module app.dialogs {
 	'use strict';
 
 	class CodePickerController {
+		selectedMatch : any;
 		searchData : string;
 		searchResults : TermlexSearchResult;
 		treeData : ITreeNode[];
@@ -51,6 +52,10 @@ module app.dialogs {
 
 		getCodeTreeData(match : TermlexSearchResultResult) {
 			var vm = this;
+			if (vm.selectedMatch) { vm.selectedMatch.isSelected = false; }
+			match.isSelected = true;
+			vm.selectedMatch = match;
+
 			vm.libraryService.getCodeTreeData(match.id)
 				.then(function(result:ITreeNode[]) {
 					vm.treeData = [
@@ -71,6 +76,11 @@ module app.dialogs {
 				return 'btn-warning';
 			}
 			return 'btn-success';
+		}
+
+		toggleExpansion(node: any) {
+			node.isExpanded = !node.isExpanded;
+			// lazy-load children as required
 		}
 
 		getMatchCount(item : CodeSearchResult) {

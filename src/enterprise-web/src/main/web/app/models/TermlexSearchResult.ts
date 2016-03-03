@@ -14,6 +14,8 @@ module app.models {
 		matches: string[];
 		status: number;
 		type: string;
+
+		isSelected: boolean;
 	}
 
 	export class TermlexSearchResult {

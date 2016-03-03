@@ -27,7 +27,7 @@
 										</thead>
 										<tbody>
 											<tr class="hover-box" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse" data-drag="true" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}" jqyoui-draggable="{animate:true}">
-												<td>{{item.name}}</td>
+												<td style="cursor:move">{{item.name}}</td>
 											</tr>
 										</tbody>
 									</table>
@@ -63,16 +63,17 @@
 
 	<script type="text/ng-template" id="folder_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content">
-			<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
-			<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-						ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-						ng-click="ctrl.toggleExpansion(node)"></span>
 			<span class="hover-box show-child-on-hover folder-item"
-						ng-class="{'selection': node.isSelected}"
-						ng-click="ctrl.selectNode(node)">
-				<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
-				<span>{{node.folderName}}</span>
-				<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+						ng-class="{'selection': node.isSelected}">
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+							ng-click="ctrl.toggleExpansion(node)"></span>
+				<span	ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
+					<span>{{node.folderName}}</span>
+					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+				</span>
 			</span>
 		</div>
 		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">

@@ -89,7 +89,7 @@
 					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
 				</span>
 			</div>
-			<ol ui-tree-nodes="" ng-model="node.nodes" ng-show="node.isExpanded">
+			<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">
 				<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
 				</li>
 			</ol>

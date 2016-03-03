@@ -77,30 +77,31 @@
 
 	<script type="text/ng-template" id="node_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content">
-			<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
-			<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-						ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-						ng-click="ctrl.toggleExpansion(node)"></span>
 			<span class="hover-box show-child-on-hover folder-item"
-						ng-class="{'selection': node.isSelected}"
-						ng-click="ctrl.selectNode(node)">
-				<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
-				<span>{{node.folderName}}</span>
-				<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
-				<span uib-dropdown>
-					<button class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
-					<ul uib-dropdown-menu>
-						<li><a href="#">Add report</a></li>
-						<li role="separator" class="divider"></li>
-						<li><a href="#">Add child folder</a></li>
-						<li role="separator" class="divider"></li>
-						<li><a href="#">Rename</a></li>
-						<li><a href="#">Delete</a></li>
-						<li role="separator" class="divider"></li>
-						<li><a href="#">Cut</a></li>
-						<li><a href="#">Copy</a></li>
-						<li><a href="#">Paste</a></li>
-					</ul>
+						ng-class="{'selection': node.isSelected}">
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+							ng-click="ctrl.toggleExpansion(node)"></span>
+				<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
+					<span>{{node.folderName}}</span>
+					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+					<span uib-dropdown>
+						<button class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
+						<ul uib-dropdown-menu>
+							<li><a href="#">Add report</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#">Add child folder</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#">Rename</a></li>
+							<li><a href="#">Delete</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#">Cut</a></li>
+							<li><a href="#">Copy</a></li>
+							<li><a href="#">Paste</a></li>
+						</ul>
+					</span>
 				</span>
 			</span>
 		</div>

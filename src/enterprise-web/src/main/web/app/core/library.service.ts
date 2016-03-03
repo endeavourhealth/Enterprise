@@ -15,7 +15,7 @@ module app.core {
 		getRecentDocumentsData() : ng.IPromise<app.models.RecentDocumentItem[]>;
 		getEngineState() : ng.IPromise<app.models.EngineState>;
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
-		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]>;
+		searchCodes(searchData : string):ng.IPromise<app.models.TermlexSearchResult>;
 		getCodeTreeData(code : string):ng.IPromise<ITreeNode[]>;
 		getFolders(moduleId : number, folderUuid : string):ng.IPromise<FolderNode[]>;
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
@@ -79,9 +79,17 @@ module app.core {
 			return defer.promise;
 		}
 
-		searchCodes(searchData : string):ng.IPromise<app.models.CodeSearchResult[]> {
+		searchCodes(searchData : string):ng.IPromise<app.models.TermlexSearchResult> {
 			var defer = this.promise.defer();
-			this.http.get('app/core/data/searchResults.json')
+			var request = {
+				params: {
+					'term': searchData,
+					'maxResultsSize': 20,
+					'start': 0
+				},
+				withCredentials: false
+			};
+			this.http.get('http://termlex.org/search/sct', request)
 				.then(function (response) {
 					defer.resolve(response.data);
 				})
@@ -92,9 +100,12 @@ module app.core {
 			return defer.promise;
 		}
 
-		getCodeTreeData(code : string):ng.IPromise<ITreeNode[]> {
+		getCodeTreeData(id : string):ng.IPromise<ITreeNode[]> {
 			var defer = this.promise.defer();
-			this.http.get('app/core/data/treeResults.json')
+			var request = {
+				withCredentials: false
+			};
+			this.http.get('http://termlex.org/hierarchy/' + id + '/children', request)
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

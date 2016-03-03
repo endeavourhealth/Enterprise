@@ -10,7 +10,10 @@ module app.core {
 
 		static $inject = ['$httpProvider', 'IdleProvider', 'KeepaliveProvider'];
 
-		constructor($httpProvider:IHttpProvider, IdleProvider:IIdleProvider, KeepaliveProvider:IKeepAliveProvider) {
+		constructor(
+			$httpProvider:IHttpProvider,
+			IdleProvider:IIdleProvider,
+			KeepaliveProvider:IKeepAliveProvider) {
 			$httpProvider.defaults.headers.post['Accept'] = 'application/json';
 			$httpProvider.defaults.headers.post['Content-Type'] = 'application/json; charset=utf-8';
 			$httpProvider.defaults.withCredentials = true;

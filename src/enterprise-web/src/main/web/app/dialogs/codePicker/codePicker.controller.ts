@@ -8,11 +8,13 @@ module app.dialogs {
 	import ILibraryService = app.core.ILibraryService;
 	import LibraryService = app.core.LibraryService;
 	import IModalService = angular.ui.bootstrap.IModalService;
+	import TermlexSearchResult = app.models.TermlexSearchResult;
+	import TermlexSearchResultResult = app.models.TermlexSearchResultResult;
 	'use strict';
 
 	class CodePickerController {
 		searchData : string;
-		searchResults : CodeSearchResult;
+		searchResults : TermlexSearchResult;
 		treeData : ITreeNode[];
 		selectedItems : CodeSearchResult[];
 		showModal : boolean;
@@ -23,7 +25,8 @@ module app.dialogs {
 								private libraryService : ILibraryService,
 								private $uibModal : IModalService) {
 			this.showModal = false;
-			this.searchData = '"Asthma","Angina","Diabetes","Hadache","Glaucoma","Ankle"';
+			// this.searchData = '"Asthma","Angina","Diabetes","Hadache","Glaucoma","Ankle"';
+			this.searchData = 'Asthma';
 		}
 
 		open() {
@@ -39,22 +42,24 @@ module app.dialogs {
 
 		search() {
 			var vm = this;
+			//vm.searchResults = vm.termlexSearch.getFindings(vm.searchData, vm.searchOptions);
 			vm.libraryService.searchCodes(vm.searchData)
-				.then(function(result:CodeSearchResult[]) {
-					vm.selectedItems = result;
-					if (result.length === 1) {
-						vm.searchResults = result[0];
-					} else {
-						vm.searchResults = null;
-					}
+				.then(function(result:TermlexSearchResult) {
+					vm.searchResults = result;
 				});
 		}
 
-		getCodeTreeData(match : CodeSearchMatch) {
+		getCodeTreeData(match : TermlexSearchResultResult) {
 			var vm = this;
-			vm.libraryService.getCodeTreeData(match.code)
+			vm.libraryService.getCodeTreeData(match.id)
 				.then(function(result:ITreeNode[]) {
-					vm.treeData = result;
+					vm.treeData = [
+						{
+							id: match.id,
+							title: match.label,
+							nodes: result
+						}
+					];
 				});
 		}
 

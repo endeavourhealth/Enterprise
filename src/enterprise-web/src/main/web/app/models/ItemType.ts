@@ -25,7 +25,7 @@ module app.models {
 				case ItemType.Report:
 					return 'glyphicon-file';
 				case ItemType.Query:
-					return 'glyphicon-filter';
+					return 'glyphicon-question-sign';
 				case ItemType.Test:
 					return 'glyphicon-random';
 				case ItemType.Datasource:

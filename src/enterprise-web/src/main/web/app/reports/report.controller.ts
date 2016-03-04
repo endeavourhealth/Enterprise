@@ -49,25 +49,36 @@ module app.reports {
 				name : source.name,
 				type : source.type,
 				nodes: []
-			}; // = new ReportNode();
+			};
 
 			var target = this.searchTree(this.reportData, targetId);
 
 			target.nodes.push(newReportNode);
 		}
 
-		searchTree(node: any, uuid: string) {
-		if (node.uuid === uuid) {
-			return node;
-		}else if (node.nodes != null) {
-			var result : any = null;
-			for (var i = 0; result == null && i < node.nodes.length; i++) {
-				result = this.searchTree(node.nodes[i], uuid);
+		deleteNode(tree: any, node: any) {
+			for (var i = 0; i < tree.nodes.length; i++) {
+				if (tree.nodes[i].uuid === node.uuid) {
+					tree.nodes.splice(i, 1);
+					return;
+				} else {
+					this.deleteNode(tree.nodes[i], node);
+				}
 			}
-			return result;
 		}
-		return null;
-	}
+
+		searchTree(node: any, uuid: string) {
+			if (node.uuid === uuid) {
+				return node;
+			}else if (node.nodes != null) {
+				var result : any = null;
+				for (var i = 0; result == null && i < node.nodes.length; i++) {
+					result = this.searchTree(node.nodes[i], uuid);
+				}
+				return result;
+			}
+			return null;
+		}
 	}
 
 	angular

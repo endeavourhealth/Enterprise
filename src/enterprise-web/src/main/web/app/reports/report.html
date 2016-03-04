@@ -26,8 +26,13 @@
 											</tr>
 										</thead>
 										<tbody>
-											<tr class="hover-box" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse" data-drag="true" data-jqyoui-options="{revert: 'invalid', helper: 'clone'}" jqyoui-draggable="{animate:true}">
-												<td style="cursor:move">{{item.name}}</td>
+											<tr class="hover-box"
+													ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse"
+													data-drag="true"
+													data-jqyoui-options="{revert: 'invalid', helper: 'clone'}"
+													jqyoui-draggable="{animate:true}"
+													id="{{item}}">
+												<td style="cursor:move"><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}}"></span>{{item.name}}</td>
 											</tr>
 										</tbody>
 									</table>
@@ -83,8 +88,13 @@
 	</script>
 
 	<script type="text/ng-template" id="report_template.html">
-		<div ui-tree-handle class="tree-node tree-node-content hover-box show-child-on-hover" data-drop="true" jqyoui-droppable data-jqyoui-options="{hoverClass: 'dragtarget-over'}">
-				<span>{{node.itemName}}</span>
+		<div ui-tree-handle
+				 class="tree-node tree-node-content hover-box show-child-on-hover"
+				 data-drop="true"
+				 jqyoui-droppable="{onDrop: 'ctrl.onDrop'}"
+				 data-jqyoui-options="{hoverClass: 'dragtarget-over'}"
+				 id="{{node.uuid}}">
+				<span><span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}}"></span>{{node.name}}</span>
 				<span uib-dropdown>
 					<button class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
 					<ul uib-dropdown-menu>

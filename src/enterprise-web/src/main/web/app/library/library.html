@@ -1,42 +1,4 @@
 <div>
-	<script type="text/ng-template" id="node_template.html">
-		<div ui-tree-handle class="tree-node tree-node-content">
-			<span class="hover-box show-child-on-hover folder-item"
-						ng-class="{'selection': node.isSelected}">
-				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
-				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-							ng-click="ctrl.toggleExpansion(node)"></span>
-				<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
-					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"> </span>
-					<span>{{node.folderName}}</span>
-					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
-					<span uib-dropdown>
-						<button class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
-						<ul uib-dropdown-menu>
-							<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
-							<li><a href="#">Add list output</a></li>
-							<li><a href="#">Add code set</a></li>
-							<li role="separator" class="divider"></li>
-							<li><a href="#">Add child folder</a></li>
-							<li role="separator" class="divider"></li>
-							<li><a href="#">Rename</a></li>
-							<li><a href="#">Delete</a></li>
-							<li role="separator" class="divider"></li>
-							<li><a href="#">Cut</a></li>
-							<li><a href="#">Copy</a></li>
-							<li><a href="#">Paste</a></li>
-						</ul>
-					</span>
-				</span>
-			</span>
-		</div>
-		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">
-			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
-			</li>
-		</ol>
-	</script>
-
 	<div class="col-md-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -82,7 +44,7 @@
 											<tr class="hover-box show-child-on-hover" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
 												<td><a ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'view'})">{{item.name}}</a></td>
 												<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
-												<td>{{item.type | itemTypeIdToString}}</td>
+												<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}}"></span>{{item.type | itemTypeIdToString}}</td>
 												<td>
 													<div class="child-to-show">
 														<button class="btn btn-info btn-xs" ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'view'})">View</button>
@@ -112,5 +74,43 @@
 			</div>
 		</div>
 	</div>
+
+	<script type="text/ng-template" id="node_template.html">
+		<div ui-tree-handle class="tree-node tree-node-content">
+			<span class="hover-box show-child-on-hover folder-item"
+						ng-class="{'selection': node.isSelected}">
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+							ng-click="ctrl.toggleExpansion(node)"></span>
+				<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"> </span>
+					<span>{{node.folderName}}</span>
+					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+					<span uib-dropdown>
+						<button class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
+						<ul uib-dropdown-menu>
+							<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
+							<li><a href="#">Add list output</a></li>
+							<li><a href="#">Add code set</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#">Add child folder</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#">Rename</a></li>
+							<li><a href="#">Delete</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="#">Cut</a></li>
+							<li><a href="#">Copy</a></li>
+							<li><a href="#">Paste</a></li>
+						</ul>
+					</span>
+				</span>
+			</span>
+		</div>
+		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">
+			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
+			</li>
+		</ol>
+	</script>
 
 </div>

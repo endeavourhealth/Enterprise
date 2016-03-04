@@ -2,9 +2,9 @@ module app.models {
 	'use strict';
 
 	export class ReportNode {
-		// uuid:string;
-		itemName:string;
-		// itemType:number;
+		uuid:string;
+		name:string;
+		type:number;
 		// hasChildren:boolean;
 		nodes:ReportNode[];
 	}

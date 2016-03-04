@@ -9,6 +9,7 @@ angular.module('app', [
 		'ui.bootstrap',
 		'ngIdle',
 		'ngDragDrop',
+		'angular-uuid-generator',
 
 		'app.core',
 		'app.blocks',

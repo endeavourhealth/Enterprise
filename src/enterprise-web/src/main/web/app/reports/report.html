@@ -55,7 +55,7 @@
 							<div class="col-md-12">
 								<div id="tree-root" class="angular-ui-tree">
 									<ol class="angular-ui-tree-nodes">
-										<li ng-repeat="node in ctrl.reportData" ng-include="'report_template.html'" class="angular-ui-tree-node"></li>
+										<li ng-init="node = ctrl.reportData" ng-include="'report_template.html'" class="angular-ui-tree-node"></li>
 									</ol>
 								</div>
 							</div>

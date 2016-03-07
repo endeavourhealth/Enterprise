@@ -5,7 +5,7 @@ module app.reports {
 	import FolderNode = app.models.FolderNode;
 	import ItemSummaryList = app.models.ItemSummaryList;
 	import ILoggerService = app.blocks.ILoggerService;
-	import FolderContent = app.models.FolderContent;
+	import FolderContent = app.models.FolderItem;
 	import itemTypeIdToString = app.models.itemTypeIdToString;
 	'use strict';
 

@@ -4,6 +4,6 @@ module app.models {
 	export class Report {
 		uuid : string;
 		name : string;
-		nodes: ReportNode[];
+		children: ReportNode[] = [];
 	}
 }

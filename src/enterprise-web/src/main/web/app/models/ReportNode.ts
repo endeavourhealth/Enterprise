@@ -6,7 +6,6 @@ module app.models {
 		itemUuid:string;
 		name:string;
 		type:number;
-		// hasChildren:boolean;
-		nodes:ReportNode[];
+		children:ReportNode[];
 	}
 }

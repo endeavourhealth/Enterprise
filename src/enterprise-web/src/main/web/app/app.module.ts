@@ -8,6 +8,7 @@ import IAdminService = app.core.IAdminService;
 angular.module('app', [
 		'ui.bootstrap',
 		'ngIdle',
+		'ui.tree',
 		'ngDragDrop',
 		'angular-uuid-generator',
 

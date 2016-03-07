@@ -4,7 +4,7 @@
 module app.library {
 	import FolderNode = app.models.FolderNode;
 	import ItemSummaryList = app.models.ItemSummaryList;
-	import FolderContent = app.models.FolderContent;
+	import FolderContent = app.models.FolderItem;
 	import ILoggerService = app.blocks.ILoggerService;
 	import itemTypeIdToString = app.models.itemTypeIdToString;
 	'use strict';

@@ -10,9 +10,9 @@
 						<div class="row">
 
 							<div class="col-md-3">
-								<div id="tree-root" class="angular-ui-tree">
-									<ol class="angular-ui-tree-nodes">
-										<li ng-repeat="node in ctrl.treeData" ng-include="'node_template.html'" class="angular-ui-tree-node"></li>
+								<div ui-tree data-nodrop-enabled="true" data-nodrag id="tree-root">
+									<ol ui-tree-nodes ng-model="ctrl.treeData">
+										<li ng-repeat="node in ctrl.treeData" ui-tree-node ng-include="'node_template.html'"></li>
 									</ol>
 								</div>
 							</div>
@@ -76,8 +76,8 @@
 	</div>
 
 	<script type="text/ng-template" id="node_template.html">
-		<div ui-tree-handle class="tree-node tree-node-content">
-			<span class="hover-box show-child-on-hover folder-item"
+		<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
+			<span class="show-child-on-hover folder-item"
 						ng-class="{'selection': node.isSelected}">
 				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
 				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
@@ -107,8 +107,8 @@
 				</span>
 			</span>
 		</div>
-		<ol ng-model="node.nodes" ng-show="node.isExpanded" class="angular-ui-tree-nodes">
-			<li ng-repeat="node in node.nodes" ng-include="'node_template.html'" class="angular-ui-tree-node">
+		<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">
+			<li ui-tree-node ng-repeat="node in node.nodes" ng-include="'node_template.html'">
 			</li>
 		</ol>
 	</script>

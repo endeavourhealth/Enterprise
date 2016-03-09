@@ -9,15 +9,15 @@
 							<div class="row">
 								<div class="col-md-5">
 									<div ui-tree data-nodrop-enabled="true" data-nodrag id="folder-tree">
-										<ol ui-tree-nodes ng-model="ctr.treeData">
-											<li ng-repeat="node in ctrl.treeData" ui-tree-node ng-include="'folder_template.html'"></li>
+										<ol ui-tree-nodes ng-model="reportCtrl.treeData">
+											<li ng-repeat="node in reportCtrl.treeData" ui-tree-node ng-include="'folder_template.html'"></li>
 										</ol>
 									</div>
 								</div>
 								<div class="col-md-7">
-									<div ui-tree="ctrl.reportTreeCallbackOptions" data-clone-enabled="true" data-nodrop-enabled="true" id="content-tree">
-										<ol ui-tree-nodes ng-model="ctrl.itemSummaryList.contents">
-											<li ng-repeat="node in ctrl.itemSummaryList.contents" ui-tree-node ng-include="'content_template.html'">
+									<div ui-tree="reportCtrl.reportTreeCallbackOptions" data-clone-enabled="true" data-nodrop-enabled="true" id="content-tree">
+										<ol ui-tree-nodes ng-model="reportCtrl.itemSummaryList.contents">
+											<li ng-repeat="node in reportCtrl.itemSummaryList.contents" ui-tree-node ng-include="'content_template.html'">
 											</li>
 										</ol>
 									</div>
@@ -38,8 +38,8 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div ui-tree id="report-tree">
-										<ol ui-tree-nodes ng-model="ctrl.reportData.children">
-											<li ng-repeat="node in ctrl.reportData.children" ui-tree-node ng-include="'report_template.html'">
+										<ol ui-tree-nodes ng-model="reportCtrl.reportData.children">
+											<li ng-repeat="node in reportCtrl.reportData.children" ui-tree-node ng-include="'report_template.html'">
 											</li>
 										</ol>
 									</div>
@@ -57,7 +57,7 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">Report Data</div>
 				<div class="panel-body">
-					{{ctrl.reportData}}
+					<pre>{{reportCtrl.reportData}}</pre>
 				</div>
 			</div>
 		</div>
@@ -69,8 +69,8 @@
 				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
 				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
 							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-							ng-click="ctrl.toggleExpansion(node)"></span>
-				<span	ng-click="ctrl.selectNode(node)">
+							ng-click="reportCtrl.toggleExpansion(node)"></span>
+				<span	ng-click="reportCtrl.selectNode(node)">
 					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
 					<span>{{node.folderName}}</span>
 					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
@@ -102,7 +102,7 @@
 					<span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
 					{{node.name}}
 				</span>
-				<button class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="ctrl.remove(this)">X</button>
+				<button class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)">X</button>
 			</span>
 		</div>
 		<ol ui-tree-nodes="" ng-model="node.children">

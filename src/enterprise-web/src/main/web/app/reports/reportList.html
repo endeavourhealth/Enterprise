@@ -11,8 +11,8 @@
 
 							<div class="col-md-3">
 								<div ui-tree data-nodrop-enabled="true" data-nodrag  id="tree-root">
-									<ol ui-tree-nodes ng-model="ctrl.treeData">
-										<li ng-repeat="node in ctrl.treeData" ui-tree-node ng-include="'node_template.html'"></li>
+									<ol ui-tree-nodes ng-model="reportListCtrl.treeData">
+										<li ng-repeat="node in reportListCtrl.treeData" ui-tree-node ng-include="'node_template.html'"></li>
 									</ol>
 								</div>
 							</div>
@@ -41,7 +41,7 @@
 											</tr>
 										</thead>
 										<tbody>
-											<tr class="hover-box show-child-on-hover" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
+											<tr class="hover-box show-child-on-hover" ng-repeat="item in reportListCtrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
 												<td><a ui-sref="app.reportAction({itemUuid: item.uuid, itemAction: 'view'})">{{item.name}}</a></td>
 												<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 												<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
@@ -82,8 +82,8 @@
 				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
 				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
 							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-							ng-click="ctrl.toggleExpansion(node)"></span>
-				<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+							ng-click="reportListCtrl.toggleExpansion(node)"></span>
+				<span ng-click="reportListCtrl.selectNode(node)" style="cursor:pointer">
 					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
 					<span>{{node.folderName}}</span>
 					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>

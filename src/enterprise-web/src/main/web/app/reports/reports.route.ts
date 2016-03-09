@@ -22,7 +22,7 @@ module app.reports {
 						url: '/reportList',
 						templateUrl: 'app/reports/reportList.html',
 						controller: 'ReportListController',
-						controllerAs: 'ctrl'
+						controllerAs: 'reportListCtrl'
 					}
 				},
 				{
@@ -31,7 +31,7 @@ module app.reports {
 						url: '/report/:itemUuid/:itemAction',
 						templateUrl: 'app/reports/report.html',
 						controller: 'ReportController',
-						controllerAs: 'ctrl'
+						controllerAs: 'reportCtrl'
 					}
 				}
 			];

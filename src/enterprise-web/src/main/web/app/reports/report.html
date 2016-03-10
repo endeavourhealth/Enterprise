@@ -1,63 +1,90 @@
 <div>
 	<div class="row">
-		<div class="col-md-7">
-			<div class="panel panel-default">
-				<div class="panel-heading">Source Components</div>
+		<div class="col-md-12">
+			<div class="panel panel-primary">
+				<div class="panel-heading">Report details</div>
 				<div class="panel-body">
 					<form>
 						<div class="form-group">
 							<div class="row">
-								<div class="col-md-5">
-									<div ui-tree data-nodrop-enabled="true" data-nodrag id="folder-tree">
-										<ol ui-tree-nodes ng-model="reportCtrl.treeData">
-											<li ng-repeat="node in reportCtrl.treeData" ui-tree-node ng-include="'folder_template.html'"></li>
-										</ol>
-									</div>
-								</div>
-								<div class="col-md-7">
-									<div ui-tree="reportCtrl.reportTreeCallbackOptions" data-clone-enabled="true" data-nodrop-enabled="true" id="content-tree">
-										<ol ui-tree-nodes ng-model="reportCtrl.itemSummaryList.contents">
-											<li ng-repeat="node in reportCtrl.itemSummaryList.contents" ui-tree-node ng-include="'content_template.html'">
-											</li>
-										</ol>
-									</div>
+								<div class="col-md-6">
+									<label for="report-name">Report name</label>
+									<input type="text" class="form-control" id="report-name" value="{{reportCtrl.report.name}}">
 								</div>
 							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-
-		<div class="col-md-5">
-			<div class="panel panel-default">
-				<div class="panel-heading">Report Structure</div>
-				<div class="panel-body">
-					<form>
-						<div class="form-group">
 							<div class="row">
 								<div class="col-md-12">
-									<div ui-tree id="report-tree">
-										<ol ui-tree-nodes ng-model="reportCtrl.reportData.children">
-											<li ng-repeat="node in reportCtrl.reportData.children" ui-tree-node ng-include="'report_template.html'">
-											</li>
-										</ol>
+									<label for="report-description">Report name</label>
+									<input type="text" class="form-control" id="report-description" value="{{reportCtrl.report.description}}">
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<label>Report content</label>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-7">
+									<div class="panel panel-default">
+										<div class="panel-heading">Components</div>
+										<div class="panel-body">
+											<form>
+												<div class="form-group">
+													<div class="row">
+														<div class="col-md-5">
+															<div ui-tree data-nodrop-enabled="true" data-nodrag id="folder-tree">
+																<ol ui-tree-nodes ng-model="reportCtrl.treeData">
+																	<li ng-repeat="node in reportCtrl.treeData" ui-tree-node ng-include="'folder_template.html'"></li>
+																</ol>
+															</div>
+														</div>
+														<div class="col-md-7">
+															<div ui-tree="reportCtrl.contentTreeCallbackOptions" data-clone-enabled="true" data-nodrop-enabled="true" id="content-tree">
+																<ol ui-tree-nodes ng-model="reportCtrl.itemSummaryList.contents">
+																	<li ng-repeat="node in reportCtrl.itemSummaryList.contents" ui-tree-node ng-include="'content_template.html'">
+																	</li>
+																</ol>
+															</div>
+														</div>
+													</div>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-md-5">
+									<div class="panel panel-default">
+										<div class="panel-heading">Structure</div>
+										<div class="panel-body">
+											<form>
+												<div class="form-group">
+													<div class="row">
+														<div class="col-md-12">
+															<div ui-tree id="report-tree">
+																<ol ui-tree-nodes ng-model="reportCtrl.reportContent">
+																	<li ng-repeat="node in reportCtrl.reportContent" ui-tree-node ng-include="'report_template.html'">
+																	</li>
+																</ol>
+															</div>
+														</div>
+													</div>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<div class="btn-toolbar" role="toolbar">
+										<button type="button" class="btn btn-primary" ng-click="reportCtrl.saveReport()">Save</button>
+										<button type="button" class="btn btn-warning" ng-click="reportCtrl.cancelReport()">Cancel</button>
 									</div>
 								</div>
 							</div>
 						</div>
 					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-md-12">
-			<div class="panel panel-default">
-				<div class="panel-heading">Report Data</div>
-				<div class="panel-body">
-					<pre>{{reportCtrl.reportData}}</pre>
 				</div>
 			</div>
 		</div>

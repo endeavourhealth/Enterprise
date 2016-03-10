@@ -8,44 +8,104 @@ module app.reports {
 	import FolderContent = app.models.FolderItem;
 	import itemTypeIdToString = app.models.itemTypeIdToString;
 	import LibraryController = app.library.LibraryController;
-	import Report = app.models.Report;
 	import ICallbacks = AngularUITree.ICallbacks;
 	import IEventInfo = AngularUITree.IEventInfo;
 	import FolderItem = app.models.FolderItem;
 	import ReportNode = app.models.ReportNode;
 	import ItemType = app.models.ItemType;
+	import ReportDb = app.models.ReportDb;
+	import ReportXml = app.models.ReportXml;
+	import Query = app.models.Query;
+	import ListOutput = app.models.ListOutput;
 	'use strict';
 
 	class ReportController {
 		treeData : FolderNode[];
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
-		reportData : Report;
-		itemAction : string;
-		itemUuid : string;
-		reportTreeCallbackOptions : any;
+		report : ReportDb;
+		reportContent : ReportNode[];
+		contentTreeCallbackOptions : any;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope', '$stateParams'];
+		static $inject = ['LibraryService', 'LoggerService', '$stateParams', 'uuid'];
 
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger : ILoggerService,
-			protected $scope : any,
-			protected $stateParams : any) {
-			this.itemAction = $stateParams.itemAction;
-			this.itemUuid = $stateParams.itemUuid;
-			this.reportTreeCallbackOptions = {dropped : this.reportTreeDroppedCallback };
+			protected $stateParams : any,
+			protected uuid : any) {
+			this.contentTreeCallbackOptions = {dropped: this.contentTreeDroppedCallback};
 
-			//this.reportData = {
-			//		uuid: uuid.v4(),
-			//		name: 'Report',
-			//		nodes: []
-			//};
-
-			this.reportData = {"uuid":"2fe4448b-d6b9-48f7-a684-6feba9b004ec","name":"Report","children":[{"uuid":"2d0ad623-69db-42dc-a191-73ef5abe7f58","itemUuid":"ecb4497a-16a2-44c3-8b51-15cfc4bea9f5","name":"Asthmatics","type":2,"children":[{"uuid":"cbe78a5f-ce19-4ba0-86c3-19bd4bc9e693","itemUuid":"098be27b-1dd3-432f-9edd-1049dad4f7ac","name":"Sub Asthmatics","type":2,"children":[]}]},{"uuid":"b7911567-9a78-4dc2-935a-4551e46e261e","itemUuid":"55086fcb-d24f-4601-afd7-b7cae55426e4","name":"renamed query","type":2,"children":[]},{"uuid":"ec525c9f-d3c7-41a0-8301-ab4bdb683cf9","itemUuid":"d7219ff4-339f-4a54-9ddd-818a0e00ace9","name":"Diabetics","type":2,"children":[{"uuid":"fc6ad839-9dea-4a00-bcb1-18fc590b6321","type":6,"typeDesc":"ListOutput","name":"List Ouput 1","lastModified":"2016-03-09","children":[]}]}]};
 			this.getLibraryRootFolders();
+			this.performAction($stateParams.itemAction, $stateParams.itemUuid);
 		}
 
+		// General report methods
+		performAction(action:string, itemUuid:string) {
+			switch (action) {
+				case 'add':
+					this.createReport(itemUuid);
+					break;
+				case 'view':
+					this.loadReport(itemUuid);
+					break;
+			}
+		}
+
+		createReport(folderUuid:string) {
+			// Initialize blank report
+			this.report = {
+				uuid: this.uuid.v4(),
+				name: 'New report',
+				description: '',
+				xmlContent: '',
+				folderUuid: folderUuid,
+				isDeleted: false
+			};
+			this.reportContent = [];
+		}
+
+		loadReport(reportUuid:string) {
+			// Load report from DB
+		}
+
+		saveReport() {
+			// Generate ReportXML object
+			var reportXml : ReportXml = <ReportXml>{};
+			reportXml.uuid = this.report.uuid;
+			reportXml.name = this.report.name;
+			reportXml.folderUuid = this.report.folderUuid;
+			reportXml.query = [];
+			reportXml.listOutput = [];
+			this.populateReportXmlFromTreeNodes(reportXml, '', this.reportContent);
+
+			// convert to XML
+			console.log(reportXml);
+		}
+
+		populateReportXmlFromTreeNodes(reportXml : ReportXml, parentUuid : string, nodes : ReportNode[]) {
+			for (var i = 0; i < nodes.length; i++) {
+				switch (nodes[i].type) {
+					case ItemType.Query:
+						var query : Query = <Query>{};
+						query.uuid = nodes[i].uuid;
+						query.parentUuid = parentUuid;
+						reportXml.query.push(query);
+						break;
+					case ItemType.ListOutput:
+						var listOutput : ListOutput = <ListOutput>{};
+						listOutput.uuid = nodes[i].uuid;
+						listOutput.parentUuid = parentUuid;
+						reportXml.listOutput.push(listOutput);
+						break;
+				}
+				if (nodes[i].children && nodes[i].children.length > 0) {
+					this.populateReportXmlFromTreeNodes(reportXml, nodes[i].uuid, nodes[i].children);
+				}
+			}
+		}
+
+		// Library tree methods
 		getLibraryRootFolders() {
 			var vm = this;
 			vm.libraryService.getFolders(1, null)
@@ -90,10 +150,12 @@ module app.reports {
 			}
 		}
 
+		// Report structure methods
 		remove(scope:any) {
 			scope.remove();
 		}
 
+		// Library folder content methods
 		validReportItemType(input:FolderContent):boolean {
 			switch (input.type) {
 				case ItemType.Query:
@@ -104,7 +166,8 @@ module app.reports {
 			}
 		};
 
-		reportTreeDroppedCallback(eventInfo: IEventInfo) {
+		contentTreeDroppedCallback(eventInfo: IEventInfo) {
+			// Convert clone model to report node
 			eventInfo.source.cloneModel.children = [];
 		}
 

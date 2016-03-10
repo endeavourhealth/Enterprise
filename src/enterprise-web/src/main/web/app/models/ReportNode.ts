@@ -3,7 +3,6 @@ module app.models {
 
 	export class ReportNode {
 		uuid:string;
-		itemUuid:string;
 		name:string;
 		type:number;
 		children:ReportNode[];

@@ -1,9 +1,20 @@
 module app.models {
 	'use strict';
 
-	export class Report {
-		uuid : string;
-		name : string;
-		children: ReportNode[] = [];
+	class ReportSummary {
+		uuid:string;
+		name:string;
+		folderUuid:string;
+	}
+
+	export class ReportXml extends ReportSummary {
+		query:Query[];
+		listOutput:ListOutput[];
+	}
+
+	export class ReportDb extends ReportSummary {
+		description : string;
+		xmlContent : string;
+		isDeleted : boolean;
 	}
 }

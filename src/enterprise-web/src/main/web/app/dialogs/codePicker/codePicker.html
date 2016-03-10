@@ -38,8 +38,8 @@
 									</div>
 									<div class="col-md-7">
 										<div class="well" style="height: 150px; overflow-y: scroll;">
-											<div class="angular-ui-tree" id="tree-root">
-												<ol class="angular-ui-tree-nodes" ng-model="codePicker.searchResults">
+											<div ui-tree id="tree-root">
+												<ol ui-tree-nodes ng-model="codePicker.treeData">
 													<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
 												</ol>
 											</div>
@@ -77,16 +77,17 @@
 	</script>
 
 		<script type="text/ng-template" id="nodes_renderer.html">
-			<div ui-tree-handle class="tree-node tree-node-content">
-				<span	ng-if="!node.nodes" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
-				<span ng-if="node.nodes" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-							ng-click="codePicker.toggleExpansion(node)"></span>
-				<span class="hover-box show-child-on-hover folder-item"
-							ng-class="{'selection': node.isSelected}"
-							ng-click="codePicker.selectNode(node)">
-					<span>{{node.title}}</span>
-					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+			<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
+				<span class="show-child-on-hover folder-item"
+										ng-class="{'selection': node.isSelected}">
+					<span	ng-if="node.childCount == 0" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+					<span ng-if="node.childCount > 0" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+								ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+								ng-click="codePicker.toggleExpansion(node)"></span>
+					<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+						<span>{{node.label}}</span>
+						<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+					</span>
 				</span>
 			</div>
 			<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">

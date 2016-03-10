@@ -105,7 +105,7 @@ module app.core {
 			var request = {
 				withCredentials: false
 			};
-			this.http.get('http://termlex.org/hierarchy/' + id + '/children', request)
+			this.http.get('http://termlex.org/hierarchy/' + id + '/childHierarchy', request)
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

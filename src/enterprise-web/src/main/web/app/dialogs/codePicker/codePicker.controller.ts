@@ -16,7 +16,7 @@ module app.dialogs {
 		selectedMatch : any;
 		searchData : string;
 		searchResults : TermlexSearchResult;
-		treeData : ITreeNode[];
+		treeData : any[];
 		selectedItems : CodeSearchResult[];
 		showModal : boolean;
 
@@ -61,7 +61,9 @@ module app.dialogs {
 					vm.treeData = [
 						{
 							id: match.id,
-							title: match.label,
+							label: match.label,
+							childCount: result.length,
+							isExpanded: true,
 							nodes: result
 						}
 					];
@@ -79,8 +81,14 @@ module app.dialogs {
 		}
 
 		toggleExpansion(node: any) {
+			var vm = this;
 			node.isExpanded = !node.isExpanded;
-			// lazy-load children as required
+			if (node.isExpanded && node.childCount > 0 && !node.nodes) {
+				vm.libraryService.getCodeTreeData(node.id)
+					.then(function(result:ITreeNode[]) {
+						node.nodes = result;
+					});
+			}
 		}
 
 		getMatchCount(item : CodeSearchResult) {

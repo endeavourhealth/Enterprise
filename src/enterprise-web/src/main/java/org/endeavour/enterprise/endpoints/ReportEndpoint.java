@@ -3,23 +3,17 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.entity.database.DbActiveItem;
 import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
+import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
+import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.xml.bind.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.UUID;
 
 /**
@@ -47,14 +41,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         String xml = item.getXmlContent();
 
-        InputStream is = new ByteArrayInputStream(xml.getBytes());
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document document = docBuilder.parse(is);
-        org.w3c.dom.Element varElement = document.getDocumentElement();
-        JAXBContext context = JAXBContext.newInstance(Report.class);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        JAXBElement<Report> loader = unmarshaller.unmarshal(varElement, Report.class);
-        Report ret = loader.getValue();
+        QueryDocument doc = QueryDocumentParser.readFromXml(xml);
+        Report ret = doc.getReport().get(0);
 
         return Response
                 .ok()
@@ -78,17 +66,9 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("SavingReport UUID {}, Name {} FolderUuid", reportUuid, name, folderUuid);
 
-        StringWriter sw = new StringWriter();
-
-        try {
-            JAXBContext carContext = JAXBContext.newInstance(LibraryItem.class);
-            Marshaller carMarshaller = carContext.createMarshaller();
-            carMarshaller.marshal(report, sw);
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        }
-
-        String xml = sw.toString();
+        QueryDocument doc = new QueryDocument();
+        doc.getReport().add(report);
+        String xml = QueryDocumentParser.writeToXml(doc);
 
         reportUuid = super.saveItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, xml, folderUuid);
 

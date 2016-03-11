@@ -6,7 +6,6 @@ import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.ws.rs.*;
@@ -14,12 +13,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.xml.bind.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.UUID;
 
 /**
@@ -46,14 +39,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         String xml = item.getXmlContent();
 
-        InputStream is = new ByteArrayInputStream(xml.getBytes());
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document document = docBuilder.parse(is);
-        org.w3c.dom.Element varElement = document.getDocumentElement();
-        JAXBContext context = JAXBContext.newInstance(LibraryItem.class);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        JAXBElement<LibraryItem> loader = unmarshaller.unmarshal(varElement, LibraryItem.class);
-        LibraryItem ret = loader.getValue();
+        QueryDocument doc = QueryDocumentParser.readFromXml(xml);
+        LibraryItem ret = doc.getLibraryItem().get(0);
 
         return Response
                 .ok()
@@ -98,17 +85,9 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             throw new BadRequestException("Can't save LibraryItem without some content (e.g. query, test etc.)");
         }
 
-        StringWriter sw = new StringWriter();
-
-        try {
-            JAXBContext carContext = JAXBContext.newInstance(LibraryItem.class);
-            Marshaller carMarshaller = carContext.createMarshaller();
-            carMarshaller.marshal(libraryItem, sw);
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        }
-
-        String xml = sw.toString();
+        QueryDocument doc = new QueryDocument();
+        doc.getLibraryItem().add(libraryItem);
+        String xml = QueryDocumentParser.writeToXml(doc);
 
         //validate the XML against the schema
 /*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

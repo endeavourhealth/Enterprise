@@ -1,99 +1,95 @@
-<div class="container">
-	<button ng-click="codePicker.open()" class="btn btn-default">Open Code Picker</button>
-
-	<script type="text/ng-template" id="myModalContent.html">
-		<div class="panel panel-default">
-					<div class="panel-heading">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title">Code Picker</h4>
-					</div>
-					<div class="panel-body">
-						<form endUserRole="form">
-							<!-- Search -->
-							<div class="form-group">
-								<label class="control-label">Search Criteria</label>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="input-group">
-											<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
-														 ng-model="codePicker.searchData">
-											<span class="btn input-group-addon" ng-click="codePicker.search()">
-												<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Matches -->
-							<div class="form-group">
-								<label class="control-label">Matches</label>
-								<div class="row">
-									<div class="col-md-5">
-										<div class="well" style="height: 150px; overflow-y: scroll;">
-											<span ng-repeat="match in codePicker.searchResults.results" ng-click="codePicker.getCodeTreeData(match)" class="hover-box" ng-class="{'selection': match.isSelected}">
-												 {{ match.label }}<br>
-											</span>
-										</div>
-									</div>
-									<div class="col-md-7">
-										<div class="well" style="height: 150px; overflow-y: scroll;">
-											<div ui-tree id="tree-root">
-												<ol ui-tree-nodes ng-model="codePicker.treeData">
-													<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-												</ol>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Selection -->
-							<div class="form-group">
-								<label class="control-label">Selection</label>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="well">
-											<span ng-repeat="item in codePicker.selectedItems" uib-dropdown>
-												<button type="button" class="btn btn-sm {{codePicker.getButtonProperties(item)}}"
-																uib-dropdown-toggle
-																value="item"
-																ng-click="codePicker.searchResults = item; codePicker.searchData = item.term">
-													{{item.term }}
-													<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
-													<i class="glyphicon glyphicon-remove-circle" aria-hidden="true"></i>
-												</button>
-												<ul uib-dropdown-menu ng-if="codePicker.getMatchCount(item) > 1;">
-													<li ng-repeat="match in item.matches">{{match.term}}</li>
-												</ul>
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</form>
-					</div>
-		</div>
-	</script>
-
-		<script type="text/ng-template" id="nodes_renderer.html">
-			<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
-				<span class="show-child-on-hover folder-item"
-										ng-class="{'selection': node.isSelected}">
-					<span	ng-if="node.childCount == 0" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
-					<span ng-if="node.childCount > 0" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-								ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-								ng-click="codePicker.toggleExpansion(node)"></span>
-					<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
-						<span>{{node.label}}</span>
-						<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
-					</span>
-				</span>
-			</div>
-			<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">
-				<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
-				</li>
-			</ol>
-		</script>
-
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	<h4 class="modal-title">Code Picker</h4>
 </div>
+<div class="modal-body">
+	<form endUserRole="form">
+		<!-- Search -->
+		<div class="form-group">
+			<label class="control-label">Search Criteria</label>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
+									 ng-model="codePicker.searchData">
+						<span class="btn input-group-addon" ng-click="codePicker.search()">
+							<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Matches -->
+		<div class="form-group">
+			<label class="control-label">Matches</label>
+			<div class="row">
+				<div class="col-md-5">
+					<div class="well" style="height: 150px; overflow-y: scroll;">
+						<span ng-repeat="match in codePicker.searchResults.results" ng-click="codePicker.getCodeTreeData(match)" class="hover-box" ng-class="{'selection': match.isSelected}">
+							 {{ match.label }}<br>
+						</span>
+					</div>
+				</div>
+				<div class="col-md-7">
+					<div class="well" style="height: 150px; overflow-y: scroll;">
+						<div ui-tree data-nodrop-enabled="true" data-nodrag id="tree-root">
+							<ol ui-tree-nodes ng-model="codePicker.treeData">
+								<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Selection -->
+		<div class="form-group">
+			<label class="control-label">Selection</label>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="well">
+						<span ng-repeat="item in codePicker.selectedItems" uib-dropdown>
+							<button type="button" class="btn btn-sm {{codePicker.getButtonProperties(item)}}"
+											uib-dropdown-toggle
+											value="item"
+											ng-click="codePicker.searchResults = item; codePicker.searchData = item.term">
+								{{item.term }}
+								<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
+								<i class="glyphicon glyphicon-remove-circle" aria-hidden="true"></i>
+							</button>
+							<ul uib-dropdown-menu ng-if="codePicker.getMatchCount(item) > 1;">
+								<li ng-repeat="match in item.matches">{{match.term}}</li>
+							</ul>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn"
+					data-ng-click="codePicker.cancel()">Cancel</button>
+	<button class="btn btn-primary"
+					data-ng-click="codePicker.ok();">Ok</button>
+</div>
+<script type="text/ng-template" id="nodes_renderer.html">
+	<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
+		<span class="show-child-on-hover folder-item"
+								ng-class="{'selection': node.isSelected}">
+			<span	ng-if="node.childCount == 0" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+			<span ng-if="node.childCount > 0" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+						ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+						ng-click="codePicker.toggleExpansion(node)"></span>
+			<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+				<span>{{node.label}}</span>
+				<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+			</span>
+		</span>
+	</div>
+	<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">
+		<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
+		</li>
+	</ol>
+</script>

@@ -7,9 +7,9 @@ module app.dialogs {
 	import ITreeNode = AngularUITree.ITreeNode;
 	import ILibraryService = app.core.ILibraryService;
 	import LibraryService = app.core.LibraryService;
-	import IModalService = angular.ui.bootstrap.IModalService;
 	import TermlexSearchResult = app.models.TermlexSearchResult;
 	import TermlexSearchResultResult = app.models.TermlexSearchResultResult;
+	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 	'use strict';
 
 	class CodePickerController {
@@ -20,25 +20,43 @@ module app.dialogs {
 		selectedItems : CodeSearchResult[];
 		showModal : boolean;
 
-		static $inject = ['LoggerService', 'LibraryService', '$uibModal'];
+		static $inject = ['LoggerService', 'LibraryService', '$uibModalInstance'];
 
 		constructor(private logger:app.blocks.ILoggerService,
 								private libraryService : ILibraryService,
-								private $uibModal : IModalService) {
+								private $uibModalInstance : IModalServiceInstance) {
 			this.showModal = false;
 			// this.searchData = '"Asthma","Angina","Diabetes","Hadache","Glaucoma","Ankle"';
 			this.searchData = 'Asthma';
-		}
-
-		open() {
-			var vm = this;
-			vm.$uibModal.open({
-				animation : true,
-				size : 'lg',
-				templateUrl : 'myModalContent.html',
-				controller : 'CodePickerController',
-				controllerAs : 'codePicker'
-			});
+			this.selectedItems = [
+				{
+					term: 'asthma',
+					matches: [
+						{
+							term: 'asthma',
+							code: '195967001'
+						}
+					]
+				},
+				{
+					term: 'angina',
+					matches: [
+						{
+							term: 'angina',
+							code: '194828000'
+						}
+					]
+				},
+				{
+					term: 'diabetes',
+					matches: [
+						{
+							term: 'diabetes mellitus',
+							code: '73211009'
+						}
+					]
+				}
+			];
 		}
 
 		search() {
@@ -93,6 +111,16 @@ module app.dialogs {
 
 		getMatchCount(item : CodeSearchResult) {
 			return item.matches.length > 1 ? item.matches.length : null;
+		}
+
+		ok() {
+			this.$uibModalInstance.close(this.selectedItems);
+			console.log('OK Pressed');
+		}
+
+		cancel() {
+			this.$uibModalInstance.dismiss('cancel');
+			console.log('Cancel Pressed');
 		}
 	}
 

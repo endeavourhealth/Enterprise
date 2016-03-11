@@ -7,6 +7,9 @@ module app.library {
 	import FolderContent = app.models.FolderItem;
 	import ILoggerService = app.blocks.ILoggerService;
 	import itemTypeIdToString = app.models.itemTypeIdToString;
+	import IModalService = angular.ui.bootstrap.IModalService;
+	import IModalSettings = angular.ui.bootstrap.IModalSettings;
+	import CodeSearchResult = app.models.CodeSearchResult;
 	'use strict';
 
 	export class LibraryController {
@@ -14,12 +17,13 @@ module app.library {
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope'];
+		static $inject = ['LibraryService', 'LoggerService', '$scope', '$uibModal'];
 
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger:ILoggerService,
-			protected $scope : any) {
+			protected $scope : any,
+			protected $modal : IModalService) {
 			this.getLibraryRootFolders();
 		}
 
@@ -63,6 +67,21 @@ module app.library {
 						node.loading = false;
 					});
 			}
+		}
+
+		showCodePicker() {
+			var options : IModalSettings = {
+				templateUrl:'app/dialogs/codePicker/codePicker.html',
+				controller:'CodePickerController',
+				controllerAs:'codePicker',
+				size:'lg'
+			};
+
+			var dialog = this.$modal.open(options);
+			dialog.result.then(function(selectedItems : CodeSearchResult[]){
+				console.log('Dialog closed');
+				console.log(selectedItems);
+			});
 		}
 	}
 

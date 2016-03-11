@@ -92,7 +92,7 @@
 						<ul uib-dropdown-menu>
 							<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
 							<li><a href="#">Add list output</a></li>
-							<li><a href="#">Add code set</a></li>
+							<li><a ng-click="ctrl.showCodePicker()">Add code set</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="#">Add child folder</a></li>
 							<li role="separator" class="divider"></li>

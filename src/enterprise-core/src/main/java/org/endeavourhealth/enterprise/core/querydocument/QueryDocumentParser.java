@@ -1,5 +1,6 @@
-package org.endeavourhealth.enterprise.core.querydocument.models;
+package org.endeavourhealth.enterprise.core.querydocument;
 
+import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

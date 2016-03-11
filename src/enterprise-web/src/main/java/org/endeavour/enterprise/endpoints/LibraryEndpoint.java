@@ -3,6 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.entity.database.DbActiveItem;
 import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

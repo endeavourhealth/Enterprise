@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

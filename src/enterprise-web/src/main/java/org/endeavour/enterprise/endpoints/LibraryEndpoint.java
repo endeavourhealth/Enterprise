@@ -1,8 +1,8 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.entity.database.DbActiveItem;
-import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.endeavour.enterprise.model.database.DbActiveItem;
+import org.endeavour.enterprise.model.database.DbItem;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
@@ -71,6 +71,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         LOG.trace("SavingLibraryItem UUID {}, Name {} FolderUuid", libraryItemUuid, name, folderUuid);
 
+        //work out the item type (query, test etc.) from the content passed up
         DefinitionItemType type = null;
         if (query != null) {
             type = DefinitionItemType.Query;
@@ -86,18 +87,17 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             throw new BadRequestException("Can't save LibraryItem without some content (e.g. query, test etc.)");
         }
 
+        boolean inserting = libraryItemUuid == null;
+        if (inserting) {
+            libraryItemUuid = UUID.randomUUID();
+            libraryItem.setUuid(libraryItemUuid.toString());
+        }
+
         QueryDocument doc = new QueryDocument();
         doc.getLibraryItem().add(libraryItem);
         String xml = QueryDocumentParser.writeToXml(doc);
 
-        //validate the XML against the schema
-/*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(xsd));
-        javax.xml.validation.Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xml));*/
-
-
-        libraryItemUuid = super.saveItem(libraryItemUuid, orgUuid, userUuid, type, name, description, xml, folderUuid);
+        super.saveItem(inserting, libraryItemUuid, orgUuid, userUuid, type, name, description, doc, folderUuid);
 
         //return the UUID of the libraryItem
         LibraryItem ret = new LibraryItem();

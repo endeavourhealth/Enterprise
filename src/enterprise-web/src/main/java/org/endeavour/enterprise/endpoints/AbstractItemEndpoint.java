@@ -1,21 +1,21 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.entity.database.DbActiveItem;
-import org.endeavour.enterprise.entity.database.DbActiveItemDependency;
-import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.DependencyType;
+import org.endeavour.enterprise.model.database.DbActiveItem;
+import org.endeavour.enterprise.model.database.DbActiveItemDependency;
+import org.endeavour.enterprise.model.database.DbItem;
+import org.endeavour.enterprise.model.utility.QueryDocumentReaderFindDependentUuids;
+import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
+import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 
 import javax.ws.rs.BadRequestException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by Drew on 25/02/2016.
  */
 public abstract class AbstractItemEndpoint extends AbstractEndpoint {
-    private static Pattern guidRegex = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
     protected DbActiveItem retrieveActiveItem(UUID itemUuid, UUID orgUuid, DefinitionItemType itemTypeDesired) throws Exception {
 
@@ -84,12 +84,12 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         //save
         itemToDelete.saveToDbInsert(); //remember to always force an insert for items
 
-        //2016-03-01 DL - delete the ActiveItem
+        //delete the ActiveItem
         DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
         activeItem.deleteFromDb();
         //activeItem.saveToDb();
 
-        //2016-03-01 DL - delete the ActiveItemDependencies too
+        //delete the ActiveItemDependencies too
         List<DbActiveItemDependency> dependencies = DbActiveItemDependency.retrieveForItem(itemUuid);
         for (int i = 0; i < dependencies.size(); i++) {
             DbActiveItemDependency dependency = dependencies.get(i);
@@ -170,8 +170,8 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
     }
 
-    protected UUID saveItem(UUID itemUuid, UUID orgUuid, UUID userUuid, DefinitionItemType itemType,
-                            String name, String description, String xmlContent, UUID containingFolderUuid) throws Exception {
+    protected void saveItem(boolean insert, UUID itemUuid, UUID orgUuid, UUID userUuid, DefinitionItemType itemType,
+                            String name, String description, QueryDocument queryDocument, UUID containingFolderUuid) throws Exception {
 
         //validate the containing folder type matches the itemType we're saving
         validateItemTypeMatchesContainingFolder(itemType, containingFolderUuid);
@@ -179,7 +179,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         DbActiveItem activeItem = null;
         DbItem item = null;
 
-        if (itemUuid == null) {
+        if (insert) {
             //if creating a NEW item, we need to validate we have the content we need
             if (name == null) {
                 throw new BadRequestException("No name specified");
@@ -188,8 +188,8 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
                 //we can live without a description, but need a non-null value
                 description = "";
             }
-            if (xmlContent == null) {
-                throw new BadRequestException("No XmlContent specified");
+            if (queryDocument == null) {
+                throw new BadRequestException("No query document specified");
             }
             if (containingFolderUuid == null
                     && itemType != DefinitionItemType.LibraryFolder
@@ -201,11 +201,12 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
 
             activeItem = new DbActiveItem();
             activeItem.setOrganisationUuid(orgUuid);
-            //activeItem.setItemUuid(); //done after saving the item
+            activeItem.setItemUuid(itemUuid);
             activeItem.setVersion(firstVersion);
             activeItem.setItemTypeId(itemType);
 
             item = new DbItem();
+            item.setPrimaryUuid(itemUuid);
             item.setVersion(firstVersion);
         } else {
             activeItem = retrieveActiveItem(itemUuid, orgUuid, itemType);
@@ -228,23 +229,26 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         if (description != null) {
             item.setDescription(description);
         }
-        if (xmlContent != null) {
+        if (queryDocument != null) {
+            String xmlContent = QueryDocumentParser.writeToXml(queryDocument);
             item.setXmlContent(xmlContent);
         }
+
+        //build up a list of entities to save, so they can all be inserted atomically
+        /*List<DbAbstractTable> toSave = new ArrayList<>();
+
+        toSave.add(item);
+        toSave.*/
 
         //save the item first, as we need to do this to assign the UUID for it
         //force the insert every time, since we allow duplicate rows in the Item table for the same UUID
         item.saveToDbInsert();
 
-        //only after saving the item are we sure we've got a UUID, so get it and set on the activeItem
-        itemUuid = item.getPrimaryUuid();
-        activeItem.setItemUuid(itemUuid);
-
         //now we can save the active item
         activeItem.saveToDb();
 
         //if our XML has changed, update our dependencies that say we're USING other things
-        updateUsingDependencies(xmlContent, itemUuid);
+        updateUsingDependencies(queryDocument, itemUuid);
 
         //now work out the parent folder link
         DependencyType dependencyType = null;
@@ -282,27 +286,17 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             linkToParent.setItemUuid(containingFolderUuid);
             linkToParent.saveToDb();
         }
-
-        return itemUuid;
     }
 
-    private static HashSet<UUID> findUuidsInXml(String xml) {
-        HashSet<UUID> ret = new HashSet<>();
+    private static HashSet<UUID> findUuidsInXml(QueryDocument queryDocument) {
 
-        //for now, just pull out anything that looks like a UUID
-        Matcher m = guidRegex.matcher(xml);
-        while (m.find()) {
-            String uuidStr = m.group();
-            UUID uuid = UUID.fromString(uuidStr);
-            ret.add(uuid);
-        }
-
-        return ret;
+        QueryDocumentReaderFindDependentUuids reader = new QueryDocumentReaderFindDependentUuids(queryDocument);
+        return reader.findUuids();
     }
 
-    private static void updateUsingDependencies(String xml, UUID itemUuid) throws Exception {
+    private static void updateUsingDependencies(QueryDocument queryDocument, UUID itemUuid) throws Exception {
 
-        if (xml == null) {
+        if (queryDocument == null) {
             return;
         }
 
@@ -316,7 +310,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
 
         //find all the UUIDs in the XML and then see if we need to create or delete dependencies
-        HashSet<UUID> usingUuids = findUuidsInXml(xml);
+        HashSet<UUID> usingUuids = findUuidsInXml(queryDocument);
 
         Iterator<UUID> iter = usingUuids.iterator();
         while (iter.hasNext()) {

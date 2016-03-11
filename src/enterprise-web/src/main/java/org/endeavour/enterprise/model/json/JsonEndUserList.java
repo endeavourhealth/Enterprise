@@ -1,8 +1,8 @@
-package org.endeavour.enterprise.entity.json;
+package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavour.enterprise.entity.database.DbEndUser;
 import org.endeavour.enterprise.model.EndUserRole;
+import org.endeavour.enterprise.model.database.DbEndUser;
 
 import java.io.Serializable;
 import java.util.ArrayList;

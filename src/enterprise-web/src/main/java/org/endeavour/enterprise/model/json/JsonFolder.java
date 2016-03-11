@@ -1,7 +1,7 @@
-package org.endeavour.enterprise.entity.json;
+package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavour.enterprise.entity.database.DbItem;
+import org.endeavour.enterprise.model.database.DbItem;
 
 import java.io.Serializable;
 import java.util.UUID;

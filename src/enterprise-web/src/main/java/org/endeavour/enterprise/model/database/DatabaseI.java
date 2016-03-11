@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.DependencyType;
@@ -13,9 +13,15 @@ public interface DatabaseI {
     //generic read/write functions
     public void writeUpdate(DbAbstractTable entity) throws Exception;
 
+    public void writeUpdate(List<DbAbstractTable> entities) throws Exception;
+
     public void writeInsert(DbAbstractTable entity) throws Exception;
 
+    public void writeInsert(List<DbAbstractTable> entities) throws Exception;
+
     public void writeDelete(DbAbstractTable entity) throws Exception;
+
+    public void writeDelete(List<DbAbstractTable> entities) throws Exception;
 
     public DbAbstractTable retrieveForPrimaryKeys(TableAdapter a, Object... keys) throws Exception;
 

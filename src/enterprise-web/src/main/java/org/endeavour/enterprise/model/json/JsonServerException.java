@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.json;
+package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

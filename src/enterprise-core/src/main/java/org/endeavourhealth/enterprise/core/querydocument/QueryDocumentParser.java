@@ -46,6 +46,14 @@ public abstract class QueryDocumentParser {
             throw new RuntimeException(e);
         }
 
+        //validate the XML against the schema
+/*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = factory.newSchema(new StreamSource(xsd));
+        javax.xml.validation.Validator validator = schema.newValidator();
+        validator.validate(new StreamSource(xml));*/
+
+
+
         return sw.toString();
     }
 

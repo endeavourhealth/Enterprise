@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 
@@ -29,21 +29,15 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     }
 
     public static List<DbEndUserEmailInvite> retrieveForEndUserNotCompleted(UUID userUuid) throws Exception {
-        //2016-02-29 DL - changed how we write
         return DatabaseManager.db().retrieveEndUserEmailInviteForUserNotCompleted(userUuid);
-        //return adapter.retrieveEntities("Administration.EndUserEmailInvite_SelectForEndUserNotCompleted", userUuid);
     }
 
     public static DbEndUserEmailInvite retrieveForToken(String token) throws Exception {
-        //2016-02-29 DL - changed how we write
         return DatabaseManager.db().retrieveEndUserEmailInviteForToken(token);
-        //return (DbEndUserEmailInvite)adapter.retrieveSingleEntity("Administration.EndUserEmailInvite_SelectForTokenNotCompleted", token);
     }
 
     public static DbEndUserEmailInvite retrieveForUuid(UUID uuid) throws Exception {
-        //2016-02-29 DL - changed how we write
         return (DbEndUserEmailInvite) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
-        //return (DbEndUserEmailInvite)adapter.retrieveSingleEntity("Administration._EndUserEmailInvite_SelectForUuid", uuid);
     }
 
     @Override

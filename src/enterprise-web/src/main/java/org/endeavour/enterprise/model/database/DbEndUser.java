@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 
@@ -29,15 +29,11 @@ public final class DbEndUser extends DbAbstractTable {
     }
 
     public static DbEndUser retrieveForEmail(String email) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbEndUser) DatabaseManager.db().retrieveEndUserForEmail(email);
-        //return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForEmail", email);
     }
 
     public static DbEndUser retrieveForUuid(UUID uuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbEndUser) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
-        //return (DbEndUser)adapter.retrieveSingleEntity("Administration._EndUser_SelectForUuid", uuid);
     }
 
     public static List<DbEndUser> retrieveSuperUsers() throws Exception {

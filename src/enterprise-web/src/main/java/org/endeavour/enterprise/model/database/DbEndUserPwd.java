@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 
@@ -29,15 +29,11 @@ public class DbEndUserPwd extends DbAbstractTable {
     }
 
     public static DbEndUserPwd retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbEndUserPwd) DatabaseManager.db().retrieveEndUserPwdForUserNotExpired(endUserUuid);
-        //return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration.EndUserPwd_SelectForEndUserNotExpired", endUserUuid);
     }
 
     public static DbEndUserPwd retrieveForUuid(UUID uuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbEndUserPwd) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
-        //return (DbEndUserPwd)adapter.retrieveSingleEntity("Administration._EndUserPwd_SelectForUuid", uuid);
     }
 
     @Override

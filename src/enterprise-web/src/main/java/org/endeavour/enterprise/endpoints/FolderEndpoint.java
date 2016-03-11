@@ -1,14 +1,16 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.entity.database.DbActiveItem;
-import org.endeavour.enterprise.entity.database.DbActiveItemDependency;
-import org.endeavour.enterprise.entity.database.DbItem;
-import org.endeavour.enterprise.entity.json.JsonFolder;
-import org.endeavour.enterprise.entity.json.JsonFolderContent;
-import org.endeavour.enterprise.entity.json.JsonFolderContentsList;
-import org.endeavour.enterprise.entity.json.JsonFolderList;
 import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.DependencyType;
+import org.endeavour.enterprise.model.database.DbActiveItem;
+import org.endeavour.enterprise.model.database.DbActiveItemDependency;
+import org.endeavour.enterprise.model.database.DbItem;
+import org.endeavour.enterprise.model.json.JsonFolder;
+import org.endeavour.enterprise.model.json.JsonFolderContent;
+import org.endeavour.enterprise.model.json.JsonFolderContentsList;
+import org.endeavour.enterprise.model.json.JsonFolderList;
+import org.endeavourhealth.enterprise.core.querydocument.models.Folder;
+import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +94,21 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             }
         }
 
-        folderUuid = super.saveItem(folderUuid, orgUuid, userUuid, itemType, folderName, "", "", parentUuid);
+        boolean inserting = folderUuid == null;
+        if (inserting) {
+            folderUuid = UUID.randomUUID();
+        }
+
+        Folder folder = new Folder();
+        folder.setUuid(folderUuid.toString());
+        folder.setName(folderName);
+        if (parentUuid != null) {
+            folder.setParentUuid(parentUuid.toString());
+        }
+        QueryDocument doc = new QueryDocument();
+        doc.getFolder().add(folder);
+
+        super.saveItem(inserting, folderUuid, orgUuid, userUuid, itemType, folderName, "", doc, parentUuid);
 
         //return the UUID of the folder we just saved or updated
         JsonFolder ret = new JsonFolder();
@@ -256,33 +272,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         return Response.ok().build();
     }
-    /*private static void deleteFolderAndContents(DbFolder folder) throws Exception
-    {
-        //see if we have any child folders, which we should delete first
-        UUID orgUuid = folder.getOrganisationUuid();
-        UUID parentUuid = folder.getPrimaryUuid();
-        int folderType = folder.getFolderType();
-        List<DbFolder> childFolders = DbFolder.retrieveForOrganisationParentType(orgUuid, parentUuid, folderType);
-        for (int i=0; i<childFolders.size(); i++)
-        {
-            DbFolder childFolder = childFolders.get(i);
-            deleteFolderAndContents(childFolder);
-        }
 
-        //retrieve the link entities for the folder and delete them
-        UUID folderUuid = folder.getPrimaryUuid();
-        List<DbFolderItemLink> links = DbFolderItemLink.retrieveForFolder(folderUuid);
-        for (int i=0; i<links.size(); i++)
-        {
-            DbFolderItemLink link = links.get(i);
-            link.deleteFromDb();
-
-            //TODO: 2016-02-22 DL - actually delete item after delting folderItemLink
-        }
-
-        //now our folder is empty
-        folder.deleteFromDb();
-    }*/
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

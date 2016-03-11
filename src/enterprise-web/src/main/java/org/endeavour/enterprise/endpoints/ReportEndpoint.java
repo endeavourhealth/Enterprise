@@ -1,8 +1,8 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.entity.database.DbActiveItem;
-import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.endeavour.enterprise.model.database.DbActiveItem;
+import org.endeavour.enterprise.model.database.DbItem;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
@@ -66,11 +66,16 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("SavingReport UUID {}, Name {} FolderUuid", reportUuid, name, folderUuid);
 
+        boolean inserting = reportUuid == null;
+        if (inserting) {
+            reportUuid = UUID.randomUUID();
+            report.setUuid(reportUuid.toString());
+        }
+
         QueryDocument doc = new QueryDocument();
         doc.getReport().add(report);
-        String xml = QueryDocumentParser.writeToXml(doc);
 
-        reportUuid = super.saveItem(reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, xml, folderUuid);
+        super.saveItem(inserting, reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, doc, folderUuid);
 
         //return the UUID of the query
         Report ret = new Report();

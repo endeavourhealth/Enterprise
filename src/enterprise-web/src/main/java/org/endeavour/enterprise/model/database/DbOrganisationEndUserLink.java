@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 import org.endeavour.enterprise.model.EndUserRole;
@@ -31,36 +31,19 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     }
 
     public static List<DbOrganisationEndUserLink> retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveOrganisationEndUserLinksForUserNotExpired(endUserUuid);
-        //return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForEndUserNotExpired", endUserUuid);
     }
 
     public static DbOrganisationEndUserLink retrieveForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(organisationUuid, endUserUuid);
-        /*List<DbAbstractTable> v = retrieveForEndUserNotExpired(endUserUuid);
-        for (int i=0; i<v.size(); i++)
-        {
-            DbOrganisationEndUserLink link = (DbOrganisationEndUserLink)v.get(i);
-            if (link.getOrganisationUuid().equals(organisationUuid))
-            {
-                return link;
-            }
-        }
-        return null;*/
     }
 
     public static List<DbOrganisationEndUserLink> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveOrganisationEndUserLinksForOrganisationNotExpired(organisationUuid);
-        //return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForOrganisationNotExpired", organisationUuid);
     }
 
     public static DbOrganisationEndUserLink retrieveForUuid(UUID uuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbOrganisationEndUserLink) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
-        //return (DbOrganisationEndUserLink)adapter.retrieveSingleEntity("Administration._OrganisationEndUserLink_SelectForUuid", uuid);
     }
 
     @Override

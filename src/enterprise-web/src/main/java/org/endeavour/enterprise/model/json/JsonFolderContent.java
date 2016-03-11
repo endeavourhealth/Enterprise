@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.json;
+package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavour.enterprise.model.DefinitionItemType;
@@ -14,7 +14,7 @@ import java.util.UUID;
 public final class JsonFolderContent implements Serializable {
     private UUID uuid = null;
     private Integer type = null;
-    private String typeDesc = null; //2016-03-01 DL - to make it easier to display
+    private String typeDesc = null;
     private String name = null;
     private Date lastModified = null;
     private Date lastRun = null; //only applicable when showing reports

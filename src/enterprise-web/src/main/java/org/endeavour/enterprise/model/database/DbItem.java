@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 import org.endeavour.enterprise.model.DefinitionItemType;
@@ -25,7 +25,6 @@ public final class DbItem extends DbAbstractTable {
     private UUID endUserUuid = null;
     private Date timeStamp = null;
     private boolean isDeleted = false;
-    //private DefinitionItemType itemType = null; //2016-02-29 DL - this can never change, so is on the ActiveItem entity
 
     public DbItem() {
     }
@@ -39,14 +38,8 @@ public final class DbItem extends DbAbstractTable {
         return ret;
     }
 
-    /*public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception
-    {
-        return (DbItem)adapter.retrieveSingleEntity("Definition.Item_SelectForUuidVersion", uuid, version);
-    }*/
     public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbItem) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid, new Integer(version));
-        //return (DbItem)adapter.retrieveSingleEntity("Definition._Item_SelectForUuid", uuid);
     }
 
     public static DbItem retrieveForUuidLatestVersion(UUID organisationUuid, UUID uuid) throws Exception {

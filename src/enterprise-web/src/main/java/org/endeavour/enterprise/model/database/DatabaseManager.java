@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by Drew on 29/02/2016.
  */
 public final class DatabaseManager {
-    private static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class); //2016-02-24 DL - logging
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);
 
     //singleton
     private static DatabaseManager ourInstance = new DatabaseManager();

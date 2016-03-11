@@ -1,14 +1,14 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.entity.database.*;
-import org.endeavour.enterprise.entity.json.JsonEmailInviteParameters;
-import org.endeavour.enterprise.entity.json.JsonEndUser;
-import org.endeavour.enterprise.entity.json.JsonOrganisation;
-import org.endeavour.enterprise.entity.json.JsonOrganisationList;
 import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.model.EndUserRole;
+import org.endeavour.enterprise.model.database.*;
+import org.endeavour.enterprise.model.json.JsonEmailInviteParameters;
+import org.endeavour.enterprise.model.json.JsonEndUser;
+import org.endeavour.enterprise.model.json.JsonOrganisation;
+import org.endeavour.enterprise.model.json.JsonOrganisationList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,7 +167,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //issue a new cookie, with the newly selected organisation
         NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, role);
 
-        //2016-02-29 DL - may as well return the full org details and the user's role at this place
+        //return the full org details and the user's role at this place
         JsonOrganisation ret = new JsonOrganisation(org, role);
 
         return Response

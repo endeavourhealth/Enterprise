@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 import org.endeavour.enterprise.model.DefinitionItemType;
@@ -44,13 +44,10 @@ public final class DbActiveItem extends DbAbstractTable {
 
     public static DbActiveItem retrieveForItemUuid(UUID itemUuid) throws Exception {
         return (DbActiveItem) DatabaseManager.db().retrieveActiveItemForItemUuid(itemUuid);
-        //return (DbActiveItem)adapter.retrieveSingleEntity("Definition.ActiveItem_SelectForItemUuid", itemUuid);
     }
 
     public static DbActiveItem retrieveForUuid(UUID uuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbActiveItem) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
-        //return (DbActiveItem)adapter.retrieveSingleEntity("Definition._ActiveItem_SelectForUuid", uuid);
     }
 
     public static int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception {

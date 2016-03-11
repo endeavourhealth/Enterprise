@@ -1,6 +1,6 @@
 package org.endeavour.enterprise.framework.exceptions;
 
-import org.endeavour.enterprise.entity.json.JsonServerException;
+import org.endeavour.enterprise.model.json.JsonServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,12 +11,8 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public final class BaseExceptionMapper implements ExceptionMapper<Exception> {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseExceptionMapper.class); //2016-02-24 DL - logging
+    private static final Logger LOG = LoggerFactory.getLogger(BaseExceptionMapper.class);
 
-    /**
-     * 2016-02-17 DL - rewriting to be a bit more concise
-     * and also to pass the exception message back with the error code
-     */
     public Response toResponse(Exception exception) {
         Response.ResponseBuilder r = null;
 
@@ -33,7 +29,6 @@ public final class BaseExceptionMapper implements ExceptionMapper<Exception> {
         //if it's some other kind of exception (e.g. SQLException) that's got this far
         else {
             //log on the server too, since these are unexpected
-            //2016-02-24 DL - use logback now
             LOG.error(null, exception);
 
             r = Response.status(Response.Status.INTERNAL_SERVER_ERROR);

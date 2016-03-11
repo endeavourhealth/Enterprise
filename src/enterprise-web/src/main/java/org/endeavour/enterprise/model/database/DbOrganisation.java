@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.entity.database;
+package org.endeavour.enterprise.model.database;
 
 import org.endeavour.enterprise.model.DatabaseName;
 
@@ -43,15 +43,11 @@ public final class DbOrganisation extends DbAbstractTable {
     }
 
     public static List<DbOrganisation> retrieveForAll() throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveAllOrganisations();
-        //return adapter.retrieveEntities("Administration.Organisation_SelectForAll");
     }
 
     public static DbOrganisation retrieveForUuid(UUID uuid) throws Exception {
-        //2016-02-29 DL - changed how we connect to db
         return (DbOrganisation) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
-        //return (DbOrganisation)adapter.retrieveSingleEntity("Administration._Organisation_SelectForUuid", uuid);
     }
 
     public static DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception {

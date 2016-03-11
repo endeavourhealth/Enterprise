@@ -8,6 +8,7 @@ module app.core {
 	import ItemSummaryList = app.models.ItemSummaryList;
 	import FolderNode = app.models.FolderNode;
 	import ITreeNode = AngularUITree.ITreeNode;
+	import Report = app.models.Report;
 	'use strict';
 
 	export interface ILibraryService {
@@ -19,6 +20,7 @@ module app.core {
 		getCodeTreeData(code : string):ng.IPromise<ITreeNode[]>;
 		getFolders(moduleId : number, folderUuid : string):ng.IPromise<FolderNode[]>;
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
+		saveReport(report : Report):ng.IPromise<string>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -156,6 +158,20 @@ module app.core {
 			return defer.promise;
 		}
 
+		saveReport(report: Report):ng.IPromise<string> {
+			var vm = this;
+			var defer = vm.promise.defer();
+
+			vm.http.post('api/report/saveReport', report)
+				.then(function(response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
 	}
 
 	angular

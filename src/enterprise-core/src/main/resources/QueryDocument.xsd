@@ -75,6 +75,7 @@
 		<xs:sequence>
 			<xs:element name="uuid" type="xs:string"/>
 			<xs:element name="name" type="xs:string"/>
+			<xs:element name="description" type="xs:string"/>
 			<xs:element name="folderUuid" type="xs:string"/>
 			<xs:element name="query" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>

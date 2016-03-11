@@ -13,8 +13,7 @@ module app.reports {
 	import FolderItem = app.models.FolderItem;
 	import ReportNode = app.models.ReportNode;
 	import ItemType = app.models.ItemType;
-	import ReportDb = app.models.ReportDb;
-	import ReportXml = app.models.ReportXml;
+	import Report = app.models.Report;
 	import Query = app.models.Query;
 	import ListOutput = app.models.ListOutput;
 	'use strict';
@@ -23,7 +22,7 @@ module app.reports {
 		treeData : FolderNode[];
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
-		report : ReportDb;
+		report : Report;
 		reportContent : ReportNode[];
 		contentTreeCallbackOptions : any;
 
@@ -58,9 +57,9 @@ module app.reports {
 				uuid: this.uuid.v4(),
 				name: 'New report',
 				description: '',
-				xmlContent: '',
 				folderUuid: folderUuid,
-				isDeleted: false
+				query: [],
+				listOutput: []
 			};
 			this.reportContent = [];
 		}
@@ -70,37 +69,39 @@ module app.reports {
 		}
 
 		saveReport() {
-			// Generate ReportXML object
-			var reportXml : ReportXml = <ReportXml>{};
-			reportXml.uuid = this.report.uuid;
-			reportXml.name = this.report.name;
-			reportXml.folderUuid = this.report.folderUuid;
-			reportXml.query = [];
-			reportXml.listOutput = [];
-			this.populateReportXmlFromTreeNodes(reportXml, '', this.reportContent);
+			var vm = this;
+			vm.report.query = [];
+			vm.report.listOutput = [];
+			vm.populateReportListsFromTree(vm.report, '', vm.reportContent);
 
-			// convert to XML
-			console.log(reportXml);
+			vm.libraryService.saveReport(vm.report)
+				.then(function (data) {
+					vm.report.uuid = data;
+					vm.logger.success('Report saved', vm.report, 'Saved');
+				})
+				.catch(function(data) {
+					vm.logger.error('Error saving report', data, 'Error');
+				});
 		}
 
-		populateReportXmlFromTreeNodes(reportXml : ReportXml, parentUuid : string, nodes : ReportNode[]) {
+		populateReportListsFromTree(report : Report, parentUuid : string, nodes : ReportNode[]) {
 			for (var i = 0; i < nodes.length; i++) {
 				switch (nodes[i].type) {
 					case ItemType.Query:
 						var query : Query = <Query>{};
 						query.uuid = nodes[i].uuid;
 						query.parentUuid = parentUuid;
-						reportXml.query.push(query);
+						report.query.push(query);
 						break;
 					case ItemType.ListOutput:
 						var listOutput : ListOutput = <ListOutput>{};
 						listOutput.uuid = nodes[i].uuid;
 						listOutput.parentUuid = parentUuid;
-						reportXml.listOutput.push(listOutput);
+						report.listOutput.push(listOutput);
 						break;
 				}
 				if (nodes[i].children && nodes[i].children.length > 0) {
-					this.populateReportXmlFromTreeNodes(reportXml, nodes[i].uuid, nodes[i].children);
+					this.populateReportListsFromTree(report, nodes[i].uuid, nodes[i].children);
 				}
 			}
 		}

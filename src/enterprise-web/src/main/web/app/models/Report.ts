@@ -1,20 +1,12 @@
 module app.models {
 	'use strict';
 
-	class ReportSummary {
+	export class Report {
 		uuid:string;
 		name:string;
+		description:string;
 		folderUuid:string;
-	}
-
-	export class ReportXml extends ReportSummary {
 		query:Query[];
 		listOutput:ListOutput[];
-	}
-
-	export class ReportDb extends ReportSummary {
-		description : string;
-		xmlContent : string;
-		isDeleted : boolean;
 	}
 }

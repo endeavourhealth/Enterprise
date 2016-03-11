@@ -11,8 +11,7 @@ import java.util.UUID;
  * Created by Drew on 25/02/2016.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonFolderContent implements Serializable
-{
+public final class JsonFolderContent implements Serializable {
     private UUID uuid = null;
     private Integer type = null;
     private String typeDesc = null; //2016-03-01 DL - to make it easier to display
@@ -21,13 +20,11 @@ public final class JsonFolderContent implements Serializable
     private Date lastRun = null; //only applicable when showing reports
     private Boolean isScheduled = null; //only applicable when showing reports
 
-    public JsonFolderContent()
-    {
+    public JsonFolderContent() {
 
     }
 
-    public void setTypeEnum(DefinitionItemType t)
-    {
+    public void setTypeEnum(DefinitionItemType t) {
         setType(t.getValue());
         setTypeDesc(t.toString());
     }

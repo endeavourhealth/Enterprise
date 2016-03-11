@@ -23,18 +23,16 @@ public final class JsonFolder implements Serializable {
     private Boolean hasChildren = null;
     private Integer contentCount = null;
 
-    public JsonFolder()
-    {
+    public JsonFolder() {
     }
-    public JsonFolder(DbItem item, int contentCount, boolean hasChildren)
-    {
+
+    public JsonFolder(DbItem item, int contentCount, boolean hasChildren) {
         this.uuid = item.getPrimaryUuid();
         this.folderName = item.getTitle();
 
         this.hasChildren = hasChildren;
 
-        if (contentCount > 0)
-        {
+        if (contentCount > 0) {
             this.contentCount = new Integer(contentCount);
         }
     }

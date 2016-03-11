@@ -15,41 +15,34 @@ public final class ResultReader {
     private ResultSet rs = null;
     private int currentCol = FIRST_COL;
 
-    public ResultReader(ResultSet rs)
-    {
+    public ResultReader(ResultSet rs) {
         this.rs = rs;
     }
 
-    public String readString() throws SQLException
-    {
+    public String readString() throws SQLException {
         return rs.getString(currentCol++);
     }
 
-    public int readInt() throws SQLException
-    {
+    public int readInt() throws SQLException {
         return rs.getInt(currentCol++);
     }
 
-    public UUID readUuid() throws SQLException
-    {
+    public UUID readUuid() throws SQLException {
         String uuidString = rs.getString(currentCol++);
 
         //UUID may be null
         return uuidString == null ? null : UUID.fromString(uuidString);
     }
 
-    public boolean readBoolean() throws SQLException
-    {
+    public boolean readBoolean() throws SQLException {
         return rs.getBoolean(currentCol++);
     }
 
-    public Date readDateTime() throws SQLException
-    {
+    public Date readDateTime() throws SQLException {
         return rs.getDate(currentCol++);
     }
 
-    public boolean nextResult() throws SQLException
-    {
+    public boolean nextResult() throws SQLException {
         currentCol = FIRST_COL;
         return rs.next();
     }

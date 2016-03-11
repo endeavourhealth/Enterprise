@@ -11,8 +11,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 29/02/2016.
  */
-public final class DbActiveItemDependency extends DbAbstractTable
-{
+public final class DbActiveItemDependency extends DbAbstractTable {
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbActiveItemDependency.class, "ActiveItemDependency", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
             "ActiveItemDependencyUuid,ItemUuid,DependentItemUuid,DependencyTypeId", "ActiveItemDependencyUuid");
@@ -21,8 +20,8 @@ public final class DbActiveItemDependency extends DbAbstractTable
     private UUID dependentItemUuid = null;
     private DependencyType dependencyTypeId = null;
 
-    public DbActiveItemDependency()
-    {}
+    public DbActiveItemDependency() {
+    }
 
     /*public static DbActiveItemDependency factoryNew(DbItem item, DbItem dependentItem, DependencyType dependencyType)
     {
@@ -46,33 +45,30 @@ public final class DbActiveItemDependency extends DbAbstractTable
         return ret;
     }*/
 
-    public static List<DbActiveItemDependency> retrieveForItem(UUID itemUuid) throws Exception
-    {
+    public static List<DbActiveItemDependency> retrieveForItem(UUID itemUuid) throws Exception {
         return DatabaseManager.db().retrieveActiveItemDependenciesForItem(itemUuid);
     }
-    public static List<DbActiveItemDependency> retrieveForItemType(UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+
+    public static List<DbActiveItemDependency> retrieveForItemType(UUID itemUuid, DependencyType dependencyType) throws Exception {
         return DatabaseManager.db().retrieveActiveItemDependenciesForItemType(itemUuid, dependencyType);
     }
-    public static List<DbActiveItemDependency> retrieveForDependentItem(UUID dependentItemUuid) throws Exception
-    {
+
+    public static List<DbActiveItemDependency> retrieveForDependentItem(UUID dependentItemUuid) throws Exception {
         return DatabaseManager.db().retrieveActiveItemDependenciesForDependentItem(dependentItemUuid);
     }
-    public static List<DbActiveItemDependency> retrieveForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception
-    {
+
+    public static List<DbActiveItemDependency> retrieveForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception {
         return DatabaseManager.db().retrieveActiveItemDependenciesForDependentItemType(dependentItemUuid, dependencyType);
     }
 
 
     @Override
-    public TableAdapter getAdapter()
-    {
+    public TableAdapter getAdapter() {
         return adapter;
     }
 
     @Override
-    public void writeForDb(ArrayList<Object> builder)
-    {
+    public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(itemUuid);
         builder.add(dependentItemUuid);
@@ -80,8 +76,7 @@ public final class DbActiveItemDependency extends DbAbstractTable
     }
 
     @Override
-    public void readFromDb(ResultReader reader) throws SQLException
-    {
+    public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         itemUuid = reader.readUuid();
         dependentItemUuid = reader.readUuid();

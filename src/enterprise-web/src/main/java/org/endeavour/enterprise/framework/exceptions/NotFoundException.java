@@ -2,8 +2,7 @@ package org.endeavour.enterprise.framework.exceptions;
 
 import javax.ws.rs.core.Response;
 
-public class NotFoundException extends MappedException
-{
+public class NotFoundException extends MappedException {
     public NotFoundException() {
         super();
     }
@@ -13,8 +12,7 @@ public class NotFoundException extends MappedException
     }
 
     @Override
-    public Response.Status getResponseStatus()
-    {
+    public Response.Status getResponseStatus() {
         return Response.Status.NOT_FOUND;
     }
 }

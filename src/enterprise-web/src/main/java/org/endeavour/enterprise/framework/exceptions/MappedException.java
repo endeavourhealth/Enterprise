@@ -2,8 +2,7 @@ package org.endeavour.enterprise.framework.exceptions;
 
 import javax.ws.rs.core.Response;
 
-public abstract class MappedException extends Exception
-{
+public abstract class MappedException extends Exception {
     public MappedException() {
         super();
     }

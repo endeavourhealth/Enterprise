@@ -17,8 +17,7 @@ import java.util.concurrent.Executor;
  * Created by Drew on 29/02/2016.
  * Database implementation for SQL Server. To support other DB types, create a new sub-class of DatabaseI
  */
-public final class SqlServerDatabase implements DatabaseI
-{
+public final class SqlServerDatabase implements DatabaseI {
     private static final Logger LOG = LoggerFactory.getLogger(SqlServerDatabase.class);
     private static final String ALIAS = "z";
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -28,62 +27,39 @@ public final class SqlServerDatabase implements DatabaseI
     /**
      * converts objects to Strings for SQL, escaping as required
      */
-    private static String convertToString(Object o)
-    {
-        if (o == null)
-        {
+    private static String convertToString(Object o) {
+        if (o == null) {
             return "'null'";
-        }
-        else if (o instanceof String)
-        {
-            String s = ((String)o).replaceAll("'", "''");
+        } else if (o instanceof String) {
+            String s = ((String) o).replaceAll("'", "''");
             return "'" + s + "'";
-        }
-        else if (o instanceof Integer)
-        {
-            return "" + ((Integer)o).intValue();
-        }
-        else if (o instanceof UUID)
-        {
-            return "'" + ((UUID)o).toString() + "'";
-        }
-        else if (o instanceof Boolean)
-        {
-            if (((Boolean)o).booleanValue())
-            {
+        } else if (o instanceof Integer) {
+            return "" + ((Integer) o).intValue();
+        } else if (o instanceof UUID) {
+            return "'" + ((UUID) o).toString() + "'";
+        } else if (o instanceof Boolean) {
+            if (((Boolean) o).booleanValue()) {
                 return "1";
-            }
-            else
-            {
+            } else {
                 return "0";
             }
-        }
-        else if (o instanceof Date)
-        {
+        } else if (o instanceof Date) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
-            return "'" + dateFormatter.format((Date)o) + "'";
-        }
-        else if (o instanceof DependencyType)
-        {
-            return "" + ((DependencyType)o).getValue();
-        }
-        else if (o instanceof DefinitionItemType)
-        {
-            return "" + ((DefinitionItemType)o).getValue();
-        }
-        else
-        {
+            return "'" + dateFormatter.format((Date) o) + "'";
+        } else if (o instanceof DependencyType) {
+            return "" + ((DependencyType) o).getValue();
+        } else if (o instanceof DefinitionItemType) {
+            return "" + ((DefinitionItemType) o).getValue();
+        } else {
             LOG.error("Unsupported entity for database", o.getClass());
             return null;
         }
     }
 
-    private int executeScalarCountQuery(String sql, String databaseName) throws Exception
-    {
+    private int executeScalarCountQuery(String sql, String databaseName) throws Exception {
         Connection connection = getConnection(databaseName);
         Statement s = connection.createStatement();
-        try
-        {
+        try {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
 
@@ -94,9 +70,7 @@ public final class SqlServerDatabase implements DatabaseI
             returnConnection(connection);
 
             return ret;
-        }
-        catch (SQLException sqlEx)
-        {
+        } catch (SQLException sqlEx) {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
@@ -106,10 +80,8 @@ public final class SqlServerDatabase implements DatabaseI
      * 2016-03-02 DL - very basic connection pooling, as it's way too slow running against Azure when
      * we keep creating connections
      */
-    private synchronized Connection getConnection(String databaseName) throws ClassNotFoundException, SQLException
-    {
-        try
-        {
+    private synchronized Connection getConnection(String databaseName) throws ClassNotFoundException, SQLException {
+        try {
             while (true) {
                 PoolableConnection connection = connectionPool.pop();
 
@@ -118,9 +90,8 @@ public final class SqlServerDatabase implements DatabaseI
                     return connection;
                 }
             }
+        } catch (NoSuchElementException nsee) {
         }
-        catch (NoSuchElementException nsee)
-        {}
 
         //if we get here, the pool didn't have one, so just create a new one
         Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
@@ -131,8 +102,8 @@ public final class SqlServerDatabase implements DatabaseI
 
         return new PoolableConnection(conn, expiry, Configuration.DB_CONNECTION_LIVES);
     }
-    private synchronized void returnConnection(Connection connection) throws SQLException
-    {
+
+    private synchronized void returnConnection(Connection connection) throws SQLException {
         //if the connection has been closed discard it
         if (connection.isClosed()) {
             LOG.trace("Discarded returning DB connection as it's already closed");
@@ -148,17 +119,16 @@ public final class SqlServerDatabase implements DatabaseI
         }
 
         //if the connection is too old, or has been used too many times, close and discard
-        PoolableConnection poolable = (PoolableConnection)connection;
+        PoolableConnection poolable = (PoolableConnection) connection;
         int lives = poolable.getLives();
         long expiry = poolable.getExpiry();
 
         //decrement the lives
-        lives --;
+        lives--;
         poolable.setLives(lives);
 
         if (lives <= 0
-                || expiry < System.currentTimeMillis())
-        {
+                || expiry < System.currentTimeMillis()) {
             LOG.trace("Discarded returning DB connection with lives {} and expiry {}", lives, expiry);
             connection.close();
             return;
@@ -184,8 +154,7 @@ public final class SqlServerDatabase implements DatabaseI
 
 
     @Override
-    public void writeUpdate(DbAbstractTable entity) throws Exception
-    {
+    public void writeUpdate(DbAbstractTable entity) throws Exception {
         TableAdapter a = entity.getAdapter();
 
         ArrayList<Object> values = new ArrayList<Object>();
@@ -197,8 +166,7 @@ public final class SqlServerDatabase implements DatabaseI
         List<String> nonKeyCols = new ArrayList<String>();
         HashMap<String, String> hmColValues = new HashMap<String, String>();
 
-        for (int i=0; i<cols.length; i++)
-        {
+        for (int i = 0; i < cols.length; i++) {
             String col = cols[i];
             Object value = values.get(i);
             String s = convertToString(value);
@@ -207,17 +175,14 @@ public final class SqlServerDatabase implements DatabaseI
 
             //see if a primary key column
             boolean isPrimaryKey = false;
-            for (int j=0; j<primaryKeyCols.length; j++)
-            {
+            for (int j = 0; j < primaryKeyCols.length; j++) {
                 String primaryKeyCol = primaryKeyCols[j];
-                if (col.equalsIgnoreCase(primaryKeyCol))
-                {
+                if (col.equalsIgnoreCase(primaryKeyCol)) {
                     isPrimaryKey = true;
                     break;
                 }
             }
-            if (!isPrimaryKey)
-            {
+            if (!isPrimaryKey) {
                 nonKeyCols.add(col);
             }
         }
@@ -229,13 +194,11 @@ public final class SqlServerDatabase implements DatabaseI
         sb.append(a.getTableName());
         sb.append(" SET ");
 
-        for (int i=0; i<nonKeyCols.size(); i++)
-        {
+        for (int i = 0; i < nonKeyCols.size(); i++) {
             String nonKeyCol = nonKeyCols.get(i);
             String val = hmColValues.get(nonKeyCol);
 
-            if (i>0)
-            {
+            if (i > 0) {
                 sb.append(", ");
             }
 
@@ -246,13 +209,11 @@ public final class SqlServerDatabase implements DatabaseI
 
         sb.append(" WHERE ");
 
-        for (int i=0; i<primaryKeyCols.length; i++)
-        {
+        for (int i = 0; i < primaryKeyCols.length; i++) {
             String primaryKeyCol = primaryKeyCols[i];
             String val = hmColValues.get(primaryKeyCol);
 
-            if (i>0)
-            {
+            if (i > 0) {
                 sb.append("AND ");
             }
 
@@ -266,23 +227,19 @@ public final class SqlServerDatabase implements DatabaseI
         Connection connection = getConnection(a.getDatabase());
         Statement s = connection.createStatement();
 
-        try
-        {
+        try {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
 
             returnConnection(connection);
-        }
-        catch (SQLException sqlEx)
-        {
+        } catch (SQLException sqlEx) {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
     }
 
     @Override
-    public void writeInsert(DbAbstractTable entity) throws Exception
-    {
+    public void writeInsert(DbAbstractTable entity) throws Exception {
         TableAdapter a = entity.getAdapter();
 
         StringBuilder sb = new StringBuilder();
@@ -295,12 +252,10 @@ public final class SqlServerDatabase implements DatabaseI
         ArrayList<Object> values = new ArrayList<Object>();
         entity.writeForDb(values);
 
-        for (int i=0; i<values.size(); i++)
-        {
+        for (int i = 0; i < values.size(); i++) {
             Object value = values.get(i);
 
-            if (i>0)
-            {
+            if (i > 0) {
                 sb.append(", ");
             }
 
@@ -315,23 +270,19 @@ public final class SqlServerDatabase implements DatabaseI
         Connection connection = getConnection(a.getDatabase());
         Statement s = connection.createStatement();
 
-        try
-        {
+        try {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
 
             returnConnection(connection);
-        }
-        catch (SQLException sqlEx)
-        {
+        } catch (SQLException sqlEx) {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
     }
 
     @Override
-    public void writeDelete(DbAbstractTable entity) throws Exception
-    {
+    public void writeDelete(DbAbstractTable entity) throws Exception {
         TableAdapter a = entity.getAdapter();
 
         ArrayList<Object> values = new ArrayList<Object>();
@@ -342,8 +293,7 @@ public final class SqlServerDatabase implements DatabaseI
 
         HashMap<String, String> hmColValues = new HashMap<String, String>();
 
-        for (int i=0; i<cols.length; i++)
-        {
+        for (int i = 0; i < cols.length; i++) {
             String col = cols[i];
             Object value = values.get(i);
             String s = convertToString(value);
@@ -358,13 +308,11 @@ public final class SqlServerDatabase implements DatabaseI
         sb.append(a.getTableName());
         sb.append(" WHERE ");
 
-        for (int i=0; i<primaryKeyCols.length; i++)
-        {
+        for (int i = 0; i < primaryKeyCols.length; i++) {
             String primaryKeyCol = primaryKeyCols[i];
             String val = hmColValues.get(primaryKeyCol);
 
-            if (i>0)
-            {
+            if (i > 0) {
                 sb.append("AND ");
             }
 
@@ -378,15 +326,12 @@ public final class SqlServerDatabase implements DatabaseI
         Connection connection = getConnection(a.getDatabase());
         Statement s = connection.createStatement();
 
-        try
-        {
+        try {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
 
             returnConnection(connection);
-        }
-        catch (SQLException sqlEx)
-        {
+        } catch (SQLException sqlEx) {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
@@ -394,25 +339,21 @@ public final class SqlServerDatabase implements DatabaseI
     }
 
     @Override
-    public DbAbstractTable retrieveForPrimaryKeys(TableAdapter a, Object... keys) throws Exception
-    {
+    public DbAbstractTable retrieveForPrimaryKeys(TableAdapter a, Object... keys) throws Exception {
         String[] primaryKeyCols = a.getPrimaryKeyColumns();
-        if (primaryKeyCols.length != keys.length)
-        {
+        if (primaryKeyCols.length != keys.length) {
             throw new RuntimeException("Primary keys length (" + primaryKeyCols.length + ")doesn't match keys length (" + keys.length + ")");
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("WHERE ");
 
-        for (int i=0; i<primaryKeyCols.length; i++)
-        {
+        for (int i = 0; i < primaryKeyCols.length; i++) {
             String primaryKeyCol = primaryKeyCols[i];
             Object o = keys[i];
             String val = convertToString(o);
 
-            if (i>0)
-            {
+            if (i > 0) {
                 sb.append(" AND ");
             }
 
@@ -424,33 +365,28 @@ public final class SqlServerDatabase implements DatabaseI
         String whereStatement = sb.toString();
         return retrieveSingleForWhere(a, whereStatement);
     }
-    private DbAbstractTable retrieveSingleForWhere(TableAdapter a, String whereStatement) throws Exception
-    {
+
+    private DbAbstractTable retrieveSingleForWhere(TableAdapter a, String whereStatement) throws Exception {
         List<DbAbstractTable> v = new ArrayList<DbAbstractTable>();
         retrieveForWhere(a, whereStatement, v);
 
-        if (v.size() == 0)
-        {
+        if (v.size() == 0) {
             return null;
-        }
-        else
-        {
+        } else {
             return v.get(0);
         }
     }
-    private void retrieveForWhere(TableAdapter a, String conditions, List ret) throws Exception
-    {
+
+    private void retrieveForWhere(TableAdapter a, String conditions, List ret) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");
 
         String[] cols = a.getColumns();
-        for (int i=0; i<cols.length; i++)
-        {
+        for (int i = 0; i < cols.length; i++) {
             String col = cols[i];
 
-            if (i>0)
-            {
+            if (i > 0) {
                 sb.append(", ");
             }
 
@@ -472,8 +408,7 @@ public final class SqlServerDatabase implements DatabaseI
 
         Connection connection = getConnection(a.getDatabase());
         Statement s = connection.createStatement();
-        try
-        {
+        try {
             LOG.trace("Executing {}", sql);
             s.execute(sql);
 
@@ -481,90 +416,78 @@ public final class SqlServerDatabase implements DatabaseI
 
             ResultReader rr = new ResultReader(rs);
 
-            while (rr.nextResult())
-            {
+            while (rr.nextResult()) {
                 DbAbstractTable entity = a.newEntity();
                 entity.readFromDb(rr);
                 ret.add(entity);
             }
 
             returnConnection(connection);
-        }
-        catch (SQLException sqlEx)
-        {
+        } catch (SQLException sqlEx) {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         }
     }
 
     @Override
-    public DbEndUser retrieveEndUserForEmail(String email) throws Exception
-    {
+    public DbEndUser retrieveEndUserForEmail(String email) throws Exception {
         String where = "WHERE Email = " + convertToString(email); //make sure to convert, to prevent SQL injection
-        return (DbEndUser)retrieveSingleForWhere(new DbEndUser().getAdapter(), where);
+        return (DbEndUser) retrieveSingleForWhere(new DbEndUser().getAdapter(), where);
     }
 
     @Override
-    public List<DbEndUser> retrieveSuperUsers() throws Exception
-    {
+    public List<DbEndUser> retrieveSuperUsers() throws Exception {
         List<DbEndUser> ret = new ArrayList<DbEndUser>();
         retrieveForWhere(new DbEndUser().getAdapter(), "WHERE IsSuperUser = 1", ret);
         return ret;
     }
 
     @Override
-    public List<DbOrganisation> retrieveAllOrganisations() throws Exception
-    {
+    public List<DbOrganisation> retrieveAllOrganisations() throws Exception {
         List<DbOrganisation> ret = new ArrayList<DbOrganisation>();
         retrieveForWhere(new DbOrganisation().getAdapter(), "WHERE 1=1", ret);
         return ret;
     }
 
     @Override
-    public List<DbEndUserEmailInvite> retrieveEndUserEmailInviteForUserNotCompleted(UUID userUuid) throws Exception
-    {
+    public List<DbEndUserEmailInvite> retrieveEndUserEmailInviteForUserNotCompleted(UUID userUuid) throws Exception {
         List<DbEndUserEmailInvite> ret = new ArrayList<DbEndUserEmailInvite>();
         String where = "WHERE UserUuid = " + convertToString(userUuid)
-                     + " AND DtCompleted > GETDATE()";
+                + " AND DtCompleted > GETDATE()";
         retrieveForWhere(new DbEndUserEmailInvite().getAdapter(), where, ret);
         return ret;
     }
 
     @Override
-    public DbEndUserEmailInvite retrieveEndUserEmailInviteForToken(String token) throws Exception
-    {
+    public DbEndUserEmailInvite retrieveEndUserEmailInviteForToken(String token) throws Exception {
         String where = "WHERE Token = " + convertToString(token); //make sure to convert, to prevent SQL injection
-        return (DbEndUserEmailInvite)retrieveSingleForWhere(new DbEndUserEmailInvite().getAdapter(), where);
+        return (DbEndUserEmailInvite) retrieveSingleForWhere(new DbEndUserEmailInvite().getAdapter(), where);
     }
 
     @Override
-    public DbActiveItem retrieveActiveItemForItemUuid(UUID itemUuid) throws Exception
-    {
+    public DbActiveItem retrieveActiveItemForItemUuid(UUID itemUuid) throws Exception {
         String where = "WHERE ItemUuid = " + convertToString(itemUuid);
-        return (DbActiveItem)retrieveSingleForWhere(new DbActiveItem().getAdapter(), where);
+        return (DbActiveItem) retrieveSingleForWhere(new DbActiveItem().getAdapter(), where);
     }
 
     @Override
-    public DbEndUserPwd retrieveEndUserPwdForUserNotExpired(UUID endUserUuid) throws Exception
-    {
+    public DbEndUserPwd retrieveEndUserPwdForUserNotExpired(UUID endUserUuid) throws Exception {
         String where = "WHERE EndUserUuid = " + convertToString(endUserUuid)
-                     + " AND DtExpired > GETDATE()";
-        return (DbEndUserPwd)retrieveSingleForWhere(new DbEndUserPwd().getAdapter(), where);
+                + " AND DtExpired > GETDATE()";
+        return (DbEndUserPwd) retrieveSingleForWhere(new DbEndUserPwd().getAdapter(), where);
     }
 
     @Override
-    public List<DbOrganisationEndUserLink> retrieveOrganisationEndUserLinksForOrganisationNotExpired(UUID organisationUuid) throws Exception
-    {
+    public List<DbOrganisationEndUserLink> retrieveOrganisationEndUserLinksForOrganisationNotExpired(UUID organisationUuid) throws Exception {
         List<DbOrganisationEndUserLink> ret = new ArrayList<DbOrganisationEndUserLink>();
         String where = "WHERE OrganisationUuid = " + convertToString(organisationUuid)
-                     + " AND DtExpired > GETDATE()";
+                + " AND DtExpired > GETDATE()";
         retrieveForWhere(new DbOrganisationEndUserLink().getAdapter(), where, ret);
         return ret;
     }
 
     @Override
-    public List<DbOrganisationEndUserLink> retrieveOrganisationEndUserLinksForUserNotExpired(UUID endUserUuid) throws Exception
-    {
+    public List<DbOrganisationEndUserLink> retrieveOrganisationEndUserLinksForUserNotExpired(UUID endUserUuid) throws Exception {
         List<DbOrganisationEndUserLink> ret = new ArrayList<DbOrganisationEndUserLink>();
         String where = "WHERE EndUserUuid = " + convertToString(endUserUuid)
                 + " AND DtExpired > GETDATE()";
@@ -573,63 +496,58 @@ public final class SqlServerDatabase implements DatabaseI
     }
 
     @Override
-    public DbOrganisationEndUserLink retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception
-    {
+    public DbOrganisationEndUserLink retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception {
         String where = "WHERE OrganisationUuid = " + convertToString(organisationUuid)
-                     + " AND EndUserUuid = " + convertToString(endUserUuid)
-                     + " AND DtExpired > GETDATE()";
-        return (DbOrganisationEndUserLink)retrieveSingleForWhere(new DbOrganisationEndUserLink().getAdapter(), where);
+                + " AND EndUserUuid = " + convertToString(endUserUuid)
+                + " AND DtExpired > GETDATE()";
+        return (DbOrganisationEndUserLink) retrieveSingleForWhere(new DbOrganisationEndUserLink().getAdapter(), where);
     }
 
     @Override
-    public DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception
-    {
+    public DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception {
         String where = "WHERE Name = " + convertToString(name)
                 + " AND NationalId = " + convertToString(nationalId);
-        return (DbOrganisation)retrieveSingleForWhere(new DbOrganisation().getAdapter(), where);
+        return (DbOrganisation) retrieveSingleForWhere(new DbOrganisation().getAdapter(), where);
     }
 
     @Override
-    public List<DbItem> retrieveDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+    public List<DbItem> retrieveDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception {
         List<DbItem> ret = new ArrayList<DbItem>();
 
         String where = "INNER JOIN Definition.ActiveItemDependency d"
-                     + " ON d.ItemUuid = " + convertToString(itemUuid)
-                     + " AND d.DependencyTypeId = " + convertToString(dependencyType)
-                     + " AND d.DependentItemUuid = " + ALIAS + ".ItemUuid"
-                     + " INNER JOIN Definition.ActiveItem a"
-                     + " ON a.ItemUuid = d.DependentItemUuid"
-                     + " AND a.Version = " + ALIAS + ".version"
-                     + " AND a.OrganisationUuid = " + convertToString(organisationUuid);
+                + " ON d.ItemUuid = " + convertToString(itemUuid)
+                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
+                + " AND d.DependentItemUuid = " + ALIAS + ".ItemUuid"
+                + " INNER JOIN Definition.ActiveItem a"
+                + " ON a.ItemUuid = d.DependentItemUuid"
+                + " AND a.Version = " + ALIAS + ".version"
+                + " AND a.OrganisationUuid = " + convertToString(organisationUuid);
 
         retrieveForWhere(new DbItem().getAdapter(), where, ret);
         return ret;
     }
 
     @Override
-    public List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception
-    {
+    public List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception {
         List<DbItem> ret = new ArrayList<DbItem>();
 
         String where = "INNER JOIN Definition.ActiveItem a"
-                     + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
-                     + " AND a.Version = " + ALIAS + ".version"
-                     + " AND a.ItemTypeId = " + convertToString(itemType)
-                     + " AND a.OrganisationUuid = " + convertToString(organisationUuid)
-                     + " WHERE NOT EXISTS ("
-                     + "SELECT 1 FROM Definition.ActiveItemDependency d"
-                     + " WHERE d.DependentItemUuid = " + ALIAS + ".ItemUuid"
-                     + " AND d.DependencyTypeId = " + convertToString(dependencyType)
-                     + ")";
+                + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND a.Version = " + ALIAS + ".version"
+                + " AND a.ItemTypeId = " + convertToString(itemType)
+                + " AND a.OrganisationUuid = " + convertToString(organisationUuid)
+                + " WHERE NOT EXISTS ("
+                + "SELECT 1 FROM Definition.ActiveItemDependency d"
+                + " WHERE d.DependentItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
+                + ")";
 
         retrieveForWhere(new DbItem().getAdapter(), where, ret);
         return ret;
     }
 
     @Override
-    public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+    public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception {
         String sql = "SELECT COUNT(1)"
                 + " FROM Definition.ActiveItemDependency"
                 + " WHERE ItemUuid = " + convertToString(itemUuid)
@@ -639,30 +557,27 @@ public final class SqlServerDatabase implements DatabaseI
     }
 
     @Override
-    public DbItem retrieveForUuidLatestVersion(UUID organisationUuid, UUID itemUuid) throws Exception
-    {
+    public DbItem retrieveForUuidLatestVersion(UUID organisationUuid, UUID itemUuid) throws Exception {
         String where = "INNER JOIN Definition.ActiveItem a"
                 + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
                 + " AND a.Version = " + ALIAS + ".version"
                 + " AND a.OrganisationUuid = " + convertToString(organisationUuid)
                 + " WHERE " + ALIAS + ".ItemUuid = " + convertToString(itemUuid);
-        return (DbItem)retrieveSingleForWhere(new DbItem().getAdapter(), where);
+        return (DbItem) retrieveSingleForWhere(new DbItem().getAdapter(), where);
     }
 
     @Override
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception
-    {
+    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception {
         List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
 
         String where = "WHERE DependentItemUuid = " + convertToString(dependentItemUuid)
-                     + " AND DependencyTypeId = " + convertToString(dependencyType);
+                + " AND DependencyTypeId = " + convertToString(dependencyType);
         retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
         return ret;
     }
 
     @Override
-    public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+    public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception {
         List<DbActiveItem> ret = new ArrayList<DbActiveItem>();
 
         String where = "INNER JOIN Definition.ActiveItemDependency d"
@@ -676,8 +591,7 @@ public final class SqlServerDatabase implements DatabaseI
     }
 
     @Override
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItem(UUID itemUuid) throws Exception
-    {
+    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItem(UUID itemUuid) throws Exception {
         List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
 
         String where = "WHERE ItemUuid = " + convertToString(itemUuid);
@@ -686,19 +600,17 @@ public final class SqlServerDatabase implements DatabaseI
     }
 
     @Override
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItemType(UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItemType(UUID itemUuid, DependencyType dependencyType) throws Exception {
         List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
 
         String where = "WHERE ItemUuid = " + convertToString(itemUuid)
-                     + " AND DependencyTypeId = " + convertToString(dependencyType);
+                + " AND DependencyTypeId = " + convertToString(dependencyType);
         retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
         return ret;
     }
 
     @Override
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItem(UUID dependentItemUuid) throws Exception
-    {
+    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItem(UUID dependentItemUuid) throws Exception {
         List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
 
         String where = "WHERE DependentItemUuid = " + convertToString(dependentItemUuid);
@@ -709,14 +621,12 @@ public final class SqlServerDatabase implements DatabaseI
 
 }
 
-class PoolableConnection implements Connection
-{
+class PoolableConnection implements Connection {
     private Connection innerConnection = null;
     private long expiry = -1;
     private int lives = -1;
 
-    public PoolableConnection(Connection connection, long expiry, int lives)
-    {
+    public PoolableConnection(Connection connection, long expiry, int lives) {
         this.innerConnection = connection;
         this.expiry = expiry;
         this.lives = lives;

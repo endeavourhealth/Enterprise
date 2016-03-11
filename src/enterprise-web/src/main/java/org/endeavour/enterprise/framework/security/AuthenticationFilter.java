@@ -14,13 +14,11 @@ import java.io.IOException;
 import java.util.Map;
 
 @Priority(Priorities.AUTHENTICATION)
-public class AuthenticationFilter implements ContainerRequestFilter
-{
+public class AuthenticationFilter implements ContainerRequestFilter {
+
     @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException
-    {
-        try
-        {
+    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+        try {
             Map<String, Cookie> cookies = containerRequestContext.getCookies();
 
             if (!cookies.containsKey(Configuration.AUTH_COOKIE_NAME))
@@ -33,11 +31,8 @@ public class AuthenticationFilter implements ContainerRequestFilter
             UserContext userContext = TokenHelper.validateToken(tokenString);
 
 
-
             containerRequestContext.setSecurityContext(new UserSecurityContext(userContext));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }

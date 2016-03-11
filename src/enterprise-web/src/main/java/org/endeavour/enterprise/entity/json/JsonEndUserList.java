@@ -12,15 +12,13 @@ import java.util.List;
  * Created by Drew on 22/02/2016.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonEndUserList implements Serializable
-{
+public final class JsonEndUserList implements Serializable {
     private List<JsonEndUser> users = new ArrayList<JsonEndUser>();
 
-    public JsonEndUserList()
-    {}
+    public JsonEndUserList() {
+    }
 
-    public void add(JsonEndUser jsonEndUser)
-    {
+    public void add(JsonEndUser jsonEndUser) {
         users.add(jsonEndUser);
 
         //find the next non-null index
@@ -35,8 +33,8 @@ public final class JsonEndUserList implements Serializable
 
         throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");*/
     }
-    public void add(DbEndUser endUser, EndUserRole role)
-    {
+
+    public void add(DbEndUser endUser, EndUserRole role) {
         JsonEndUser jsonEndUser = new JsonEndUser(endUser, role);
         add(jsonEndUser);
     }

@@ -13,8 +13,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 25/02/2016.
  */
-public final class DbItem extends DbAbstractTable
-{
+public final class DbItem extends DbAbstractTable {
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbItem.class, "Item", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
             "ItemUuid,Version,XmlContent,Title,Description,EndUserUuid,TimeStamp,IsDeleted", "ItemUuid,Version");
@@ -28,10 +27,10 @@ public final class DbItem extends DbAbstractTable
     private boolean isDeleted = false;
     //private DefinitionItemType itemType = null; //2016-02-29 DL - this can never change, so is on the ActiveItem entity
 
-    public DbItem()
-    {}
-    public static DbItem factoryNew(UUID endUserUuid, String title)
-    {
+    public DbItem() {
+    }
+
+    public static DbItem factoryNew(UUID endUserUuid, String title) {
         DbItem ret = new DbItem();
         ret.setVersion(1); //doesn't really matter, but start somewhere positive
         ret.setTitle(title);
@@ -44,34 +43,31 @@ public final class DbItem extends DbAbstractTable
     {
         return (DbItem)adapter.retrieveSingleEntity("Definition.Item_SelectForUuidVersion", uuid, version);
     }*/
-    public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception
-    {
+    public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception {
         //2016-02-29 DL - changed how we connect to db
-        return (DbItem)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid, new Integer(version));
+        return (DbItem) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid, new Integer(version));
         //return (DbItem)adapter.retrieveSingleEntity("Definition._Item_SelectForUuid", uuid);
     }
-    public static DbItem retrieveForUuidLatestVersion(UUID organisationUuid, UUID uuid) throws Exception
-    {
+
+    public static DbItem retrieveForUuidLatestVersion(UUID organisationUuid, UUID uuid) throws Exception {
         return DatabaseManager.db().retrieveForUuidLatestVersion(organisationUuid, uuid);
     }
-    public static List<DbItem> retrieveDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+
+    public static List<DbItem> retrieveDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception {
         return DatabaseManager.db().retrieveDependentItems(organisationUuid, itemUuid, dependencyType);
     }
-    public static List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception
-    {
+
+    public static List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception {
         return DatabaseManager.db().retrieveNonDependentItems(organisationUuid, dependencyType, itemType);
     }
 
     @Override
-    public TableAdapter getAdapter()
-    {
+    public TableAdapter getAdapter() {
         return adapter;
     }
 
     @Override
-    public void writeForDb(ArrayList<Object> builder)
-    {
+    public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(version);
         builder.add(xmlContent);
@@ -84,8 +80,7 @@ public final class DbItem extends DbAbstractTable
     }
 
     @Override
-    public void readFromDb(ResultReader reader) throws SQLException
-    {
+    public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         version = reader.readInt();
         xmlContent = reader.readString();

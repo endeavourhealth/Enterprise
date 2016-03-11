@@ -8,12 +8,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * a request has gone wrong on the server
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonServerException
-{
+public final class JsonServerException {
     private String message = null;
 
-    public JsonServerException(String message)
-    {
+    public JsonServerException(String message) {
         this.message = message;
     }
 

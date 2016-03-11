@@ -26,16 +26,14 @@ import java.util.UUID;
  * Endpoint for functions related to creating and managing folders
  */
 @Path("/folder")
-public final class FolderEndpoint extends ItemEndpoint
-{
+public final class FolderEndpoint extends AbstractItemEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(FolderEndpoint.class);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveFolder")
-    public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
-    {
+    public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception {
         //get the parameters out
         UUID folderUuid = folderParameters.getUuid();
         String folderName = folderParameters.getFolderName();
@@ -50,35 +48,25 @@ public final class FolderEndpoint extends ItemEndpoint
         DefinitionItemType itemType = null;
 
         //if folder type was passed up from client
-        if (folderType != null)
-        {
-            if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY)
-            {
+        if (folderType != null) {
+            if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY) {
                 itemType = DefinitionItemType.LibraryFolder;
-            }
-            else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS)
-            {
+            } else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS) {
                 itemType = DefinitionItemType.ReportFolder;
-            }
-            else
-            {
+            } else {
                 throw new BadRequestException("Invalid folder type " + folderType);
             }
         }
         //if we're amending an existing folder, we can use its item type
-        else if (folderUuid != null)
-        {
+        else if (folderUuid != null) {
             DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(folderUuid);
             itemType = activeItem.getItemTypeId();
         }
         //if we're creating a new folder, we can get the item type from our parent
-        else if (parentUuid != null)
-        {
+        else if (parentUuid != null) {
             DbActiveItem parentActiveItem = DbActiveItem.retrieveForItemUuid(parentUuid);
             itemType = parentActiveItem.getItemTypeId();
-        }
-        else
-        {
+        } else {
             throw new BadRequestException("Must specify folder type");
         }
 
@@ -87,30 +75,24 @@ public final class FolderEndpoint extends ItemEndpoint
         //before letting our superclass do the normal item saving,
         //validate that we're not making a folder a child of itself
         if (parentUuid != null
-                && folderUuid != null)
-        {
+                && folderUuid != null) {
             UUID currentParentUuid = parentUuid;
-            while (currentParentUuid != null)
-            {
-                if (currentParentUuid.equals(folderUuid))
-                {
+            while (currentParentUuid != null) {
+                if (currentParentUuid.equals(folderUuid)) {
                     throw new BadRequestException("Cannot move a folder to be a child of itself");
                 }
 
                 List<DbActiveItemDependency> parents = DbActiveItemDependency.retrieveForDependentItemType(currentParentUuid, DependencyType.IsChildOf);
-                if (parents.isEmpty())
-                {
+                if (parents.isEmpty()) {
                     currentParentUuid = null;
-                }
-                else
-                {
+                } else {
                     DbActiveItemDependency parent = parents.get(0);
                     currentParentUuid = parent.getItemUuid();
                 }
             }
         }
 
-        folderUuid = super.saveItem(folderUuid, orgUuid, userUuid, itemType, folderName, "", "", false, parentUuid);
+        folderUuid = super.saveItem(folderUuid, orgUuid, userUuid, itemType, folderName, "", "", parentUuid);
 
         //return the UUID of the folder we just saved or updated
         JsonFolder ret = new JsonFolder();
@@ -252,8 +234,7 @@ public final class FolderEndpoint extends ItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteFolder")
-    public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
-    {
+    public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception {
         //get the organisation from the server token
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
@@ -267,12 +248,11 @@ public final class FolderEndpoint extends ItemEndpoint
         DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(folderUuid);
         DefinitionItemType itemType = activeItem.getItemTypeId();
         if (itemType != DefinitionItemType.LibraryFolder
-                && itemType != DefinitionItemType.ReportFolder)
-        {
+                && itemType != DefinitionItemType.ReportFolder) {
             throw new BadRequestException("UUID is a " + itemType + " not a folder");
         }
 
-        deleteItem(folderUuid, orgUuid, userUuid, itemType);
+        deleteItem(folderUuid, orgUuid, userUuid);
 
         return Response.ok().build();
     }
@@ -308,20 +288,14 @@ public final class FolderEndpoint extends ItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolders")
-    public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String parentUuidStr) throws Exception
-    {
+    public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String parentUuidStr) throws Exception {
         //convert the nominal folder type to the actual Item DefinitionType
         DefinitionItemType itemType = null;
-        if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY)
-        {
+        if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY) {
             itemType = DefinitionItemType.LibraryFolder;
-        }
-        else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS)
-        {
+        } else if (folderType == JsonFolder.FOLDER_TYPE_REPORTS) {
             itemType = DefinitionItemType.ReportFolder;
-        }
-        else
-        {
+        } else {
             throw new BadRequestException("Invalid folder type " + folderType);
         }
 
@@ -332,13 +306,11 @@ public final class FolderEndpoint extends ItemEndpoint
         List<DbItem> items = null;
 
         //if we have no parent, then we're looking for the TOP-LEVEL folder
-        if (parentUuidStr == null)
-        {
+        if (parentUuidStr == null) {
             items = DbItem.retrieveNonDependentItems(orgUuid, DependencyType.IsChildOf, itemType);
 
             //if we don't have a top-level folder, for some reason, re-create it
-            if (items.size() == 0)
-            {
+            if (items.size() == 0) {
                 UUID userUuid = getEndUserUuidFromToken(sc);
                 FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, itemType);
 
@@ -347,8 +319,7 @@ public final class FolderEndpoint extends ItemEndpoint
             }
         }
         //if we have a parent, then we want the child folders under it
-        else
-        {
+        else {
             UUID parentUuid = UUID.fromString(parentUuidStr);
             items = DbItem.retrieveDependentItems(orgUuid, parentUuid, DependencyType.IsChildOf);
         }
@@ -357,8 +328,7 @@ public final class FolderEndpoint extends ItemEndpoint
 
         JsonFolderList ret = new JsonFolderList();
 
-        for (int i=0; i<items.size(); i++)
-        {
+        for (int i = 0; i < items.size(); i++) {
             DbItem item = items.get(i);
             UUID itemUuid = item.getPrimaryUuid();
 
@@ -376,21 +346,16 @@ public final class FolderEndpoint extends ItemEndpoint
                 .entity(ret)
                 .build();
     }
-    public static void createTopLevelFolder(UUID organisationUuid, UUID userUuid, DefinitionItemType itemType) throws Exception
-    {
+
+    public static void createTopLevelFolder(UUID organisationUuid, UUID userUuid, DefinitionItemType itemType) throws Exception {
         LOG.trace("Creating top-level folder of type {}", itemType);
 
         String title = null;
-        if (itemType == DefinitionItemType.LibraryFolder)
-        {
+        if (itemType == DefinitionItemType.LibraryFolder) {
             title = "Library";
-        }
-        else if (itemType == DefinitionItemType.ReportFolder)
-        {
+        } else if (itemType == DefinitionItemType.ReportFolder) {
             title = "Reports";
-        }
-        else
-        {
+        } else {
             throw new RuntimeException("Trying to create folder for type " + itemType);
         }
 
@@ -455,13 +420,11 @@ public final class FolderEndpoint extends ItemEndpoint
 
         return folder;
     }*/
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolderContents")
-    public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception
-    {
+    public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception {
         UUID folderUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
@@ -473,8 +436,7 @@ public final class FolderEndpoint extends ItemEndpoint
         LOG.trace("GettingFolderContents for folder {}", folderUuid);
 
         List<DbActiveItem> childActiveItems = DbActiveItem.retrieveDependentItems(orgUuid, folderUuid, DependencyType.IsContainedWithin);
-        for (int i=0; i<childActiveItems.size(); i++)
-        {
+        for (int i = 0; i < childActiveItems.size(); i++) {
             DbActiveItem activeItem = childActiveItems.get(i);
             UUID uuid = activeItem.getItemUuid();
             int version = activeItem.getVersion();
@@ -490,28 +452,19 @@ public final class FolderEndpoint extends ItemEndpoint
             ret.addContent(c);
 
             //and set any extra data we need
-            if (itemType == DefinitionItemType.Report)
-            {
+            if (itemType == DefinitionItemType.Report) {
                 //TODO: 2016-03-01 DL - set last run date etc. on folder content
                 c.setLastRun(new Date());
                 c.setIsScheduled(true);
-            }
-            else if (itemType == DefinitionItemType.Query)
-            {
+            } else if (itemType == DefinitionItemType.Query) {
 
 
-            }
-            else if (itemType == DefinitionItemType.ListOutput)
-            {
+            } else if (itemType == DefinitionItemType.ListOutput) {
 
 
-            }
-            else if (itemType == DefinitionItemType.CodeSet)
-            {
+            } else if (itemType == DefinitionItemType.CodeSet) {
 
-            }
-            else
-            {
+            } else {
                 throw new RuntimeException("Unexpected content " + item + " in folder");
             }
         }

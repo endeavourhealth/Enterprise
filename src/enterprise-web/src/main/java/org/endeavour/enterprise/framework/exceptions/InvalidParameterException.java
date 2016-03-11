@@ -2,8 +2,7 @@ package org.endeavour.enterprise.framework.exceptions;
 
 import javax.ws.rs.core.Response;
 
-public class InvalidParameterException extends MappedException
-{
+public class InvalidParameterException extends MappedException {
     public InvalidParameterException() {
         super();
     }
@@ -13,8 +12,7 @@ public class InvalidParameterException extends MappedException
     }
 
     @Override
-    public Response.Status getResponseStatus()
-    {
+    public Response.Status getResponseStatus() {
         return Response.Status.BAD_REQUEST;
     }
 }

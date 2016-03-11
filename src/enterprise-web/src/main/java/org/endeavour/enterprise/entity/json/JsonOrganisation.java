@@ -11,22 +11,20 @@ import java.util.UUID;
  * Created by Drew on 18/02/2016.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonOrganisation implements Serializable
-{
+public final class JsonOrganisation implements Serializable {
     private UUID uuid = null;
     private String name = null;
     private String nationalId = null;
     private Integer permissions = null;
 
-    public JsonOrganisation()
-    {}
-    public JsonOrganisation(DbOrganisation org, EndUserRole permissions)
-    {
+    public JsonOrganisation() {
+    }
+
+    public JsonOrganisation(DbOrganisation org, EndUserRole permissions) {
         this.uuid = org.getPrimaryUuid();
         this.name = org.getName();
         this.nationalId = org.getNationalId();
-        if (permissions != null)
-        {
+        if (permissions != null) {
             this.permissions = new Integer(permissions.get());
         }
     }

@@ -20,8 +20,8 @@ public final class DbOrganisation extends DbAbstractTable {
     private String nationalId = null;
 
 
-    public DbOrganisation()
-    {}
+    public DbOrganisation() {
+    }
 
     @Override
     public TableAdapter getAdapter() {
@@ -29,35 +29,32 @@ public final class DbOrganisation extends DbAbstractTable {
     }
 
     @Override
-    public void writeForDb(ArrayList<Object> builder)
-    {
+    public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(name);
         builder.add(nationalId);
     }
 
     @Override
-    public void readFromDb(ResultReader reader) throws SQLException
-    {
+    public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         name = reader.readString();
         nationalId = reader.readString();
     }
 
-    public static List<DbOrganisation> retrieveForAll() throws Exception
-    {
+    public static List<DbOrganisation> retrieveForAll() throws Exception {
         //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveAllOrganisations();
         //return adapter.retrieveEntities("Administration.Organisation_SelectForAll");
     }
-    public static DbOrganisation retrieveForUuid(UUID uuid) throws Exception
-    {
+
+    public static DbOrganisation retrieveForUuid(UUID uuid) throws Exception {
         //2016-02-29 DL - changed how we connect to db
-        return (DbOrganisation)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return (DbOrganisation) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
         //return (DbOrganisation)adapter.retrieveSingleEntity("Administration._Organisation_SelectForUuid", uuid);
     }
-    public static DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception
-    {
+
+    public static DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception {
         return DatabaseManager.db().retrieveOrganisationForNameNationalId(name, nationalId);
     }
 

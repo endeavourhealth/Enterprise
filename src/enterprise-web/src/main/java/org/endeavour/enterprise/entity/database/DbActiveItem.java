@@ -12,8 +12,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 25/02/2016.
  */
-public final class DbActiveItem extends DbAbstractTable
-{
+public final class DbActiveItem extends DbAbstractTable {
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItem", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
             "ActiveItemUuid,OrganisationUuid,ItemUuid,Version,ItemTypeId", "ActiveItemUuid");
@@ -23,15 +22,14 @@ public final class DbActiveItem extends DbAbstractTable
     private int version = -1;
     private DefinitionItemType itemTypeId = null;
 
-    public DbActiveItem()
-    {}
-    public static DbActiveItem factoryNew(DbItem item, UUID organisationUuid, DefinitionItemType itemType)
-    {
+    public DbActiveItem() {
+    }
+
+    public static DbActiveItem factoryNew(DbItem item, UUID organisationUuid, DefinitionItemType itemType) {
         UUID itemUuid = item.getPrimaryUuid();
         int version = item.getVersion();
 
-        if (itemUuid == null)
-        {
+        if (itemUuid == null) {
             throw new RuntimeException("Cannot create ActiveItem without first saving Item to DB");
         }
 
@@ -44,35 +42,32 @@ public final class DbActiveItem extends DbAbstractTable
         return ret;
     }
 
-    public static DbActiveItem retrieveForItemUuid(UUID itemUuid) throws Exception
-    {
-        return (DbActiveItem)DatabaseManager.db().retrieveActiveItemForItemUuid(itemUuid);
+    public static DbActiveItem retrieveForItemUuid(UUID itemUuid) throws Exception {
+        return (DbActiveItem) DatabaseManager.db().retrieveActiveItemForItemUuid(itemUuid);
         //return (DbActiveItem)adapter.retrieveSingleEntity("Definition.ActiveItem_SelectForItemUuid", itemUuid);
     }
-    public static DbActiveItem retrieveForUuid(UUID uuid) throws Exception
-    {
+
+    public static DbActiveItem retrieveForUuid(UUID uuid) throws Exception {
         //2016-02-29 DL - changed how we connect to db
-        return (DbActiveItem)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return (DbActiveItem) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
         //return (DbActiveItem)adapter.retrieveSingleEntity("Definition._ActiveItem_SelectForUuid", uuid);
     }
-    public static int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+
+    public static int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception {
         return DatabaseManager.db().retrieveCountDependencies(itemUuid, dependencyType);
     }
-    public static List<DbActiveItem> retrieveDependentItems(UUID orgUuid, UUID itemUuid, DependencyType dependencyType) throws Exception
-    {
+
+    public static List<DbActiveItem> retrieveDependentItems(UUID orgUuid, UUID itemUuid, DependencyType dependencyType) throws Exception {
         return DatabaseManager.db().retrieveActiveItemDependentItems(orgUuid, itemUuid, dependencyType);
     }
 
     @Override
-    public TableAdapter getAdapter()
-    {
+    public TableAdapter getAdapter() {
         return adapter;
     }
 
     @Override
-    public void writeForDb(ArrayList<Object> builder)
-    {
+    public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(organisationUuid);
         builder.add(itemUuid);
@@ -81,8 +76,7 @@ public final class DbActiveItem extends DbAbstractTable
     }
 
     @Override
-    public void readFromDb(ResultReader reader) throws SQLException
-    {
+    public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         organisationUuid = reader.readUuid();
         itemUuid = reader.readUuid();

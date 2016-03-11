@@ -3,19 +3,10 @@ package org.endeavour.enterprise.entity.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 /**
  * Created by Drew on 17/02/2016.
  */
-public final class TableAdapter
-{
+public final class TableAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(TableAdapter.class); //2016-02-26 DL - logging
 
     private Class cls = null;
@@ -29,8 +20,7 @@ public final class TableAdapter
 /*    private List<Method> cachedGetMethods = null;
     private List<Method> cachedSetMethods = null;*/
 
-    public TableAdapter(Class cls, String tableName, String schema, String database, String columns, String primaryKeyColumns)
-    {
+    public TableAdapter(Class cls, String tableName, String schema, String database, String columns, String primaryKeyColumns) {
         this.cls = cls;
         this.tableName = tableName;
         this.schema = schema;
@@ -69,8 +59,7 @@ public final class TableAdapter
     /**
      * creates a new instance of our database class
      */
-    public DbAbstractTable newEntity() throws Exception
-    {
+    public DbAbstractTable newEntity() throws Exception {
         return (DbAbstractTable) getCls().newInstance();
     }
 

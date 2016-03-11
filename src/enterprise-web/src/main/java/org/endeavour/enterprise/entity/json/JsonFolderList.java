@@ -14,11 +14,10 @@ public final class JsonFolderList implements Serializable {
 
     private List<JsonFolder> folders = new ArrayList<JsonFolder>();
 
-    public JsonFolderList()
-    {}
+    public JsonFolderList() {
+    }
 
-    public void add(JsonFolder jsonFolder)
-    {
+    public void add(JsonFolder jsonFolder) {
         folders.add(jsonFolder);
 
         //find the next non-null index

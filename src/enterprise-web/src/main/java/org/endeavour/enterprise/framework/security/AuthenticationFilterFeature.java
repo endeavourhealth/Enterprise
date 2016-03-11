@@ -12,31 +12,26 @@ import java.lang.annotation.Annotation;
 public class AuthenticationFilterFeature implements DynamicFeature
 {
     @Override
-    public void configure(ResourceInfo resourceInfo, FeatureContext featureContext)
-    {
+    public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
         boolean usePackageFilter = true;
 
-        String packageName = (String)featureContext.getConfiguration().getProperties().get(ServerProperties.PROVIDER_PACKAGES);
+        String packageName = (String) featureContext.getConfiguration().getProperties().get(ServerProperties.PROVIDER_PACKAGES);
 
-        if ((packageName == null) || (packageName.trim().equals("")))
-        {
+        if ((packageName == null) || (packageName.trim().equals(""))) {
             usePackageFilter = false;
 
             // raise error
         }
 
-        if ((!usePackageFilter) || (resourceInfo.getResourceClass().getName().startsWith(packageName)))
-        {
-            if (!containsUnsecuredAnnotation(resourceInfo.getResourceMethod().getAnnotations()))
-            {
+        if ((!usePackageFilter) || (resourceInfo.getResourceClass().getName().startsWith(packageName))) {
+            if (!containsUnsecuredAnnotation(resourceInfo.getResourceMethod().getAnnotations())) {
                 AuthenticationFilter authenticationFilter = new AuthenticationFilter();
                 featureContext.register(authenticationFilter);
             }
         }
     }
 
-    private static boolean containsUnsecuredAnnotation(Annotation[] annotations)
-    {
+    private static boolean containsUnsecuredAnnotation(Annotation[] annotations) {
         for (Annotation annotation : annotations)
             if (annotation.annotationType().equals(Unsecured.class))
                 return true;

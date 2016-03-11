@@ -10,8 +10,7 @@ import java.util.List;
  * Created by Drew on 23/02/2016.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonFolderContentsList implements Serializable
-{
+public final class JsonFolderContentsList implements Serializable {
     private List<JsonFolderContent> contents = null;
 /*
     private List<JsonQuery> queries = null;
@@ -19,8 +18,8 @@ public final class JsonFolderContentsList implements Serializable
     private List<JsonReport> reports = null;
 */
 
-    public JsonFolderContentsList()
-    {}
+    public JsonFolderContentsList() {
+    }
 
 
     /*public void addQuery(JsonQuery query)
@@ -47,10 +46,8 @@ public final class JsonFolderContentsList implements Serializable
         }
         reports.add(report);
     }*/
-    public void addContent(JsonFolderContent content)
-    {
-        if (contents == null)
-        {
+    public void addContent(JsonFolderContent content) {
+        if (contents == null) {
             contents = new ArrayList<JsonFolderContent>();
         }
         contents.add(content);

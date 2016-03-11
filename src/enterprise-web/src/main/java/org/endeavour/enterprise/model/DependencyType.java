@@ -10,19 +10,17 @@ public enum DependencyType {
 
     private int value;
 
-    DependencyType(final int value)
-    {
+    DependencyType(final int value) {
         this.value = value;
     }
 
-    public int getValue()
-    {
+    public int getValue() {
         return value;
     }
 
     public static DependencyType get(int value) {
-        for(DependencyType e: DependencyType.values()) {
-            if(e.value == value) {
+        for (DependencyType e : DependencyType.values()) {
+            if (e.value == value) {
                 return e;
             }
         }

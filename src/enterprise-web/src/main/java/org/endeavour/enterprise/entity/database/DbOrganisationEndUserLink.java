@@ -27,18 +27,16 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     private Date dtExpired = null;
 
 
+    public DbOrganisationEndUserLink() {
+    }
 
-    public DbOrganisationEndUserLink()
-    {}
-
-    public static List<DbOrganisationEndUserLink> retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception
-    {
+    public static List<DbOrganisationEndUserLink> retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception {
         //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveOrganisationEndUserLinksForUserNotExpired(endUserUuid);
         //return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForEndUserNotExpired", endUserUuid);
     }
-    public static DbOrganisationEndUserLink retrieveForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception
-    {
+
+    public static DbOrganisationEndUserLink retrieveForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception {
         //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(organisationUuid, endUserUuid);
         /*List<DbAbstractTable> v = retrieveForEndUserNotExpired(endUserUuid);
@@ -52,16 +50,16 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
         }
         return null;*/
     }
-    public static List<DbOrganisationEndUserLink> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Exception
-    {
+
+    public static List<DbOrganisationEndUserLink> retrieveForOrganisationNotExpired(UUID organisationUuid) throws Exception {
         //2016-02-29 DL - changed how we connect to db
         return DatabaseManager.db().retrieveOrganisationEndUserLinksForOrganisationNotExpired(organisationUuid);
         //return adapter.retrieveEntities("Administration.OrganisationEndUserLink_SelectForOrganisationNotExpired", organisationUuid);
     }
-    public static DbOrganisationEndUserLink retrieveForUuid(UUID uuid) throws Exception
-    {
+
+    public static DbOrganisationEndUserLink retrieveForUuid(UUID uuid) throws Exception {
         //2016-02-29 DL - changed how we connect to db
-        return (DbOrganisationEndUserLink)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return (DbOrganisationEndUserLink) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
         //return (DbOrganisationEndUserLink)adapter.retrieveSingleEntity("Administration._OrganisationEndUserLink_SelectForUuid", uuid);
     }
 
@@ -71,8 +69,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     }
 
     @Override
-    public void writeForDb(ArrayList<Object> builder)
-    {
+    public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(organisationUuid);
         builder.add(endUserUuid);
@@ -81,8 +78,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     }
 
     @Override
-    public void readFromDb(ResultReader reader) throws SQLException
-    {
+    public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         organisationUuid = reader.readUuid();
         endUserUuid = reader.readUuid();
@@ -93,8 +89,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     /**
      * non-db gets/sets
      */
-    public EndUserRole getRole()
-    {
+    public EndUserRole getRole() {
         return EndUserRole.get(permissions);
     }
 

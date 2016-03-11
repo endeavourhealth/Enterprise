@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
 @NameBinding
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Roles
-{
+public @interface Roles {
     EndUserRole[] value() default {};
 }

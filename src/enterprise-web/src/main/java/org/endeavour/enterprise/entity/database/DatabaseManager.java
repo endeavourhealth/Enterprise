@@ -11,14 +11,13 @@ import java.util.Date;
 /**
  * Created by Drew on 29/02/2016.
  */
-public final class DatabaseManager
-{
+public final class DatabaseManager {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class); //2016-02-24 DL - logging
 
     //singleton
     private static DatabaseManager ourInstance = new DatabaseManager();
-    public static DatabaseManager getInstance()
-    {
+
+    public static DatabaseManager getInstance() {
         return ourInstance;
     }
 
@@ -26,8 +25,7 @@ public final class DatabaseManager
 
     private DatabaseI databaseImplementation = null;
 
-    private DatabaseManager()
-    {
+    private DatabaseManager() {
         //this would be where we plug in support for different databases
         databaseImplementation = new SqlServerDatabase();
     }
@@ -35,24 +33,19 @@ public final class DatabaseManager
     /**
      * 2016-02-25 DL - haven't got anywhere good to put these, but leaving with other DB stuff
      */
-    public static Date getEndOfTime()
-    {
-        if (endOfTime == null)
-        {
+    public static Date getEndOfTime() {
+        if (endOfTime == null) {
             DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             try {
                 endOfTime = formatter.parse("31/12/9999");
-            }
-            catch (ParseException pe)
-            {
+            } catch (ParseException pe) {
                 LOG.error("Failed to create end of time date", pe);
             }
         }
         return endOfTime;
     }
 
-    public static DatabaseI db()
-    {
+    public static DatabaseI db() {
         return getInstance().databaseImplementation;
     }
 }

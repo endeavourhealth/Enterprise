@@ -10,8 +10,7 @@ import java.util.UUID;
 /**
  * Created by Drew on 17/02/2016.
  */
-public final class DbEndUser extends DbAbstractTable
-{
+public final class DbEndUser extends DbAbstractTable {
 
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
@@ -25,25 +24,23 @@ public final class DbEndUser extends DbAbstractTable
     private boolean isSuperUser = false;
 
 
-    public DbEndUser()
-    {
+    public DbEndUser() {
 
     }
 
-    public static DbEndUser retrieveForEmail(String email) throws Exception
-    {
+    public static DbEndUser retrieveForEmail(String email) throws Exception {
         //2016-02-29 DL - changed how we connect to db
-        return (DbEndUser)DatabaseManager.db().retrieveEndUserForEmail(email);
+        return (DbEndUser) DatabaseManager.db().retrieveEndUserForEmail(email);
         //return (DbEndUser)adapter.retrieveSingleEntity("Administration.EndUser_SelectForEmail", email);
     }
-    public static DbEndUser retrieveForUuid(UUID uuid) throws Exception
-    {
+
+    public static DbEndUser retrieveForUuid(UUID uuid) throws Exception {
         //2016-02-29 DL - changed how we connect to db
-        return (DbEndUser)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return (DbEndUser) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
         //return (DbEndUser)adapter.retrieveSingleEntity("Administration._EndUser_SelectForUuid", uuid);
     }
-    public static List<DbEndUser> retrieveSuperUsers() throws Exception
-    {
+
+    public static List<DbEndUser> retrieveSuperUsers() throws Exception {
         return DatabaseManager.db().retrieveSuperUsers();
     }
 
@@ -54,8 +51,7 @@ public final class DbEndUser extends DbAbstractTable
     }
 
     @Override
-    public void writeForDb(ArrayList<Object> builder)
-    {
+    public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(title);
         builder.add(forename);
@@ -65,8 +61,7 @@ public final class DbEndUser extends DbAbstractTable
     }
 
     @Override
-    public void readFromDb(ResultReader reader) throws SQLException
-    {
+    public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         title = reader.readString();
         forename = reader.readString();

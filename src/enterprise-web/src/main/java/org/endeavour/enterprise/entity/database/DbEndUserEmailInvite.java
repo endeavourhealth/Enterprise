@@ -25,25 +25,24 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     private Date dtCompleted = null;
 
 
-    public DbEndUserEmailInvite()
-    {}
+    public DbEndUserEmailInvite() {
+    }
 
-    public static List<DbEndUserEmailInvite> retrieveForEndUserNotCompleted(UUID userUuid) throws Exception
-    {
+    public static List<DbEndUserEmailInvite> retrieveForEndUserNotCompleted(UUID userUuid) throws Exception {
         //2016-02-29 DL - changed how we write
         return DatabaseManager.db().retrieveEndUserEmailInviteForUserNotCompleted(userUuid);
         //return adapter.retrieveEntities("Administration.EndUserEmailInvite_SelectForEndUserNotCompleted", userUuid);
     }
-    public static DbEndUserEmailInvite retrieveForToken(String token) throws Exception
-    {
+
+    public static DbEndUserEmailInvite retrieveForToken(String token) throws Exception {
         //2016-02-29 DL - changed how we write
         return DatabaseManager.db().retrieveEndUserEmailInviteForToken(token);
         //return (DbEndUserEmailInvite)adapter.retrieveSingleEntity("Administration.EndUserEmailInvite_SelectForTokenNotCompleted", token);
     }
-    public static DbEndUserEmailInvite retrieveForUuid(UUID uuid) throws Exception
-    {
+
+    public static DbEndUserEmailInvite retrieveForUuid(UUID uuid) throws Exception {
         //2016-02-29 DL - changed how we write
-        return (DbEndUserEmailInvite)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return (DbEndUserEmailInvite) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
         //return (DbEndUserEmailInvite)adapter.retrieveSingleEntity("Administration._EndUserEmailInvite_SelectForUuid", uuid);
     }
 
@@ -53,8 +52,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     }
 
     @Override
-    public void writeForDb(ArrayList<Object> builder)
-    {
+    public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(endUserUuid);
         builder.add(uniqueToken);
@@ -62,8 +60,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     }
 
     @Override
-    public void readFromDb(ResultReader reader) throws SQLException
-    {
+    public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         endUserUuid = reader.readUuid();
         uniqueToken = reader.readString();
@@ -73,8 +70,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     /**
      * sends the invite email for this person
      */
-    public void sendInviteEmail(DbEndUser user, DbOrganisation org)
-    {
+    public void sendInviteEmail(DbEndUser user, DbOrganisation org) {
         String emailTo = user.getEmail();
 
         String forename = user.getForename();
@@ -86,8 +82,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
      * sends an email to the person, telling them about the new access that
      * has been added to their account
      */
-    public static void sendNewAccessGrantedEmail(DbEndUser user, DbOrganisation org)
-    {
+    public static void sendNewAccessGrantedEmail(DbEndUser user, DbOrganisation org) {
 
         //TODO: 2016-02-22 DL - send email to the user about new acess granted
     }

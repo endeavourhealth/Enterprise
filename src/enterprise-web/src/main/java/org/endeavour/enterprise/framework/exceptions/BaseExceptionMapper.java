@@ -10,33 +10,28 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public final class BaseExceptionMapper implements ExceptionMapper<Exception>
-{
+public final class BaseExceptionMapper implements ExceptionMapper<Exception> {
     private static final Logger LOG = LoggerFactory.getLogger(BaseExceptionMapper.class); //2016-02-24 DL - logging
 
     /**
      * 2016-02-17 DL - rewriting to be a bit more concise
      * and also to pass the exception message back with the error code
      */
-    public Response toResponse(Exception exception)
-    {
+    public Response toResponse(Exception exception) {
         Response.ResponseBuilder r = null;
 
         //if the exception is one of our own exception objects
-        if (exception instanceof MappedException)
-        {
-            MappedException me = (MappedException)exception;
+        if (exception instanceof MappedException) {
+            MappedException me = (MappedException) exception;
             r = Response.status(me.getResponseStatus());
         }
         //if the exception is a web service application
-        else if (exception instanceof WebApplicationException)
-        {
-            WebApplicationException we = (WebApplicationException)exception;
+        else if (exception instanceof WebApplicationException) {
+            WebApplicationException we = (WebApplicationException) exception;
             r = Response.status(we.getResponse().getStatus());
         }
         //if it's some other kind of exception (e.g. SQLException) that's got this far
-        else
-        {
+        else {
             //log on the server too, since these are unexpected
             //2016-02-24 DL - use logback now
             LOG.error(null, exception);
@@ -47,8 +42,7 @@ public final class BaseExceptionMapper implements ExceptionMapper<Exception>
         //if our exception has a message, then send this in the response too
         //so even if there's an error, we can give some feedback as to what it is
         String message = exception.getMessage();
-        if (message != null)
-        {
+        if (message != null) {
             JsonServerException wrapper = new JsonServerException(message);
             r = r.entity(wrapper);
         }

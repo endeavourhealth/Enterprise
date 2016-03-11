@@ -22,10 +22,10 @@ public final class JsonEndUser implements Serializable {
     private Boolean isSuperUser = null; //using non-primative types because serialisation to JSON can skip nulls, if we want
     private Integer permissions = null;
 
-    public JsonEndUser()
-    {}
-    public JsonEndUser(DbEndUser endUser, EndUserRole role)
-    {
+    public JsonEndUser() {
+    }
+
+    public JsonEndUser(DbEndUser endUser, EndUserRole role) {
         this.uuid = endUser.getPrimaryUuid();
         this.username = endUser.getEmail();
         this.title = endUser.getTitle();
@@ -33,8 +33,7 @@ public final class JsonEndUser implements Serializable {
         this.surname = endUser.getSurname();
         this.isSuperUser = new Boolean(endUser.getIsSuperUser());
 
-        if (role != null)
-        {
+        if (role != null) {
             this.permissions = role.get();
         }
     }

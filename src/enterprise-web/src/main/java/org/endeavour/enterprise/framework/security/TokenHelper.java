@@ -15,8 +15,7 @@ import javax.ws.rs.core.NewCookie;
 import java.time.Instant;
 import java.util.*;
 
-public class TokenHelper
-{
+public class TokenHelper {
     private static final String TOKEN_TYPE = "typ";
     private static final String TOKEN_TYPE_JWT = "JWT";
     private static final String TOKEN_ISSUED_AT = "iat";
@@ -48,25 +47,22 @@ public class TokenHelper
         return builder.compact();
     }*/
 
-    public static NewCookie createTokenAsCookie(DbEndUser person, DbOrganisation org, EndUserRole endUserRole)
-    {
+    public static NewCookie createTokenAsCookie(DbEndUser person, DbOrganisation org, EndUserRole endUserRole) {
         String token = createToken(person, org, endUserRole);
         return createCookie(token);
     }
-    private static String createToken(DbEndUser person, DbOrganisation org, EndUserRole endUserRole)
-    {
+
+    private static String createToken(DbEndUser person, DbOrganisation org, EndUserRole endUserRole) {
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
 
         //when logging a user off, we create a token with a null person
-        if (person != null)
-        {
+        if (person != null) {
             bodyParameterMap.put(TOKEN_USER, person.getPrimaryUuid());
         }
 
         //if the person has multiple orgs they can log on to, then we may pass in null until they select one
-        if (org != null)
-        {
+        if (org != null) {
             bodyParameterMap.put(TOKEN_ORGANISATION, org.getPrimaryUuid());
             bodyParameterMap.put(TOKEN_ROLE, endUserRole.name());
         }
@@ -79,9 +75,8 @@ public class TokenHelper
         return builder.compact();
     }
 
-    private static NewCookie createCookie(String token)
-    {
-        int maxAge = (int)(60L * Configuration.TOKEN_EXPIRY_MINUTES); //a day
+    private static NewCookie createCookie(String token) {
+        int maxAge = (int) (60L * Configuration.TOKEN_EXPIRY_MINUTES); //a day
         long now = System.currentTimeMillis() + (1000 * maxAge);
         Date d = new Date(now);
 
@@ -110,8 +105,7 @@ public class TokenHelper
     /**
      * 2016-02-29 DL - changed to handle tokens where we haven't selected an organisation yet (i.e. super users)
      */
-    public static UserContext validateToken(String token) throws Exception
-    {
+    public static UserContext validateToken(String token) throws Exception {
         Claims claims = Jwts
                 .parser()
                 .setSigningKey(Configuration.TOKEN_SIGNING_SECRET)
@@ -128,18 +122,17 @@ public class TokenHelper
 
         //a token will ALWAYS have a user ID, unless we've logged the user off, in which case this'll cause a
         //null pointer and fail validation
-        UUID userUuid = UUID.fromString((String)claims.get(TOKEN_USER));
+        UUID userUuid = UUID.fromString((String) claims.get(TOKEN_USER));
 
         //a token may not have an orgaisation selected, if they have access to multiple organisations
         //but haven't selected one to operate at yet
         UUID organisationUuid = null;
         EndUserRole endUserRole = null;
 
-        String orgUuidStr = (String)claims.get(TOKEN_ORGANISATION);
-        if (orgUuidStr != null)
-        {
+        String orgUuidStr = (String) claims.get(TOKEN_ORGANISATION);
+        if (orgUuidStr != null) {
             organisationUuid = UUID.fromString(orgUuidStr);
-            endUserRole = Enum.valueOf(EndUserRole.class, (String)claims.get(TOKEN_ROLE));
+            endUserRole = Enum.valueOf(EndUserRole.class, (String) claims.get(TOKEN_ROLE));
         }
 
         return new UserContext(userUuid, organisationUuid, endUserRole, tokenIssued);

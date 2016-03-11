@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("/security")
-public final class SecurityEndpoint extends Endpoint
-{
+public final class SecurityEndpoint extends AbstractEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityEndpoint.class);
 
     @POST
@@ -28,8 +27,7 @@ public final class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
     @Unsecured
-    public Response login(@Context SecurityContext sc, JsonEndUser personParameters) throws Exception
-    {
+    public Response login(@Context SecurityContext sc, JsonEndUser personParameters) throws Exception {
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
 
@@ -38,14 +36,12 @@ public final class SecurityEndpoint extends Endpoint
         if (email == null
                 || email.length() == 0
                 || password == null
-                || password.length() == 0)
-        {
+                || password.length() == 0) {
             throw new BadRequestException("Missing username or password in request");
         }
 
         DbEndUser user = DbEndUser.retrieveForEmail(email);
-        if (user == null)
-        {
+        if (user == null) {
             throw new NotAuthorizedException("No user found for email");
         }
 
@@ -53,15 +49,13 @@ public final class SecurityEndpoint extends Endpoint
         UUID uuid = user.getPrimaryUuid();
 
         DbEndUserPwd pwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
-        if (pwd == null)
-        {
+        if (pwd == null) {
             throw new NotAuthorizedException("No active password for email");
         }
 
         //validate the password
         String hash = pwd.getPwdHash();
-        if (!PasswordHash.validatePassword(password, hash))
-        {
+        if (!PasswordHash.validatePassword(password, hash)) {
             throw new NotAuthorizedException("Invalid password");
         }
 
@@ -71,23 +65,20 @@ public final class SecurityEndpoint extends Endpoint
 
         //now see what organisations the person can access
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
-        if (user.getIsSuperUser())
-        {
+        if (user.getIsSuperUser()) {
             List<DbOrganisation> orgs = DbOrganisation.retrieveForAll();
             ret = new JsonOrganisationList(orgs.size());
 
             //super-users are assumed to be admins at every organisation
             EndUserRole endUserRole = EndUserRole.ADMIN;
 
-            for (int i=0; i<orgs.size(); i++)
-            {
+            for (int i = 0; i < orgs.size(); i++) {
                 DbOrganisation o = orgs.get(i);
 
                 ret.add(o, endUserRole);
 
                 //if there's only one organisation, automatically select it
-                if (orgs.size() == 1)
-                {
+                if (orgs.size() == 1) {
                     orgToAutoSelect = o;
                     endUserRoleToAutoSelect = endUserRole;
                 }
@@ -96,15 +87,13 @@ public final class SecurityEndpoint extends Endpoint
         //if the person ISN'T a superUser, then we look at the person/org link, so see where they can log on to
         else {
             List<DbOrganisationEndUserLink> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(uuid);
-            if (orgLinks.isEmpty())
-            {
+            if (orgLinks.isEmpty()) {
                 throw new NotAuthorizedException("No organisations to log on to");
             }
 
             ret = new JsonOrganisationList(orgLinks.size());
 
-            for (int i=0; i<orgLinks.size(); i++)
-            {
+            for (int i = 0; i < orgLinks.size(); i++) {
                 DbOrganisationEndUserLink orgLink = orgLinks.get(i);
                 UUID orgUuid = orgLink.getOrganisationUuid();
                 DbOrganisation o = DbOrganisation.retrieveForUuid(orgUuid);
@@ -112,8 +101,7 @@ public final class SecurityEndpoint extends Endpoint
                 ret.add(o, role);
 
                 //if there's only one organisation, automatically select it
-                if (orgLinks.size() == 1)
-                {
+                if (orgLinks.size() == 1) {
                     orgToAutoSelect = o;
                     endUserRoleToAutoSelect = role;
                 }
@@ -136,8 +124,7 @@ public final class SecurityEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/selectOrganisation")
-    public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Exception
-    {
+    public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Exception {
         DbEndUser endUser = getEndUserFromSession(sc);
         UUID endUserUuid = endUser.getPrimaryUuid();
 
@@ -148,8 +135,7 @@ public final class SecurityEndpoint extends Endpoint
 
         //validate the organisation exists
         DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
-        if (org == null)
-        {
+        if (org == null) {
             throw new BadRequestException("Invalid organisation " + orgUuid);
         }
 
@@ -157,27 +143,21 @@ public final class SecurityEndpoint extends Endpoint
         EndUserRole role = null;
 
         DbEndUser user = getEndUserFromSession(sc);
-        if (user.getIsSuperUser())
-        {
+        if (user.getIsSuperUser()) {
             //super users are always admin
             role = EndUserRole.ADMIN;
-        }
-        else
-        {
+        } else {
             DbOrganisationEndUserLink link = null;
             List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
-            for (int i = 0; i < links.size(); i++)
-            {
+            for (int i = 0; i < links.size(); i++) {
                 DbOrganisationEndUserLink l = links.get(i);
-                if (l.getOrganisationUuid().equals(orgUuid))
-                {
+                if (l.getOrganisationUuid().equals(orgUuid)) {
                     link = l;
                     break;
                 }
             }
 
-            if (link == null)
-            {
+            if (link == null) {
                 throw new BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
             }
 
@@ -202,8 +182,7 @@ public final class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/logoff")
     @Unsecured
-    public Response logoff(@Context SecurityContext sc) throws Exception
-    {
+    public Response logoff(@Context SecurityContext sc) throws Exception {
         LOG.trace("Logoff");
 
         //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
@@ -222,8 +201,7 @@ public final class SecurityEndpoint extends Endpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/changePassword")
-    public Response changePassword(@Context SecurityContext sc, JsonEndUser parameters) throws Exception
-    {
+    public Response changePassword(@Context SecurityContext sc, JsonEndUser parameters) throws Exception {
         //validate token
         DbEndUser user = getEndUserFromSession(sc);
 
@@ -233,8 +211,7 @@ public final class SecurityEndpoint extends Endpoint
 
         //validate we have a new password
         if (newPwd == null
-                || newPwd.length() == 0)
-        {
+                || newPwd.length() == 0) {
             throw new BadRequestException("No new password provided");
         }
 
@@ -254,8 +231,7 @@ public final class SecurityEndpoint extends Endpoint
         p.saveToDb();
 
         //once we've successfully save the new password entity, make the old one as expired
-        if (oldPwd != null)
-        {
+        if (oldPwd != null) {
             oldPwd.setDtExpired(new Date());
             oldPwd.saveToDb();
         }
@@ -266,20 +242,18 @@ public final class SecurityEndpoint extends Endpoint
     }
 
     /**
-     @Path("customer")
-     public class CustomerResource {
-     @GET
-     @Path("id/{id}")
-     @Produces(MediaType.APPLICATION_JSON)
-     public Customer getCustomer(@PathParam("id") String id) {
-     Customer customer = new Customer();
-     customer.setId(id);
-     customer.setCity("Austin");
-     customer.setState("TX");
-     customer.setName("Mighty Pulpo");
-     return customer;
-     }
-     }
+     * @Path("customer") public class CustomerResource {
+     * @GET
+     * @Path("id/{id}")
+     * @Produces(MediaType.APPLICATION_JSON) public Customer getCustomer(@PathParam("id") String id) {
+     * Customer customer = new Customer();
+     * customer.setId(id);
+     * customer.setCity("Austin");
+     * customer.setState("TX");
+     * customer.setName("Mighty Pulpo");
+     * return customer;
+     * }
+     * }
      */
 
     @POST
@@ -287,8 +261,7 @@ public final class SecurityEndpoint extends Endpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/setPasswordFromInviteEmail")
     @Unsecured
-    public Response setPasswordFromInviteEmail(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Exception
-    {
+    public Response setPasswordFromInviteEmail(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Exception {
         String token = parameters.getToken();
         String password = parameters.getPassword();
 
@@ -296,8 +269,7 @@ public final class SecurityEndpoint extends Endpoint
 
         //find the invite for the token
         DbEndUserEmailInvite invite = DbEndUserEmailInvite.retrieveForToken(token);
-        if (invite == null)
-        {
+        if (invite == null) {
             throw new javax.ws.rs.BadRequestException("No invite found for token");
         }
 

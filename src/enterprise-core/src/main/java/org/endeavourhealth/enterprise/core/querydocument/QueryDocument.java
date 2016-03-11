@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="folder" type="{}folder" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="libraryItem" type="{}libraryItemType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="libraryItem" type="{}libraryItem" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="report" type="{}report" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
 public class QueryDocument {
 
     protected List<Folder> folder;
-    protected List<LibraryItemType> libraryItem;
+    protected List<LibraryItem> libraryItem;
     protected List<Report> report;
 
     /**
@@ -88,13 +88,13 @@ public class QueryDocument {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LibraryItemType }
+     * {@link LibraryItem }
      * 
      * 
      */
-    public List<LibraryItemType> getLibraryItem() {
+    public List<LibraryItem> getLibraryItem() {
         if (libraryItem == null) {
-            libraryItem = new ArrayList<LibraryItemType>();
+            libraryItem = new ArrayList<LibraryItem>();
         }
         return this.libraryItem;
     }

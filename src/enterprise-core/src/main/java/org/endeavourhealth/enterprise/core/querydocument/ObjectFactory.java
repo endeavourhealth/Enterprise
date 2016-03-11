@@ -26,9 +26,6 @@ public class ObjectFactory {
 
     private final static QName _QueryDocument_QNAME = new QName("", "queryDocument");
     private final static QName _LibraryItem_QNAME = new QName("", "libraryItem");
-    private final static QName _RuleTestLibraryItemUUID_QNAME = new QName("", "testLibraryItemUUID");
-    private final static QName _RuleQueryLibraryItemUUID_QNAME = new QName("", "queryLibraryItemUUID");
-    private final static QName _RuleTest_QNAME = new QName("", "test");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.endeavourhealth.enterprise.core.querydocument
@@ -54,6 +51,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link org.endeavourhealth.enterprise.core.querydocument.Query }
+     * 
+     */
+    public org.endeavourhealth.enterprise.core.querydocument.Query createQuery() {
+        return new org.endeavourhealth.enterprise.core.querydocument.Query();
+    }
+
+    /**
      * Create an instance of {@link Test }
      * 
      */
@@ -70,11 +75,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link LibraryItemType }
+     * Create an instance of {@link LibraryItem }
      * 
      */
-    public LibraryItemType createLibraryItemType() {
-        return new LibraryItemType();
+    public LibraryItem createLibraryItem() {
+        return new LibraryItem();
     }
 
     /**
@@ -150,6 +155,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link LayoutType }
+     * 
+     */
+    public LayoutType createLayoutType() {
+        return new LayoutType();
+    }
+
+    /**
      * Create an instance of {@link Value }
      * 
      */
@@ -174,14 +187,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link org.endeavourhealth.enterprise.core.querydocument.Query }
-     * 
-     */
-    public org.endeavourhealth.enterprise.core.querydocument.Query createQuery() {
-        return new org.endeavourhealth.enterprise.core.querydocument.Query();
-    }
-
-    /**
      * Create an instance of {@link CalculationParameter }
      * 
      */
@@ -195,6 +200,14 @@ public class ObjectFactory {
      */
     public ValueFrom createValueFrom() {
         return new ValueFrom();
+    }
+
+    /**
+     * Create an instance of {@link RuleAction }
+     * 
+     */
+    public RuleAction createRuleAction() {
+        return new RuleAction();
     }
 
     /**
@@ -262,6 +275,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link org.endeavourhealth.enterprise.core.querydocument.Query.StartingRules }
+     * 
+     */
+    public org.endeavourhealth.enterprise.core.querydocument.Query.StartingRules createQueryStartingRules() {
+        return new org.endeavourhealth.enterprise.core.querydocument.Query.StartingRules();
+    }
+
+    /**
      * Create an instance of {@link Test.IsAny }
      * 
      */
@@ -279,39 +300,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LibraryItemType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link LibraryItem }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "libraryItem")
-    public JAXBElement<LibraryItemType> createLibraryItem(LibraryItemType value) {
-        return new JAXBElement<LibraryItemType>(_LibraryItem_QNAME, LibraryItemType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "testLibraryItemUUID", scope = Rule.class)
-    public JAXBElement<String> createRuleTestLibraryItemUUID(String value) {
-        return new JAXBElement<String>(_RuleTestLibraryItemUUID_QNAME, String.class, Rule.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "queryLibraryItemUUID", scope = Rule.class)
-    public JAXBElement<String> createRuleQueryLibraryItemUUID(String value) {
-        return new JAXBElement<String>(_RuleQueryLibraryItemUUID_QNAME, String.class, Rule.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Test }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "test", scope = Rule.class)
-    public JAXBElement<Test> createRuleTest(Test value) {
-        return new JAXBElement<Test>(_RuleTest_QNAME, Test.class, Rule.class, value);
+    public JAXBElement<LibraryItem> createLibraryItem(LibraryItem value) {
+        return new JAXBElement<LibraryItem>(_LibraryItem_QNAME, LibraryItem.class, null, value);
     }
 
 }

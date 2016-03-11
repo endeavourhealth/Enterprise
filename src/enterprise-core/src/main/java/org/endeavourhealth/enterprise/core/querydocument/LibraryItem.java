@@ -8,12 +8,12 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for libraryItemType complex type.
+ * <p>Java class for libraryItem complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="libraryItemType">
+ * &lt;complexType name="libraryItem">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "libraryItemType", propOrder = {
+@XmlType(name = "libraryItem", propOrder = {
     "uuid",
     "name",
     "description",
@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
     "codeSet",
     "listOutput"
 })
-public class LibraryItemType {
+public class LibraryItem {
 
     @XmlElement(required = true)
     protected String uuid;

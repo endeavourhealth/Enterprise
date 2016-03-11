@@ -1,54 +1,99 @@
 
 package org.endeavourhealth.enterprise.core.querydocument;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for ruleAction.
+ * <p>Java class for ruleAction complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ * 
  * <pre>
- * &lt;simpleType name="ruleAction">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="include"/>
- *     &lt;enumeration value="exclude"/>
- *     &lt;enumeration value="nextRule"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;complexType name="ruleAction">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="action" type="{}ruleActionOperator"/>
+ *         &lt;element name="ruleId" type="{http://www.w3.org/2001/XMLSchema}int" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
  * </pre>
  * 
+ * 
  */
-@XmlType(name = "ruleAction")
-@XmlEnum
-public enum RuleAction {
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "ruleAction", propOrder = {
+    "action",
+    "ruleId"
+})
+public class RuleAction {
 
-    @XmlEnumValue("include")
-    INCLUDE("include"),
-    @XmlEnumValue("exclude")
-    EXCLUDE("exclude"),
-    @XmlEnumValue("nextRule")
-    NEXT_RULE("nextRule");
-    private final String value;
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "string")
+    protected RuleActionOperator action;
+    @XmlElement(type = Integer.class)
+    protected List<Integer> ruleId;
 
-    RuleAction(String v) {
-        value = v;
+    /**
+     * Gets the value of the action property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link RuleActionOperator }
+     *     
+     */
+    public RuleActionOperator getAction() {
+        return action;
     }
 
-    public String value() {
-        return value;
+    /**
+     * Sets the value of the action property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link RuleActionOperator }
+     *     
+     */
+    public void setAction(RuleActionOperator value) {
+        this.action = value;
     }
 
-    public static RuleAction fromValue(String v) {
-        for (RuleAction c: RuleAction.values()) {
-            if (c.value.equals(v)) {
-                return c;
-            }
+    /**
+     * Gets the value of the ruleId property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the ruleId property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getRuleId().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Integer }
+     * 
+     * 
+     */
+    public List<Integer> getRuleId() {
+        if (ruleId == null) {
+            ruleId = new ArrayList<Integer>();
         }
-        throw new IllegalArgumentException(v);
+        return this.ruleId;
     }
 
 }

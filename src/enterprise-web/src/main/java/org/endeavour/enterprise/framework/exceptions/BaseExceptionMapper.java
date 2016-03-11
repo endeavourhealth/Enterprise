@@ -46,23 +46,4 @@ public final class BaseExceptionMapper implements ExceptionMapper<Exception> {
     }
 
 
-    /**
-     * TODO: 2016-02-25 DL - get the DB appender for log back working
-     Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-     DBAppender appender = new DBAppender();
-     appender.setConnectionSource();
-
-     ConnectionSource cs = new Co
-     *
-     xxx 1) test logging exceptions
-     xxx 4) what are the two XML files
-     xxxx 5) delete one of the xml files
-     6) move logback.xml to an existing folder
-
-
-     2) get logging to db
-     3) understand SQL timestamp?
-     5) Add two xml files to repo
-     6) commit to GitHub
-     */
 }

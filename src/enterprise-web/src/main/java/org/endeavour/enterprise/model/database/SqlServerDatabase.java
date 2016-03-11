@@ -56,7 +56,7 @@ public final class SqlServerDatabase implements DatabaseI {
     }
 
     private int executeScalarCountQuery(String sql) throws Exception {
-        Connection connection = getConnection();
+        Connection connection = borrowConnection();
         Statement s = connection.createStatement();
         try {
             LOG.trace("Executing {}", sql);
@@ -78,7 +78,7 @@ public final class SqlServerDatabase implements DatabaseI {
     /**
      * very basic connection pooling, as it's way too slow running against Azure when we keep creating connections
      */
-    private synchronized Connection getConnection() throws ClassNotFoundException, SQLException {
+    private synchronized Connection borrowConnection() throws ClassNotFoundException, SQLException {
         try {
             while (true) {
                 PoolableConnection connection = connectionPool.pop();
@@ -101,6 +101,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
         return new PoolableConnection(conn, expiry, Configuration.DB_CONNECTION_LIVES);
     }
+
 
     private synchronized void returnConnection(Connection connection) throws SQLException {
         //if the connection has been closed discard it
@@ -152,7 +153,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
         LOG.trace("Writing {} entities to DB", entities.size());
 
-        Connection connection = getConnection();
+        Connection connection = borrowConnection();
         Statement statement = connection.createStatement();
 
         StringJoiner sqlLogging = new StringJoiner("\r\n");
@@ -401,7 +402,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
         String sql = sb.toString();
 
-        Connection connection = getConnection();
+        Connection connection = borrowConnection();
         Statement s = connection.createStatement();
         try {
             LOG.trace("Executing {}", sql);
@@ -612,7 +613,6 @@ public final class SqlServerDatabase implements DatabaseI {
         retrieveForWhere(new DbActiveItemDependency().getAdapter(), where, ret);
         return ret;
     }
-
 
 }
 

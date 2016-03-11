@@ -629,195 +629,98 @@
 	</script>
 
 <hr/>
-<h3>/api/query/getQuery</h3>
+<h3>/api/library/getLibraryItem</h3>
 
-	UUID: <input type="text" id="getQueryUuid">
+	UUID: <input type="text" id="getLibraryUuid">
 	<br/>
-	<button type="button" onclick="getQuery()">Submit</button>
+	<button type="button" onclick="getLibrary()">Submit</button>
 
 	<script>
-		function getQuery() {
+		function getLibrary() {
 
-			var s = document.getElementById('getQueryUuid').value;
+			var s = document.getElementById('getLibraryUuid').value;
 
-			get('/api/query/getQuery', 'uuid=' + s);
+			get('/api/library/getLibraryItem', 'uuid=' + s);
 		}
 	</script>
 
 <hr/>
-<h3>/api/query/saveQuery</h3>
+<h3>/api/library/saveLibraryItem</h3>
 
 	
-	UUID: <input type="text" id="saveQueryUuid">(leave blank to create a new one)
+	UUID: <input type="text" id="saveLibraryUuid">(leave blank to create a new one)
 	<br/>
-	Name: <input type="text" id="saveQueryName">
+	Name: <input type="text" id="saveLibraryName">
 	<br/>
-	Description: <input type="text" id="saveQueryDescription">
+	Description: <input type="text" id="saveLibraryDescription">
 	<br/>
-	XML Content: <input type="text" id="saveQueryXml">
+	XML Content: <input type="text" id="saveLibraryXml">
 	<br/>
-	Is Deleted: <input type="checkbox" id="saveQueryDeleted">
+	Is Deleted: <input type="checkbox" id="saveLibraryDeleted">
 	<br/>
-	Folder UUID: <input type="text" id="saveQueryFolderUuid">
+	Folder UUID: <input type="text" id="saveLibraryFolderUuid">
 	<br/>
-	<button type="button" onclick="saveQuery()">Submit</button>
+	<button type="button" onclick="saveLibrary()">Submit</button>
 	
 	<script>
-		function saveQuery() {
+		function saveLibrary() {
 
 			var params = {};
 
-			var s = document.getElementById('saveQueryUuid').value;
+			var s = document.getElementById('saveLibraryUuid').value;
 			if (s.length > 0)
 			{
 				params['uuid'] = s;
 			}
 
-			s = document.getElementById('saveQueryName').value;
+			s = document.getElementById('saveLibraryName').value;
 			if (s.length > 0)
 			{
 				params['name'] = s;
 			}
 
-			s = document.getElementById('saveQueryDescription').value;
+			s = document.getElementById('saveLibraryDescription').value;
 			if (s.length > 0)
 			{
 				params['description'] = s;
 			}
 
-			s = document.getElementById('saveQueryXml').value;
+			s = document.getElementById('saveLibraryXml').value;
 			if (s.length > 0)
 			{
 				params['xmlContent'] = s;
 			}
 
-			if (document.getElementById("saveQueryDeleted").checked)
+			if (document.getElementById("saveLibraryDeleted").checked)
 			{
 				params['isDeleted'] = 'true';
 			}
 
-			s = document.getElementById('saveQueryFolderUuid').value;
+			s = document.getElementById('saveLibraryFolderUuid').value;
 			if (s.length > 0)
 			{
 				params['folderUuid'] = s;
 			}
 
-			post('/api/query/saveQuery/', params);
+			post('/api/library/saveLibraryItem/', params);
 
 		}
 	</script>
 
 <hr/>
-<h3>/api/query/deleteQuery</h3>
+<h3>/api/library/deleteLibraryItem</h3>
 
-	UUID: <input type="text" id="deleteQueryUuid">
+	UUID: <input type="text" id="deleteLibraryUuid">
 	<br/>
-	<button type="button" onclick="deleteQuery()">Submit</button>
+	<button type="button" onclick="deleteLibrary()">Submit</button>
 
 	<script>
-		function deleteQuery() {
+		function deleteLibrary() {
 
-			var s = document.getElementById('deleteQueryUuid').value;
+			var s = document.getElementById('deleteLibraryUuid').value;
 			var params = {uuid:s};
 
-			post('/api/query/deleteQuery/', params);
-
-		}
-	</script>
-
-<hr/>
-<h3>/api/listOutput/getListOutput</h3>
-
-	UUID: <input type="text" id="getListOutputUuid">
-	<br/>
-	<button type="button" onclick="getListOutput()">Submit</button>
-
-	<script>
-		function getListOutput() {
-
-			var s = document.getElementById('getListOutputUuid').value;
-
-			get('/api/listOutput/getListOutput', 'uuid=' + s);
-		}
-	</script>
-
-
-<hr/>
-<h3>/api/listOutput/saveListOutput</h3>
-
-	UUID: <input type="text" id="saveListOutputUuid">(leave blank to create a new one)
-	<br/>
-	Name: <input type="text" id="saveListOutputName">
-	<br/>
-	Description: <input type="text" id="saveListOutputDescription">
-	<br/>
-	XML Content: <input type="text" id="saveListOutputXml">
-	<br/>
-	Is Deleted: <input type="checkbox" id="saveListOutputDeleted">
-	<br/>
-	Folder UUID: <input type="text" id="saveListOutputFolderUuid">
-	<br/>
-	<button type="button" onclick="saveListOutput()">Submit</button>
-
-	<script>
-		function saveListOutput() {
-
-			var params = {};
-
-			var s = document.getElementById('saveListOutputUuid').value;
-			if (s.length > 0)
-			{
-				params['uuid'] = s;
-			}
-
-			s = document.getElementById('saveListOutputName').value;
-			if (s.length > 0)
-			{
-				params['name'] = s;
-			}
-
-			s = document.getElementById('saveListOutputDescription').value;
-			if (s.length > 0)
-			{
-				params['description'] = s;
-			}
-
-			s = document.getElementById('saveListOutputXml').value;
-			if (s.length > 0)
-			{
-				params['xmlContent'] = s;
-			}
-
-			if (document.getElementById("saveListOutputDeleted").checked)
-			{
-				params['isDeleted'] = 'true';
-			}
-
-			s = document.getElementById('saveListOutputFolderUuid').value;
-			if (s.length > 0)
-			{
-				params['folderUuid'] = s;
-			}
-
-			post('/api/listOutput/saveListOutput/', params);
-
-		}
-	</script>
-
-<hr/>
-<h3>/api/listOutput/deleteListOutput</h3>
-
-	UUID: <input type="text" id="deleteListOutputUuid">
-	<br/>
-	<button type="button" onclick="deleteListOutput()">Submit</button>
-
-	<script>
-		function deleteListOutput() {
-
-			var s = document.getElementById('deleteListOutputUuid').value;
-			var params = {uuid:s};
-
-			post('/api/listOutput/deleteListOutput/', params);
+			post('/api/library/deleteLibraryItem/', params);
 
 		}
 	</script>

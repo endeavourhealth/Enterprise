@@ -16,16 +16,27 @@
   </appender>-->
 
   <!-- appender for database -->
-  <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-    <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-      <driverClass>net.sourceforge.jtds.jdbc.Driver</driverClass>
-      <url>jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise</url>
-      <user>Endeavour_Enterprise_ApplicationUser</user>
-      <password>TheQuickBrownFox1234%^&amp;*</password>
-    </connectionSource>
-  </appender>
+  <!--<appender name="AzureDB" class="ch.qos.logback.classic.db.DBAppender">
+  <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+    <driverClass>net.sourceforge.jtds.jdbc.Driver</driverClass>
+    <url>jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise</url>
+    <user>devuser@mpydpvsu61</user>
+    <password>7oaG7FVsvK08sE9T5NEe</password>
+  </connectionSource>
+</appender>-->
 
-  <!-- appender for log file-->
+<!-- appender for database -->
+  <!--<appender name="LocalDB" class="ch.qos.logback.classic.db.DBAppender">
+  <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+    <driverClass>net.sourceforge.jtds.jdbc.Driver</driverClass>
+    <url>jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise;instance=SQLEXPRESS</url>
+    <user>Endeavour_Enterprise_ApplicationUser</user>
+    <password>TheQuickBrownFox1234%^&amp;*</password>
+  </connectionSource>
+</appender>-->
+
+
+<!-- appender for log file-->
   <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>EnterpriseWebServer.log</file>
     <encoder>
@@ -40,6 +51,7 @@
   <root level="debug">
     <appender-ref ref="STDOUT" />
     <!--<appender-ref ref="FILE" />-->
-    <!--<appender-ref ref="DB" />-->
-  </root>
+    <!--<appender-ref ref="AzureDB" />-->
+    <!--<appender-ref ref="LocalDB" />-->
+</root>
 </configuration>

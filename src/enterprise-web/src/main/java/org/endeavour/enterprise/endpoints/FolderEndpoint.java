@@ -117,132 +117,6 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
                 .build();
     }
 
-    /*public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception
-    {
-        //get the parameters out
-        UUID folderUuid = folderParameters.getUuid();
-        String folderName = folderParameters.getFolderName();
-        Integer folderType = folderParameters.getFolderType();
-        UUID parentUuid = folderParameters.getParentFolderUuid();
-
-        //validate the minimum requirements
-        if (folderName == null || folderName.length() == 0)
-        {
-            throw new BadRequestException("Missing or empty folder name");
-        }
-        if (folderType == null)
-        {
-            throw new BadRequestException("Missing folder type");
-        }
-
-        //get the organisation from the server token
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-
-        DbFolder f = null;
-
-        //if we have no UUID then we're creating a new folder
-        if (folderUuid == null)
-        {
-            //validate name isn't a duplicate
-            DbFolder existingFolder = DbFolder.retrieveForOrganisationTitleParentType(orgUuid, folderName, parentUuid, folderType);
-            if (existingFolder != null)
-            {
-                throw new BadRequestException("Folder already exists");
-            }
-
-            //validate parent is at same org
-            if (parentUuid != null)
-            {
-                DbFolder parent = DbFolder.retrieveForUuid(parentUuid);
-                if (parent != null
-                        || !parent.getOrganisationUuid().equals(orgUuid))
-                {
-                    throw new BadRequestException("Invalid or missing parent folder");
-                }
-            }
-
-            //create the new folder
-            f = new DbFolder();
-            f.setTitle(folderName);
-            f.setFolderType(folderType);
-            f.setParentFolderUuid(parentUuid);
-            f.setOrganisationUuid(orgUuid);
-
-        }
-        //if we have a UUID then we're updating an existing folder
-        else
-        {
-            f = getFolderForUuidAndValidateOrganisation(sc, folderUuid);
-
-            String existingName = f.getTitle();
-            int existingType = f.getFolderType();
-            UUID existingParentUuid = f.getParentFolderUuid();
-
-            //we don't permit changing of a folder type
-            if (existingType != folderType.intValue())
-            {
-                throw new BadRequestException("Folder already exists");
-            }
-
-            //validate if there's a duplicate folder with our new name/parent
-            DbFolder existingFolder = DbFolder.retrieveForOrganisationTitleParentType(orgUuid, folderName, parentUuid, folderType);
-            if (existingFolder != null
-                    && !existingFolder.equals(f))
-            {
-                throw new BadRequestException("Folder already exists");
-            }
-
-            //if we're changing the parent UUID to a non-null value, we need to validate that we're not
-            //moving the folder to be a child of itself
-            if (existingParentUuid != parentUuid
-                    && parentUuid != null)
-            {
-                UUID nextParent = parentUuid;
-                while (nextParent != null)
-                {
-                    DbFolder parentFolder = DbFolder.retrieveForUuid(nextParent);
-                    if (parentFolder.equals(f))
-                    {
-                        throw new BadRequestException("Cannot make a folder a child of itself");
-                    }
-
-                    nextParent = parentFolder.getParentFolderUuid();
-                }
-            }
-
-            //set the new parameters in the folder
-            f.setTitle(folderName);
-            f.setParentFolderUuid(parentUuid);
-        }
-
-        //now validate that the parent folder actually exists
-        if (parentUuid != null)
-        {
-            DbFolder parent = DbFolder.retrieveForUuid(parentUuid);
-            if (parent == null)
-            {
-                throw new BadRequestException("Parent folder doesn't exist");
-            }
-
-            UUID existingOrganisationUuid = parent.getOrganisationUuid();
-            if (!existingOrganisationUuid.equals(orgUuid)) {
-                throw new BadRequestException("Parent folder is for different organisation");
-            }
-        }
-
-        //save
-        f.saveToDb();
-
-        //return the UUID of the folder we just saved or updated
-        JsonFolder ret = new JsonFolder();
-        ret.setUuid(f.getPrimaryUuid());
-
-        return Response
-                .ok()
-                .entity(ret)
-                .build();
-    }*/
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -394,9 +268,13 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
                 c.setIsScheduled(true);
             } else if (itemType == DefinitionItemType.Query) {
 
+            } else if (itemType == DefinitionItemType.Test) {
+
+            } else if (itemType == DefinitionItemType.Datasource) {
+
+            } else if (itemType == DefinitionItemType.CodeSet) {
 
             } else if (itemType == DefinitionItemType.ListOutput) {
-
 
             } else if (itemType == DefinitionItemType.CodeSet) {
 

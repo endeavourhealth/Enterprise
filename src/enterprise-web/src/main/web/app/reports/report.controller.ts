@@ -26,13 +26,12 @@ module app.reports {
 		reportContent : ReportNode[];
 		contentTreeCallbackOptions : any;
 
-		static $inject = ['LibraryService', 'LoggerService', '$stateParams', 'uuid'];
+		static $inject = ['LibraryService', 'LoggerService', '$stateParams'];
 
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger : ILoggerService,
-			protected $stateParams : any,
-			protected uuid : any) {
+			protected $stateParams : any) {
 			this.contentTreeCallbackOptions = {dropped: this.contentTreeDroppedCallback};
 
 			this.getLibraryRootFolders();
@@ -54,7 +53,7 @@ module app.reports {
 		createReport(folderUuid:string) {
 			// Initialize blank report
 			this.report = {
-				uuid: this.uuid.v4(),
+				uuid: '',
 				name: 'New report',
 				description: '',
 				folderUuid: folderUuid,

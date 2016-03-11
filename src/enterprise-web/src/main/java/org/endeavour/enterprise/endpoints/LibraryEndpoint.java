@@ -3,7 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.entity.database.DbActiveItem;
 import org.endeavour.enterprise.entity.database.DbItem;
 import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.querydocument.*;
+import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -108,9 +108,16 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             throw new RuntimeException(e);
         }
 
-        String xmlContent = sw.toString();
+        String xml = sw.toString();
 
-        libraryItemUuid = super.saveItem(libraryItemUuid, orgUuid, userUuid, type, name, description, xmlContent, folderUuid);
+        //validate the XML against the schema
+/*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = factory.newSchema(new StreamSource(xsd));
+        javax.xml.validation.Validator validator = schema.newValidator();
+        validator.validate(new StreamSource(xml));*/
+
+
+        libraryItemUuid = super.saveItem(libraryItemUuid, orgUuid, userUuid, type, name, description, xml, folderUuid);
 
         //return the UUID of the libraryItem
         LibraryItem ret = new LibraryItem();

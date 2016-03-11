@@ -138,19 +138,19 @@ public final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
-    public void writeUpdate(DbAbstractTable entity) throws Exception {
-        List<DbAbstractTable> v = new ArrayList<DbAbstractTable>();
+    public void writeEntity(DbAbstractTable entity) throws Exception {
+        List<DbAbstractTable> v = new ArrayList<>();
         v.add(entity);
-        writeUpdate(v);
+        writeEntities(v);
     }
 
     @Override
-    public void writeUpdate(List<DbAbstractTable> entities) throws Exception {
+    public void writeEntities(List<DbAbstractTable> entities) throws Exception {
         if (entities.isEmpty()) {
             return;
         }
 
-        LOG.trace("Deleting {} entities", entities.size());
+        LOG.trace("Writing {} entities to DB", entities.size());
 
         Connection connection = getConnection();
         Statement statement = connection.createStatement();
@@ -159,75 +159,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
         for (DbAbstractTable entity: entities)
         {
-
-            TableAdapter a = entity.getAdapter();
-
-            ArrayList<Object> values = new ArrayList<Object>();
-            entity.writeForDb(values);
-
-            String[] primaryKeyCols = a.getPrimaryKeyColumns();
-            String[] cols = a.getColumns();
-
-            List<String> nonKeyCols = new ArrayList<String>();
-            HashMap<String, String> hmColValues = new HashMap<String, String>();
-
-            for (int i = 0; i < cols.length; i++) {
-                String col = cols[i];
-                Object value = values.get(i);
-                String s = convertToString(value);
-
-                hmColValues.put(col, s);
-
-                //see if a primary key column
-                boolean isPrimaryKey = false;
-                for (int j = 0; j < primaryKeyCols.length; j++) {
-                    String primaryKeyCol = primaryKeyCols[j];
-                    if (col.equalsIgnoreCase(primaryKeyCol)) {
-                        isPrimaryKey = true;
-                        break;
-                    }
-                }
-                if (!isPrimaryKey) {
-                    nonKeyCols.add(col);
-                }
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("UPDATE ");
-            sb.append(a.getSchema());
-            sb.append(".");
-            sb.append(a.getTableName());
-            sb.append(" SET ");
-
-            for (int i = 0; i < nonKeyCols.size(); i++) {
-                String nonKeyCol = nonKeyCols.get(i);
-                String val = hmColValues.get(nonKeyCol);
-
-                if (i > 0) {
-                    sb.append(", ");
-                }
-
-                sb.append(nonKeyCol);
-                sb.append(" = ");
-                sb.append(val);
-            }
-
-            sb.append(" WHERE ");
-
-            for (int i = 0; i < primaryKeyCols.length; i++) {
-                String primaryKeyCol = primaryKeyCols[i];
-                String val = hmColValues.get(primaryKeyCol);
-
-                if (i > 0) {
-                    sb.append("AND ");
-                }
-
-                sb.append(primaryKeyCol);
-                sb.append(" = ");
-                sb.append(val);
-            }
-
-            String sql = sb.toString();
+            String sql = writeSql(entity);
             sqlLogging.add(sql);
             statement.addBatch(sql);
         }
@@ -248,154 +180,158 @@ public final class SqlServerDatabase implements DatabaseI {
         }
     }
 
-    @Override
-    public void writeInsert(DbAbstractTable entity) throws Exception {
-        List<DbAbstractTable> v = new ArrayList<DbAbstractTable>();
-        v.add(entity);
-        writeInsert(v);
+    private static String writeSql(DbAbstractTable entity) throws Exception {
+        switch (entity.getSaveMode()) {
+            case INSERT:
+                return writeInsertSql(entity);
+            case UPDATE:
+                return writeUpdateSql(entity);
+            case DELETE:
+                return writeDeleteSql(entity);
+            default:
+                throw new RuntimeException("Invalid save mode " + entity.getSaveMode());
+        }
     }
+    private static String writeInsertSql(DbAbstractTable entity) {
+        TableAdapter a = entity.getAdapter();
 
-    @Override
-    public void writeInsert(List<DbAbstractTable> entities) throws Exception {
-        if (entities.isEmpty()) {
-            return;
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ");
+        sb.append(a.getSchema());
+        sb.append(".");
+        sb.append(a.getTableName());
+        sb.append(" VALUES (");
+
+        ArrayList<Object> values = new ArrayList<Object>();
+        entity.writeForDb(values);
+
+        for (int i = 0; i < values.size(); i++) {
+            Object value = values.get(i);
+
+            if (i > 0) {
+                sb.append(", ");
+            }
+
+            String s = convertToString(value);
+            sb.append(s);
         }
 
-        LOG.trace("Deleting {} entities", entities.size());
+        sb.append(")");
 
-        Connection connection = getConnection();
-        Statement statement = connection.createStatement();
+        return sb.toString();
+    }
+    private static String writeUpdateSql(DbAbstractTable entity) {
+        TableAdapter a = entity.getAdapter();
 
-        StringJoiner sqlLogging = new StringJoiner("\r\n");
+        ArrayList<Object> values = new ArrayList<Object>();
+        entity.writeForDb(values);
 
-        for (DbAbstractTable entity: entities)
-        {
-            TableAdapter a = entity.getAdapter();
+        String[] primaryKeyCols = a.getPrimaryKeyColumns();
+        String[] cols = a.getColumns();
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("INSERT INTO ");
-            sb.append(a.getSchema());
-            sb.append(".");
-            sb.append(a.getTableName());
-            sb.append(" VALUES (");
+        List<String> nonKeyCols = new ArrayList<String>();
+        HashMap<String, String> hmColValues = new HashMap<String, String>();
 
-            ArrayList<Object> values = new ArrayList<Object>();
-            entity.writeForDb(values);
+        for (int i = 0; i < cols.length; i++) {
+            String col = cols[i];
+            Object value = values.get(i);
+            String s = convertToString(value);
 
-            for (int i = 0; i < values.size(); i++) {
-                Object value = values.get(i);
+            hmColValues.put(col, s);
 
-                if (i > 0) {
-                    sb.append(", ");
+            //see if a primary key column
+            boolean isPrimaryKey = false;
+            for (int j = 0; j < primaryKeyCols.length; j++) {
+                String primaryKeyCol = primaryKeyCols[j];
+                if (col.equalsIgnoreCase(primaryKeyCol)) {
+                    isPrimaryKey = true;
+                    break;
                 }
+            }
+            if (!isPrimaryKey) {
+                nonKeyCols.add(col);
+            }
+        }
 
-                String s = convertToString(value);
-                sb.append(s);
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE ");
+        sb.append(a.getSchema());
+        sb.append(".");
+        sb.append(a.getTableName());
+        sb.append(" SET ");
+
+        for (int i = 0; i < nonKeyCols.size(); i++) {
+            String nonKeyCol = nonKeyCols.get(i);
+            String val = hmColValues.get(nonKeyCol);
+
+            if (i > 0) {
+                sb.append(", ");
             }
 
-            sb.append(")");
-
-            String sql = sb.toString();
-            sqlLogging.add(sql);
-            statement.addBatch(sql);
+            sb.append(nonKeyCol);
+            sb.append(" = ");
+            sb.append(val);
         }
 
-        LOG.trace("Executing {}", sqlLogging.toString());
+        sb.append(" WHERE ");
 
-        try {
-            statement.executeBatch();
-            connection.commit();
-            returnConnection(connection);
+        for (int i = 0; i < primaryKeyCols.length; i++) {
+            String primaryKeyCol = primaryKeyCols[i];
+            String val = hmColValues.get(primaryKeyCol);
 
-        } catch (SQLException sqlEx) {
-
-            LOG.error("Error in SQL {}", sqlLogging.toString());
-            connection.rollback();
-            //don't return the connection, since the problem maybe at the connection level
-            throw sqlEx;
-        }
-    }
-
-    @Override
-    public void writeDelete(DbAbstractTable entity) throws Exception {
-        List<DbAbstractTable> v = new ArrayList<DbAbstractTable>();
-        v.add(entity);
-        writeDelete(v);
-    }
-
-    @Override
-    public void writeDelete(List<DbAbstractTable> entities) throws Exception {
-        if (entities.isEmpty()) {
-            return;
-        }
-
-        LOG.trace("Deleting {} entities", entities.size());
-
-        Connection connection = getConnection();
-        Statement statement = connection.createStatement();
-
-        StringJoiner sqlLogging = new StringJoiner("\r\n");
-
-        for (DbAbstractTable entity: entities)
-        {
-            TableAdapter a = entity.getAdapter();
-
-            ArrayList<Object> values = new ArrayList<Object>();
-            entity.writeForDb(values);
-
-            String[] primaryKeyCols = a.getPrimaryKeyColumns();
-            String[] cols = a.getColumns();
-
-            HashMap<String, String> hmColValues = new HashMap<String, String>();
-
-            for (int i = 0; i < cols.length; i++) {
-                String col = cols[i];
-                Object value = values.get(i);
-                String s = convertToString(value);
-
-                hmColValues.put(col, s);
+            if (i > 0) {
+                sb.append("AND ");
             }
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("DELETE FROM ");
-            sb.append(a.getSchema());
-            sb.append(".");
-            sb.append(a.getTableName());
-            sb.append(" WHERE ");
+            sb.append(primaryKeyCol);
+            sb.append(" = ");
+            sb.append(val);
+        }
 
-            for (int i = 0; i < primaryKeyCols.length; i++) {
-                String primaryKeyCol = primaryKeyCols[i];
-                String val = hmColValues.get(primaryKeyCol);
+        return sb.toString();
+    }
+    private static String writeDeleteSql(DbAbstractTable entity) {
+        TableAdapter a = entity.getAdapter();
 
-                if (i > 0) {
-                    sb.append("AND ");
-                }
+        ArrayList<Object> values = new ArrayList<Object>();
+        entity.writeForDb(values);
 
-                sb.append(primaryKeyCol);
-                sb.append(" = ");
-                sb.append(val);
+        String[] primaryKeyCols = a.getPrimaryKeyColumns();
+        String[] cols = a.getColumns();
+
+        HashMap<String, String> hmColValues = new HashMap<String, String>();
+
+        for (int i = 0; i < cols.length; i++) {
+            String col = cols[i];
+            Object value = values.get(i);
+            String s = convertToString(value);
+
+            hmColValues.put(col, s);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("DELETE FROM ");
+        sb.append(a.getSchema());
+        sb.append(".");
+        sb.append(a.getTableName());
+        sb.append(" WHERE ");
+
+        for (int i = 0; i < primaryKeyCols.length; i++) {
+            String primaryKeyCol = primaryKeyCols[i];
+            String val = hmColValues.get(primaryKeyCol);
+
+            if (i > 0) {
+                sb.append("AND ");
             }
 
-            String sql = sb.toString();
-            sqlLogging.add(sql);
-            statement.addBatch(sql);
+            sb.append(primaryKeyCol);
+            sb.append(" = ");
+            sb.append(val);
         }
 
-        LOG.trace("Executing {}", sqlLogging.toString());
-
-        try {
-            statement.executeBatch();
-            connection.commit();
-            returnConnection(connection);
-
-        } catch (SQLException sqlEx) {
-
-            LOG.error("Error in SQL {}", sqlLogging.toString());
-            connection.rollback();
-            //don't return the connection, since the problem maybe at the connection level
-            throw sqlEx;
-        }
+        return sb.toString();
     }
+
 
     @Override
     public DbAbstractTable retrieveForPrimaryKeys(TableAdapter a, Object... keys) throws Exception {

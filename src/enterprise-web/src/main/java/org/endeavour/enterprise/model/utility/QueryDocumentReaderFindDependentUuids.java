@@ -32,20 +32,6 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
     }
 
     @Override
-    protected void processFolder(Folder folder) {
-        addUuid(folder.getParentUuid());
-
-        super.processFolder(folder);
-    }
-
-    @Override
-    protected void processReport(Report report) {
-        addUuid(report.getFolderUuid());
-
-        super.processReport(report);
-    }
-
-    @Override
     protected void processQuery(Query query) {
         addUuid(query.getParentQueryUuid());
 
@@ -66,13 +52,6 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
         addUuid(listOutput.getParentUuid());
 
         super.processReportListOutput(listOutput);
-    }
-
-    @Override
-    protected void processLibraryItem(LibraryItem libraryItem) {
-        addUuid(libraryItem.getFolderUuid());
-
-        super.processLibraryItem(libraryItem);
     }
 
     @Override

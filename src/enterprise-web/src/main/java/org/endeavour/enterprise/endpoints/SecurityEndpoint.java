@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -227,14 +228,15 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         p.setPwdHash(hash);
         p.setDtExpired(DatabaseManager.getEndOfTime());
 
-        //save
-        p.saveToDb();
-
-        //once we've successfully save the new password entity, make the old one as expired
+        //save both old and new passwords atomically
+        List<DbAbstractTable> toSave = new ArrayList<>();
+        toSave.add(p);
         if (oldPwd != null) {
             oldPwd.setDtExpired(new Date());
-            oldPwd.saveToDb();
+            toSave.add(oldPwd);
         }
+
+        DatabaseManager.db().writeEntities(toSave);
 
         return Response
                 .ok()
@@ -283,11 +285,11 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         p.setDtExpired(DatabaseManager.getEndOfTime());
 
         //save
-        p.saveToDb();
+        p.writeToDb();
 
         //now we've correctly set up the new password for the user, we can delete the invite
         invite.setDtCompleted(new Date());
-        invite.saveToDb();
+        invite.writeToDb();
 
         //retrieve the link entity for the org and person
         UUID orgUuid = getOrganisationUuidFromToken(sc);

@@ -3,6 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.database.DbActiveItem;
 import org.endeavour.enterprise.model.database.DbItem;
+import org.endeavour.enterprise.model.json.JsonDeleteResponse;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
@@ -121,9 +122,12 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         LOG.trace("DeletingLibraryItem UUID {}", libraryItemUuid);
 
-        super.deleteItem(libraryItemUuid, orgUuid, userUuid);
+        JsonDeleteResponse ret = deleteItem(libraryItemUuid, orgUuid, userUuid);
 
-        return Response.ok().build();
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
     }
 
     @POST

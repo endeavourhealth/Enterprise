@@ -5,10 +5,7 @@ import org.endeavour.enterprise.model.DependencyType;
 import org.endeavour.enterprise.model.database.DbActiveItem;
 import org.endeavour.enterprise.model.database.DbActiveItemDependency;
 import org.endeavour.enterprise.model.database.DbItem;
-import org.endeavour.enterprise.model.json.JsonFolder;
-import org.endeavour.enterprise.model.json.JsonFolderContent;
-import org.endeavour.enterprise.model.json.JsonFolderContentsList;
-import org.endeavour.enterprise.model.json.JsonFolderList;
+import org.endeavour.enterprise.model.json.*;
 import org.endeavourhealth.enterprise.core.querydocument.models.Folder;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.slf4j.Logger;
@@ -268,9 +265,12 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             throw new BadRequestException("UUID is a " + itemType + " not a folder");
         }
 
-        deleteItem(folderUuid, orgUuid, userUuid);
+        JsonDeleteResponse ret = deleteItem(folderUuid, orgUuid, userUuid);
 
-        return Response.ok().build();
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
     }
 
 
@@ -350,66 +350,12 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         }
 
         DbItem item = DbItem.factoryNew(userUuid, title);
-        item.saveToDb();
+        item.writeToDb();
 
         DbActiveItem activeItemReports = DbActiveItem.factoryNew(item, organisationUuid, itemType);
-        activeItemReports.saveToDb();
+        activeItemReports.writeToDb();
     }
-    /*public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String uuidStr) throws Exception
-    {
-        UUID uuid = null;
-        if (uuidStr != null
-                && uuidStr.length() > 0)
-        {
-            uuid = UUID.fromString(uuidStr);
-        }
 
-        //get all our folders at the desired level
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-        List<DbFolder> folders = DbFolder.retrieveForOrganisationParentType(orgUuid, uuid, folderType);
-        JsonFolderList ret = new JsonFolderList(folders.size());
-
-        for (int i=0; i<folders.size(); i++)
-        {
-            DbFolder folder = folders.get(i);
-            UUID folderUuid = folder.getPrimaryUuid();
-            List<DbFolderItemLink> items = DbFolderItemLink.retrieveForFolder(folderUuid);
-            int contentCount = items.size();
-
-            ret.add(folder, contentCount);
-        }
-
-        return Response
-                .ok()
-                .entity(ret)
-                .build();
-    }*/
-
-
-    /**
-     * several of our functions perform the same checks, so refactored out to here
-     */
-    /*private DbFolder getFolderForUuidAndValidateOrganisation(SecurityContext sc, UUID folderUuid) throws Exception
-    {
-        //get the organisation from the server token
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-
-        //ensure the folder actually exists
-        DbFolder folder = DbFolder.retrieveForUuid(folderUuid);
-        if (folder == null)
-        {
-            throw new BadRequestException("Folder doesn't exist");
-        }
-
-        //ensure it's for the right organisation
-        UUID folderOrgUuid = folder.getOrganisationUuid();
-        if (!folderOrgUuid.equals(orgUuid))
-        {
-            throw new BadRequestException("Folder belongs to different organisation");
-        }
-
-        return folder;
-    }*/
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -465,105 +411,4 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
                 .build();
     }
 
-    /*public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception
-    {
-        UUID folderUuid = UUID.fromString(uuidStr);
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-
-        //retrieve the folder and validate it's for our org
-        DbFolder folder = DbFolder.retrieveForUuid(folderUuid);
-        if (!folder.getOrganisationUuid().equals(orgUuid))
-        {
-            throw new BadRequestException("Folder at different organisation");
-        }
-
-        JsonFolderContentsList ret = new JsonFolderContentsList();
-
-        *//*List<DbAbstractTable> items = DbFolderItemLink.retrieveForFolder(folderUuid);
-        for (int i=0; i<items.size(); i++)
-        {
-            DbFolderItemLink item = (DbFolderItemLink)items.get(i);
-        }*//*
-
-        if (folder.getFolderType() == DbFolder.FOLDER_TYPE_REPORTS)
-        {
-            JsonFolderContent c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("Report 1");
-            c.setTypeEnum(DefinitionItemType.Report);
-            c.setLastModified(new Date());
-            c.setLastRun(new Date());
-            c.setIsScheduled(true);
-            ret.addContent(c);
-
-            c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("Report 2");
-            c.setTypeEnum(DefinitionItemType.Report);
-            c.setLastModified(new Date());
-            c.setIsScheduled(false);
-            ret.addContent(c);
-
-            c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("Report 3");
-            c.setTypeEnum(DefinitionItemType.Report);
-            c.setLastModified(new Date());
-            c.setIsScheduled(false);
-            ret.addContent(c);
-        }
-        else if (folder.getFolderType() == DbFolder.FOLDER_TYPE_LIBRARY)
-        {
-            JsonFolderContent c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("List Output 1");
-            c.setTypeEnum(DefinitionItemType.ListOutput);
-            c.setLastModified(new Date());
-            ret.addContent(c);
-
-            c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("List Output 2");
-            c.setTypeEnum(DefinitionItemType.ListOutput);
-            c.setLastModified(new Date());
-            ret.addContent(c);
-
-            c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("List Output 3");
-            c.setTypeEnum(DefinitionItemType.ListOutput);
-            c.setLastModified(new Date());
-            ret.addContent(c);
-
-            c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("Query 1");
-            c.setTypeEnum(DefinitionItemType.Query);
-            c.setLastModified(new Date());
-            ret.addContent(c);
-
-            c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("Query 2");
-            c.setTypeEnum(DefinitionItemType.Query);
-            c.setLastModified(new Date());
-            ret.addContent(c);
-
-            c = new JsonFolderContent();
-            c.setUuid(UUID.randomUUID());
-            c.setName("Query 3");
-            c.setTypeEnum(DefinitionItemType.Query);
-            c.setLastModified(new Date());
-            ret.addContent(c);
-        }
-        else
-        {
-            throw new BadRequestException("Unsupported folder type");
-        }
-
-        return Response
-                .ok()
-                .entity(ret)
-                .build();
-    }*/
 }

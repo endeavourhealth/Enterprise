@@ -77,7 +77,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
 
         //save to db
-        org.saveToDb();
+        org.writeToDb();
 
         //if we've created new root folders, save them now
         if (creteRootFolders) {
@@ -172,7 +172,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 user.setIsSuperUser(isSuperUser);
 
                 //we need the UUID of this person, so save right now to generate it
-                user.saveToDb();
+                user.writeToDb();
                 uuid = user.getPrimaryUuid();
             }
             //if we're trying to create a new user, but they already exist at another org,
@@ -227,7 +227,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             user.setForename(forename);
             user.setSurname(surname);
             user.setIsSuperUser(isSuperUser);
-            user.saveToDb();
+            user.writeToDb();
 
             //retrieve the link entity, as we may want to change the permissions on there
             link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
@@ -239,10 +239,10 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
 
         //save our things to db
-        user.saveToDb();
+        user.writeToDb();
 
         if (link != null) {
-            link.saveToDb();
+            link.writeToDb();
         }
 
         //if we just updated a person, then we don't want to generate any invite email
@@ -281,7 +281,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         invite.sendInviteEmail(user, org);
 
         //only save AFTER we've successfully send the invite email
-        invite.saveToDb();
+        invite.writeToDb();
     }
 
     @POST
@@ -314,7 +314,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             DbOrganisationEndUserLink link = links.get(i);
             if (link.getOrganisationUuid().equals(orgUuid)) {
                 link.setDtExpired(new Date());
-                link.saveToDb();
+                link.writeToDb();
             }
         }
 
@@ -389,7 +389,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         for (int i = 0; i < invites.size(); i++) {
             DbEndUserEmailInvite invite = invites.get(i);
             invite.setDtCompleted(new Date());
-            invite.saveToDb();
+            invite.writeToDb();
         }
 
         //now generate a new invite and send it

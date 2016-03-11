@@ -3,6 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.database.DbActiveItem;
 import org.endeavour.enterprise.model.database.DbItem;
+import org.endeavour.enterprise.model.json.JsonDeleteResponse;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
@@ -99,9 +100,12 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("DeletingReport UUID {}", reportUuid);
 
-        super.deleteItem(reportUuid, orgUuid, userUuid);
+        JsonDeleteResponse ret = deleteItem(reportUuid, orgUuid, userUuid);
 
-        return Response.ok().build();
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
     }
 
 }

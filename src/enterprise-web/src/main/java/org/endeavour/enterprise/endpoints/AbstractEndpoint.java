@@ -11,7 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import java.util.UUID;
 
-public abstract class Endpoint
+public abstract class AbstractEndpoint
 {
     @Context
     protected SecurityContext securityContext;

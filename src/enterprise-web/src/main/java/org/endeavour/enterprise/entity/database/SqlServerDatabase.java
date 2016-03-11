@@ -21,7 +21,7 @@ public final class SqlServerDatabase implements DatabaseI
 {
     private static final Logger LOG = LoggerFactory.getLogger(SqlServerDatabase.class);
     private static final String ALIAS = "z";
-    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private LinkedList<PoolableConnection> connectionPool = new LinkedList<>();
 
@@ -60,6 +60,7 @@ public final class SqlServerDatabase implements DatabaseI
         }
         else if (o instanceof Date)
         {
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
             return "'" + dateFormatter.format((Date)o) + "'";
         }
         else if (o instanceof DependencyType)

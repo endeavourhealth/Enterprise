@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Drew on 25/02/2016.
  */
-public abstract class ItemEndpoint extends Endpoint
+public abstract class AbstractItemEndpoint extends Endpoint
 {
     private static Pattern guidRegex = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 

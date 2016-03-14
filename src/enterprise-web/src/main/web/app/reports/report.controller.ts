@@ -45,7 +45,7 @@ module app.reports {
 					this.createReport(itemUuid);
 					break;
 				case 'view':
-					this.loadReport(itemUuid);
+					this.getReport(itemUuid);
 					break;
 			}
 		}
@@ -63,8 +63,45 @@ module app.reports {
 			this.reportContent = [];
 		}
 
-		loadReport(reportUuid:string) {
-			// Load report from DB
+		getReport(reportUuid:string) {
+			var vm = this;
+			vm.libraryService.getReport(reportUuid)
+				.then(function (data) {
+					vm.report = data;
+					vm.logger.success('Report loaded', vm.report, 'Loded');
+					vm.reportContent = [];
+					vm.populateTreeFromReportLists(vm.report, vm.reportContent, '');
+				})
+				.catch(function(data) {
+					vm.logger.error('Error loading report', data, 'Error');
+				});
+		}
+
+		populateTreeFromReportLists(report : Report, nodeList : ReportNode[], parentUuid : string) {
+			for (var i = 0; i < report.query.length; i++) {
+				if (this.report.query[i].parentUuid === parentUuid) {
+					var reportNode:ReportNode = {
+						name : report.query[i].uuid,
+						uuid : report.query[i].uuid,
+						type : ItemType.Query,
+						children : []
+					};
+					nodeList.push(reportNode);
+					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid);
+				}
+			}
+			for (var i = 0; i < report.listOutput.length; i++) {
+				if (this.report.listOutput[i].parentUuid === parentUuid) {
+					var reportNode:ReportNode = {
+						name : report.listOutput[i].uuid,
+						uuid : report.listOutput[i].uuid,
+						type : ItemType.ListOutput,
+						children : []
+					};
+					nodeList.push(reportNode);
+					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid);
+				}
+			}
 		}
 
 		saveReport() {

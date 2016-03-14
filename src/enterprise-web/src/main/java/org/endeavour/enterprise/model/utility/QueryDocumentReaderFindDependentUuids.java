@@ -26,7 +26,7 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
     }
 
     private void addUuid(String uuid) {
-        if (uuid != null) {
+        if (uuid != null && !uuid.isEmpty()) {
             uuids.add(UUID.fromString(uuid));
         }
     }

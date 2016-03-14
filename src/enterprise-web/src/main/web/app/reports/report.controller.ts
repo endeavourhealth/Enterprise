@@ -55,7 +55,7 @@ module app.reports {
 			this.report = {
 				uuid: '',
 				name: 'New report',
-				description: '',
+//				description: '',
 				folderUuid: folderUuid,
 				query: [],
 				listOutput: []
@@ -75,7 +75,7 @@ module app.reports {
 
 			vm.libraryService.saveReport(vm.report)
 				.then(function (data) {
-					vm.report.uuid = data;
+					vm.report.uuid = data.uuid;
 					vm.logger.success('Report saved', vm.report, 'Saved');
 				})
 				.catch(function(data) {

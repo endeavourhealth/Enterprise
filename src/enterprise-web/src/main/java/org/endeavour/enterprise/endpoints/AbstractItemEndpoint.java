@@ -369,7 +369,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     }
 
     protected UUID parseUuidFromStr(String uuidStr) {
-        if (uuidStr == null) {
+        if (uuidStr == null || uuidStr.isEmpty()) {
             return null;
         } else {
             return UUID.fromString(uuidStr);

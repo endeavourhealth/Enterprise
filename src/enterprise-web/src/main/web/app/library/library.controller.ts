@@ -9,9 +9,10 @@ module app.library {
 	import itemTypeIdToString = app.models.itemTypeIdToString;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
-	import CodeSearchResult = app.models.CodeSearchResult;
 	import InputBoxController = app.dialogs.InputBoxController;
 	import CodePickerController = app.dialogs.CodePickerController;
+	import CodeSelection = app.models.CodeSelection;
+	import IScope = angular.IScope;
 	'use strict';
 
 	export class LibraryController {
@@ -24,7 +25,7 @@ module app.library {
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger:ILoggerService,
-			protected $scope : any,
+			protected $scope : IScope,
 			protected $modal : IModalService) {
 			this.getLibraryRootFolders();
 		}
@@ -72,7 +73,7 @@ module app.library {
 		}
 
 		showCodePicker() {
-			var selection : CodeSearchResult[] = [
+			var selection : CodeSelection[] = [
 				{
 					term: 'asthma',
 					matches: [
@@ -103,15 +104,15 @@ module app.library {
 			];
 
 			CodePickerController.open(this.$modal, selection)
-				.result.then(function(selectedItems : CodeSearchResult[]){
+				.result.then(function(resultData : CodeSelection[]){
 					console.log('Dialog closed');
-					console.log(selectedItems);
+					console.log(resultData);
 				});
 		}
 
 		renameFolder(folder : FolderNode) {
 			InputBoxController.open(this.$modal, 'Rename folder', 'Enter new name for ' + folder.folderName, folder.folderName)
-				.result.then(function(resultData : any) {
+				.result.then(function(resultData : string) {
 					console.log('Dialog closed');
 					console.log(resultData);
 				});

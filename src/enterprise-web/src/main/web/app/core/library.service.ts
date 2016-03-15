@@ -7,8 +7,9 @@
 module app.core {
 	import ItemSummaryList = app.models.ItemSummaryList;
 	import FolderNode = app.models.FolderNode;
-	import ITreeNode = AngularUITree.ITreeNode;
 	import Report = app.models.Report;
+	import TermlexTreeNode = app.models.TermlexTreeNode;
+	import UuidNameKVP = app.models.UuidNameKVP;
 	'use strict';
 
 	export interface ILibraryService {
@@ -17,12 +18,12 @@ module app.core {
 		getEngineState() : ng.IPromise<app.models.EngineState>;
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
 		searchCodes(searchData : string):ng.IPromise<app.models.TermlexSearchResult>;
-		getCodeTreeData(code : string):ng.IPromise<ITreeNode[]>;
+		getCodeTreeData(code : string):ng.IPromise<TermlexTreeNode[]>;
 		getFolders(moduleId : number, folderUuid : string):ng.IPromise<FolderNode[]>;
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
-		getLibraryItemNamesForReport(uuid : string):ng.IPromise<any>;
+		getLibraryItemNamesForReport(uuid : string):ng.IPromise<UuidNameKVP[]>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -104,7 +105,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getCodeTreeData(id : string):ng.IPromise<ITreeNode[]> {
+		getCodeTreeData(id : string):ng.IPromise<TermlexTreeNode[]> {
 			var defer = this.promise.defer();
 			var request = {
 				withCredentials: false
@@ -130,7 +131,7 @@ module app.core {
 				}
 			};
 
-			vm.http.get<any>('api/folder/getFolders', {params: {'folderType': moduleId, 'parentUuid': folderUuid}})
+			vm.http.get<{folders:FolderNode[]}>('api/folder/getFolders', request)
 				.then(function (response) {
 					defer.resolve(response.data.folders);
 				})
@@ -194,7 +195,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		getLibraryItemNamesForReport(uuid : string):ng.IPromise<any> {
+		getLibraryItemNamesForReport(uuid : string):ng.IPromise<UuidNameKVP[]> {
 			var vm = this;
 			var defer = vm.promise.defer();
 			var request = {
@@ -202,9 +203,9 @@ module app.core {
 					'uuid': uuid
 				}
 			};
-			vm.http.get('api/library/getLibraryItemNamesForReport', request)
+			vm.http.get<{contents:UuidNameKVP[]}>('api/library/getLibraryItemNamesForReport', request)
 				.then(function(response) {
-					defer.resolve(response.data);
+					defer.resolve(response.data.contents);
 				})
 				.catch(function (exception) {
 					defer.reject(exception);

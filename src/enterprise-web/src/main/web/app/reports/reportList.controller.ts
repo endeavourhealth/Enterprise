@@ -7,6 +7,7 @@ module app.reports {
 	import ILoggerService = app.blocks.ILoggerService;
 	import FolderContent = app.models.FolderItem;
 	import itemTypeIdToString = app.models.itemTypeIdToString;
+	import IScope = angular.IScope;
 	'use strict';
 
 	export class ReportListController {
@@ -19,7 +20,7 @@ module app.reports {
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger : ILoggerService,
-			protected $scope : any) {
+			protected $scope : IScope) {
 			this.getReportsRootFolders();
 		}
 

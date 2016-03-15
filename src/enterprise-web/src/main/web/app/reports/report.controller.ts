@@ -16,6 +16,8 @@ module app.reports {
 	import Report = app.models.Report;
 	import Query = app.models.Query;
 	import ListOutput = app.models.ListOutput;
+	import UuidNameKVP = app.models.UuidNameKVP;
+	import IScope = angular.IScope;
 	'use strict';
 
 	class ReportController {
@@ -24,15 +26,15 @@ module app.reports {
 		itemSummaryList : ItemSummaryList;
 		report : Report;
 		reportContent : ReportNode[];
-		contentTreeCallbackOptions : any;
+		contentTreeCallbackOptions : ICallbacks;
 
 		static $inject = ['LibraryService', 'LoggerService', '$stateParams'];
 
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger : ILoggerService,
-			protected $stateParams : any) {
-			this.contentTreeCallbackOptions = {dropped: this.contentTreeDroppedCallback};
+			protected $stateParams : {itemAction : string, itemUuid : string}) {
+			this.contentTreeCallbackOptions = {dropped: this.contentTreeDroppedCallback, accept: null, dragStart: null};
 
 			this.getLibraryRootFolders();
 			this.performAction($stateParams.itemAction, $stateParams.itemUuid);
@@ -55,7 +57,7 @@ module app.reports {
 			this.report = {
 				uuid: '',
 				name: 'New report',
-//				description: '',
+				description: '',
 				folderUuid: folderUuid,
 				query: [],
 				listOutput: []
@@ -68,7 +70,6 @@ module app.reports {
 			vm.libraryService.getReport(reportUuid)
 				.then(function (data) {
 					vm.report = data;
-					vm.logger.success('Report loaded', vm.report, 'Loded');
 					vm.reportContent = [];
 					vm.libraryService.getLibraryItemNamesForReport(reportUuid)
 						.then(function(data) {
@@ -83,12 +84,16 @@ module app.reports {
 				});
 		}
 
-		populateTreeFromReportLists(report : Report, nodeList : ReportNode[], parentUuid : string, nameMap : any) {
+		populateTreeFromReportLists(report : Report,
+																nodeList : ReportNode[],
+																parentUuid : string,
+																nameMap : UuidNameKVP[]) {
+			if (report.query == null) { report.query = []; }
 			for (var i = 0; i < report.query.length; i++) {
 				if (this.report.query[i].parentUuid === parentUuid) {
 					var reportNode:ReportNode = {
-						name : $.grep(nameMap.contents,
-							(e : {uuid:string, name:string}) => { return e.uuid === report.query[i].uuid; }
+						name : $.grep(nameMap,
+							(e : UuidNameKVP) => { return e.uuid === report.query[i].uuid; }
 						)[0].name,
 						uuid : report.query[i].uuid,
 						type : ItemType.Query,
@@ -98,11 +103,12 @@ module app.reports {
 					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid, nameMap);
 				}
 			}
+			if (report.listOutput == null) { report.listOutput = []; }
 			for (var i = 0; i < report.listOutput.length; i++) {
 				if (this.report.listOutput[i].parentUuid === parentUuid) {
 					var reportNode:ReportNode = {
-						name : $.grep(nameMap.contents,
-							(e : {uuid:string, name:string}) => { return e.uuid === report.query[i].uuid; }
+						name : $.grep(nameMap,
+							(e : UuidNameKVP) => { return e.uuid === report.query[i].uuid; }
 						)[0].name,
 						uuid : report.listOutput[i].uuid,
 						type : ItemType.ListOutput,

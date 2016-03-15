@@ -2,8 +2,6 @@
 /// <reference path="../../blocks/logger.service.ts" />
 
 module app.dialogs {
-	import CodeSearchResult = app.models.CodeSearchResult;
-	import CodeSearchMatch = app.models.CodeSearchMatch;
 	import ITreeNode = AngularUITree.ITreeNode;
 	import ILibraryService = app.core.ILibraryService;
 	import LibraryService = app.core.LibraryService;
@@ -12,15 +10,17 @@ module app.dialogs {
 	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import IModalService = angular.ui.bootstrap.IModalService;
+	import CodeSelection = app.models.CodeSelection;
+	import TermlexTreeNode = app.models.TermlexTreeNode;
 	'use strict';
 
 	export class CodePickerController extends BaseDialogController {
-		selectedMatch : any;
+		selectedMatch : TermlexSearchResultResult;
 		searchData : string;
 		searchResults : TermlexSearchResult;
-		treeData : any[];
+		treeData : TermlexTreeNode[];
 
-		public static open($modal : IModalService, selection : CodeSearchResult[]) : IModalServiceInstance {
+		public static open($modal : IModalService, selection : CodeSelection[]) : IModalServiceInstance {
 			var options : IModalSettings = {
 				templateUrl:'app/dialogs/codePicker/codePicker.html',
 				controller:'CodePickerController',
@@ -40,7 +40,7 @@ module app.dialogs {
 		constructor(protected $uibModalInstance : IModalServiceInstance,
 								private logger:app.blocks.ILoggerService,
 								private libraryService : ILibraryService,
-								private selection : CodeSearchResult[]) {
+								private selection : CodeSelection[]) {
 			super($uibModalInstance);
 			this.searchData = 'Asthma';
 			this.resultData = selection;
@@ -62,7 +62,7 @@ module app.dialogs {
 			vm.selectedMatch = match;
 
 			vm.libraryService.getCodeTreeData(match.id)
-				.then(function(result:ITreeNode[]) {
+				.then(function(result:TermlexTreeNode[]) {
 					vm.treeData = [
 						{
 							id: match.id,
@@ -75,7 +75,7 @@ module app.dialogs {
 				});
 		}
 
-		getButtonProperties(item : CodeSearchResult) {
+		getButtonProperties(item : CodeSelection) {
 			if (item.matches.length === 0) {
 				return 'btn-danger';
 			}
@@ -85,18 +85,18 @@ module app.dialogs {
 			return 'btn-success';
 		}
 
-		toggleExpansion(node: any) {
+		toggleExpansion(node: TermlexTreeNode) {
 			var vm = this;
 			node.isExpanded = !node.isExpanded;
 			if (node.isExpanded && node.childCount > 0 && !node.nodes) {
 				vm.libraryService.getCodeTreeData(node.id)
-					.then(function(result:ITreeNode[]) {
+					.then(function(result:TermlexTreeNode[]) {
 						node.nodes = result;
 					});
 			}
 		}
 
-		getMatchCount(item : CodeSearchResult) {
+		getMatchCount(item : CodeSelection) {
 			return item.matches.length > 1 ? item.matches.length : null;
 		}
 	}

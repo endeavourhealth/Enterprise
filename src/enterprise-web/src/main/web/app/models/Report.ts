@@ -4,7 +4,7 @@ module app.models {
 	export class Report {
 		uuid:string;
 		name:string;
-		// description:string;
+		description:string;
 		folderUuid:string;
 		query:Query[];
 		listOutput:ListOutput[];

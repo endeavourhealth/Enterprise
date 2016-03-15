@@ -2,8 +2,6 @@
 /// <reference path="../../blocks/logger.service.ts" />
 
 module app.dialogs {
-	import CodeSearchResult = app.models.CodeSearchResult;
-	import CodeSearchMatch = app.models.CodeSearchMatch;
 	import ITreeNode = AngularUITree.ITreeNode;
 	import ILibraryService = app.core.ILibraryService;
 	import LibraryService = app.core.LibraryService;

@@ -1,13 +1,13 @@
 package org.endeavourhealth.enterprise.core.querydocument;
 
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
+import org.endeavourhealth.enterprise.core.querydocument.models.ObjectFactory;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.*;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +21,7 @@ import java.io.StringWriter;
  */
 public abstract class QueryDocumentParser {
 
+    private static ObjectFactory objectFactory = new ObjectFactory();
 
     public static <T> T readFromXml(Class cls, String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
@@ -31,11 +32,11 @@ public abstract class QueryDocumentParser {
         org.w3c.dom.Element varElement = document.getDocumentElement();
 
         String name = varElement.getNodeName();
-        if (name.equals("Report")) {
+        if (name.equalsIgnoreCase("report")) {
             return readObjectFromXml(Report.class, document);
-        } else if (name.equals("LibraryItem")) {
+        } else if (name.equalsIgnoreCase("libraryItem")) {
             return readObjectFromXml(LibraryItem.class, document);
-        } else if (name.equals("QueryDocument")) {
+        } else if (name.equalsIgnoreCase("queryDocument")) {
              return readObjectFromXml(QueryDocument.class, document);
         } else {
             throw new RuntimeException("Unexpected root node " + name);
@@ -57,31 +58,33 @@ public abstract class QueryDocumentParser {
                 && q.getReport().size() == 1) {
 
             Report report = q.getReport().get(0);
-            return writeObjectToXml(report);
+            JAXBElement element = objectFactory.createReport(report);
+            return writeObjectToXml(element);
 
         } else if (q.getFolder().isEmpty()
                 && q.getLibraryItem().size() == 1
                 && q.getReport().isEmpty()) {
 
             LibraryItem libraryItem = q.getLibraryItem().get(0);
-            return writeObjectToXml(libraryItem);
+            JAXBElement element = objectFactory.createLibraryItem(libraryItem);
+            return writeObjectToXml(element);
         }
         else
         {
-            return writeObjectToXml(q);
+            JAXBElement element = objectFactory.createQueryDocument(q);
+            return writeObjectToXml(element);
         }
     }
 
-    private static <T> String writeObjectToXml(T obj) {
+    private static String writeObjectToXml(JAXBElement element) {
         StringWriter sw = new StringWriter();
-        Class cls = obj.getClass();
+        Class cls = element.getValue().getClass();
 
         try {
             JAXBContext context = JAXBContext.newInstance(cls);
-
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); //just makes output easier to read
-            marshaller.marshal(new JAXBElement<T>(new QName(cls.getSimpleName()), cls, obj), sw);
+            marshaller.marshal(element, sw);
 
         } catch (JAXBException e) {
             throw new RuntimeException(e);

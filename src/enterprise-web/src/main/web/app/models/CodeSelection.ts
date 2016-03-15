@@ -1,11 +1,12 @@
 module app.models {
-	export class CodeSelectionMatches {
+	export class CodeSelectionMatch {
 		term:string;
 		code:string;
 	}
 
 	export class CodeSelection {
 		term:string;
-		matches:CodeSelectionMatches[];
+		includeChildren:boolean;
+		matches:CodeSelectionMatch[];
 	}
 }

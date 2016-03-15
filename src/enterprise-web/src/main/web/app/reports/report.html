@@ -129,7 +129,9 @@
 					<span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
 					{{node.name}}
 				</span>
-				<button class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)">X</button>
+				<button class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)">
+					<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+				</button>
 			</span>
 		</div>
 		<ol ui-tree-nodes="" ng-model="node.children">

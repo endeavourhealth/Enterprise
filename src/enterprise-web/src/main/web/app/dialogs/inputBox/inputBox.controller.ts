@@ -25,6 +25,7 @@ module app.dialogs {
 				templateUrl:'app/dialogs/inputBox/inputBox.html',
 				controller:'InputBoxController',
 				controllerAs:'ctrl',
+				backdrop:'static',
 				resolve: {
 					title : () => title,
 					message : () => message,

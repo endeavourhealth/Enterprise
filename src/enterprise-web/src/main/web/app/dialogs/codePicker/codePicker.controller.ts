@@ -26,6 +26,7 @@ module app.dialogs {
 				controller:'CodePickerController',
 				controllerAs:'codePicker',
 				size:'lg',
+				backdrop: 'static',
 				resolve:{
 					selection : () => selection
 				}
@@ -98,6 +99,27 @@ module app.dialogs {
 
 		getMatchCount(item : CodeSelection) {
 			return item.matches.length > 1 ? item.matches.length : null;
+		}
+
+		select(match : TermlexSearchResultResult, includeChildren : boolean) {
+			var item : CodeSelection = {
+				term : match.label,
+				includeChildren : includeChildren,
+				matches : [
+					{
+						code : match.id,
+						term : match.label
+					}
+				]
+			};
+			this.resultData.push(item);
+		}
+
+		unselect(item : CodeSelection) {
+			var i = this.resultData.indexOf(item);
+			if (i !== -1) {
+				this.resultData.splice(i, 1);
+			}
 		}
 	}
 

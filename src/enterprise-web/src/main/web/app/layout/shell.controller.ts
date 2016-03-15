@@ -5,13 +5,14 @@ module app.layout {
 	import IStateService = angular.ui.IStateService;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
+	import IModalStackService = angular.ui.bootstrap.IModalStackService;
 	class ShellController {
 		warning : IModalServiceInstance;
 		timedout : IModalServiceInstance;
 
-		static $inject = ['$scope', '$uibModal', '$state'];
+		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state'];
 
-		constructor($scope : IRootScopeService, $modal : IModalService, $state : IStateService) {
+		constructor($scope : IRootScopeService, $modal : IModalService, $modalStack : IModalStackService, $state : IStateService) {
 			var vm = this;
 
 			function closeModals() {
@@ -41,6 +42,7 @@ module app.layout {
 
 			$scope.$on('IdleTimeout', function () {
 				closeModals();
+				$modalStack.dismissAll();
 				$state.transitionTo('login');
 				vm.timedout = $modal.open({
 					templateUrl: 'timedout-dialog.html',

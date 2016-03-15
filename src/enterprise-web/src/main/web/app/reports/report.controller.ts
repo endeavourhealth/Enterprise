@@ -70,36 +70,46 @@ module app.reports {
 					vm.report = data;
 					vm.logger.success('Report loaded', vm.report, 'Loded');
 					vm.reportContent = [];
-					vm.populateTreeFromReportLists(vm.report, vm.reportContent, '');
+					vm.libraryService.getLibraryItemNamesForReport(reportUuid)
+						.then(function(data) {
+						vm.populateTreeFromReportLists(vm.report, vm.reportContent, '', data);
+					})
+					.catch(function(data) {
+						vm.logger.error('Error loading report item names', data, 'Error');
+					});
 				})
 				.catch(function(data) {
 					vm.logger.error('Error loading report', data, 'Error');
 				});
 		}
 
-		populateTreeFromReportLists(report : Report, nodeList : ReportNode[], parentUuid : string) {
+		populateTreeFromReportLists(report : Report, nodeList : ReportNode[], parentUuid : string, nameMap : any) {
 			for (var i = 0; i < report.query.length; i++) {
 				if (this.report.query[i].parentUuid === parentUuid) {
 					var reportNode:ReportNode = {
-						name : report.query[i].uuid,
+						name : $.grep(nameMap.contents,
+							(e : {uuid:string, name:string}) => { return e.uuid === report.query[i].uuid; }
+						)[0].name,
 						uuid : report.query[i].uuid,
 						type : ItemType.Query,
 						children : []
 					};
 					nodeList.push(reportNode);
-					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid);
+					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid, nameMap);
 				}
 			}
 			for (var i = 0; i < report.listOutput.length; i++) {
 				if (this.report.listOutput[i].parentUuid === parentUuid) {
 					var reportNode:ReportNode = {
-						name : report.listOutput[i].uuid,
+						name : $.grep(nameMap.contents,
+							(e : {uuid:string, name:string}) => { return e.uuid === report.query[i].uuid; }
+						)[0].name,
 						uuid : report.listOutput[i].uuid,
 						type : ItemType.ListOutput,
 						children : []
 					};
 					nodeList.push(reportNode);
-					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid);
+					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid, nameMap);
 				}
 			}
 		}

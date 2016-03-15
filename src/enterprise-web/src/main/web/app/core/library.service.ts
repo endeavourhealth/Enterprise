@@ -22,6 +22,7 @@ module app.core {
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
+		getLibraryItemNamesForReport(uuid : string):ng.IPromise<any>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -183,6 +184,25 @@ module app.core {
 				}
 			};
 			vm.http.get('api/report/getReport', request)
+				.then(function(response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		getLibraryItemNamesForReport(uuid : string):ng.IPromise<any> {
+			var vm = this;
+			var defer = vm.promise.defer();
+			var request = {
+				params: {
+					'uuid': uuid
+				}
+			};
+			vm.http.get('api/library/getLibraryItemNamesForReport', request)
 				.then(function(response) {
 					defer.resolve(response.data);
 				})

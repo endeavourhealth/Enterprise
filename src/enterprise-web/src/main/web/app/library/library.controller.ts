@@ -10,6 +10,8 @@ module app.library {
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import CodeSearchResult = app.models.CodeSearchResult;
+	import InputBoxController = app.dialogs.InputBoxController;
+	import CodePickerController = app.dialogs.CodePickerController;
 	'use strict';
 
 	export class LibraryController {
@@ -70,18 +72,49 @@ module app.library {
 		}
 
 		showCodePicker() {
-			var options : IModalSettings = {
-				templateUrl:'app/dialogs/codePicker/codePicker.html',
-				controller:'CodePickerController',
-				controllerAs:'codePicker',
-				size:'lg'
-			};
+			var selection : CodeSearchResult[] = [
+				{
+					term: 'asthma',
+					matches: [
+						{
+							term: 'asthma',
+							code: '195967001'
+						}
+					]
+				},
+				{
+					term: 'angina',
+					matches: [
+						{
+							term: 'angina',
+							code: '194828000'
+						}
+					]
+				},
+				{
+					term: 'diabetes',
+					matches: [
+						{
+							term: 'diabetes mellitus',
+							code: '73211009'
+						}
+					]
+				}
+			];
 
-			var dialog = this.$modal.open(options);
-			dialog.result.then(function(selectedItems : CodeSearchResult[]){
-				console.log('Dialog closed');
-				console.log(selectedItems);
-			});
+			CodePickerController.open(this.$modal, selection)
+				.result.then(function(selectedItems : CodeSearchResult[]){
+					console.log('Dialog closed');
+					console.log(selectedItems);
+				});
+		}
+
+		renameFolder(folder : FolderNode) {
+			InputBoxController.open(this.$modal, 'Rename folder', 'Enter new name for ' + folder.folderName, folder.folderName)
+				.result.then(function(resultData : any) {
+					console.log('Dialog closed');
+					console.log(resultData);
+				});
 		}
 	}
 

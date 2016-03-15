@@ -111,7 +111,7 @@ module app.reports {
 			vm.populateReportListsFromTree(vm.report, '', vm.reportContent);
 
 			vm.libraryService.saveReport(vm.report)
-				.then(function (data) {
+				.then(function (data:Report) {
 					vm.report.uuid = data.uuid;
 					vm.logger.success('Report saved', vm.report, 'Saved');
 				})

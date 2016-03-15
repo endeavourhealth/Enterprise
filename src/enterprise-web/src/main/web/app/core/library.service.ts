@@ -20,7 +20,7 @@ module app.core {
 		getCodeTreeData(code : string):ng.IPromise<ITreeNode[]>;
 		getFolders(moduleId : number, folderUuid : string):ng.IPromise<FolderNode[]>;
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
-		saveReport(report : Report):ng.IPromise<string>;
+		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
 	}
 
@@ -159,7 +159,7 @@ module app.core {
 			return defer.promise;
 		}
 
-		saveReport(report: Report):ng.IPromise<string> {
+		saveReport(report: Report):ng.IPromise<Report> {
 			var vm = this;
 			var defer = vm.promise.defer();
 

@@ -10,53 +10,40 @@ module app.dialogs {
 	import TermlexSearchResult = app.models.TermlexSearchResult;
 	import TermlexSearchResultResult = app.models.TermlexSearchResultResult;
 	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
+	import IModalSettings = angular.ui.bootstrap.IModalSettings;
+	import IModalService = angular.ui.bootstrap.IModalService;
 	'use strict';
 
-	class CodePickerController {
+	export class CodePickerController extends BaseDialogController {
 		selectedMatch : any;
 		searchData : string;
 		searchResults : TermlexSearchResult;
 		treeData : any[];
-		selectedItems : CodeSearchResult[];
-		showModal : boolean;
 
-		static $inject = ['LoggerService', 'LibraryService', '$uibModalInstance'];
-
-		constructor(private logger:app.blocks.ILoggerService,
-								private libraryService : ILibraryService,
-								private $uibModalInstance : IModalServiceInstance) {
-			this.showModal = false;
-			// this.searchData = '"Asthma","Angina","Diabetes","Hadache","Glaucoma","Ankle"';
-			this.searchData = 'Asthma';
-			this.selectedItems = [
-				{
-					term: 'asthma',
-					matches: [
-						{
-							term: 'asthma',
-							code: '195967001'
-						}
-					]
-				},
-				{
-					term: 'angina',
-					matches: [
-						{
-							term: 'angina',
-							code: '194828000'
-						}
-					]
-				},
-				{
-					term: 'diabetes',
-					matches: [
-						{
-							term: 'diabetes mellitus',
-							code: '73211009'
-						}
-					]
+		public static open($modal : IModalService, selection : CodeSearchResult[]) : IModalServiceInstance {
+			var options : IModalSettings = {
+				templateUrl:'app/dialogs/codePicker/codePicker.html',
+				controller:'CodePickerController',
+				controllerAs:'codePicker',
+				size:'lg',
+				resolve:{
+					selection : () => selection
 				}
-			];
+			};
+
+			var dialog = $modal.open(options);
+			return dialog;
+		}
+
+		static $inject = ['$uibModalInstance', 'LoggerService', 'LibraryService', 'selection'];
+
+		constructor(protected $uibModalInstance : IModalServiceInstance,
+								private logger:app.blocks.ILoggerService,
+								private libraryService : ILibraryService,
+								private selection : CodeSearchResult[]) {
+			super($uibModalInstance);
+			this.searchData = 'Asthma';
+			this.resultData = selection;
 		}
 
 		search() {
@@ -111,16 +98,6 @@ module app.dialogs {
 
 		getMatchCount(item : CodeSearchResult) {
 			return item.matches.length > 1 ? item.matches.length : null;
-		}
-
-		ok() {
-			this.$uibModalInstance.close(this.selectedItems);
-			console.log('OK Pressed');
-		}
-
-		cancel() {
-			this.$uibModalInstance.dismiss('cancel');
-			console.log('Cancel Pressed');
 		}
 	}
 

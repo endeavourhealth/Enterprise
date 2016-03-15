@@ -3,79 +3,71 @@
 	<h4 class="modal-title">Code Picker</h4>
 </div>
 <div class="modal-body">
-	<form endUserRole="form">
+	<form endUserRole="form" class="container-fluid">
 		<!-- Search -->
-		<div class="form-group">
-			<label class="control-label">Search Criteria</label>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
-									 ng-model="codePicker.searchData">
-						<span class="btn input-group-addon" ng-click="codePicker.search()">
-							<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
-						</span>
-					</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<label class="control-label">Search Criteria</label>
+				<div class="input-group">
+					<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
+								 ng-model="codePicker.searchData">
+					<span class="input-group-addon" ng-click="codePicker.search()">
+						<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
+					</span>
 				</div>
 			</div>
 		</div>
 
 		<!-- Matches -->
-		<div class="form-group">
-			<label class="control-label">Matches</label>
-			<div class="row">
-				<div class="col-md-5">
-					<div style="height: 150px; overflow-y: scroll;">
-						<div ng-repeat="match in codePicker.searchResults.results"
-								 ng-click="codePicker.getCodeTreeData(match)"
-								 class="hover-box show-child-on-hover"
-								 ng-class="{'selection': match.isSelected}">
-							 {{ match.label }}
-							<button type="button" class="btn btn-xs btn-default pull-right child-to-show" ng-click="codePicker.select(match, true)">
-								<span class="glyphicon glyphicon-duplicate"></span>
-							</button>
-							<button type="button" class="btn btn-xs btn-default pull-right child-to-show" ng-click="codePicker.select(match, false)">
-								<span class="glyphicon glyphicon-file"></span>
-							</button>
-						</div>
+		<div class="row">
+			<div class="form-group col-md-5">
+				<label class="control-label">Matches</label>
+				<div style="height: 150px; overflow-y: scroll;">
+					<div ng-repeat="match in codePicker.searchResults.results"
+							 ng-click="codePicker.getCodeTreeData(match)"
+							 class="hover-box show-child-on-hover"
+							 ng-class="{'selection': match.isSelected}">
+						 {{ match.label }}
+						<button type="button" class="btn btn-xs btn-default pull-right child-to-show" ng-click="codePicker.select(match, true)">
+							<span class="glyphicon glyphicon-duplicate"></span>
+						</button>
+						<button type="button" class="btn btn-xs btn-default pull-right child-to-show" ng-click="codePicker.select(match, false)">
+							<span class="glyphicon glyphicon-file"></span>
+						</button>
 					</div>
 				</div>
-				<div class="col-md-7">
-					<div style="height: 150px; overflow-y: scroll;">
-						<div ui-tree data-nodrop-enabled="true" data-nodrag id="tree-root">
-							<ol ui-tree-nodes ng-model="codePicker.treeData">
-								<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-							</ol>
-						</div>
+			</div>
+			<div class="form-group col-md-7">
+				<label class="control-label">Code tree</label>
+				<div style="height: 150px; overflow-y: scroll;">
+					<div ui-tree data-nodrop-enabled="true" data-nodrag id="tree-root">
+						<ol ui-tree-nodes ng-model="codePicker.treeData">
+							<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+						</ol>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- Selection -->
-		<div class="form-group">
-			<label class="control-label">Selection</label>
-			<div class="row">
-				<div class="col-md-12">
-					<!--<div class="well">-->
-						<span ng-repeat="item in codePicker.resultData" uib-dropdown>
-							<label type="button" class="btn btn-xs {{codePicker.getButtonProperties(item)}}"
-											uib-dropdown-toggle
-											value="item">
-								{{item.term }}
-								<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
-								<span class="glyphicon"
-											ng-click="item.includeChildren=!item.includeChildren"
-											ng-class="{'glyphicon-file': !item.includeChildren,'glyphicon-duplicate': item.includeChildren}">
-								</span>
-								<span class="glyphicon glyphicon-remove-circle" aria-hidden="true" ng-click="codePicker.unselect(item)"></span>
-							</label>
-							<ul uib-dropdown-menu ng-if="codePicker.getMatchCount(item) > 1;">
-								<li ng-repeat="match in item.matches">{{match.term}}</li>
-							</ul>
-						</span>
-					<!--</div>-->
-				</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<label class="control-label">Selection</label>
+				<span ng-repeat="item in codePicker.resultData" uib-dropdown>
+					<label type="button" class="btn btn-xs {{codePicker.getButtonProperties(item)}}"
+									uib-dropdown-toggle
+									value="item">
+						{{item.term }}
+						<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
+						<span class="glyphicon"
+									ng-click="item.includeChildren=!item.includeChildren"
+									ng-class="{'glyphicon-file': !item.includeChildren,'glyphicon-duplicate': item.includeChildren}"></span>
+						<span class="glyphicon glyphicon-remove-circle" aria-hidden="true" ng-click="codePicker.unselect(item)"></span>
+					</label>
+					<ul uib-dropdown-menu ng-if="codePicker.getMatchCount(item) > 1;">
+						<li ng-repeat="match in item.matches">{{match.term}}</li>
+					</ul>
+				</span>
 			</div>
 		</div>
 	</form>
@@ -83,7 +75,7 @@
 <div class="modal-footer">
 	<button type="button" class="btn"
 					data-ng-click="codePicker.cancel()">Cancel</button>
-	<button class="btn btn-primary"
+	<button type="button" class="btn btn-primary"
 					data-ng-click="codePicker.ok();">Ok</button>
 </div>
 <script type="text/ng-template" id="nodes_renderer.html">

@@ -3,22 +3,18 @@
 	<h4 class="modal-title">{{ ctrl.title }}</h4>
 </div>
 <div class="modal-body">
-	<form endUserRole="form">
+	<form endUserRole="form" class="container-fluid">
 		<!-- Search -->
-		<div class="form-group">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="input-group">
-						<label class="control-label">{{ ctrl.message }}</label>
-						<input type="text" class="form-control" placeholder="{{ ctrl.resultData}}" ng-model="ctrl.resultData">
-					</div>
-				</div>
+		<div class="row">
+			<div class="form-group col-md-12">
+				<label class="control-label">{{ ctrl.message }}</label>
+				<input type="text" class="form-control" placeholder="{{ ctrl.resultData}}" ng-model="ctrl.resultData">
 			</div>
 		</div>
 	</form>
 </div>
 <div class="modal-footer">
 	<button type="button" class="btn" data-ng-click="ctrl.cancel()">Cancel</button>
-	<button class="btn btn-primary" data-ng-click="ctrl.ok()">Ok</button>
+	<button type="button" class="btn btn-primary" data-ng-click="ctrl.ok()">Ok</button>
 </div>
 

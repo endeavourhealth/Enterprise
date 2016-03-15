@@ -42,8 +42,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         String xml = item.getXmlContent();
 
-        QueryDocument doc = QueryDocumentParser.readFromXml(xml);
-        Report ret = doc.getReport().get(0);
+        Report ret = QueryDocumentParser.readFromXml(Report.class, xml);
 
         return Response
                 .ok()

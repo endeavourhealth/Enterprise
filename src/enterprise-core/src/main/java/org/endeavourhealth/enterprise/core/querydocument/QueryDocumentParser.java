@@ -1,6 +1,8 @@
 package org.endeavourhealth.enterprise.core.querydocument;
 
+import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
+import org.endeavourhealth.enterprise.core.querydocument.models.Report;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -20,7 +22,7 @@ import java.io.StringWriter;
 public abstract class QueryDocumentParser {
 
 
-    public static QueryDocument readFromXml(String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+    public static <T> T readFromXml(Class cls, String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
         //parse XML string into DOM
         InputStream is = new ByteArrayInputStream(xml.getBytes());
@@ -28,58 +30,74 @@ public abstract class QueryDocumentParser {
         Document document = docBuilder.parse(is);
         org.w3c.dom.Element varElement = document.getDocumentElement();
 
+        String name = varElement.getNodeName();
+        if (name.equals("Report")) {
+            return readObjectFromXml(Report.class, document);
+        } else if (name.equals("LibraryItem")) {
+            return readObjectFromXml(LibraryItem.class, document);
+        } else if (name.equals("QueryDocument")) {
+             return readObjectFromXml(QueryDocument.class, document);
+        } else {
+            throw new RuntimeException("Unexpected root node " + name);
+        }
+    }
+
+    public static <T> T readObjectFromXml(Class cls, Document doc) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+
         //parse DOM into POJOs
-        JAXBContext context = JAXBContext.newInstance(QueryDocument.class);
+        JAXBContext context = JAXBContext.newInstance(cls);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        JAXBElement<QueryDocument> loader = unmarshaller.unmarshal(varElement, QueryDocument.class);
+        JAXBElement<T> loader = unmarshaller.unmarshal(doc, cls);
         return loader.getValue();
     }
 
     public static String writeToXml(QueryDocument q) {
+        if (q.getFolder().isEmpty()
+                && q.getLibraryItem().isEmpty()
+                && q.getReport().size() == 1) {
 
+            Report report = q.getReport().get(0);
+            return writeObjectToXml(report);
+
+        } else if (q.getFolder().isEmpty()
+                && q.getLibraryItem().size() == 1
+                && q.getReport().isEmpty()) {
+
+            LibraryItem libraryItem = q.getLibraryItem().get(0);
+            return writeObjectToXml(libraryItem);
+        }
+        else
+        {
+            return writeObjectToXml(q);
+        }
+    }
+
+    private static <T> String writeObjectToXml(T obj) {
         StringWriter sw = new StringWriter();
+        Class cls = obj.getClass();
 
         try {
-            JAXBContext context = JAXBContext.newInstance(QueryDocument.class);
-/*
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.marshal(q, sw);
-*/
+            JAXBContext context = JAXBContext.newInstance(cls);
 
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); //just makes output easier to read
-            marshaller.marshal(new JAXBElement<QueryDocument>(new QName("uri","local"), QueryDocument.class, q), sw);
+            marshaller.marshal(new JAXBElement<T>(new QName(cls.getSimpleName()), cls, obj), sw);
+
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
 
-        //validate the XML against the schema
-/*
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+/*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new StreamSource(xsd));
         javax.xml.validation.Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xml));
-*/
-
+        validator.validate(new StreamSource(xml));*/
 
         String ret = sw.toString();
-/*
-        QueryDocument q2 = null;
-        try {
-            q2 = readFromXml(ret);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        }
-*/
+
 
 
         return ret;
     }
+
 
 }

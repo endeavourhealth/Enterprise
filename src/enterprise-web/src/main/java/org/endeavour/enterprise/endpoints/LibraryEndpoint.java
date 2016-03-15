@@ -44,8 +44,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         String xml = item.getXmlContent();
 
-        QueryDocument doc = QueryDocumentParser.readFromXml(xml);
-        LibraryItem ret = doc.getLibraryItem().get(0);
+        Report ret = QueryDocumentParser.readFromXml(LibraryItem.class, xml);
 
         return Response
                 .ok()
@@ -99,7 +98,6 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         QueryDocument doc = new QueryDocument();
         doc.getLibraryItem().add(libraryItem);
-        String xml = QueryDocumentParser.writeToXml(doc);
 
         super.saveItem(inserting, libraryItemUuid, orgUuid, userUuid, type, name, description, doc, folderUuid);
 

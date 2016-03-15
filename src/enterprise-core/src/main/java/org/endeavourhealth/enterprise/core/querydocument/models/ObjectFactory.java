@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _QueryDocument_QNAME = new QName("", "queryDocument");
+    private final static QName _Report_QNAME = new QName("", "report");
     private final static QName _LibraryItem_QNAME = new QName("", "libraryItem");
 
     /**
@@ -32,14 +33,6 @@ public class ObjectFactory {
      * 
      */
     public ObjectFactory() {
-    }
-
-    /**
-     * Create an instance of {@link Report }
-     * 
-     */
-    public Report createReport() {
-        return new Report();
     }
 
     /**
@@ -64,6 +57,14 @@ public class ObjectFactory {
      */
     public Test createTest() {
         return new Test();
+    }
+
+    /**
+     * Create an instance of {@link Report }
+     * 
+     */
+    public Report createReport() {
+        return new Report();
     }
 
     /**
@@ -243,22 +244,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Report.Query }
-     * 
-     */
-    public Report.Query createReportQuery() {
-        return new Report.Query();
-    }
-
-    /**
-     * Create an instance of {@link Report.ListOutput }
-     * 
-     */
-    public Report.ListOutput createReportListOutput() {
-        return new Report.ListOutput();
-    }
-
-    /**
      * Create an instance of {@link ListGroup.Summary }
      * 
      */
@@ -291,12 +276,37 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Report.Query }
+     * 
+     */
+    public Report.Query createReportQuery() {
+        return new Report.Query();
+    }
+
+    /**
+     * Create an instance of {@link Report.ListOutput }
+     * 
+     */
+    public Report.ListOutput createReportListOutput() {
+        return new Report.ListOutput();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link QueryDocument }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "queryDocument")
     public JAXBElement<QueryDocument> createQueryDocument(QueryDocument value) {
         return new JAXBElement<QueryDocument>(_QueryDocument_QNAME, QueryDocument.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Report }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "report")
+    public JAXBElement<Report> createReport(Report value) {
+        return new JAXBElement<Report>(_Report_QNAME, Report.class, null, value);
     }
 
     /**

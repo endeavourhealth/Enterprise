@@ -6,8 +6,6 @@ import org.endeavour.enterprise.model.database.DbActiveItem;
 import org.endeavour.enterprise.model.database.DbActiveItemDependency;
 import org.endeavour.enterprise.model.database.DbItem;
 import org.endeavour.enterprise.model.json.*;
-import org.endeavourhealth.enterprise.core.querydocument.models.Folder;
-import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,16 +94,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             folderUuid = UUID.randomUUID();
         }
 
-        Folder folder = new Folder();
-        folder.setUuid(folderUuid.toString());
-        folder.setName(folderName);
-        if (parentUuid != null) {
-            folder.setParentUuid(parentUuid.toString());
-        }
-        QueryDocument doc = new QueryDocument();
-        doc.getFolder().add(folder);
-
-        super.saveItem(inserting, folderUuid, orgUuid, userUuid, itemType, folderName, "", doc, parentUuid);
+        super.saveItem(inserting, folderUuid, orgUuid, userUuid, itemType, folderName, "", null, parentUuid);
 
         //return the UUID of the folder we just saved or updated
         JsonFolder ret = new JsonFolder();

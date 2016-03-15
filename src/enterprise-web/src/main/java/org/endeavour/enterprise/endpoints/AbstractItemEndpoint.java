@@ -211,9 +211,6 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
                 //we can live without a description, but need a non-null value
                 description = "";
             }
-            if (queryDocument == null) {
-                throw new BadRequestException("No query document specified");
-            }
             if (containingFolderUuid == null
                     && itemType != DefinitionItemType.LibraryFolder
                     && itemType != DefinitionItemType.ReportFolder) {
@@ -231,6 +228,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             item = new DbItem();
             item.setPrimaryUuid(itemUuid);
             item.setVersion(firstVersion);
+            item.setXmlContent(""); //when creating folders, we don't store XML, so this needs to be non-null
         } else {
             activeItem = retrieveActiveItem(itemUuid, orgUuid, itemType);
             item = retrieveItem(activeItem);

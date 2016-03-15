@@ -557,9 +557,13 @@
 	<br/>
 	Description: <input type="text" id="saveReportDescription">
 	<br/>
-	XML Content: <input type="text" id="saveReportXml">
+	Query1: <input type="text" id="saveReportQuery1Uuid">
 	<br/>
-	Is Deleted: <input type="checkbox" id="saveReportDeleted">
+	Query1: <input type="text" id="saveReportQuery2Uuid">
+	<br/>
+	ListOutput1: <input type="text" id="saveReportListOutput1Uuid">
+	<br/>
+	ListOutput2: <input type="text" id="saveReportListOutput2Uuid">
 	<br/>
 	Folder UUID: <input type="text" id="saveReportFolderUuid">
 	<br/>
@@ -588,15 +592,34 @@
 				params['description'] = s;
 			}
 
-			s = document.getElementById('saveReportXml').value;
-			if (s.length > 0)
+			var query1 = document.getElementById('saveReportQuery1Uuid').value;
+			var query2 = document.getElementById('saveReportQuery2Uuid').value;
+			if (query1.length > 0)
 			{
-				params['xmlContent'] = s;
+				var queries = [];
+				queries[0] = {'uuid': query1};
+
+				if (query2.length > 0)
+				{
+					queries[1] = {'uuid': query2};
+				}
+
+				params['query'] = queries;
 			}
 
-			if (document.getElementById("saveReportDeleted").checked)
+			var output1 = document.getElementById('saveReportListOutput1Uuid').value;
+			var output2 = document.getElementById('saveReportListOutput2Uuid').value;
+			if (output1.length > 0)
 			{
-				params['isDeleted'] = 'true';
+				var outputs = [];
+				outputs[0] = {'uuid': output1};
+
+				if (output2.length > 0)
+				{
+					outputs[1] = {'uuid': output2};
+				}
+
+				params['listOutput'] = outputs;
 			}
 
 			s = document.getElementById('saveReportFolderUuid').value;
@@ -724,6 +747,23 @@
 
 		}
 	</script>
+
+<hr/>
+<h3>/api/library/getLibraryItemNamesForReport</h3>
+
+UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
+<br/>
+<button type="button" onclick="getLibraryItemNamesForReport()">Submit</button>
+
+<script>
+		function getLibraryItemNamesForReport() {
+
+			var s = document.getElementById('getLibraryItemNamesForReportUuid').value;
+
+			get('/api/library/getLibraryItemNamesForReport', 'uuid=' + s);
+		}
+	</script>
+
 
 <hr/>
 <h3>Results</h3>

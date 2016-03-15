@@ -5,6 +5,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.*;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,22 +40,46 @@ public abstract class QueryDocumentParser {
         StringWriter sw = new StringWriter();
 
         try {
-            JAXBContext carContext = JAXBContext.newInstance(QueryDocument.class);
-            Marshaller carMarshaller = carContext.createMarshaller();
-            carMarshaller.marshal(q, sw);
+            JAXBContext context = JAXBContext.newInstance(QueryDocument.class);
+/*
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.marshal(q, sw);
+*/
+
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); //just makes output easier to read
+            marshaller.marshal(new JAXBElement<QueryDocument>(new QName("uri","local"), QueryDocument.class, q), sw);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
 
         //validate the XML against the schema
-/*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+/*
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new StreamSource(xsd));
         javax.xml.validation.Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xml));*/
+        validator.validate(new StreamSource(xml));
+*/
 
 
+        String ret = sw.toString();
+/*
+        QueryDocument q2 = null;
+        try {
+            q2 = readFromXml(ret);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+*/
 
-        return sw.toString();
+
+        return ret;
     }
 
 }

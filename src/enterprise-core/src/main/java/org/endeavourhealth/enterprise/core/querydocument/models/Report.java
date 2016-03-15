@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="uuid" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="folderUuid" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="query" maxOccurs="unbounded" minOccurs="0">
  *           &lt;complexType>
@@ -58,6 +59,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "report", propOrder = {
     "uuid",
     "name",
+    "description",
     "folderUuid",
     "query",
     "listOutput"
@@ -68,6 +70,8 @@ public class Report {
     protected String uuid;
     @XmlElement(required = true)
     protected String name;
+    @XmlElement(required = true)
+    protected String description;
     @XmlElement(required = true)
     protected String folderUuid;
     protected List<Report.Query> query;
@@ -119,6 +123,30 @@ public class Report {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    /**
+     * Gets the value of the description property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the value of the description property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDescription(String value) {
+        this.description = value;
     }
 
     /**

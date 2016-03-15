@@ -2,6 +2,7 @@ package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavour.enterprise.model.DefinitionItemType;
+import org.endeavour.enterprise.model.database.DbItem;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -22,6 +23,11 @@ public final class JsonFolderContent implements Serializable {
 
     public JsonFolderContent() {
 
+    }
+
+    public JsonFolderContent(DbItem item) {
+        this.uuid = item.getPrimaryUuid();
+        this.name = item.getTitle();
     }
 
     public void setTypeEnum(DefinitionItemType t) {

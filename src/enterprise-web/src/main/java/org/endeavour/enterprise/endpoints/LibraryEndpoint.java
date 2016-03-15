@@ -2,19 +2,22 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.model.DefinitionItemType;
 import org.endeavour.enterprise.model.database.DbActiveItem;
+import org.endeavour.enterprise.model.database.DbActiveItemDependency;
 import org.endeavour.enterprise.model.database.DbItem;
 import org.endeavour.enterprise.model.json.JsonDeleteResponse;
+import org.endeavour.enterprise.model.json.JsonFolderContent;
+import org.endeavour.enterprise.model.json.JsonFolderContentsList;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -130,20 +133,30 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 .build();
     }
 
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/validateDeleteLibraryItem")
-    public Response validateDeleteLibraryItem(@Context SecurityContext sc, LibraryItem libraryItem) throws Exception {
-
-        UUID libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
+    @Path("/getLibraryItemNamesForReport")
+    public Response getLibraryItemNamesForReport(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
+        UUID reportUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
 
-        LOG.trace("ValidatingDeletingLibraryItem UUID {}", libraryItemUuid);
+        LOG.trace("GettingLibraryItemNamesForReport for UUID {}", reportUuid);
 
-        throw new NotImplementedException();
+        JsonFolderContentsList ret = new JsonFolderContentsList();
 
-        //return Response.ok().build();
+        List<DbActiveItemDependency> dependentItems = DbActiveItemDependency.retrieveForItem(reportUuid);
+        for (DbActiveItemDependency dependentItem: dependentItems) {
+            UUID itemUuid = dependentItem.getDependentItemUuid();
+            DbItem item = DbItem.retrieveForUuidLatestVersion(orgUuid, itemUuid);
+
+            JsonFolderContent content = new JsonFolderContent(item);
+            ret.addContent(content);
+        }
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
     }
 }

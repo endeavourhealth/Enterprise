@@ -253,9 +253,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             DbItem item = DbItem.retrieveForUuidVersion(uuid, version);
             DefinitionItemType itemType = activeItem.getItemTypeId();
 
-            JsonFolderContent c = new JsonFolderContent();
-            c.setUuid(uuid);
-            c.setName(item.getTitle());
+            JsonFolderContent c = new JsonFolderContent(item);
             c.setTypeEnum(itemType);
             c.setLastModified(item.getTimeStamp());
 

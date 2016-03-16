@@ -14,8 +14,7 @@ module app.reports {
 	import ReportNode = app.models.ReportNode;
 	import ItemType = app.models.ItemType;
 	import Report = app.models.Report;
-	import Query = app.models.Query;
-	import ListOutput = app.models.ListOutput;
+	import ReportItem = app.models.ReportItem;
 	import UuidNameKVP = app.models.UuidNameKVP;
 	import IScope = angular.IScope;
 	'use strict';
@@ -59,8 +58,7 @@ module app.reports {
 				name: 'New report',
 				description: '',
 				folderUuid: folderUuid,
-				query: [],
-				listOutput: []
+				reportItem: []
 			};
 			this.reportContent = [];
 		}
@@ -88,42 +86,41 @@ module app.reports {
 																nodeList : ReportNode[],
 																parentUuid : string,
 																nameMap : UuidNameKVP[]) {
-			if (report.query == null) { report.query = []; }
-			for (var i = 0; i < report.query.length; i++) {
-				if (this.report.query[i].parentUuid === parentUuid) {
-					var reportNode:ReportNode = {
-						name : $.grep(nameMap,
-							(e : UuidNameKVP) => { return e.uuid === report.query[i].uuid; }
-						)[0].name,
-						uuid : report.query[i].uuid,
-						type : ItemType.Query,
-						children : []
-					};
-					nodeList.push(reportNode);
-					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid, nameMap);
-				}
-			}
-			if (report.listOutput == null) { report.listOutput = []; }
-			for (var i = 0; i < report.listOutput.length; i++) {
-				if (this.report.listOutput[i].parentUuid === parentUuid) {
-					var reportNode:ReportNode = {
-						name : $.grep(nameMap,
-							(e : UuidNameKVP) => { return e.uuid === report.query[i].uuid; }
-						)[0].name,
-						uuid : report.listOutput[i].uuid,
-						type : ItemType.ListOutput,
-						children : []
-					};
-					nodeList.push(reportNode);
-					this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid, nameMap);
+
+			if (report.reportItem == null) { report.reportItem = []; }
+
+			for (var i = 0; i < report.reportItem.length; i++) {
+				var reportItem:ReportItem = report.reportItem[i];
+				if (reportItem.parentUuid === parentUuid) {
+					var uuid:string = null;
+					var type:ItemType = null;
+
+					if (reportItem.queryLibraryItemUuid && reportItem.queryLibraryItemUuid !== '') {
+						uuid = reportItem.queryLibraryItemUuid;
+						type = ItemType.Query;
+					} else if (reportItem.listReportLibraryItemUuid && reportItem.listReportLibraryItemUuid !== '') {
+						uuid = reportItem.listReportLibraryItemUuid;
+						type = ItemType.ListOutput;
+					}
+
+					if (uuid != null) {
+						var reportNode:ReportNode = {
+							uuid : uuid,
+							name : $.grep(nameMap, (e:UuidNameKVP) => {return e.uuid === uuid; })[0].name,
+							type : ItemType.Query,
+							children : []
+						};
+
+						nodeList.push(reportNode);
+						this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid, nameMap);
+					}
 				}
 			}
 		}
 
 		saveReport() {
 			var vm = this;
-			vm.report.query = [];
-			vm.report.listOutput = [];
+			vm.report.reportItem = [];
 			vm.populateReportListsFromTree(vm.report, '', vm.reportContent);
 
 			vm.libraryService.saveReport(vm.report)
@@ -138,20 +135,21 @@ module app.reports {
 
 		populateReportListsFromTree(report : Report, parentUuid : string, nodes : ReportNode[]) {
 			for (var i = 0; i < nodes.length; i++) {
+				var reportItem : ReportItem = {
+					queryLibraryItemUuid : null,
+					listReportLibraryItemUuid : null,
+					parentUuid : parentUuid
+				};
+
 				switch (nodes[i].type) {
 					case ItemType.Query:
-						var query : Query = <Query>{};
-						query.uuid = nodes[i].uuid;
-						query.parentUuid = parentUuid;
-						report.query.push(query);
+						reportItem.queryLibraryItemUuid = nodes[i].uuid;
 						break;
 					case ItemType.ListOutput:
-						var listOutput : ListOutput = <ListOutput>{};
-						listOutput.uuid = nodes[i].uuid;
-						listOutput.parentUuid = parentUuid;
-						report.listOutput.push(listOutput);
+						reportItem.listReportLibraryItemUuid = nodes[i].uuid;
 						break;
 				}
+				report.reportItem.push(reportItem);
 				if (nodes[i].children && nodes[i].children.length > 0) {
 					this.populateReportListsFromTree(report, nodes[i].uuid, nodes[i].children);
 				}

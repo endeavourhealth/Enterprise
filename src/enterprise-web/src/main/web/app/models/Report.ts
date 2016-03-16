@@ -6,7 +6,6 @@ module app.models {
 		name:string;
 		description:string;
 		folderUuid:string;
-		query:Query[];
-		listOutput:ListOutput[];
+		reportItem:ReportItem[];
 	}
 }

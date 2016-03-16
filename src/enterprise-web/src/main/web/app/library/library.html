@@ -94,12 +94,12 @@
 						<button type="button" class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
 						<ul uib-dropdown-menu>
 							<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
-							<li><a href="#">Add list output</a></li>
+							<li><a ui-sref="app.listOuputAction({itemUuid: node.uuid, itemAction: 'add'})">Add list output</a></li>
 							<li><a ng-click="ctrl.showCodePicker()">Add code set</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="#">Add child folder</a></li>
 							<li role="separator" class="divider"></li>
-							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="ctrl.renameFolder(node)">Rename</a></li>
+							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.renameFolder(node)">Rename</a></li>
 							<li ng-class="{'disabled': !node.parentFolderUuid}"><a href="#">Delete</a></li>
 							<li role="separator" class="divider"></li>
 							<li ng-class="{'disabled': !node.parentFolderUuid}"><a href="#">Cut</a></li>

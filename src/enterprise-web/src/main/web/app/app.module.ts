@@ -22,6 +22,7 @@ angular.module('app', [
 		'app.dashboard',
 		'app.library',
 		'app.reports',
+		'app.listOutput',
 		'app.admin',
 		'app.query',
 		'flowChart',

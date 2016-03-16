@@ -28,7 +28,7 @@
 				<xs:element name="dataSource" type="dataSource"/>
 				<xs:element name="test" type="test"/>
 				<xs:element name="codeSet" type="codeSet"/>
-				<xs:element name="listOutput" type="listOutput"/>
+				<xs:element name="listReport" type="listReport"/>
 			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
@@ -53,6 +53,7 @@
 				<xs:element name="test" type="test"/>
 				<xs:element name="testLibraryItemUUID" type="xs:string"/>
 				<xs:element name="queryLibraryItemUUID" type="xs:string"/>
+				<xs:element name="expression" type="expressionType"/>
 			</xs:choice>
 			<xs:element name="onPass" type="ruleAction"/>
 			<xs:element name="onFail" type="ruleAction"/>
@@ -76,24 +77,18 @@
 		<xs:sequence>
 			<xs:element name="uuid" type="xs:string"/>
 			<xs:element name="name" type="xs:string"/>
-			<xs:element name="description" type="xs:string"/>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
 			<xs:element name="folderUuid" type="xs:string"/>
-			<xs:element name="query" minOccurs="0" maxOccurs="unbounded">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="uuid" type="xs:string"/>
-						<xs:element name="parentUuid" type="xs:string" minOccurs="0"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="listOutput" minOccurs="0" maxOccurs="unbounded">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="uuid" type="xs:string"/>
-						<xs:element name="parentUuid" type="xs:string" minOccurs="0"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="reportItem" type="reportItem"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="reportItem">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="queryLibraryItemUuid"/>
+				<xs:element name="listReportLibraryItemUuid"/>
+			</xs:choice>
+			<xs:element name="parentUuid" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="fieldTest">
@@ -212,39 +207,6 @@
 			<xs:element name="valueEqualTo" type="value"/>
 		</xs:choice>
 	</xs:complexType>
-	<xs:complexType name="fieldOutput">
-		<xs:sequence>
-			<xs:element name="field" type="xs:string"/>
-			<xs:element name="heading" type="xs:string" minOccurs="0"/>
-			<xs:element name="format"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="listGroup">
-		<xs:sequence>
-			<xs:element name="heading" type="xs:string" minOccurs="0"/>
-			<xs:choice>
-				<xs:element name="summary">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="type"/>
-							<xs:choice>
-								<xs:element name="dataSourceUuid" type="xs:string"/>
-								<xs:element name="testUuid" type="xs:string"/>
-							</xs:choice>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="field">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="dataSourceUuid" type="xs:string"/>
-							<xs:element name="fieldOutput" type="fieldOutput" maxOccurs="unbounded"/>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
-		</xs:sequence>
-	</xs:complexType>
 	<xs:complexType name="test">
 		<xs:sequence>
 			<xs:choice>
@@ -256,9 +218,7 @@
 					<xs:complexType/>
 				</xs:element>
 				<xs:element name="fieldTest" type="fieldTest" maxOccurs="unbounded"/>
-				<xs:element name="count" type="comparison"/>
 			</xs:choice>
-			<xs:element name="linkedTest" type="linkedTestType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="dataSource">
@@ -272,17 +232,26 @@
 			<xs:element name="restriction" type="restriction" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="listOutput">
-		<xs:sequence>
-			<xs:element name="group" type="listGroup" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
 	<xs:complexType name="linkedTestType">
 		<xs:sequence>
-			<xs:choice>
-				<xs:element name="dataSource" type="dataSource"/>
-				<xs:element name="dataSourceUuid" type="xs:string"/>
-			</xs:choice>
+			<xs:element name="node1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="id"/>
+						<xs:element name="fieldName" type="xs:string"/>
+						<xs:element name="orderDirection" type="orderDirection"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="node2">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="id"/>
+						<xs:element name="fieldName" type="xs:string"/>
+						<xs:element name="orderDirection" type="orderDirection"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="parentField" type="xs:string"/>
 			<xs:element name="childField" type="xs:string"/>
 			<xs:element name="comparison" type="comparison"/>
@@ -313,4 +282,68 @@
 			<xs:element name="y" type="xs:int"/>
 		</xs:sequence>
 	</xs:complexType>
+	<xs:complexType name="listReport">
+		<xs:sequence>
+			<xs:element name="group" type="listReportGroup" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="listReportGroup">
+		<xs:sequence>
+			<xs:element name="heading" type="xs:string" minOccurs="0"/>
+			<xs:choice>
+				<xs:element name="summary" type="listReportSummaryType"/>
+				<xs:element name="fieldBased" type="listReportFieldBasedType"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="listReportSummaryType">
+		<xs:sequence>
+			<xs:element name="summaryType" type="summaryType"/>
+			<xs:choice>
+				<xs:element name="dataSourceUuid" type="xs:string"/>
+				<xs:element name="testUuid" type="xs:string"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="summaryType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="any"/>
+			<xs:enumeration value="count"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="listReportFieldBasedType">
+		<xs:sequence>
+			<xs:element name="dataSourceUuid" type="xs:string"/>
+			<xs:element name="fieldOutput" type="fieldOutput" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="fieldOutput">
+		<xs:sequence>
+			<xs:element name="field" type="xs:string"/>
+			<xs:element name="heading" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="expressionType">
+		<xs:sequence>
+			<xs:element name="expressionText" type="xs:string"/>
+			<xs:element name="variable" type="variableType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="variableType">
+		<xs:sequence>
+			<xs:element name="variableName" type="xs:string"/>
+			<xs:element name="ruleId" type="xs:int"/>
+			<xs:element name="restriction" type="restriction" minOccurs="0"/>
+			<xs:element name="fieldName" type="xs:string"/>
+			<xs:element name="function" type="variableFunction" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="variableFunction">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="count"/>
+			<xs:enumeration value="average"/>
+			<xs:enumeration value="minimum"/>
+			<xs:enumeration value="maximum"/>
+		</xs:restriction>
+	</xs:simpleType>
 </xs:schema>

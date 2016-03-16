@@ -24,6 +24,7 @@ module app.core {
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
 		getLibraryItemNamesForReport(uuid : string):ng.IPromise<UuidNameKVP[]>;
+		saveFolder(folder : FolderNode):ng.IPromise<any>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -206,6 +207,21 @@ module app.core {
 			vm.http.get<{contents:UuidNameKVP[]}>('api/library/getLibraryItemNamesForReport', request)
 				.then(function(response) {
 					defer.resolve(response.data.contents);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		saveFolder(folder: FolderNode):ng.IPromise<any> {
+			var vm = this;
+			var defer = vm.promise.defer();
+
+			vm.http.post('api/folder/saveFolder', folder)
+				.then(function (response) {
+					defer.resolve(response.data);
 				})
 				.catch(function (exception) {
 					defer.reject(exception);

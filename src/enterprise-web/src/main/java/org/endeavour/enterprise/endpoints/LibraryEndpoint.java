@@ -70,7 +70,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         DataSource dataSource = libraryItem.getDataSource();
         Test test = libraryItem.getTest();
         CodeSet codeSet = libraryItem.getCodeSet();
-        ListOutput listOutput = libraryItem.getListOutput();
+        ListReport listOutput = libraryItem.getListReport();
 
         LOG.trace("SavingLibraryItem UUID {}, Name {} FolderUuid", libraryItemUuid, name, folderUuid);
 

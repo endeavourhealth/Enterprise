@@ -34,7 +34,7 @@ public abstract class AbstractQueryDocumentReader {
 
 
 
-    public final void process() {
+    public final void processQueryDocument() {
 
         try {
             stack.push(doc);        
@@ -90,8 +90,8 @@ public abstract class AbstractQueryDocumentReader {
                 processCodeSet(libraryItem.getCodeSet());
             }
 
-            if (libraryItem.getListOutput() != null) {
-                processListOutput(libraryItem.getListOutput());
+            if (libraryItem.getListReport() != null) {
+                processListReport(libraryItem.getListReport());
             }
 
         } finally {
@@ -139,14 +139,14 @@ public abstract class AbstractQueryDocumentReader {
         }
     }
 
-    protected void processListOutput(ListOutput listOutput) {
+    protected void processListReport(ListReport listReport) {
         try {
-            stack.push(listOutput);
+            stack.push(listReport);
 
-            List<ListGroup> groups = listOutput.getGroup();
+            List<ListReportGroup> groups = listReport.getGroup();
             if (groups != null && !groups.isEmpty()) {
-                for (ListGroup group: groups) {
-                    processListGroup(group);
+                for (ListReportGroup group: groups) {
+                    processListReportGroup(group);
                 }
             }
 
@@ -155,16 +155,16 @@ public abstract class AbstractQueryDocumentReader {
         }
     }
 
-    protected void processListGroup(ListGroup listGroup) {
+    protected void processListReportGroup(ListReportGroup listReportGroup) {
         try {
-            stack.push(listGroup);
+            stack.push(listReportGroup);
 
-            if (listGroup.getSummary() != null) {
-                processListGroupSummary(listGroup.getSummary());
+            if (listReportGroup.getSummary() != null) {
+                processListReportSummaryType(listReportGroup.getSummary());
             }
 
-            if (listGroup.getField() != null) {
-                processListGroupField(listGroup.getField());
+            if (listReportGroup.getFieldBased() != null) {
+                processListReportFieldBasedType(listReportGroup.getFieldBased());
             }
 
         } finally {
@@ -172,11 +172,24 @@ public abstract class AbstractQueryDocumentReader {
         }
     }
 
-    protected void processListGroupSummary(ListGroup.Summary listGroupSummary) {
+    protected void processListReportSummaryType(ListReportSummaryType listGroupSummaryType) {
+        try {
+            stack.push(listGroupSummaryType);
+
+            if (listGroupSummaryType.getSummaryType() != null) {
+                processSummaryType(listGroupSummaryType.getSummaryType());
+            }
+
+        } finally {
+            stack.pop();
+        }
+    }
+
+    protected void processSummaryType(SummaryType summaryType) {
         //no child complex types to recurse to
     }
 
-    protected void processListGroupField(ListGroup.Field listGroupField) {
+    protected void processListReportFieldBasedType(ListReportFieldBasedType listGroupField) {
         try {
             stack.push(listGroupField);
 
@@ -191,6 +204,8 @@ public abstract class AbstractQueryDocumentReader {
             stack.pop();
         }
     }
+
+
 
     protected void processFieldOutput(FieldOutput fieldOutput) {
         //no child complex types to recurse to
@@ -230,6 +245,10 @@ public abstract class AbstractQueryDocumentReader {
                 processTest(rule.getTest());
             }
 
+            if (rule.getExpression() != null) {
+                processExpressionType(rule.getExpression());
+            }
+
             if (rule.getOnPass() != null) {
                 processRuleAction(rule.getOnPass(), true);
             }
@@ -260,31 +279,6 @@ public abstract class AbstractQueryDocumentReader {
                 for (FieldTest fieldTest: fieldTests) {
                     processFieldTest(fieldTest);
                 }
-            }
-
-            if (test.getCount() != null) {
-                processComparison(test.getCount());
-            }
-
-            if (test.getLinkedTest() != null) {
-                processLinkedTestType(test.getLinkedTest());
-            }
-
-        } finally {
-            stack.pop();
-        }
-    }
-
-    protected void processLinkedTestType(LinkedTestType linkedTestType) {
-        try {
-            stack.push(linkedTestType);
-
-            if (linkedTestType.getDataSource() != null) {
-                processDataSource(linkedTestType.getDataSource());
-            }
-
-            if (linkedTestType.getComparison() != null) {
-                processComparison(linkedTestType.getComparison());
             }
 
         } finally {
@@ -339,6 +333,43 @@ public abstract class AbstractQueryDocumentReader {
         } finally {
             stack.pop();
         }
+    }
+
+    protected void processExpressionType(ExpressionType expressionType) {
+        try {
+            stack.push(expressionType);
+
+            List<VariableType> variables = expressionType.getVariable();
+            if (variables != null && !variables.isEmpty()) {
+                for (VariableType variable: variables) {
+                    processVariableType(variable);
+                }
+            }
+
+        } finally {
+            stack.pop();
+        }
+     }
+
+    protected void processVariableType(VariableType variableType) {
+        try {
+            stack.push(variableType);
+
+            if (variableType.getRestriction() != null) {
+                processRestriction(variableType.getRestriction());
+            }
+
+            if (variableType.getFunction() != null) {
+                processVariableFunction(variableType.getFunction());
+            }
+
+        } finally {
+            stack.pop();
+        }
+    }
+
+    protected void processVariableFunction(VariableFunction variableFunction) {
+        //no child complex types to recurse to
     }
 
     protected void processRestriction(Restriction restriction) {
@@ -526,17 +557,10 @@ public abstract class AbstractQueryDocumentReader {
         try {
             stack.push(report);
 
-            List<Report.Query> queries = report.getQuery();
-            if (queries != null && !queries.isEmpty()) {
-                for (Report.Query query: queries) {
-                    processReportQuery(query);
-                }
-            }
-
-            List<Report.ListOutput> listOutputs = report.getListOutput();
-            if (listOutputs != null && !listOutputs.isEmpty()) {
-                for (Report.ListOutput listOutput: listOutputs) {
-                    processReportListOutput(listOutput);
+            List<ReportItem> reportItems = report.getReportItem();
+            if (reportItems != null && !reportItems.isEmpty()) {
+                for (ReportItem reportItem: reportItems) {
+                    processReportItem(reportItem);
                 }
             }
 
@@ -546,11 +570,7 @@ public abstract class AbstractQueryDocumentReader {
 
     }
 
-    protected void processReportQuery(Report.Query query) {
-        //no child complex types to recurse to
-    }
-
-    protected void processReportListOutput(Report.ListOutput listOutput) {
+    protected void processReportItem(ReportItem reportItem) {
         //no child complex types to recurse to
     }
 }

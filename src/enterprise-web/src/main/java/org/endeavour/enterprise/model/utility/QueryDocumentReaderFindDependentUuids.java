@@ -20,7 +20,7 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
 
     public HashSet<UUID> findUuids()
     {
-        super.process();
+        super.processQueryDocument();
 
         return uuids;
     }
@@ -39,19 +39,12 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
     }
 
     @Override
-    protected void processReportQuery(Report.Query query) {
-        addUuid(query.getUuid());
-        addUuid(query.getParentUuid());
+    protected void processReportItem(ReportItem reportItem) {
+        addUuid(reportItem.getListReportLibraryItemUuid());
+        addUuid(reportItem.getQueryLibraryItemUuid());
+        addUuid(reportItem.getParentUuid());
 
-        super.processReportQuery(query);
-    }
-
-    @Override
-    protected void processReportListOutput(Report.ListOutput listOutput) {
-        addUuid(listOutput.getUuid());
-        addUuid(listOutput.getParentUuid());
-
-        super.processReportListOutput(listOutput);
+        super.processReportItem(reportItem);
     }
 
     @Override
@@ -60,20 +53,6 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
         addUuid(rule.getTestLibraryItemUUID());
 
         super.processRule(rule);
-    }
-
-    @Override
-    protected void processListGroupSummary(ListGroup.Summary listGroupSummary) {
-        addUuid(listGroupSummary.getDataSourceUuid());
-
-        super.processListGroupSummary(listGroupSummary);
-    }
-
-    @Override
-    protected void processListGroupField(ListGroup.Field listGroupField) {
-        addUuid(listGroupField.getDataSourceUuid());
-
-        super.processListGroupField(listGroupField);
     }
 
     @Override
@@ -98,13 +77,6 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
         addUuid(test.getDataSourceUuid());
 
         super.processTest(test);
-    }
-
-    @Override
-    protected void processLinkedTestType(LinkedTestType linkedTestType) {
-        addUuid(linkedTestType.getDataSourceUuid());
-
-        super.processLinkedTestType(linkedTestType);
     }
 
     @Override

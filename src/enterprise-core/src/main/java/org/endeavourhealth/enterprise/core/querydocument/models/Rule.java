@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element name="test" type="{}test"/>
  *           &lt;element name="testLibraryItemUUID" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *           &lt;element name="queryLibraryItemUUID" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *           &lt;element name="expression" type="{}expressionType"/>
  *         &lt;/choice>
  *         &lt;element name="onPass" type="{}ruleAction"/>
  *         &lt;element name="onFail" type="{}ruleAction"/>
@@ -42,6 +43,7 @@ import javax.xml.bind.annotation.XmlType;
     "test",
     "testLibraryItemUUID",
     "queryLibraryItemUUID",
+    "expression",
     "onPass",
     "onFail",
     "layout"
@@ -54,6 +56,7 @@ public class Rule {
     protected Test test;
     protected String testLibraryItemUUID;
     protected String queryLibraryItemUUID;
+    protected ExpressionType expression;
     @XmlElement(required = true)
     protected RuleAction onPass;
     @XmlElement(required = true)
@@ -171,6 +174,30 @@ public class Rule {
      */
     public void setQueryLibraryItemUUID(String value) {
         this.queryLibraryItemUUID = value;
+    }
+
+    /**
+     * Gets the value of the expression property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ExpressionType }
+     *     
+     */
+    public ExpressionType getExpression() {
+        return expression;
+    }
+
+    /**
+     * Sets the value of the expression property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ExpressionType }
+     *     
+     */
+    public void setExpression(ExpressionType value) {
+        this.expression = value;
     }
 
     /**

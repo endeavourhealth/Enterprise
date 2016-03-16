@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 rel. 2 (http://www.altova.com) by Drew Littler (Yorkshire Code Ltd) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xs:element name="queryDocument" type="queryDocument"/>
 	<xs:element name="libraryItem" type="libraryItem"/>
@@ -79,14 +80,14 @@
 			<xs:element name="name" type="xs:string"/>
 			<xs:element name="description" type="xs:string" minOccurs="0"/>
 			<xs:element name="folderUuid" type="xs:string"/>
-			<xs:element name="reportItem" type="reportItem"/>
+			<xs:element name="reportItem" type="reportItem" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="reportItem">
 		<xs:sequence>
 			<xs:choice>
-				<xs:element name="queryLibraryItemUuid"/>
-				<xs:element name="listReportLibraryItemUuid"/>
+				<xs:element name="queryLibraryItemUuid" type="xs:string"/>
+				<xs:element name="listReportLibraryItemUuid" type="xs:string"/>
 			</xs:choice>
 			<xs:element name="parentUuid" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
@@ -230,31 +231,6 @@
 			</xs:choice>
 			<xs:element name="filter" type="fieldTest" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="restriction" type="restriction" minOccurs="0"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="linkedTestType">
-		<xs:sequence>
-			<xs:element name="node1">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="id"/>
-						<xs:element name="fieldName" type="xs:string"/>
-						<xs:element name="orderDirection" type="orderDirection"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="node2">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="id"/>
-						<xs:element name="fieldName" type="xs:string"/>
-						<xs:element name="orderDirection" type="orderDirection"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="parentField" type="xs:string"/>
-			<xs:element name="childField" type="xs:string"/>
-			<xs:element name="comparison" type="comparison"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="parameterType">

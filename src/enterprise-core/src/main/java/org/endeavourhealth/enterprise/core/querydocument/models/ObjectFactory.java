@@ -36,19 +36,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ListGroup }
+     * Create an instance of {@link Query }
      * 
      */
-    public ListGroup createListGroup() {
-        return new ListGroup();
-    }
-
-    /**
-     * Create an instance of {@link org.endeavourhealth.enterprise.core.querydocument.models.Query }
-     * 
-     */
-    public org.endeavourhealth.enterprise.core.querydocument.models.Query createQuery() {
-        return new org.endeavourhealth.enterprise.core.querydocument.models.Query();
+    public Query createQuery() {
+        return new Query();
     }
 
     /**
@@ -60,19 +52,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Report }
-     * 
-     */
-    public Report createReport() {
-        return new Report();
-    }
-
-    /**
      * Create an instance of {@link QueryDocument }
      * 
      */
     public QueryDocument createQueryDocument() {
         return new QueryDocument();
+    }
+
+    /**
+     * Create an instance of {@link Report }
+     * 
+     */
+    public Report createReport() {
+        return new Report();
     }
 
     /**
@@ -97,14 +89,6 @@ public class ObjectFactory {
      */
     public ValueTo createValueTo() {
         return new ValueTo();
-    }
-
-    /**
-     * Create an instance of {@link org.endeavourhealth.enterprise.core.querydocument.models.ListOutput }
-     * 
-     */
-    public org.endeavourhealth.enterprise.core.querydocument.models.ListOutput createListOutput() {
-        return new org.endeavourhealth.enterprise.core.querydocument.models.ListOutput();
     }
 
     /**
@@ -140,11 +124,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link LinkedTestType }
+     * Create an instance of {@link ListReport }
      * 
      */
-    public LinkedTestType createLinkedTestType() {
-        return new LinkedTestType();
+    public ListReport createListReport() {
+        return new ListReport();
+    }
+
+    /**
+     * Create an instance of {@link VariableType }
+     * 
+     */
+    public VariableType createVariableType() {
+        return new VariableType();
+    }
+
+    /**
+     * Create an instance of {@link ListReportFieldBasedType }
+     * 
+     */
+    public ListReportFieldBasedType createListReportFieldBasedType() {
+        return new ListReportFieldBasedType();
     }
 
     /**
@@ -161,6 +161,14 @@ public class ObjectFactory {
      */
     public LayoutType createLayoutType() {
         return new LayoutType();
+    }
+
+    /**
+     * Create an instance of {@link ExpressionType }
+     * 
+     */
+    public ExpressionType createExpressionType() {
+        return new ExpressionType();
     }
 
     /**
@@ -193,6 +201,14 @@ public class ObjectFactory {
      */
     public CalculationParameter createCalculationParameter() {
         return new CalculationParameter();
+    }
+
+    /**
+     * Create an instance of {@link ListReportGroup }
+     * 
+     */
+    public ListReportGroup createListReportGroup() {
+        return new ListReportGroup();
     }
 
     /**
@@ -244,27 +260,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ListGroup.Summary }
+     * Create an instance of {@link ListReportSummaryType }
      * 
      */
-    public ListGroup.Summary createListGroupSummary() {
-        return new ListGroup.Summary();
+    public ListReportSummaryType createListReportSummaryType() {
+        return new ListReportSummaryType();
     }
 
     /**
-     * Create an instance of {@link ListGroup.Field }
+     * Create an instance of {@link ReportItem }
      * 
      */
-    public ListGroup.Field createListGroupField() {
-        return new ListGroup.Field();
+    public ReportItem createReportItem() {
+        return new ReportItem();
     }
 
     /**
-     * Create an instance of {@link org.endeavourhealth.enterprise.core.querydocument.models.Query.StartingRules }
+     * Create an instance of {@link Query.StartingRules }
      * 
      */
-    public org.endeavourhealth.enterprise.core.querydocument.models.Query.StartingRules createQueryStartingRules() {
-        return new org.endeavourhealth.enterprise.core.querydocument.models.Query.StartingRules();
+    public Query.StartingRules createQueryStartingRules() {
+        return new Query.StartingRules();
     }
 
     /**
@@ -273,22 +289,6 @@ public class ObjectFactory {
      */
     public Test.IsAny createTestIsAny() {
         return new Test.IsAny();
-    }
-
-    /**
-     * Create an instance of {@link Report.Query }
-     * 
-     */
-    public Report.Query createReportQuery() {
-        return new Report.Query();
-    }
-
-    /**
-     * Create an instance of {@link Report.ListOutput }
-     * 
-     */
-    public Report.ListOutput createReportListOutput() {
-        return new Report.ListOutput();
     }
 
     /**

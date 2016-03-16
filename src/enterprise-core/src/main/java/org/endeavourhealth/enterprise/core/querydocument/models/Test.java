@@ -32,9 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexType>
  *           &lt;/element>
  *           &lt;element name="fieldTest" type="{}fieldTest" maxOccurs="unbounded"/>
- *           &lt;element name="count" type="{}comparison"/>
  *         &lt;/choice>
- *         &lt;element name="linkedTest" type="{}linkedTestType" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -48,9 +46,7 @@ import javax.xml.bind.annotation.XmlType;
     "dataSource",
     "dataSourceUuid",
     "isAny",
-    "fieldTest",
-    "count",
-    "linkedTest"
+    "fieldTest"
 })
 public class Test {
 
@@ -58,8 +54,6 @@ public class Test {
     protected String dataSourceUuid;
     protected Test.IsAny isAny;
     protected List<FieldTest> fieldTest;
-    protected Comparison count;
-    protected LinkedTestType linkedTest;
 
     /**
      * Gets the value of the dataSource property.
@@ -160,54 +154,6 @@ public class Test {
             fieldTest = new ArrayList<FieldTest>();
         }
         return this.fieldTest;
-    }
-
-    /**
-     * Gets the value of the count property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Comparison }
-     *     
-     */
-    public Comparison getCount() {
-        return count;
-    }
-
-    /**
-     * Sets the value of the count property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Comparison }
-     *     
-     */
-    public void setCount(Comparison value) {
-        this.count = value;
-    }
-
-    /**
-     * Gets the value of the linkedTest property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LinkedTestType }
-     *     
-     */
-    public LinkedTestType getLinkedTest() {
-        return linkedTest;
-    }
-
-    /**
-     * Sets the value of the linkedTest property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LinkedTestType }
-     *     
-     */
-    public void setLinkedTest(LinkedTestType value) {
-        this.linkedTest = value;
     }
 
 

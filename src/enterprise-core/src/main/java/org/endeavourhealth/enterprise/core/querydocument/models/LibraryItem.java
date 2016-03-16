@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element name="dataSource" type="{}dataSource"/>
  *           &lt;element name="test" type="{}test"/>
  *           &lt;element name="codeSet" type="{}codeSet"/>
- *           &lt;element name="listOutput" type="{}listOutput"/>
+ *           &lt;element name="listReport" type="{}listReport"/>
  *         &lt;/choice>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.XmlType;
     "dataSource",
     "test",
     "codeSet",
-    "listOutput"
+    "listReport"
 })
 public class LibraryItem {
 
@@ -61,7 +61,7 @@ public class LibraryItem {
     protected DataSource dataSource;
     protected Test test;
     protected CodeSet codeSet;
-    protected ListOutput listOutput;
+    protected ListReport listReport;
 
     /**
      * Gets the value of the uuid property.
@@ -256,27 +256,27 @@ public class LibraryItem {
     }
 
     /**
-     * Gets the value of the listOutput property.
+     * Gets the value of the listReport property.
      * 
      * @return
      *     possible object is
-     *     {@link ListOutput }
+     *     {@link ListReport }
      *     
      */
-    public ListOutput getListOutput() {
-        return listOutput;
+    public ListReport getListReport() {
+        return listReport;
     }
 
     /**
-     * Sets the value of the listOutput property.
+     * Sets the value of the listReport property.
      * 
      * @param value
      *     allowed object is
-     *     {@link ListOutput }
+     *     {@link ListReport }
      *     
      */
-    public void setListOutput(ListOutput value) {
-        this.listOutput = value;
+    public void setListReport(ListReport value) {
+        this.listReport = value;
     }
 
 }

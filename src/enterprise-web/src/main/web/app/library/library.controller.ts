@@ -76,6 +76,7 @@ module app.library {
 			var selection : CodeSelection[] = [
 				{
 					term: 'asthma',
+					includeChildren: true,
 					matches: [
 						{
 							term: 'asthma',
@@ -85,6 +86,7 @@ module app.library {
 				},
 				{
 					term: 'angina',
+					includeChildren: false,
 					matches: [
 						{
 							term: 'angina',
@@ -94,6 +96,7 @@ module app.library {
 				},
 				{
 					term: 'diabetes',
+					includeChildren: false,
 					matches: [
 						{
 							term: 'diabetes mellitus',
@@ -111,10 +114,18 @@ module app.library {
 		}
 
 		renameFolder(folder : FolderNode) {
-			InputBoxController.open(this.$modal, 'Rename folder', 'Enter new name for ' + folder.folderName, folder.folderName)
-				.result.then(function(resultData : string) {
-					console.log('Dialog closed');
-					console.log(resultData);
+			var vm = this;
+			InputBoxController.open(vm.$modal, 'Rename folder', 'Enter new name for ' + folder.folderName, folder.folderName)
+				.result.then(function(newName : string) {
+				var oldName = folder.folderName;
+				folder.folderName = newName;
+					vm.libraryService.saveFolder(folder)
+						.then(function (response) {
+							vm.logger.success('Folder renamed to ' + newName, response, 'Rename folder');
+						})
+						.catch(function (error) {
+							vm.logger.error('Error renaming folder', error, 'Rename folder');
+						});
 				});
 		}
 	}

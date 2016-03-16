@@ -3,12 +3,12 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
-import org.endeavour.enterprise.model.EndUserRole;
-import org.endeavour.enterprise.model.database.*;
 import org.endeavour.enterprise.model.json.JsonEmailInviteParameters;
 import org.endeavour.enterprise.model.json.JsonEndUser;
 import org.endeavour.enterprise.model.json.JsonOrganisation;
 import org.endeavour.enterprise.model.json.JsonOrganisationList;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
+import org.endeavourhealth.enterprise.core.entity.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

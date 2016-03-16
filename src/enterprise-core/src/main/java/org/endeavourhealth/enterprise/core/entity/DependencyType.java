@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.model;
+package org.endeavourhealth.enterprise.core.entity;
 
 /**
  * Created by Drew on 29/02/2016.

@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavour.enterprise.model.database.DbItem;
+import org.endeavourhealth.enterprise.core.entity.database.DbItem;
 
 import java.io.Serializable;
 import java.util.UUID;

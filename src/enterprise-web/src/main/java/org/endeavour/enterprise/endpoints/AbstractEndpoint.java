@@ -2,10 +2,10 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.framework.security.UserPrincipal;
-import org.endeavour.enterprise.model.EndUserRole;
 import org.endeavour.enterprise.model.UserContext;
-import org.endeavour.enterprise.model.database.DbEndUser;
-import org.endeavour.enterprise.model.database.DbOrganisation;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
+import org.endeavourhealth.enterprise.core.entity.database.DbEndUser;
+import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;

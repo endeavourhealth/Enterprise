@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.model.database;
+package org.endeavourhealth.enterprise.core.entity.database;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

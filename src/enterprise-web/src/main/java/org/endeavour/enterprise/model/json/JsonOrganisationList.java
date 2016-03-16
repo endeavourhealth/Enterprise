@@ -1,8 +1,8 @@
 package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavour.enterprise.model.EndUserRole;
-import org.endeavour.enterprise.model.database.DbOrganisation;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
+import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;
 
 import java.io.Serializable;
 

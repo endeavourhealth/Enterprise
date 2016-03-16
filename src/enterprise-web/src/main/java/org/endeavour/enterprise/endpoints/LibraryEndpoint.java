@@ -1,12 +1,12 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavour.enterprise.model.database.DbActiveItem;
-import org.endeavour.enterprise.model.database.DbActiveItemDependency;
-import org.endeavour.enterprise.model.database.DbItem;
 import org.endeavour.enterprise.model.json.JsonDeleteResponse;
 import org.endeavour.enterprise.model.json.JsonFolderContent;
 import org.endeavour.enterprise.model.json.JsonFolderContentsList;
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
+import org.endeavourhealth.enterprise.core.entity.database.DbActiveItemDependency;
+import org.endeavourhealth.enterprise.core.entity.database.DbItem;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;

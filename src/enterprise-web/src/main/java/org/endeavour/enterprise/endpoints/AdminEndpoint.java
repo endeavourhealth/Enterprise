@@ -1,12 +1,12 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
-import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavour.enterprise.model.EndUserRole;
-import org.endeavour.enterprise.model.database.*;
 import org.endeavour.enterprise.model.json.JsonEndUser;
 import org.endeavour.enterprise.model.json.JsonEndUserList;
 import org.endeavour.enterprise.model.json.JsonOrganisation;
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
+import org.endeavourhealth.enterprise.core.entity.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

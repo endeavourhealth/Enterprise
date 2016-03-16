@@ -592,34 +592,31 @@
 				params['description'] = s;
 			}
 
-			var query1 = document.getElementById('saveReportQuery1Uuid').value;
-			var query2 = document.getElementById('saveReportQuery2Uuid').value;
-			if (query1.length > 0)
+			var reportItems = [];
+			params['reportItem'] = reportItems;
+
+			s = document.getElementById('saveReportQuery1Uuid').value;
+			if (s.length > 0)
 			{
-				var queries = [];
-				queries[0] = {'uuid': query1};
-
-				if (query2.length > 0)
-				{
-					queries[1] = {'uuid': query2};
-				}
-
-				params['query'] = queries;
+				reportItems[reportItems.length] = {'queryLibraryItemUuid': s};
 			}
 
-			var output1 = document.getElementById('saveReportListOutput1Uuid').value;
-			var output2 = document.getElementById('saveReportListOutput2Uuid').value;
-			if (output1.length > 0)
+			s = document.getElementById('saveReportQuery2Uuid').value;
+			if (s.length > 0)
 			{
-				var outputs = [];
-				outputs[0] = {'uuid': output1};
+				reportItems[reportItems.length] = {'queryLibraryItemUuid': s};
+			}
 
-				if (output2.length > 0)
-				{
-					outputs[1] = {'uuid': output2};
-				}
+			s = document.getElementById('saveReportListOutput1Uuid').value;
+			if (s.length > 0)
+			{
+				reportItems[reportItems.length] = {'listReportLibraryItemUuid': s};
+			}
 
-				params['listOutput'] = outputs;
+			s = document.getElementById('saveReportListOutput2Uuid').value;
+			if (s.length > 0)
+			{
+				reportItems[reportItems.length] = {'listReportLibraryItemUuid': s};
 			}
 
 			s = document.getElementById('saveReportFolderUuid').value;

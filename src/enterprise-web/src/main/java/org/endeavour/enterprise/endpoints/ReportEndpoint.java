@@ -1,9 +1,9 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavour.enterprise.model.database.DbActiveItem;
-import org.endeavour.enterprise.model.database.DbItem;
 import org.endeavour.enterprise.model.json.JsonDeleteResponse;
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
+import org.endeavourhealth.enterprise.core.entity.database.DbItem;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;

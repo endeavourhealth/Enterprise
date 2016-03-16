@@ -1,6 +1,4 @@
-package org.endeavour.enterprise.model.database;
-
-import org.endeavour.enterprise.model.DatabaseName;
+package org.endeavourhealth.enterprise.core.entity.database;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,8 +12,7 @@ public class DbEndUserPwd extends DbAbstractTable {
 
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
-            "EndUserPwd", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
-            "EndUserPwdUuid,EndUserUuid,PwdHash,DtExpired", "EndUserPwdUuid");
+            "EndUserPwd", "Administration", "EndUserPwdUuid,EndUserUuid,PwdHash,DtExpired", "EndUserPwdUuid");
 
 
     private UUID endUserUuid = null;

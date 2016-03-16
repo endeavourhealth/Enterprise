@@ -1,6 +1,6 @@
 package org.endeavour.enterprise.framework.security;
 
-import org.endeavour.enterprise.model.EndUserRole;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.ElementType;

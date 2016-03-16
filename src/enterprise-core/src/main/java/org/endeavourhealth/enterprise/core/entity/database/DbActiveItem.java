@@ -1,8 +1,7 @@
-package org.endeavour.enterprise.model.database;
+package org.endeavourhealth.enterprise.core.entity.database;
 
-import org.endeavour.enterprise.model.DatabaseName;
-import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavour.enterprise.model.DependencyType;
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.DependencyType;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.UUID;
  */
 public final class DbActiveItem extends DbAbstractTable {
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItem", "Definition", DatabaseName.ENDEAVOUR_ENTERPRISE,
+    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItem", "Definition",
             "ActiveItemUuid,OrganisationUuid,ItemUuid,Version,ItemTypeId", "ActiveItemUuid");
 
     private UUID organisationUuid = null;

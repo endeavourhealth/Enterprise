@@ -1,11 +1,11 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavour.enterprise.model.DependencyType;
-import org.endeavour.enterprise.model.database.DbActiveItem;
-import org.endeavour.enterprise.model.database.DbActiveItemDependency;
-import org.endeavour.enterprise.model.database.DbItem;
 import org.endeavour.enterprise.model.json.*;
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.DependencyType;
+import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
+import org.endeavourhealth.enterprise.core.entity.database.DbActiveItemDependency;
+import org.endeavourhealth.enterprise.core.entity.database.DbItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

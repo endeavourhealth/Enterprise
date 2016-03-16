@@ -4,11 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavour.enterprise.framework.configuration.Configuration;
-import org.endeavour.enterprise.model.EndUserRole;
 import org.endeavour.enterprise.model.UserContext;
-import org.endeavour.enterprise.model.database.DbEndUser;
-import org.endeavour.enterprise.model.database.DbOrganisation;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
+import org.endeavourhealth.enterprise.core.entity.database.DbEndUser;
+import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;
 
 import javax.naming.AuthenticationException;
 import javax.ws.rs.core.NewCookie;
@@ -47,38 +46,38 @@ public class TokenHelper {
         JwtBuilder builder = Jwts.builder()
                 .setHeaderParam(TOKEN_TYPE, TOKEN_TYPE_JWT)
                 .setClaims(bodyParameterMap)
-                .signWith(SignatureAlgorithm.HS256, Configuration.TOKEN_SIGNING_SECRET);
+                .signWith(SignatureAlgorithm.HS256, SecurityConfig.TOKEN_SIGNING_SECRET);
 
         return builder.compact();
     }
 
     private static NewCookie createCookie(String token) {
-        int maxAge = (int) (60L * Configuration.TOKEN_EXPIRY_MINUTES); //a day
+        int maxAge = (int) (60L * SecurityConfig.TOKEN_EXPIRY_MINUTES); //a day
         long now = System.currentTimeMillis() + (1000 * maxAge);
         Date d = new Date(now);
 
-        return new NewCookie(Configuration.AUTH_COOKIE_NAME,
+        return new NewCookie(SecurityConfig.AUTH_COOKIE_NAME,
                 token,
-                Configuration.AUTH_COOKIE_VALID_PATH,
-                Configuration.AUTH_COOKIE_VALID_DOMAIN,
+                SecurityConfig.AUTH_COOKIE_VALID_PATH,
+                SecurityConfig.AUTH_COOKIE_VALID_DOMAIN,
                 1,
                 null,
                 maxAge,
                 d,
-                Configuration.AUTH_COOKIE_REQUIRES_HTTPS,
+                SecurityConfig.AUTH_COOKIE_REQUIRES_HTTPS,
                 false);
     }
 
     public static UserContext validateToken(String token) throws Exception {
         Claims claims = Jwts
                 .parser()
-                .setSigningKey(Configuration.TOKEN_SIGNING_SECRET)
+                .setSigningKey(SecurityConfig.TOKEN_SIGNING_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
 
         long tokenIssuedMilliseconds = Long.parseLong((String) claims.get(TOKEN_ISSUED_AT)) * 1000L;
         Date tokenIssued = new Date(tokenIssuedMilliseconds);
-        Date tokenExpiry = new Date(tokenIssuedMilliseconds + (Configuration.TOKEN_EXPIRY_MINUTES * 60L * 1000L));
+        Date tokenExpiry = new Date(tokenIssuedMilliseconds + (SecurityConfig.TOKEN_EXPIRY_MINUTES * 60L * 1000L));
 
         if (Calendar.getInstance().getTime().after(tokenExpiry)) {
             throw new AuthenticationException("Token expired");

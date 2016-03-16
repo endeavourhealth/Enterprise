@@ -1,7 +1,6 @@
-package org.endeavour.enterprise.model.database;
+package org.endeavourhealth.enterprise.core.entity.database;
 
-import org.endeavour.enterprise.model.DatabaseName;
-import org.endeavour.enterprise.model.EndUserRole;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,9 +14,8 @@ import java.util.UUID;
  */
 public final class DbOrganisationEndUserLink extends DbAbstractTable {
 
-
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class, "OrganisationEndUserLink", "Administration", DatabaseName.ENDEAVOUR_ENTERPRISE,
+    private static final TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class, "OrganisationEndUserLink", "Administration",
             "OrganisationEndUserLinkUuid,OrganisationUuid,EndUserUuid,Permissions,DtExpired", "OrganisationEndUserLinkUuid");
 
 

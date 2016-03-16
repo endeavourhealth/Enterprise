@@ -1,14 +1,7 @@
-package org.endeavour.enterprise.framework.configuration;
+package org.endeavourhealth.enterprise.core.entity.database;
 
-public class Configuration {
-    public static final String TOKEN_SIGNING_SECRET = "DLKV342nNaCapGgSieNde18OFRYwg3etCabRfsPcrnc=";
-    public static final long TOKEN_EXPIRY_MINUTES = 60L * 12L;
-    public static final String AUTH_COOKIE_NAME = "AUTH";
+public abstract class SqlServerConfig {
 
-    public static final String AUTH_COOKIE_VALID_DOMAIN = "localhost";
-
-    public static final String AUTH_COOKIE_VALID_PATH = "/";
-    public static final boolean AUTH_COOKIE_REQUIRES_HTTPS = false;
 
     public static final int DB_CONNECTION_POOL_SIZE = 5; //pool up to this many connection
     public static final int DB_CONNECTION_LIVES = 1000; //let each pooled connection be used this many times

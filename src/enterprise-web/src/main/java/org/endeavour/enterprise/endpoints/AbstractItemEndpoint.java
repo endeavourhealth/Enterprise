@@ -1,10 +1,10 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavour.enterprise.model.DependencyType;
-import org.endeavour.enterprise.model.database.*;
 import org.endeavour.enterprise.model.json.JsonDeleteResponse;
 import org.endeavour.enterprise.model.utility.QueryDocumentReaderFindDependentUuids;
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.DependencyType;
+import org.endeavourhealth.enterprise.core.entity.database.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 

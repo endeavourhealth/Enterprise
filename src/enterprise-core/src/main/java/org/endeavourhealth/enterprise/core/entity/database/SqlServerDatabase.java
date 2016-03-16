@@ -1,8 +1,7 @@
-package org.endeavour.enterprise.model.database;
+package org.endeavourhealth.enterprise.core.entity.database;
 
-import org.endeavour.enterprise.framework.configuration.Configuration;
-import org.endeavour.enterprise.model.DefinitionItemType;
-import org.endeavour.enterprise.model.DependencyType;
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.DependencyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,13 +92,13 @@ public final class SqlServerDatabase implements DatabaseI {
 
         //if we get here, the pool didn't have one, so just create a new one
         Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
-        Connection conn = DriverManager.getConnection(Configuration.DB_CONNECTION_STRING);
+        Connection conn = DriverManager.getConnection(SqlServerConfig.DB_CONNECTION_STRING);
         conn.setAutoCommit(false);
 
-        long expiry = System.currentTimeMillis() + Configuration.DB_CONNECTION_MAX_AGE_MILLIS;
+        long expiry = System.currentTimeMillis() + SqlServerConfig.DB_CONNECTION_MAX_AGE_MILLIS;
         LOG.trace("Created new DB connection");
 
-        return new PoolableConnection(conn, expiry, Configuration.DB_CONNECTION_LIVES);
+        return new PoolableConnection(conn, expiry, SqlServerConfig.DB_CONNECTION_LIVES);
     }
 
 
@@ -111,7 +110,7 @@ public final class SqlServerDatabase implements DatabaseI {
         }
 
         //if the connection pool is already big enough or it's not a poolable connection, just close and discard
-        if (connectionPool.size() >= Configuration.DB_CONNECTION_POOL_SIZE
+        if (connectionPool.size() >= SqlServerConfig.DB_CONNECTION_POOL_SIZE
                 || !(connection instanceof PoolableConnection)) {
             LOG.trace("Discarded returning DB connection with pool size {} and connection class {}", connectionPool.size(), connection.getClass());
             connection.close();

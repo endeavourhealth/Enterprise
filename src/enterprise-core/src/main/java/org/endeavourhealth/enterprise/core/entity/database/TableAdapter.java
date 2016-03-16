@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.model.database;
+package org.endeavourhealth.enterprise.core.entity.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,16 +12,14 @@ public final class TableAdapter {
     private Class cls = null;
     private String tableName = null;
     private String schema = null;
-    private String database = null;
     private String[] columns = null;
     private String[] primaryKeyColumns = null;
 
 
-    public TableAdapter(Class cls, String tableName, String schema, String database, String columns, String primaryKeyColumns) {
+    public TableAdapter(Class cls, String tableName, String schema, String columns, String primaryKeyColumns) {
         this.cls = cls;
         this.tableName = tableName;
         this.schema = schema;
-        this.database = database;
         this.columns = columns.split(",");
         this.primaryKeyColumns = primaryKeyColumns.split(",");
     }
@@ -39,10 +37,6 @@ public final class TableAdapter {
 
     public String getSchema() {
         return schema;
-    }
-
-    public String getDatabase() {
-        return database;
     }
 
     public String[] getColumns() {

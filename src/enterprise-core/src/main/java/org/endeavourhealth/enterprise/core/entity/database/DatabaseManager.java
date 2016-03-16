@@ -1,10 +1,9 @@
-package org.endeavour.enterprise.model.database;
+package org.endeavourhealth.enterprise.core.entity.database;
 
 import ch.qos.logback.classic.db.DBAppender;
 import ch.qos.logback.core.db.ConnectionSource;
 import ch.qos.logback.core.db.DriverManagerConnectionSource;
 import ch.qos.logback.core.db.dialect.SQLDialectCode;
-import org.endeavour.enterprise.framework.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +132,7 @@ class LogbackConnectionSource implements ConnectionSource {
     private DriverManagerConnectionSource inner = new DriverManagerConnectionSource();
 
     public LogbackConnectionSource() {
-        inner.setUrl(Configuration.DB_CONNECTION_STRING);
+        inner.setUrl(SqlServerConfig.DB_CONNECTION_STRING);
     }
 
     @Override

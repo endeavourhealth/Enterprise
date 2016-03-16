@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.model;
 
 import org.endeavour.enterprise.framework.security.UserPrincipal;
+import org.endeavourhealth.enterprise.core.entity.EndUserRole;
 
 import javax.ws.rs.core.SecurityContext;
 import java.util.Date;

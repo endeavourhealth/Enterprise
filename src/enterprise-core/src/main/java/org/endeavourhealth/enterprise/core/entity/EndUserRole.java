@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.model;
+package org.endeavourhealth.enterprise.core.entity;
 
 public enum EndUserRole {
     USER(1),

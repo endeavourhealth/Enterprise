@@ -24,6 +24,23 @@
             <version>1.3.1</version>
         </dependency>
         <!-- End Java SQL Server driver -->
+
+        <!-- Jersey -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.22.1</version>
+        </dependency>
+        <!-- End Jersey -->
+
+        <!-- Gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <!-- End Gson -->
+
     </dependencies>
 
     <build>

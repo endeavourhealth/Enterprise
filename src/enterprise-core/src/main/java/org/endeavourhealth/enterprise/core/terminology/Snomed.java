@@ -76,7 +76,9 @@ public abstract class Snomed {
         }
     }
 
-
+    /**
+     * for quick testing
+     */
     public static void main(String[] args) {
 
         List<String> v = getChildren("195967001");

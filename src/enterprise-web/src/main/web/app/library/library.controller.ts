@@ -38,7 +38,7 @@ module app.library {
 			var vm = this;
 			vm.libraryService.getFolders(1, null)
 				.then(function (data) {
-					vm.treeData = data;
+					vm.treeData = data.folders;
 					// Set folder type (not retrieved by API)
 					vm.treeData.forEach((item) => { item.folderType = FolderType.Library; } );
 				});
@@ -68,7 +68,7 @@ module app.library {
 				node.loading = true;
 				this.libraryService.getFolders(1, folderId)
 					.then(function (data) {
-						node.nodes = data;
+						node.nodes = data.folders;
 						// Set parent folder (not retrieved by API)
 						node.nodes.forEach((item) => { item.parentFolderUuid = node.uuid; } );
 						node.loading = false;

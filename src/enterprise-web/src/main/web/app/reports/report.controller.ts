@@ -71,7 +71,7 @@ module app.reports {
 					vm.reportContent = [];
 					vm.libraryService.getLibraryItemNamesForReport(reportUuid)
 						.then(function(data) {
-						vm.populateTreeFromReportLists(vm.report, vm.reportContent, '', data);
+						vm.populateTreeFromReportLists(vm.report, vm.reportContent, '', data.contents);
 					})
 					.catch(function(data) {
 						vm.logger.error('Error loading report item names', data, 'Error');
@@ -161,7 +161,7 @@ module app.reports {
 			var vm = this;
 			vm.libraryService.getFolders(1, null)
 				.then(function (data) {
-					vm.treeData = data;
+					vm.treeData = data.folders;
 				});
 		}
 
@@ -193,7 +193,7 @@ module app.reports {
 				node.loading = true;
 				this.libraryService.getFolders(1, folderId)
 					.then(function (data) {
-						node.nodes = data;
+						node.nodes = data.folders;
 						node.loading = false;
 					});
 			}

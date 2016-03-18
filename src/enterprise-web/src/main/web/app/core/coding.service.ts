@@ -1,8 +1,4 @@
 /// <reference path="../../typings/tsd.d.ts" />
-/// <reference path="../models/EngineState.ts" />
-/// <reference path="../models/EngineHistoryItem.ts" />
-/// <reference path="../models/RecentDocumentItem.ts" />
-/// <reference path="../models/ReportActivityItem.ts" />
 
 module app.core {
 	import TermlexCode = app.models.Code;
@@ -15,13 +11,9 @@ module app.core {
 		getCodeParents(code : string):ng.IPromise<TermlexCode[]>;
 	}
 
-	export class CodingService implements ICodingService {
-		static $inject = ['$http', '$q'];
+	export class CodingService extends BaseHttpService implements ICodingService {
 
-		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
-		}
 		searchCodes(searchData : string):ng.IPromise<TermlexSearchResult> {
-			var defer = this.promise.defer();
 			var request = {
 				params: {
 					'term': searchData,
@@ -30,47 +22,18 @@ module app.core {
 				},
 				withCredentials: false
 			};
-			this.http.get('http://termlex.org/search/sct', request)
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
 
-			return defer.promise;
+			return this.httpGet('http://termlex.org/search/sct', request);
 		}
 
 		getCodeChildren(id : string):ng.IPromise<TermlexCode[]> {
-			var defer = this.promise.defer();
-			var request = {
-				withCredentials: false
-			};
-			this.http.get('http://termlex.org/hierarchy/' + id + '/childHierarchy', request)
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
+			var request = { withCredentials: false };
+			return this.httpGet('http://termlex.org/hierarchy/' + id + '/childHierarchy', request);
 		}
 
 		getCodeParents(id : string):ng.IPromise<TermlexCode[]> {
-			var defer = this.promise.defer();
-			var request = {
-				withCredentials: false
-			};
-			this.http.get('http://termlex.org/hierarchy/' + id + '/parentHierarchy', request)
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
+			var request = { withCredentials: false };
+			return this.httpGet('http://termlex.org/hierarchy/' + id + '/parentHierarchy', request);
 		}
 	}
 

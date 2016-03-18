@@ -19,13 +19,8 @@ module app.core {
 		getUserList() : IPromise<app.models.UserList>;
 	}
 
-	export class AdminService implements IAdminService {
-		static $inject = ['$http', '$q'];
+	export class AdminService extends BaseHttpService implements IAdminService {
 		currentUser:app.models.User;
-
-		constructor(private http:ng.IHttpService, private promise:ng.IQService) {
-			this.currentUser = null;
-		}
 
 		getCurrentUser() : app.models.User {
 			return this.currentUser;
@@ -68,32 +63,12 @@ module app.core {
 		}
 
 		switchUserInRole(userInRoleUuid:string) : IPromise<app.models.UserInRole> {
-			var vm = this;
-			var defer = vm.promise.defer();
 			var request = '"' + userInRoleUuid + '"';
-			vm.http.post('/api/security/switchUserInRole', request)
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
+			return this.httpPost('/api/security/switchUserInRole', request);
 		}
 
 		getUserList() : IPromise<app.models.UserList> {
-			var vm = this;
-			var defer = vm.promise.defer();
-			vm.http.get('/api/admin/getUsers')
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
+			return this.httpGet('/api/admin/getUsers');
 		}
 
 		logout() {

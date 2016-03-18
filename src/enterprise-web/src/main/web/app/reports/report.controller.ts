@@ -107,7 +107,7 @@ module app.reports {
 						var reportNode:ReportNode = {
 							uuid : uuid,
 							name : $.grep(nameMap, (e:UuidNameKVP) => {return e.uuid === uuid; })[0].name,
-							type : ItemType.Query,
+							type : type,
 							children : []
 						};
 

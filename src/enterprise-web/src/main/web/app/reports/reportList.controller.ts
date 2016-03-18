@@ -37,10 +37,6 @@ module app.reports {
 			if (node === this.selectedNode) { return; }
 			var vm = this;
 
-			if (vm.selectedNode !== null) {
-				vm.selectedNode.isSelected = false;
-			}
-			node.isSelected = true;
 			vm.selectedNode = node;
 			node.loading = true;
 

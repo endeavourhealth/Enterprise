@@ -169,17 +169,15 @@ module app.reports {
 			if (node === this.selectedNode) { return; }
 			var vm = this;
 
-			if (vm.selectedNode !== null) {
-				vm.selectedNode.isSelected = false;
-			}
-			node.isSelected = true;
 			vm.selectedNode = node;
 			node.loading = true;
 			vm.libraryService.getFolderContents(node.uuid)
 				.then(function(data) {
 					vm.itemSummaryList = data;
 					// filter content by those allowed in reports
-					vm.itemSummaryList.contents = vm.itemSummaryList.contents.filter(vm.validReportItemType);
+					if (vm.itemSummaryList.contents) {
+						vm.itemSummaryList.contents = vm.itemSummaryList.contents.filter(vm.validReportItemType);
+					}
 					node.loading = false;
 				});
 		}

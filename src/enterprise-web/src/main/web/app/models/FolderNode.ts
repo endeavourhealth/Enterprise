@@ -10,7 +10,6 @@ module app.models {
 		contentCount:number;
 
 		isExpanded:boolean;
-		isSelected:boolean;
 		loading:boolean;
 		nodes:FolderNode[];
 	}

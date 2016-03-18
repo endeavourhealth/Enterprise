@@ -1,12 +1,8 @@
 module app.models {
-	export class CodeSelectionMatch {
-		term:string;
-		code:string;
-	}
+	'use strict';
 
-	export class CodeSelection {
-		term:string;
-		includeChildren:boolean;
-		matches:CodeSelectionMatch[];
+	export class CodeSelection extends Code {
+		includeChildren: boolean;
+		exclusions: Code[];
 	}
 }

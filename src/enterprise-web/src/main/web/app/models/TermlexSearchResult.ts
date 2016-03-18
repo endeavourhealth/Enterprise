@@ -6,21 +6,17 @@ module app.models {
 		type: string;
 	}
 
-	export class TermlexSearchResultResult {
+	export class TermlexSearchResultResult extends Code {
 		dt: string;
-		id: string;
-		label: string;
 		lang: string;
 		matches: string[];
 		status: number;
 		type: string;
-
-		isSelected: boolean;
 	}
 
 	export class TermlexSearchResult {
 		categories: TermlexSearchResultCategory[];
-		results: TermlexSearchResultResult[];
+		results: Code[];
 		searchTime: number;
 		showingSuggestions: boolean;
 		totalHits:number;

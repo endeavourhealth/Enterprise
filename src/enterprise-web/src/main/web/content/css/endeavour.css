@@ -1,5 +1,10 @@
 /* Endeavour specific CSS */
 
+.scroll-box-150 {
+    height: 150px;
+    overflow-y: scroll;
+}
+
 .show-child-on-hover .child-to-show {
     display: none;
 }
@@ -15,6 +20,10 @@
 }
 
 .selection {
+    background : #afd9ee !important;
+}
+
+.previous-selection {
     background : #afd9ee !important;
 }
 

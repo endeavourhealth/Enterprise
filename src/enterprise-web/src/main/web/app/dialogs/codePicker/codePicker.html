@@ -20,30 +20,39 @@
 
 		<!-- Matches -->
 		<div class="row">
-			<div class="form-group col-md-5">
+			<div class="form-group col-md-4">
+				<label class="control-label">Parents</label>
+				<div class="scroll-box-150 form-control">
+					<div ng-repeat="parent in codePicker.parents"
+							 ng-dblclick="codePicker.displayCode(parent, true)"
+							 class="hover-box"
+							 ng-class="{'previous-selection': parent.id == codePicker.previousSelection.id}">
+						{{ parent.label }}
+					</div>
+				</div>
+			</div>
+			<div class="form-group col-md-4">
 				<label class="control-label">Matches</label>
-				<div style="height: 150px; overflow-y: scroll;">
-					<div ng-repeat="match in codePicker.searchResults.results"
-							 ng-click="codePicker.getCodeTreeData(match)"
+				<div class="scroll-box-150 form-control">
+					<div ng-repeat="match in codePicker.searchResults"
+							 ng-click="codePicker.displayCode(match, false)"
 							 class="hover-box show-child-on-hover"
-							 ng-class="{'selection': match.isSelected}">
+							 ng-class="{'selection': match.id == codePicker.selectedMatch.id}">
 						 {{ match.label }}
 						<button type="button" class="btn btn-xs btn-default pull-right child-to-show" ng-click="codePicker.select(match, true)">
-							<span class="glyphicon glyphicon-duplicate"></span>
-						</button>
-						<button type="button" class="btn btn-xs btn-default pull-right child-to-show" ng-click="codePicker.select(match, false)">
-							<span class="glyphicon glyphicon-file"></span>
+							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
 						</button>
 					</div>
 				</div>
 			</div>
-			<div class="form-group col-md-7">
-				<label class="control-label">Code tree</label>
-				<div style="height: 150px; overflow-y: scroll;">
-					<div ui-tree data-nodrop-enabled="true" data-nodrag id="tree-root">
-						<ol ui-tree-nodes ng-model="codePicker.treeData">
-							<li ng-repeat="node in codePicker.treeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
-						</ol>
+			<div class="form-group col-md-4">
+				<label class="control-label">Children</label>
+				<div class="scroll-box-150 form-control">
+					<div ng-repeat="child in codePicker.children"
+							 ng-dblclick="codePicker.displayCode(child, true)"
+							 class="hover-box"
+							 ng-class="{'previous-selection': child.id == codePicker.previousSelection.id}">
+						{{ child.label }}
 					</div>
 				</div>
 			</div>
@@ -51,24 +60,27 @@
 
 		<!-- Selection -->
 		<div class="row">
-			<div class="form-group col-md-12">
-				<label class="control-label">Selection</label>
-				<div class="input-group">
-					<span ng-repeat="item in codePicker.resultData" uib-dropdown>
-						<label type="button" class="btn btn-xs {{codePicker.getButtonProperties(item)}}"
-										uib-dropdown-toggle
-										value="item">
-							{{item.term }}
-							<span class="badge">{{ codePicker.getMatchCount(item) }}</span>
-							<span class="glyphicon"
-										ng-click="item.includeChildren=!item.includeChildren"
-										ng-class="{'glyphicon-file': !item.includeChildren,'glyphicon-duplicate': item.includeChildren}"></span>
-							<span class="glyphicon glyphicon-remove-circle" aria-hidden="true" ng-click="codePicker.unselect(item)"></span>
-						</label>
-						<ul uib-dropdown-menu ng-if="codePicker.getMatchCount(item) > 1;">
-							<li ng-repeat="match in item.matches">{{match.term}}</li>
-						</ul>
-					</span>
+			<div class="form-group col-md-6">
+			<label class="control-label">Selection</label>
+				<div class="scroll-box-150 form-control">
+					<div ng-repeat="selection in codePicker.resultData"
+							 ng-click="codePicker.displayExclusionTree(selection)"
+							 class="hover-box"
+							 ng-class="{'selection': selection == codePicker.selectedExclusion}">
+						{{ selection.label }}
+						<span class="label label-success" ng-show="selection.includeChildren && (selection.exclusions.length == 0)">All children</span>
+						<span class="label label-warning" ng-show="selection.includeChildren && (selection.exclusions.length > 0)">Some children</span>
+						<span class="label label-danger" ng-show="!selection.includeChildren">No children</span>
+					</div>
+				</div>
+			</div>
+			<div class="form-group col-md-6">
+				<label class="control-label">Inclusions/Exclusions</label>
+				<div class="scroll-box-150 form-control">
+					<div ui-tree data-nodrop-enabled="true" data-nodrag id="tree-root">
+						<ol ui-tree-nodes ng-model="codePicker.exclusionTreeData">
+							<li ng-repeat="node in codePicker.exclusionTreeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+						</ol>
 				</div>
 			</div>
 		</div>
@@ -80,22 +92,24 @@
 	<button type="button" class="btn btn-primary"
 					data-ng-click="codePicker.ok();">Ok</button>
 </div>
+
 <script type="text/ng-template" id="nodes_renderer.html">
 	<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
-		<span class="show-child-on-hover folder-item"
-								ng-class="{'selection': node.isSelected}">
-			<span	ng-if="node.childCount == 0" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
-			<span ng-if="node.childCount > 0" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-						ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-						ng-click="codePicker.toggleExpansion(node)"></span>
-			<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
-				<span>{{node.label}}</span>
-				<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
-			</span>
+		<span class="folder-item">
+			<span class="text-success glyphicon glyphicon-ok-circle"
+						ng-click="codePicker.excludeNode(node)"
+						ng-show="node.includeChildren && (!node.exclusions || node.exclusions.length == 0)"> </span>
+			<span class="text-warning glyphicon glyphicon-remove-circle"
+						ng-click="codePicker.includeNode(node)"
+						ng-show="node.includeChildren && (node.exclusions && node.exclusions.length > 0)"> </span>
+			<span class="text-danger glyphicon glyphicon-ban-circle"
+						ng-click="codePicker.includeNode(node)"
+						ng-show="!node.includeChildren"> </span>
+			<span>{{node.label}}</span>
 		</span>
 	</div>
-	<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">
-		<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
+	<ol ui-tree-nodes ng-model="node.children">
+		<li ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
 		</li>
 	</ol>
 </script>

@@ -8,8 +8,8 @@ module app.core {
 	import ItemSummaryList = app.models.ItemSummaryList;
 	import FolderNode = app.models.FolderNode;
 	import Report = app.models.Report;
-	import TermlexTreeNode = app.models.TermlexTreeNode;
 	import UuidNameKVP = app.models.UuidNameKVP;
+	import TermlexCode = app.models.Code;
 	'use strict';
 
 	export interface ILibraryService {
@@ -17,8 +17,6 @@ module app.core {
 		getRecentDocumentsData() : ng.IPromise<app.models.RecentDocumentItem[]>;
 		getEngineState() : ng.IPromise<app.models.EngineState>;
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
-		searchCodes(searchData : string):ng.IPromise<app.models.TermlexSearchResult>;
-		getCodeTreeData(code : string):ng.IPromise<TermlexTreeNode[]>;
 		getFolders(moduleId : number, folderUuid : string):ng.IPromise<FolderNode[]>;
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
 		saveReport(report : Report):ng.IPromise<Report>;
@@ -75,43 +73,6 @@ module app.core {
 		getReportActivityData():ng.IPromise<app.models.ReportActivityItem[]> {
 			var defer = this.promise.defer();
 			this.http.get('app/core/data/reportactivity.json')
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
-		}
-
-		searchCodes(searchData : string):ng.IPromise<app.models.TermlexSearchResult> {
-			var defer = this.promise.defer();
-			var request = {
-				params: {
-					'term': searchData,
-					'maxResultsSize': 20,
-					'start': 0
-				},
-				withCredentials: false
-			};
-			this.http.get('http://termlex.org/search/sct', request)
-				.then(function (response) {
-					defer.resolve(response.data);
-				})
-				.catch(function (exception) {
-					defer.reject(exception);
-				});
-
-			return defer.promise;
-		}
-
-		getCodeTreeData(id : string):ng.IPromise<TermlexTreeNode[]> {
-			var defer = this.promise.defer();
-			var request = {
-				withCredentials: false
-			};
-			this.http.get('http://termlex.org/hierarchy/' + id + '/childHierarchy', request)
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

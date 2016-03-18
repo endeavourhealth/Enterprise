@@ -8,6 +8,7 @@ module app.reports {
 	import FolderContent = app.models.FolderItem;
 	import itemTypeIdToString = app.models.itemTypeIdToString;
 	import IScope = angular.IScope;
+	import FolderItem = app.models.FolderItem;
 	'use strict';
 
 	export class ReportListController {
@@ -65,6 +66,10 @@ module app.reports {
 						node.loading = false;
 					});
 			}
+		}
+
+		deleteItem(item : FolderItem) {
+			// delete
 		}
 	}
 

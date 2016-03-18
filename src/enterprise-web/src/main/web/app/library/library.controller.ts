@@ -11,8 +11,9 @@ module app.library {
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import InputBoxController = app.dialogs.InputBoxController;
 	import CodePickerController = app.dialogs.CodePickerController;
-	import CodeSelection = app.models.CodeSelection;
 	import IScope = angular.IScope;
+	import TermlexCode = app.models.Code;
+	import TermlexCodeSelection = app.models.CodeSelection;
 	'use strict';
 
 	export class LibraryController {
@@ -73,41 +74,32 @@ module app.library {
 		}
 
 		showCodePicker() {
-			var selection : CodeSelection[] = [
+			var selection : TermlexCodeSelection[] = [
 				{
-					term: 'asthma',
+					id: '195967001',
+					label: 'asthma',
 					includeChildren: true,
-					matches: [
-						{
-							term: 'asthma',
-							code: '195967001'
-						}
+					exclusions: []
+				},
+				{
+					id: '194828000',
+					label: 'angina',
+					includeChildren: true,
+					exclusions: [
+						{id:'315025001', label:'refractory angina' },
+						{id:'4557003', label:'preinfarcation syndrome' }
 					]
 				},
 				{
-					term: 'angina',
+					id: '73211009',
+					label: 'diabetes',
 					includeChildren: false,
-					matches: [
-						{
-							term: 'angina',
-							code: '194828000'
-						}
-					]
-				},
-				{
-					term: 'diabetes',
-					includeChildren: false,
-					matches: [
-						{
-							term: 'diabetes mellitus',
-							code: '73211009'
-						}
-					]
+					exclusions: []
 				}
 			];
 
 			CodePickerController.open(this.$modal, selection)
-				.result.then(function(resultData : CodeSelection[]){
+				.result.then(function(resultData : TermlexCodeSelection[]){
 					console.log('Dialog closed');
 					console.log(resultData);
 				});

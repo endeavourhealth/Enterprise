@@ -40,7 +40,7 @@ module app.dialogs {
 			var dialog = $modal.open(options);
 			return dialog;
 		}
-		static $inject = ['$uibModalInstance', 'title', 'message', 'value'];
+		static $inject = ['$uibModalInstance', 'title', 'message', 'okText', 'cancelText'];
 
 		constructor(protected $uibModalInstance : IModalServiceInstance,
 								title : string,

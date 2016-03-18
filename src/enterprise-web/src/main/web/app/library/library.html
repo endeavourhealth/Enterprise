@@ -99,8 +99,8 @@
 							<li role="separator" class="divider"></li>
 							<li><a href="#">Add child folder</a></li>
 							<li role="separator" class="divider"></li>
-							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.renameFolder(node)">Rename</a></li>
-							<li ng-class="{'disabled': !node.parentFolderUuid}"><a href="#">Delete</a></li>
+							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.renameFolder(this)">Rename</a></li>
+							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.deleteFolder(this)">Delete</a></li>
 							<li role="separator" class="divider"></li>
 							<li ng-class="{'disabled': !node.parentFolderUuid}"><a href="#">Cut</a></li>
 							<li ng-class="{'disabled': !node.parentFolderUuid}"><a href="#">Copy</a></li>

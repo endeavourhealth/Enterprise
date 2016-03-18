@@ -10,6 +10,7 @@ module app.core {
 	import Report = app.models.Report;
 	import UuidNameKVP = app.models.UuidNameKVP;
 	import TermlexCode = app.models.Code;
+	import Folder = app.models.Folder;
 	'use strict';
 
 	export interface ILibraryService {
@@ -22,7 +23,8 @@ module app.core {
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
 		getLibraryItemNamesForReport(uuid : string):ng.IPromise<UuidNameKVP[]>;
-		saveFolder(folder : FolderNode):ng.IPromise<any>;
+		saveFolder(folder : Folder):ng.IPromise<string>;
+		deleteFolder(folder : Folder):ng.IPromise<any>;
 	}
 
 	export class LibraryService implements ILibraryService {
@@ -176,11 +178,48 @@ module app.core {
 			return defer.promise;
 		}
 
-		saveFolder(folder: FolderNode):ng.IPromise<any> {
+		saveFolder(folder: Folder):ng.IPromise<string> {
 			var vm = this;
 			var defer = vm.promise.defer();
 
-			vm.http.post('api/folder/saveFolder', folder)
+			// Make clean copy of object, just in case of additions
+			// Typing the request ensures any property changes are caught
+			var request : Folder = {
+				uuid : folder.uuid,
+				folderName : folder.folderName,
+				folderType : folder.folderType,
+				parentFolderUuid : folder.parentFolderUuid,
+				hasChildren : folder.hasChildren,
+				contentCount : folder.contentCount
+			};
+
+			vm.http.post('api/folder/saveFolder', request)
+				.then(function (response) {
+					defer.resolve(response.data);
+				})
+				.catch(function (exception) {
+					defer.reject(exception);
+				});
+
+			return defer.promise;
+		}
+
+		deleteFolder(folder: Folder):ng.IPromise<string> {
+			var vm = this;
+			var defer = vm.promise.defer();
+
+			// Make clean copy of object, just in case of additions
+			// Typing the request ensures any property changes are caught
+			var request : Folder = {
+				uuid : folder.uuid,
+				folderName : folder.folderName,
+				folderType : folder.folderType,
+				parentFolderUuid : folder.parentFolderUuid,
+				hasChildren : folder.hasChildren,
+				contentCount : folder.contentCount
+			};
+
+			vm.http.post('api/folder/deleteFolder', request)
 				.then(function (response) {
 					defer.resolve(response.data);
 				})

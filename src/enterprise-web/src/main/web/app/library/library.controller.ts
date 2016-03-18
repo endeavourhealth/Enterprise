@@ -14,6 +14,9 @@ module app.library {
 	import IScope = angular.IScope;
 	import TermlexCode = app.models.Code;
 	import TermlexCodeSelection = app.models.CodeSelection;
+	import Folder = app.models.Folder;
+	import FolderType = app.models.FolderType;
+	import MessageBoxController = app.dialogs.MessageBoxController;
 	'use strict';
 
 	export class LibraryController {
@@ -36,6 +39,8 @@ module app.library {
 			vm.libraryService.getFolders(1, null)
 				.then(function (data) {
 					vm.treeData = data;
+					// Set folder type (not retrieved by API)
+					vm.treeData.forEach((item) => { item.folderType = FolderType.Library; } );
 				});
 		}
 
@@ -64,6 +69,8 @@ module app.library {
 				this.libraryService.getFolders(1, folderId)
 					.then(function (data) {
 						node.nodes = data;
+						// Set parent folder (not retrieved by API)
+						node.nodes.forEach((item) => { item.parentFolderUuid = node.uuid; } );
 						node.loading = false;
 					});
 			}
@@ -101,20 +108,40 @@ module app.library {
 				});
 		}
 
-		renameFolder(folder : FolderNode) {
+		renameFolder(scope : any) {
 			var vm = this;
-			InputBoxController.open(vm.$modal, 'Rename folder', 'Enter new name for ' + folder.folderName, folder.folderName)
+			var folderNode : FolderNode = scope.$modelValue;
+			InputBoxController.open(vm.$modal,
+				'Rename folder', 'Enter new name for ' + folderNode.folderName, folderNode.folderName)
 				.result.then(function(newName : string) {
-				var oldName = folder.folderName;
-				folder.folderName = newName;
-					vm.libraryService.saveFolder(folder)
+				var oldName = folderNode.folderName;
+				folderNode.folderName = newName;
+					vm.libraryService.saveFolder(folderNode)
 						.then(function (response) {
 							vm.logger.success('Folder renamed to ' + newName, response, 'Rename folder');
 						})
 						.catch(function (error) {
+							folderNode.folderName = oldName;
 							vm.logger.error('Error renaming folder', error, 'Rename folder');
 						});
 				});
+		}
+
+		deleteFolder(scope : any) {
+			var vm = this;
+			var folderNode : FolderNode = scope.$modelValue;
+			MessageBoxController.open(vm.$modal,
+				'Delete folder', 'Are you sure you want to delete folder ' + folderNode.folderName + '?', 'Yes', 'No')
+				.result.then(function() {
+					vm.libraryService.deleteFolder(folderNode)
+					.then(function (response) {
+						scope.remove();
+						vm.logger.success('Folder deleted', response, 'Delete folder');
+					})
+					.catch(function (error) {
+						vm.logger.error('Error deleting folder', error, 'Delete folder');
+					});
+			});
 		}
 	}
 

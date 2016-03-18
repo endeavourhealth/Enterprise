@@ -1,14 +1,7 @@
 module app.models {
 	'use strict';
 
-	export class FolderNode {
-		uuid:string;
-		folderName:string;
-		folderType:number;
-		parentFolderUuid:string;
-		hasChildren:boolean;
-		contentCount:number;
-
+	export class FolderNode extends Folder {
 		isExpanded:boolean;
 		loading:boolean;
 		nodes:FolderNode[];

@@ -178,6 +178,8 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="EMISReadV2"/>
 			<xs:enumeration value="DMD"/>
+			<xs:enumeration value="SnomedCt"/>			
+			<xs:enumeration value="CTV3"/>			
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:complexType name="codeSetValue">

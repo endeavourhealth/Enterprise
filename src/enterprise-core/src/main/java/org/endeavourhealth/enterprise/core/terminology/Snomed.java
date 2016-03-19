@@ -108,6 +108,9 @@ abstract class Snomed {
      */
     public static String getPreferredTerm(String conceptCode) {
         JsonElement json = executeTermlexGet("concepts/" + conceptCode);
+        if (json == null) {
+            return null;
+        }
         JsonObject obj = json.getAsJsonObject();
         JsonElement termObj = obj.get("preferredTerm");
         return termObj.getAsString();

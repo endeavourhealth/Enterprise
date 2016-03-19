@@ -34,15 +34,12 @@ public final class DatabaseManager {
 
     private DatabaseManager() {
 
-        //probably should go in a class guaranteed to be initialised earlier
-        //registerLogbackDbAppender();
-
         //this would be where we plug in support for different databases
         databaseImplementation = new SqlServerDatabase();
     }
 
     /**
-     * 2016-02-25 DL - haven't got anywhere good to put these, but leaving with other DB stuff
+     * haven't got anywhere good to put these, but leaving with other DB stuff
      */
     public static Date getEndOfTime() {
         if (endOfTime == null) {
@@ -58,134 +55,6 @@ public final class DatabaseManager {
 
     public static DatabaseI db() {
         return getInstance().databaseImplementation;
-    }
-
-
-    private static void registerLogbackDbAppender()
-    {
-System.out.println("----------------------------------------------------------");
-        try {
-
-            Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
-
-            /*DriverManagerConnectionSource connSource = new DriverManagerConnectionSource(){
-                @Override
-                public SQLDialectCode getSQLDialectCode()
-                {
-                    return SQLDialectCode.MSSQL_DIALECT;
-                }
-            };
-            connSource.setUrl(Configuration.DB_CONNECTION_STRING);
-            connSource.setContext(logger.getLoggerContext());
-
-            DatabaseMetaData se = connSource.getConnection().getMetaData();
-            String sqle = se.getDatabaseProductName().toLowerCase();
-            System.out.println("----------------------------------------------------------"  + sqle);
-
-            connSource.start();*/
-
-            LogbackConnectionSource src = new LogbackConnectionSource();
-            src.start();
-
-            ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-
-            DBAppender dbAppender = new DBAppender();
-            dbAppender.setContext(logger.getLoggerContext());
-            dbAppender.setConnectionSource(src);
-            //dbAppender.setConnectionSource(connSource);
-
-            dbAppender.setName("DB Appender");
-
-            DefaultDBNameResolver r = new DefaultDBNameResolver(){
-                @Override
-                public <N extends Enum<?>> String getTableName(N tableName) {
-                    System.out.println("GETTING TABLE NAME<<<<<<<<<<<<<<");
-                    return "Logging." + super.getTableName(tableName);
-                }
-            };
-
-            dbAppender.setDbNameResolver(r);
-
-            dbAppender.start();
-
-            logger.addAppender(dbAppender);
-
-
-/*
-            ch.qos.logback.classic.Logger localLogger = (ch.qos.logback.classic.Logger)LOG;
-            localLogger.addAppender(dbAppender);*/
-
-            LOG.error("Added db appender");
-
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-        }
-
-        /*Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        DBAppender appender = new DBAppender();
-        appender.setConnectionSource();
-
-        //ConnectionSource cs = new Co
-
-        rootLogger.addAppender(appender);*/
-
-        /**
-         * TODO: 2016-02-25 DL - get the DB appender for log back working
-         *
-         xxx 1) test logging exceptions
-         xxx 4) what are the two XML files
-         xxxx 5) delete one of the xml files
-
-
-
-         2) get logging to db
-         */
-
-    }
-}
-
-
-class LogbackConnectionSource implements ConnectionSource {
-    private DriverManagerConnectionSource inner = new DriverManagerConnectionSource();
-
-    public LogbackConnectionSource() {
-        inner.setUrl(SqlServerConfig.DB_CONNECTION_STRING);
-    }
-
-    @Override
-    public Connection getConnection() throws SQLException {
-        System.out.println("getting connection");
-        return inner.getConnection();
-    }
-
-    @Override
-    public SQLDialectCode getSQLDialectCode() {
-        return SQLDialectCode.MSSQL_DIALECT;
-    }
-
-    @Override
-    public boolean supportsGetGeneratedKeys() {
-        return inner.supportsGetGeneratedKeys();
-    }
-
-    @Override
-    public boolean supportsBatchUpdates() {
-        return inner.supportsBatchUpdates();
-    }
-
-    @Override
-    public void start() {
-        inner.start();
-    }
-
-    @Override
-    public void stop() {
-        inner.stop();
-    }
-
-    @Override
-    public boolean isStarted() {
-        return inner.isStarted();
     }
 }
 

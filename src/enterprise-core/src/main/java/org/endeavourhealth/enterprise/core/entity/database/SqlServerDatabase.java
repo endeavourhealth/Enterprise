@@ -1,5 +1,10 @@
 package org.endeavourhealth.enterprise.core.entity.database;
 
+import ch.qos.logback.classic.db.DBAppender;
+import ch.qos.logback.classic.db.names.DefaultDBNameResolver;
+import ch.qos.logback.core.db.ConnectionSource;
+import ch.qos.logback.core.db.DriverManagerConnectionSource;
+import ch.qos.logback.core.db.dialect.SQLDialectCode;
 import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.entity.DependencyType;
 import org.endeavourhealth.enterprise.core.entity.ExecutionStatus;
@@ -20,8 +25,21 @@ public final class SqlServerDatabase implements DatabaseI {
     private static final Logger LOG = LoggerFactory.getLogger(SqlServerDatabase.class);
     private static final String ALIAS = "z";
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String LOGGING_SCHEMA_PREFIX = "Logging.";
 
     private LinkedList<PoolableConnection> connectionPool = new LinkedList<>();
+
+    public SqlServerDatabase() {
+
+        //need to force the loading of the class before we try to create any connections
+        try {
+            Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        //registerLogbackDbAppender();
+    }
 
     /**
      * converts objects to Strings for SQL, escaping as required
@@ -93,8 +111,11 @@ public final class SqlServerDatabase implements DatabaseI {
         } catch (NoSuchElementException nsee) {
         }
 
+        //TODO: use C3P0 database connection pooling (recommended by JTDS) see http://www.javatips.net/blog/2013/12/c3p0-connection-pooling-example
+
+
         //if we get here, the pool didn't have one, so just create a new one
-        Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
+
         Connection conn = DriverManager.getConnection(SqlServerConfig.DB_CONNECTION_STRING);
         conn.setAutoCommit(false);
 
@@ -139,6 +160,33 @@ public final class SqlServerDatabase implements DatabaseI {
         //if we make it here, add to our pool
         connectionPool.push(poolable);
     }
+
+    @Override
+    public void registerLogbackDbAppender() {
+
+        //our connection source
+        LogbackConnectionSource connectionSource = new LogbackConnectionSource();
+
+        //because the three logging tables are in a schema, we need to override the resolver to insert the schema name
+        DefaultDBNameResolver r = new DefaultDBNameResolver(){
+            @Override
+            public <N extends Enum<?>> String getTableName(N tableName) {
+                return LOGGING_SCHEMA_PREFIX + super.getTableName(tableName);
+            }
+        };
+
+        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+
+        DBAppender dbAppender = new DBAppender();
+        dbAppender.setContext(rootLogger.getLoggerContext());
+        dbAppender.setConnectionSource(connectionSource);
+        dbAppender.setName("DB Appender");
+        dbAppender.setDbNameResolver(r);
+        dbAppender.start();
+
+        rootLogger.addAppender(dbAppender);
+    }
+
 
     @Override
     public void writeEntity(DbAbstractTable entity) throws Exception {
@@ -987,4 +1035,49 @@ public final class SqlServerDatabase implements DatabaseI {
         }
     }
 
+    /**
+     * Connection source implementation for LogBack, as it seems unable to correctly work out it should use SQL Server dialect
+     */
+    class LogbackConnectionSource implements ConnectionSource {
+        private DriverManagerConnectionSource inner = new DriverManagerConnectionSource();
+
+        public LogbackConnectionSource() {
+            inner.setUrl(SqlServerConfig.DB_CONNECTION_STRING);
+        }
+
+        @Override
+        public Connection getConnection() throws SQLException {
+            return inner.getConnection();
+        }
+
+        @Override
+        public SQLDialectCode getSQLDialectCode() {
+            return SQLDialectCode.MSSQL_DIALECT;
+        }
+
+        @Override
+        public boolean supportsGetGeneratedKeys() {
+            return inner.supportsGetGeneratedKeys();
+        }
+
+        @Override
+        public boolean supportsBatchUpdates() {
+            return inner.supportsBatchUpdates();
+        }
+
+        @Override
+        public void start() {
+            inner.start();
+        }
+
+        @Override
+        public void stop() {
+            inner.stop();
+        }
+
+        @Override
+        public boolean isStarted() {
+            return inner.isStarted();
+        }
+    }
 }

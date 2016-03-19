@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.core.entity.database;
 
+import ch.qos.logback.core.db.ConnectionSource;
 import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.entity.DependencyType;
 
@@ -10,6 +11,10 @@ import java.util.UUID;
  * Created by Drew on 29/02/2016.
  */
 public interface DatabaseI {
+
+    //setting up logging to db
+    public void registerLogbackDbAppender();
+
     //generic read/write functions
     public void writeEntity(DbAbstractTable entity) throws Exception;
 

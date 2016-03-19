@@ -38,6 +38,15 @@ public abstract class DbAbstractTable {
         return super.equals(o);
     }
 
+    public UUID assignPrimaryUUid() {
+        if (primaryUuid != null) {
+            return primaryUuid;
+        }
+
+        primaryUuid = UUID.randomUUID();
+        saveMode = TableSaveMode.INSERT;
+        return primaryUuid;
+    }
 
     /**
      * get/sets method only
@@ -54,9 +63,9 @@ public abstract class DbAbstractTable {
 
         //if we have no primary UUID, then generate one and go into insert mode
         if (primaryUuid == null) {
-            primaryUuid = UUID.randomUUID();
-            saveMode = TableSaveMode.INSERT;
+            assignPrimaryUUid();
         }
+
         //if we have a UUID, but no explicity set save mode, then assume an update
         else if (saveMode == null) {
             saveMode = TableSaveMode.UPDATE;

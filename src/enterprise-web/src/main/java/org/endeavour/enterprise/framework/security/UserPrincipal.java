@@ -1,7 +1,5 @@
 package org.endeavour.enterprise.framework.security;
 
-import org.endeavour.enterprise.model.UserContext;
-
 import java.security.Principal;
 
 public class UserPrincipal implements Principal {

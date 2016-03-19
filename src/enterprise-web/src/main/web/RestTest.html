@@ -269,11 +269,11 @@
 	<br/>
 	Email: <input type="text" id="saveUserEmail">
 	<br/>
-	Title: <input type="text" id="saveUserTitle"">
+	Title: <input type="text" id="saveUserTitle">
 	<br/>
 	Forename: <input type="text" id="saveUserForename">
 	<br/>
-	Surname: <input type="text" id="saveUserSurname"">
+	Surname: <input type="text" id="saveUserSurname">
 	<br/>
 	Permissions:
 	<select id="saveUserPermissions">
@@ -281,7 +281,7 @@
 		<option value="2">Admin</option>
 	</select>
 	<br/>
-	Super user: <input type="checkbox" id="saveUserSuperUser"">
+	Super user: <input type="checkbox" id="saveUserSuperUser">
 	<br/>
 
 	<button type="button" onclick="saveUser()">Submit</button>
@@ -761,10 +761,45 @@ UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
 		}
 	</script>
 
+<hr/>
+<h3>/api/dashboard/getRecentDocuments</h3>
+
+<button type="button" onclick="getRecentDocuments()">Submit</button>
+
+<script>
+		function getRecentDocuments() {
+
+			get('/api/dashboard/getRecentDocuments', 'count=5');
+		}
+	</script>
+
+<hr/>
+<h3>/api/dashboard/getReportActivity</h3>
+
+<button type="button" onclick="getReportActivity()">Submit</button>
+
+<script>
+		function getReportActivity() {
+
+			get('/api/dashboard/getReportActivity', 'count=5');
+		}
+	</script>
+
+<hr/>
+<h3>/api/dashboard/getEngineHistory</h3>
+
+<button type="button" onclick="getEngineHistory()">Submit</button>
+
+<script>
+		function getEngineHistory() {
+
+			get('/api/dashboard/getEngineHistory', 'count=5');
+		}
+	</script>
+
 
 <hr/>
 <h3>Results</h3>
-
 
 <div id="results"></div>
 

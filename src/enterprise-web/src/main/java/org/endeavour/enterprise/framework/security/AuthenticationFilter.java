@@ -1,7 +1,6 @@
 package org.endeavour.enterprise.framework.security;
 
 import org.endeavour.enterprise.framework.exceptions.NotAuthorizedException;
-import org.endeavour.enterprise.model.UserContext;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;

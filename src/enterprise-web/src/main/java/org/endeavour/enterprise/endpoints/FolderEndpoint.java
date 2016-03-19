@@ -6,6 +6,7 @@ import org.endeavourhealth.enterprise.core.entity.DependencyType;
 import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
 import org.endeavourhealth.enterprise.core.entity.database.DbActiveItemDependency;
 import org.endeavourhealth.enterprise.core.entity.database.DbItem;
+import org.endeavourhealth.enterprise.core.entity.database.DbRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -235,6 +237,13 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         LOG.trace("GettingFolderContents for folder {}", folderUuid);
 
         List<DbActiveItem> childActiveItems = DbActiveItem.retrieveDependentItems(orgUuid, folderUuid, DependencyType.IsContainedWithin);
+
+        HashMap<UUID, DbRequest> hmPendingRequestsByItem = new HashMap<>();
+        List<DbRequest> pendingRequests = DbRequest.retrievePendingForActiveItems(orgUuid, childActiveItems);
+        for (DbRequest pendingRequest: pendingRequests ) {
+            hmPendingRequestsByItem.put(pendingRequest.getReportUuid(), pendingRequest);
+        }
+
         for (int i = 0; i < childActiveItems.size(); i++) {
             DbActiveItem activeItem = childActiveItems.get(i);
             UUID uuid = activeItem.getItemUuid();
@@ -250,9 +259,13 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
             //and set any extra data we need
             if (itemType == DefinitionItemType.Report) {
-                //TODO: 2016-03-01 DL - set last run date etc. on folder content
+
+                DbRequest pendingRequest = hmPendingRequestsByItem.get(uuid);
+                c.setIsScheduled(pendingRequest != null);
+
+                //TODO: 2016-03-01 DL - set last run date on folder content
                 c.setLastRun(new Date());
-                c.setIsScheduled(true);
+
             } else if (itemType == DefinitionItemType.Query) {
 
             } else if (itemType == DefinitionItemType.Test) {

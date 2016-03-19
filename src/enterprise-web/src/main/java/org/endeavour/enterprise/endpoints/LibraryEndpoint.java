@@ -44,7 +44,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         String xml = item.getXmlContent();
 
-        Report ret = QueryDocumentParser.readFromXml(LibraryItem.class, xml);
+        LibraryItem ret = QueryDocumentParser.readLibraryItemFromXml(xml);
 
         return Response
                 .ok()

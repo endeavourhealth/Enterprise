@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.core.entity.database;
 
 import ch.qos.logback.classic.db.DBAppender;
+import ch.qos.logback.classic.db.names.DefaultDBNameResolver;
 import ch.qos.logback.core.db.ConnectionSource;
 import ch.qos.logback.core.db.DriverManagerConnectionSource;
 import ch.qos.logback.core.db.dialect.SQLDialectCode;
@@ -89,13 +90,32 @@ System.out.println("----------------------------------------------------------")
             ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
             DBAppender dbAppender = new DBAppender();
-            //dbAppender.setConnectionSource(connSource);
-            dbAppender.setConnectionSource(src);
             dbAppender.setContext(logger.getLoggerContext());
+            dbAppender.setConnectionSource(src);
+            //dbAppender.setConnectionSource(connSource);
+
+            dbAppender.setName("DB Appender");
+
+            DefaultDBNameResolver r = new DefaultDBNameResolver(){
+                @Override
+                public <N extends Enum<?>> String getTableName(N tableName) {
+                    System.out.println("GETTING TABLE NAME<<<<<<<<<<<<<<");
+                    return "Logging." + super.getTableName(tableName);
+                }
+            };
+
+            dbAppender.setDbNameResolver(r);
+
             dbAppender.start();
 
-
             logger.addAppender(dbAppender);
+
+
+/*
+            ch.qos.logback.classic.Logger localLogger = (ch.qos.logback.classic.Logger)LOG;
+            localLogger.addAppender(dbAppender);*/
+
+            LOG.error("Added db appender");
 
         } catch (Exception e) {
             e.printStackTrace(System.err);
@@ -115,13 +135,10 @@ System.out.println("----------------------------------------------------------")
          xxx 1) test logging exceptions
          xxx 4) what are the two XML files
          xxxx 5) delete one of the xml files
-         6) move logback.xml to an existing folder
+
 
 
          2) get logging to db
-         3) understand SQL timestamp?
-         5) Add two xml files to repo
-         6) commit to GitHub
          */
 
     }

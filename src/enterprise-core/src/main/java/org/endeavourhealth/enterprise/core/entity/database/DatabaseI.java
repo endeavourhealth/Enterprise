@@ -48,6 +48,8 @@ public interface DatabaseI {
 
     public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception;
 
+    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, int count) throws Exception;
+
     public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception;
 
     public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItem(UUID itemUuid) throws Exception;
@@ -58,5 +60,11 @@ public interface DatabaseI {
 
     public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception;
 
+    public List<DbRequest> retrievePendingRequestsForItems(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
 
+    public List<DbRequest> retrievePendingRequests() throws Exception;
+
+    public List<DbJob> retrieveRecentJobs(int count) throws Exception;
+
+    public List<DbJobReport> retrieveJobReports(UUID organisationUuid, int count) throws Exception;
 }

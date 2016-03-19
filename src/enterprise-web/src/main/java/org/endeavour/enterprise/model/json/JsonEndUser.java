@@ -34,7 +34,7 @@ public final class JsonEndUser implements Serializable {
         this.isSuperUser = new Boolean(endUser.getIsSuperUser());
 
         if (role != null) {
-            this.permissions = role.get();
+            this.permissions = role.getValue();
         }
     }
 

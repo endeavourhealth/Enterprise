@@ -159,8 +159,7 @@ abstract class Snomed {
             JsonParser parser = new JsonParser();
             return parser.parse(s);
         } else {
-            LOG.error("Error performing termlex query to {} - status code {}", path, response.getStatus());
-            return null;
+            throw new RuntimeException("Error performing termlex query to " + path + " - status code " + response.getStatus());
         }
     }
 

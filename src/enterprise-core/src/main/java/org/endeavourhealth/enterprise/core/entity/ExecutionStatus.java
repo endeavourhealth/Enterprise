@@ -1,12 +1,16 @@
 package org.endeavourhealth.enterprise.core.entity;
 
-public enum EndUserRole {
-    USER(1),
-    ADMIN(2);
+/**
+ * Created by Drew on 19/03/2016.
+ */
+public enum ExecutionStatus {
+    Executing(0),
+    Successded(1),
+    Failed(2);
 
     private int value;
 
-    EndUserRole(int value) {
+    ExecutionStatus(int value) {
         this.value = value;
     }
 
@@ -14,8 +18,8 @@ public enum EndUserRole {
         return value;
     }
 
-    public static EndUserRole get(int value) {
-        for (EndUserRole e : EndUserRole.values()) {
+    public static ExecutionStatus get(int value) {
+        for (ExecutionStatus e : ExecutionStatus.values()) {
             if (e.value == value) {
                 return e;
             }

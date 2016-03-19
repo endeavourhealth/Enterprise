@@ -37,6 +37,10 @@ public final class DbItem extends DbAbstractTable {
         return ret;
     }
 
+    public static DbItem retrieveForActiveItem(DbActiveItem activeItem) throws Exception {
+        return retrieveForUuidVersion(activeItem.getItemUuid(), activeItem.getVersion());
+    }
+
     public static DbItem retrieveForUuidVersion(UUID uuid, int version) throws Exception {
         return (DbItem) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid, new Integer(version));
     }

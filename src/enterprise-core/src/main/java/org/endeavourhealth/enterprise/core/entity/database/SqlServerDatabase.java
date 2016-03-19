@@ -2,6 +2,7 @@ package org.endeavourhealth.enterprise.core.entity.database;
 
 import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.entity.DependencyType;
+import org.endeavourhealth.enterprise.core.entity.ExecutionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,8 @@ public final class SqlServerDatabase implements DatabaseI {
             return "" + ((DependencyType) o).getValue();
         } else if (o instanceof DefinitionItemType) {
             return "" + ((DefinitionItemType) o).getValue();
+        } else if (o instanceof ExecutionStatus) {
+            return "" + ((ExecutionStatus) o).getValue();
         } else {
             LOG.error("Unsupported entity for database", o.getClass());
             return null;
@@ -157,8 +160,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
         StringJoiner sqlLogging = new StringJoiner("\r\n");
 
-        for (DbAbstractTable entity: entities)
-        {
+        for (DbAbstractTable entity : entities) {
             String sql = writeSql(entity);
             sqlLogging.add(sql);
             statement.addBatch(sql);
@@ -192,6 +194,7 @@ public final class SqlServerDatabase implements DatabaseI {
                 throw new RuntimeException("Invalid save mode " + entity.getSaveMode());
         }
     }
+
     private static String writeInsertSql(DbAbstractTable entity) {
         TableAdapter a = entity.getAdapter();
 
@@ -220,6 +223,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
         return sb.toString();
     }
+
     private static String writeUpdateSql(DbAbstractTable entity) {
         TableAdapter a = entity.getAdapter();
 
@@ -290,6 +294,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
         return sb.toString();
     }
+
     private static String writeDeleteSql(DbAbstractTable entity) {
         TableAdapter a = entity.getAdapter();
 
@@ -373,9 +378,19 @@ public final class SqlServerDatabase implements DatabaseI {
     }
 
     private void retrieveForWhere(TableAdapter a, String conditions, List ret) throws Exception {
+        retrieveForWhere(a, Integer.MAX_VALUE, conditions, ret);
+    }
+
+    private void retrieveForWhere(TableAdapter a, int count, String conditions, List ret) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");
+
+        if (count < Integer.MAX_VALUE) {
+            sb.append("TOP ");
+            sb.append(count);
+            sb.append(" ");
+        }
 
         String[] cols = a.getColumns();
         for (int i = 0; i < cols.length; i++) {
@@ -563,7 +578,7 @@ public final class SqlServerDatabase implements DatabaseI {
 
     @Override
     public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception {
-        List<DbActiveItemDependency> ret = new ArrayList<DbActiveItemDependency>();
+        List<DbActiveItemDependency> ret = new ArrayList<>();
 
         String where = "WHERE DependentItemUuid = " + convertToString(dependentItemUuid)
                 + " AND DependencyTypeId = " + convertToString(dependencyType);
@@ -572,8 +587,52 @@ public final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public List<DbRequest> retrievePendingRequestsForItems(UUID organisationUuid, List<UUID> itemUuids) throws Exception {
+        List<DbRequest> ret = new ArrayList<>();
+        if (itemUuids.isEmpty()) {
+            return ret;
+        }
+
+        String[] strs = itemUuids.toArray(new String[0]);
+
+        String where = "WHERE JobUuid IS NULL"
+                + " AND OrganisationUuid = " + convertToString(organisationUuid)
+                + " AND ReportItemUuid IN (" + String.join(", ", strs) + ")";
+        retrieveForWhere(new DbRequest().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbRequest> retrievePendingRequests() throws Exception {
+        List<DbRequest> ret = new ArrayList<>();
+
+        String where = "WHERE JobUuid IS NULL";
+        retrieveForWhere(new DbRequest().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbJob> retrieveRecentJobs(int count) throws Exception {
+        List<DbJob> ret = new ArrayList<>();
+
+        String where = "ORDER BY StartDateTime DESC";
+        retrieveForWhere(new DbJob().getAdapter(), count, where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbJobReport> retrieveJobReports(UUID organisationUuid, int count) throws Exception {
+        List<DbJobReport> ret = new ArrayList<>();
+
+        String where = "OrganisationUuid = " + convertToString(organisationUuid)
+                + " ORDER BY TimeStamp DESC";
+        retrieveForWhere(new DbJobReport().getAdapter(), count, where, ret);
+        return ret;
+    }
+
+    @Override
     public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception {
-        List<DbActiveItem> ret = new ArrayList<DbActiveItem>();
+        List<DbActiveItem> ret = new ArrayList<>();
 
         String where = "INNER JOIN Definition.ActiveItemDependency d"
                 + " ON d.ItemUuid = " + convertToString(itemUuid)
@@ -582,6 +641,20 @@ public final class SqlServerDatabase implements DatabaseI {
                 + " WHERE " + ALIAS + ".OrganisationUuid = " + convertToString(organisationUuid);
 
         retrieveForWhere(new DbActiveItem().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, int count) throws Exception {
+        List<DbActiveItem> ret = new ArrayList<>();
+
+        String where = "INNER JOIN Definition.Item i"
+                + " ON i.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND i.Version = " + ALIAS + ".Version"
+                + " AND i.EndUserUuid = " + convertToString(userUuid)
+                + " ORDER BY i.TimeStamp DESC";
+
+        retrieveForWhere(new DbActiveItem().getAdapter(), count, where, ret);
         return ret;
     }
 
@@ -613,303 +686,305 @@ public final class SqlServerDatabase implements DatabaseI {
         return ret;
     }
 
+    /**
+     * Connection wrapper to add expiry time and life count
+     */
+    class PoolableConnection implements Connection {
+        private Connection innerConnection = null;
+        private long expiry = -1;
+        private int lives = -1;
+
+        public PoolableConnection(Connection connection, long expiry, int lives) {
+            this.innerConnection = connection;
+            this.expiry = expiry;
+            this.lives = lives;
+        }
+
+        public long getExpiry() {
+            return expiry;
+        }
+
+        public void setExpiry(long expiry) {
+            this.expiry = expiry;
+        }
+
+        public int getLives() {
+            return lives;
+        }
+
+        public void setLives(int lives) {
+            this.lives = lives;
+        }
+
+        @Override
+        public Statement createStatement() throws SQLException {
+            return innerConnection.createStatement();
+        }
+
+        @Override
+        public PreparedStatement prepareStatement(String sql) throws SQLException {
+            return innerConnection.prepareStatement(sql);
+        }
+
+        @Override
+        public CallableStatement prepareCall(String sql) throws SQLException {
+            return innerConnection.prepareCall(sql);
+        }
+
+        @Override
+        public String nativeSQL(String sql) throws SQLException {
+            return innerConnection.nativeSQL(sql);
+        }
+
+        @Override
+        public void setAutoCommit(boolean autoCommit) throws SQLException {
+            innerConnection.setAutoCommit(autoCommit);
+        }
+
+        @Override
+        public boolean getAutoCommit() throws SQLException {
+            return innerConnection.getAutoCommit();
+        }
+
+        @Override
+        public void commit() throws SQLException {
+            innerConnection.commit();
+        }
+
+        @Override
+        public void rollback() throws SQLException {
+            innerConnection.rollback();
+        }
+
+        @Override
+        public void close() throws SQLException {
+            innerConnection.close();
+        }
+
+        @Override
+        public boolean isClosed() throws SQLException {
+            return innerConnection.isClosed();
+        }
+
+        @Override
+        public DatabaseMetaData getMetaData() throws SQLException {
+            return innerConnection.getMetaData();
+        }
+
+        @Override
+        public void setReadOnly(boolean readOnly) throws SQLException {
+            innerConnection.setReadOnly(readOnly);
+        }
+
+        @Override
+        public boolean isReadOnly() throws SQLException {
+            return innerConnection.isReadOnly();
+        }
+
+        @Override
+        public void setCatalog(String catalog) throws SQLException {
+            innerConnection.setCatalog(catalog);
+        }
+
+        @Override
+        public String getCatalog() throws SQLException {
+            return innerConnection.getCatalog();
+        }
+
+        @Override
+        public void setTransactionIsolation(int level) throws SQLException {
+            innerConnection.setTransactionIsolation(level);
+        }
+
+        @Override
+        public int getTransactionIsolation() throws SQLException {
+            return innerConnection.getTransactionIsolation();
+        }
+
+        @Override
+        public SQLWarning getWarnings() throws SQLException {
+            return innerConnection.getWarnings();
+        }
+
+        @Override
+        public void clearWarnings() throws SQLException {
+            innerConnection.clearWarnings();
+        }
+
+        @Override
+        public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
+            return innerConnection.createStatement(resultSetType, resultSetConcurrency);
+        }
+
+        @Override
+        public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+            return innerConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
+        }
+
+        @Override
+        public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+            return innerConnection.prepareCall(sql, resultSetType, resultSetConcurrency);
+        }
+
+        @Override
+        public Map<String, Class<?>> getTypeMap() throws SQLException {
+            return innerConnection.getTypeMap();
+        }
+
+        @Override
+        public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+            innerConnection.setTypeMap(map);
+        }
+
+        @Override
+        public void setHoldability(int holdability) throws SQLException {
+            innerConnection.setHoldability(holdability);
+        }
+
+        @Override
+        public int getHoldability() throws SQLException {
+            return innerConnection.getHoldability();
+        }
+
+        @Override
+        public Savepoint setSavepoint() throws SQLException {
+            return innerConnection.setSavepoint();
+        }
+
+        @Override
+        public Savepoint setSavepoint(String name) throws SQLException {
+            return innerConnection.setSavepoint(name);
+        }
+
+        @Override
+        public void rollback(Savepoint savepoint) throws SQLException {
+            innerConnection.rollback(savepoint);
+        }
+
+        @Override
+        public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+            innerConnection.releaseSavepoint(savepoint);
+        }
+
+        @Override
+        public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+            return innerConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+        }
+
+        @Override
+        public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+            return innerConnection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+        }
+
+        @Override
+        public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+            return innerConnection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+        }
+
+        @Override
+        public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+            return innerConnection.prepareStatement(sql, autoGeneratedKeys);
+        }
+
+        @Override
+        public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+            return innerConnection.prepareStatement(sql, columnIndexes);
+        }
+
+        @Override
+        public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+            return innerConnection.prepareStatement(sql, columnNames);
+        }
+
+        @Override
+        public Clob createClob() throws SQLException {
+            return innerConnection.createClob();
+        }
+
+        @Override
+        public Blob createBlob() throws SQLException {
+            return innerConnection.createBlob();
+        }
+
+        @Override
+        public NClob createNClob() throws SQLException {
+            return innerConnection.createNClob();
+        }
+
+        @Override
+        public SQLXML createSQLXML() throws SQLException {
+            return innerConnection.createSQLXML();
+        }
+
+        @Override
+        public boolean isValid(int timeout) throws SQLException {
+            return innerConnection.isValid(timeout);
+        }
+
+        @Override
+        public void setClientInfo(String name, String value) throws SQLClientInfoException {
+            innerConnection.setClientInfo(name, value);
+        }
+
+        @Override
+        public void setClientInfo(Properties properties) throws SQLClientInfoException {
+            innerConnection.setClientInfo(properties);
+        }
+
+        @Override
+        public String getClientInfo(String name) throws SQLException {
+            return innerConnection.getClientInfo(name);
+        }
+
+        @Override
+        public Properties getClientInfo() throws SQLException {
+            return innerConnection.getClientInfo();
+        }
+
+        @Override
+        public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+            return innerConnection.createArrayOf(typeName, elements);
+        }
+
+        @Override
+        public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+            return innerConnection.createStruct(typeName, attributes);
+        }
+
+        @Override
+        public void setSchema(String schema) throws SQLException {
+            innerConnection.setSchema(schema);
+        }
+
+        @Override
+        public String getSchema() throws SQLException {
+            return innerConnection.getSchema();
+        }
+
+        @Override
+        public void abort(Executor executor) throws SQLException {
+            innerConnection.abort(executor);
+        }
+
+        @Override
+        public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+            innerConnection.setNetworkTimeout(executor, milliseconds);
+        }
+
+        @Override
+        public int getNetworkTimeout() throws SQLException {
+            return innerConnection.getNetworkTimeout();
+        }
+
+        @Override
+        public <T> T unwrap(Class<T> iface) throws SQLException {
+            return innerConnection.unwrap(iface);
+        }
+
+        @Override
+        public boolean isWrapperFor(Class<?> iface) throws SQLException {
+            return innerConnection.isWrapperFor(iface);
+        }
+    }
+
 }
-
-class PoolableConnection implements Connection {
-    private Connection innerConnection = null;
-    private long expiry = -1;
-    private int lives = -1;
-
-    public PoolableConnection(Connection connection, long expiry, int lives) {
-        this.innerConnection = connection;
-        this.expiry = expiry;
-        this.lives = lives;
-    }
-
-    public long getExpiry() {
-        return expiry;
-    }
-
-    public void setExpiry(long expiry) {
-        this.expiry = expiry;
-    }
-
-    public int getLives() {
-        return lives;
-    }
-
-    public void setLives(int lives) {
-        this.lives = lives;
-    }
-
-    @Override
-    public Statement createStatement() throws SQLException {
-        return innerConnection.createStatement();
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return innerConnection.prepareStatement(sql);
-    }
-
-    @Override
-    public CallableStatement prepareCall(String sql) throws SQLException {
-        return innerConnection.prepareCall(sql);
-    }
-
-    @Override
-    public String nativeSQL(String sql) throws SQLException {
-        return innerConnection.nativeSQL(sql);
-    }
-
-    @Override
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
-        innerConnection.setAutoCommit(autoCommit);
-    }
-
-    @Override
-    public boolean getAutoCommit() throws SQLException {
-        return innerConnection.getAutoCommit();
-    }
-
-    @Override
-    public void commit() throws SQLException {
-        innerConnection.commit();
-    }
-
-    @Override
-    public void rollback() throws SQLException {
-        innerConnection.rollback();
-    }
-
-    @Override
-    public void close() throws SQLException {
-        innerConnection.close();
-    }
-
-    @Override
-    public boolean isClosed() throws SQLException {
-        return innerConnection.isClosed();
-    }
-
-    @Override
-    public DatabaseMetaData getMetaData() throws SQLException {
-        return innerConnection.getMetaData();
-    }
-
-    @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
-        innerConnection.setReadOnly(readOnly);
-    }
-
-    @Override
-    public boolean isReadOnly() throws SQLException {
-        return innerConnection.isReadOnly();
-    }
-
-    @Override
-    public void setCatalog(String catalog) throws SQLException {
-        innerConnection.setCatalog(catalog);
-    }
-
-    @Override
-    public String getCatalog() throws SQLException {
-        return innerConnection.getCatalog();
-    }
-
-    @Override
-    public void setTransactionIsolation(int level) throws SQLException {
-        innerConnection.setTransactionIsolation(level);
-    }
-
-    @Override
-    public int getTransactionIsolation() throws SQLException {
-        return innerConnection.getTransactionIsolation();
-    }
-
-    @Override
-    public SQLWarning getWarnings() throws SQLException {
-        return innerConnection.getWarnings();
-    }
-
-    @Override
-    public void clearWarnings() throws SQLException {
-        innerConnection.clearWarnings();
-    }
-
-    @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        return innerConnection.createStatement(resultSetType, resultSetConcurrency);
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return innerConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
-    }
-
-    @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return innerConnection.prepareCall(sql, resultSetType, resultSetConcurrency);
-    }
-
-    @Override
-    public Map<String, Class<?>> getTypeMap() throws SQLException {
-        return innerConnection.getTypeMap();
-    }
-
-    @Override
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-        innerConnection.setTypeMap(map);
-    }
-
-    @Override
-    public void setHoldability(int holdability) throws SQLException {
-        innerConnection.setHoldability(holdability);
-    }
-
-    @Override
-    public int getHoldability() throws SQLException {
-        return innerConnection.getHoldability();
-    }
-
-    @Override
-    public Savepoint setSavepoint() throws SQLException {
-        return innerConnection.setSavepoint();
-    }
-
-    @Override
-    public Savepoint setSavepoint(String name) throws SQLException {
-        return innerConnection.setSavepoint(name);
-    }
-
-    @Override
-    public void rollback(Savepoint savepoint) throws SQLException {
-        innerConnection.rollback(savepoint);
-    }
-
-    @Override
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        innerConnection.releaseSavepoint(savepoint);
-    }
-
-    @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return innerConnection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return innerConnection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-    }
-
-    @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return innerConnection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
-        return innerConnection.prepareStatement(sql, autoGeneratedKeys);
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
-        return innerConnection.prepareStatement(sql, columnIndexes);
-    }
-
-    @Override
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
-        return innerConnection.prepareStatement(sql, columnNames);
-    }
-
-    @Override
-    public Clob createClob() throws SQLException {
-        return innerConnection.createClob();
-    }
-
-    @Override
-    public Blob createBlob() throws SQLException {
-        return innerConnection.createBlob();
-    }
-
-    @Override
-    public NClob createNClob() throws SQLException {
-        return innerConnection.createNClob();
-    }
-
-    @Override
-    public SQLXML createSQLXML() throws SQLException {
-        return innerConnection.createSQLXML();
-    }
-
-    @Override
-    public boolean isValid(int timeout) throws SQLException {
-        return innerConnection.isValid(timeout);
-    }
-
-    @Override
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        innerConnection.setClientInfo(name, value);
-    }
-
-    @Override
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        innerConnection.setClientInfo(properties);
-    }
-
-    @Override
-    public String getClientInfo(String name) throws SQLException {
-        return innerConnection.getClientInfo(name);
-    }
-
-    @Override
-    public Properties getClientInfo() throws SQLException {
-        return innerConnection.getClientInfo();
-    }
-
-    @Override
-    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        return innerConnection.createArrayOf(typeName, elements);
-    }
-
-    @Override
-    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        return innerConnection.createStruct(typeName, attributes);
-    }
-
-    @Override
-    public void setSchema(String schema) throws SQLException {
-        innerConnection.setSchema(schema);
-    }
-
-    @Override
-    public String getSchema() throws SQLException {
-        return innerConnection.getSchema();
-    }
-
-    @Override
-    public void abort(Executor executor) throws SQLException {
-        innerConnection.abort(executor);
-    }
-
-    @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-        innerConnection.setNetworkTimeout(executor, milliseconds);
-    }
-
-    @Override
-    public int getNetworkTimeout() throws SQLException {
-        return innerConnection.getNetworkTimeout();
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        return innerConnection.unwrap(iface);
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return innerConnection.isWrapperFor(iface);
-    }
-}
-

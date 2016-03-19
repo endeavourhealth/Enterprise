@@ -2,6 +2,7 @@ package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
 import org.endeavourhealth.enterprise.core.entity.database.DbItem;
 
 import java.io.Serializable;
@@ -25,9 +26,14 @@ public final class JsonFolderContent implements Serializable {
 
     }
 
+    public JsonFolderContent(DbActiveItem activeItem, DbItem item) {
+        this(item);
+        setTypeEnum(activeItem.getItemTypeId());
+    }
     public JsonFolderContent(DbItem item) {
         this.uuid = item.getPrimaryUuid();
         this.name = item.getTitle();
+        this.lastModified = item.getTimeStamp();
     }
 
     public void setTypeEnum(DefinitionItemType t) {

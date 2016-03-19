@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavour.enterprise.model.UserContext;
 import org.endeavourhealth.enterprise.core.entity.EndUserRole;
 import org.endeavourhealth.enterprise.core.entity.database.DbEndUser;
 import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;

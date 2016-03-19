@@ -1,6 +1,5 @@
-package org.endeavour.enterprise.model;
+package org.endeavour.enterprise.framework.security;
 
-import org.endeavour.enterprise.framework.security.UserPrincipal;
 import org.endeavourhealth.enterprise.core.entity.EndUserRole;
 
 import javax.ws.rs.core.SecurityContext;

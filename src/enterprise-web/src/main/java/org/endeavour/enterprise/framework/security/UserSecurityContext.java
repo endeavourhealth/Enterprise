@@ -1,7 +1,5 @@
 package org.endeavour.enterprise.framework.security;
 
-import org.endeavour.enterprise.model.UserContext;
-
 import java.security.Principal;
 
 public class UserSecurityContext implements javax.ws.rs.core.SecurityContext {

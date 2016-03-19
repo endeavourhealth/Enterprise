@@ -4,9 +4,12 @@ import org.endeavour.enterprise.model.json.JsonDeleteResponse;
 import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
 import org.endeavourhealth.enterprise.core.entity.database.DbItem;
+import org.endeavourhealth.enterprise.core.entity.database.DbRequest;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
+import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersParser;
+import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +18,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,7 +48,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         String xml = item.getXmlContent();
 
-        Report ret = QueryDocumentParser.readFromXml(Report.class, xml);
+        Report ret = QueryDocumentParser.readReportFromXml(xml);
 
         return Response
                 .ok()
@@ -107,4 +113,57 @@ public final class ReportEndpoint extends AbstractItemEndpoint
                 .build();
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/scheduleReport")
+    public Response scheduleReport(@Context SecurityContext sc, RequestParameters requestParameters) throws Exception
+    {
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
+
+        UUID reportUuid = parseUuidFromStr(requestParameters.getReportUuid());
+        String parameterXml = RequestParametersParser.writeToXml(requestParameters);
+
+        DbRequest request = new DbRequest();
+        request.setReportUuid(reportUuid);
+        request.setOrganisationUuuid(orgUuid);
+        request.setEndUserUuid(userUuid);
+        request.setTimeStamp(new Date());
+        request.setParameters(parameterXml);
+
+        request.writeToDb();
+
+        return Response
+                .ok()
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getReportSchedules")
+    public Response getReportSchedules(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception
+    {
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID reportUuid = UUID.fromString(uuidStr);
+
+        LOG.trace("getReportSchedules for UUID {}", reportUuid);
+
+        List<RequestParameters> ret = new ArrayList<>();
+
+        List<UUID> v = new ArrayList<>();
+        v.add(reportUuid);
+        List<DbRequest> requests = DbRequest.retrievePendingForItemUuids(orgUuid, v);
+        for (DbRequest request: requests) {
+            String xml = request.getParameters();
+            RequestParameters requestObj = RequestParametersParser.readFromXml(xml);
+            ret.add(requestObj);
+        }
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
 }

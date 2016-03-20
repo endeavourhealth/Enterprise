@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Drew on 19/03/2016.
  */
-public final class Reference {
+public final class TerminologyService {
 
     public static HashSet<String> enumerateConcepts(CodeSet codeSet) {
 

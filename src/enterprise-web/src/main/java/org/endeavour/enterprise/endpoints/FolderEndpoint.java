@@ -3,10 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.model.json.*;
 import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.entity.DependencyType;
-import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
-import org.endeavourhealth.enterprise.core.entity.database.DbActiveItemDependency;
-import org.endeavourhealth.enterprise.core.entity.database.DbItem;
-import org.endeavourhealth.enterprise.core.entity.database.DbRequest;
+import org.endeavourhealth.enterprise.core.entity.database.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -244,6 +241,13 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             hmPendingRequestsByItem.put(pendingRequest.getReportUuid(), pendingRequest);
         }
 
+        HashMap<UUID, DbJobReport> hmLastJobReportsByItem = new HashMap<>();
+        List<DbJobReport> jobReports = DbJobReport.retrieveLatestForActiveItems(orgUuid, childActiveItems);
+        for (DbJobReport jobReport: jobReports) {
+            hmLastJobReportsByItem.put(jobReport.getReportUuid(), jobReport);
+        }
+
+
         for (int i = 0; i < childActiveItems.size(); i++) {
             DbActiveItem activeItem = childActiveItems.get(i);
             UUID uuid = activeItem.getItemUuid();
@@ -260,11 +264,15 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             //and set any extra data we need
             if (itemType == DefinitionItemType.Report) {
 
+                //for reports, indicate if it's currently scheduled to be run
                 DbRequest pendingRequest = hmPendingRequestsByItem.get(uuid);
                 c.setIsScheduled(pendingRequest != null);
 
-                //TODO: 2016-03-01 DL - set last run date on folder content
-                c.setLastRun(new Date());
+                //show when a report was last executed
+                DbJobReport jobReport = hmLastJobReportsByItem.get(uuid);
+                if (jobReport != null) {
+                    c.setLastRun(jobReport.getTimeStamp());
+                }
 
             } else if (itemType == DefinitionItemType.Query) {
 

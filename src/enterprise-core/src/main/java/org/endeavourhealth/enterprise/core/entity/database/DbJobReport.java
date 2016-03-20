@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.core.entity.database;
 
+import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.entity.ExecutionStatus;
 
 import java.sql.SQLException;
@@ -13,8 +14,8 @@ import java.util.UUID;
  */
 public final class DbJobReport extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class, "JobReport", "Execution",
-            "JobReportUuid,JobUuid,ReportUuid,OrganisationUuid,EndUserUuid,TimeStamp,Parameters", "JobReportUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbJobReport.class, "JobReport", "Execution",
+            "JobReportUuid,JobUuid,ReportUuid,OrganisationUuid,EndUserUuid,TimeStamp,Parameters,StatusId", "JobReportUuid");
 
     private UUID jobUuid = null;
     private UUID reportUuid = null;
@@ -26,6 +27,23 @@ public final class DbJobReport extends DbAbstractTable {
 
     public static List<DbJobReport> retrieveRecent(UUID organisationUuid, int count) throws Exception {
         return DatabaseManager.db().retrieveJobReports(organisationUuid, count);
+    }
+    public static List<DbJobReport> retrieveForJob(UUID jobUuid) throws Exception {
+        return DatabaseManager.db().retrieveJobReportsForJob(jobUuid);
+    }
+    public static List<DbJobReport> retrieveLatestForActiveItems(UUID organisationUuid, List<DbActiveItem> activeItems) throws Exception {
+
+        //filter activeItems to find UUIDs of just reports
+        List<UUID> itemUuids = new ArrayList<>();
+        for (DbActiveItem activeItem: activeItems) {
+            if (activeItem.getItemTypeId() == DefinitionItemType.Report) {
+                itemUuids.add(activeItem.getItemUuid());
+            }
+        }
+        return retrieveLatestForItemUuids(organisationUuid, itemUuids);
+    }
+    public static List<DbJobReport> retrieveLatestForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception {
+        return DatabaseManager.db().retrieveLatestJobReportsForItemUuids(organisationUuid, itemUuids);
     }
 
     @Override

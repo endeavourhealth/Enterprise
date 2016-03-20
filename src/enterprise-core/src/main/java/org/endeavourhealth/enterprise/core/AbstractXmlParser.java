@@ -3,6 +3,7 @@ package org.endeavourhealth.enterprise.core;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
+import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -18,7 +19,7 @@ import java.io.StringWriter;
 /**
  * Created by Drew on 19/03/2016.
  */
-public abstract class AbstractParser {
+public abstract class AbstractXmlParser {
 
     protected static <T> T readFromXml(Class cls, String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
@@ -26,18 +27,8 @@ public abstract class AbstractParser {
         InputStream is = new ByteArrayInputStream(xml.getBytes());
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = docBuilder.parse(is);
-        org.w3c.dom.Element varElement = document.getDocumentElement();
 
-        String name = varElement.getNodeName();
-        if (name.equalsIgnoreCase("report")) {
-            return readObjectFromXml(Report.class, document);
-        } else if (name.equalsIgnoreCase("libraryItem")) {
-            return readObjectFromXml(LibraryItem.class, document);
-        } else if (name.equalsIgnoreCase("queryDocument")) {
-            return readObjectFromXml(QueryDocument.class, document);
-        } else {
-            throw new RuntimeException("Unexpected root node " + name);
-        }
+        return readObjectFromXml(cls, document);
     }
 
     protected static <T> T readObjectFromXml(Class cls, Document doc) throws ParserConfigurationException, JAXBException, IOException, SAXException {

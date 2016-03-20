@@ -12,8 +12,8 @@ import java.util.List;
  */
 public final class DbJob extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class, "Job", "Execution",
-            "JobUuid,StatusId,StartDateTime,EndDateTime", "JobUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbJob.class, "Job", "Execution",
+            "JobUuid,StatusId,StartDateTime,EndDateTime,PatientsInDatabase", "JobUuid");
 
     private ExecutionStatus statusId = ExecutionStatus.Executing;
     private Date startDateTime = null;
@@ -22,6 +22,9 @@ public final class DbJob extends DbAbstractTable {
 
     public static List<DbJob> retrieveRecent(int count) throws Exception {
         return DatabaseManager.db().retrieveRecentJobs(count);
+    }
+    public static List<DbJob> retrieveForStatus(ExecutionStatus status) throws Exception {
+        return DatabaseManager.db().retrieveJobsForStatus(status);
     }
 
     @Override
@@ -32,6 +35,7 @@ public final class DbJob extends DbAbstractTable {
     @Override
     public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
+        builder.add(statusId);
         builder.add(startDateTime);
         builder.add(endDateTime);
         builder.add(patientsInDatabase);
@@ -40,6 +44,7 @@ public final class DbJob extends DbAbstractTable {
     @Override
     public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
+        statusId = ExecutionStatus.get(reader.readInt());
         startDateTime = reader.readDateTime();
         endDateTime = reader.readDateTime();
         patientsInDatabase = reader.readInt();

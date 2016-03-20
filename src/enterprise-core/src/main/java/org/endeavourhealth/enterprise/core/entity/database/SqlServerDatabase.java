@@ -60,7 +60,7 @@ final class SqlServerDatabase implements DatabaseI {
      */
     private static String convertToString(Object o) {
         if (o == null) {
-            return "'null'";
+            return "null";
         } else if (o instanceof String) {
             String s = ((String) o).replaceAll("'", "''");
             return "'" + s + "'";
@@ -113,7 +113,9 @@ final class SqlServerDatabase implements DatabaseI {
 
 
     private synchronized Connection getConnection() throws ClassNotFoundException, SQLException {
-        return cpds.getConnection();
+        Connection conn = cpds.getConnection();
+        conn.setAutoCommit(false); //never want auto-commit
+        return conn;
     }
 
     private synchronized void closeConnection(Connection connection) throws SQLException {
@@ -611,11 +613,14 @@ final class SqlServerDatabase implements DatabaseI {
             return ret;
         }
 
-        String[] strs = itemUuids.toArray(new String[0]);
+        List<String> uuidStrs = new ArrayList<>();
+        for (UUID uuid: itemUuids) {
+            uuidStrs.add(convertToString(uuid));
+        }
 
         String where = "WHERE JobUuid IS NULL"
                 + " AND OrganisationUuid = " + convertToString(organisationUuid)
-                + " AND ReportItemUuid IN (" + String.join(", ", strs) + ")";
+                + " AND ReportUuid IN (" + String.join(", ", uuidStrs) + ")";
         retrieveForWhere(new DbRequest().getAdapter(), where, ret);
         return ret;
     }
@@ -639,12 +644,61 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public List<DbJob> retrieveJobsForStatus(ExecutionStatus status) throws Exception {
+        List<DbJob> ret = new ArrayList<>();
+
+        String where = "WHERE StatusId = " + convertToString(status);
+        retrieveForWhere(new DbJob().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
     public List<DbJobReport> retrieveJobReports(UUID organisationUuid, int count) throws Exception {
         List<DbJobReport> ret = new ArrayList<>();
 
-        String where = "OrganisationUuid = " + convertToString(organisationUuid)
+        String where = "WHERE OrganisationUuid = " + convertToString(organisationUuid)
                 + " ORDER BY TimeStamp DESC";
         retrieveForWhere(new DbJobReport().getAdapter(), count, where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbJobReport> retrieveJobReportsForJob(UUID jobUuid) throws Exception {
+        List<DbJobReport> ret = new ArrayList<>();
+
+        String where = "WHERE JobUuid = " + convertToString(jobUuid);
+        retrieveForWhere(new DbJobReport().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbJobReport> retrieveLatestJobReportsForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception {
+
+        List<DbJobReport> ret = new ArrayList<>();
+        if (itemUuids.isEmpty()) {
+            return ret;
+        }
+
+        List<String> uuidStrs = new ArrayList<>();
+        for (UUID uuid: itemUuids) {
+            uuidStrs.add(convertToString(uuid));
+        }
+
+        String where = "WHERE OrganisationUuid = " + convertToString(organisationUuid)
+                + " AND ReportUuid IN (" + String.join(", ", uuidStrs) + ")"
+                + " AND NOT EXISTS (SELECT 1 FROM Execution.JobReport later"
+                + " WHERE later.JobReportUuid = " + ALIAS + ".JobReportUuid"
+                + " AND later.TimeStamp > " + ALIAS + ".TimeStamp)";
+        retrieveForWhere(new DbJobReport().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception {
+        List<DbJobReportItem> ret = new ArrayList<>();
+
+        String where = "WHERE JobReportUuid = " + convertToString(jobReportUuid);
+        retrieveForWhere(new DbJobReportItem().getAdapter(), where, ret);
         return ret;
     }
 

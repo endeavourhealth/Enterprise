@@ -548,6 +548,22 @@
 	</script>
 
 <hr/>
+<h3>/api/report/getReportSchedules</h3>
+	
+	Report UUID: <input type="text" id="getReportSchedulesUuid">
+	<br/>
+	<button type="button" onclick="getReportSchedules()">Submit</button>
+	
+	<script>
+		function getReportSchedules() {
+
+			var s = document.getElementById('getReportSchedulesUuid').value;
+
+			get('/api/report/getReportSchedules', 'uuid=' + s);
+		}
+	</script>
+
+<hr/>
 <h3>/api/report/saveReport</h3>
 
 
@@ -626,6 +642,82 @@
 			}
 
 			post('/api/report/saveReport/', params);
+
+		}
+	</script>
+
+<hr/>
+<h3>/api/report/scheduleReport</h3>
+	
+	
+	Report UUID: <input type="text" id="scheduleReportUuid">
+	<br/>
+	Baseline date: <input type="text" id="scheduleReportDate">
+	<br/>
+	Patient type:
+	<select id="scheduleReportPatientType">
+		<option value="regular">Regular</option>
+		<option value="nonRegular">Non-Regular</option>
+		<option value="all">All</option>
+	</select>
+	<br/>
+	Patient status:
+	<select id="scheduleReportPatientStatus">
+		<option value="active">Active</option>
+		<option value="all">All</option>
+	</select>
+	<br/>
+	Organisation1: <input type="text" id="scheduleReportOrganisation1">
+	<br/>
+	Organisation2: <input type="text" id="scheduleReportOrganisation2">
+	<br/>
+	<button type="button" onclick="scheduleReport()">Submit</button>
+
+	<script>
+		function scheduleReport() {
+
+			var params = {};
+
+			var s = document.getElementById('scheduleReportUuid').value;
+			if (s.length > 0)
+			{
+				params['reportUuid'] = s;
+			}
+
+			s = document.getElementById('scheduleReportDate').value;
+			if (s.length > 0)
+			{
+				params['baselineDate'] = s;
+			}
+
+			s = document.getElementById('scheduleReportPatientType').value;
+			if (s.length > 0)
+			{
+				params['patientType'] = s;
+			}
+
+			s = document.getElementById('scheduleReportPatientStatus').value;
+			if (s.length > 0)
+			{
+				params['patientStatus'] = s;
+			}
+
+			var organisations = [];
+			params['organisation'] = organisations;
+
+			s = document.getElementById('scheduleReportOrganisation1').value;
+			if (s.length > 0)
+			{
+				organisations[organisations.length] = s;
+			}
+
+			s = document.getElementById('scheduleReportOrganisation2').value;
+			if (s.length > 0)
+			{
+				organisations[organisations.length] = s;
+			}
+
+			post('/api/report/scheduleReport/', params);
 
 		}
 	</script>

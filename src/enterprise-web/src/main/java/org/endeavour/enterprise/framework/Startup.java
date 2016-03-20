@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.framework;
 
+import org.endeavourhealth.enterprise.core.Examples;
 import org.endeavourhealth.enterprise.core.entity.database.DatabaseManager;
 
 import javax.servlet.ServletContext;
@@ -15,6 +16,13 @@ public final class Startup implements ServletContextListener {
 
         //tell our database manager to set up logging to db
         DatabaseManager.db().registerLogbackDbAppender();
+
+        try {
+            Examples.findingPendingRequestsAndCreateJob();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void contextDestroyed(ServletContextEvent contextEvent) {

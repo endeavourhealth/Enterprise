@@ -125,6 +125,10 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         UUID reportUuid = parseUuidFromStr(requestParameters.getReportUuid());
         String parameterXml = RequestParametersParser.writeToXml(requestParameters);
 
+        if (reportUuid == null) {
+            throw new BadRequestException("Missing report UUID");
+        }
+
         DbRequest request = new DbRequest();
         request.setReportUuid(reportUuid);
         request.setOrganisationUuuid(orgUuid);

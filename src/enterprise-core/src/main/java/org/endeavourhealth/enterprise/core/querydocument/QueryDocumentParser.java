@@ -1,29 +1,35 @@
 package org.endeavourhealth.enterprise.core.querydocument;
 
-import org.endeavourhealth.enterprise.core.AbstractParser;
+import org.endeavourhealth.enterprise.core.AbstractXmlParser;
+import org.endeavourhealth.enterprise.core.entity.database.DbItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.ObjectFactory;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
-import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 
 /**
  * Created by Drew on 11/03/2016.
  */
-public abstract class QueryDocumentParser extends AbstractParser {
+public abstract class QueryDocumentParser extends AbstractXmlParser {
 
     private static ObjectFactory queryDocumentObjectFactory = new ObjectFactory();
+
+
+    public static LibraryItem readLibraryItemFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+        return readFromXml(LibraryItem.class, item.getXmlContent());
+    }
+    public static Report readReportFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+        return readFromXml(Report.class, item.getXmlContent());
+    }
+    public static QueryDocument readQueryDocumentFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+        return readFromXml(QueryDocument.class, item.getXmlContent());
+    }
+
 
     public static LibraryItem readLibraryItemFromXml(String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
         return readFromXml(LibraryItem.class, xml);

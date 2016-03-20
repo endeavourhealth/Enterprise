@@ -13,8 +13,8 @@ import java.util.UUID;
  */
 public final class DbRequest extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class, "Request", "Execution",
-            "RequestUuid,ReportItemUuid,OrganisationUuid,EndUserUuid,TimeStamp,Parameters,JobUuid", "RequestUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbRequest.class, "Request", "Execution",
+            "RequestUuid,ReportUuid,OrganisationUuid,EndUserUuid,TimeStamp,Parameters,JobUuid", "RequestUuid");
 
     private UUID reportUuid = null;
     private UUID organisationUuuid = null;
@@ -24,6 +24,8 @@ public final class DbRequest extends DbAbstractTable {
     private UUID jobUuid = null;
 
     public static List<DbRequest> retrievePendingForActiveItems(UUID organisationUuid, List<DbActiveItem> activeItems) throws Exception {
+
+        //filter activeItems to find UUIDs of just reports
         List<UUID> itemUuids = new ArrayList<>();
         for (DbActiveItem activeItem: activeItems) {
             if (activeItem.getItemTypeId() == DefinitionItemType.Report) {
@@ -41,7 +43,7 @@ public final class DbRequest extends DbAbstractTable {
 
     @Override
     public TableAdapter getAdapter() {
-        return null;
+        return adapter;
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.endeavourhealth.enterprise.core.entity.database;
 import ch.qos.logback.core.db.ConnectionSource;
 import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.entity.DependencyType;
+import org.endeavourhealth.enterprise.core.entity.ExecutionStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -71,5 +72,14 @@ public interface DatabaseI {
 
     public List<DbJob> retrieveRecentJobs(int count) throws Exception;
 
+    public List<DbJob> retrieveJobsForStatus(ExecutionStatus status) throws Exception;
+
     public List<DbJobReport> retrieveJobReports(UUID organisationUuid, int count) throws Exception;
+
+    public List<DbJobReport> retrieveJobReportsForJob(UUID jobUuid) throws Exception;
+
+    public List<DbJobReport> retrieveLatestJobReportsForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
+
+    public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception;
+
 }

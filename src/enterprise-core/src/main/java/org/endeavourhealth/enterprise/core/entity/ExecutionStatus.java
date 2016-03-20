@@ -5,7 +5,7 @@ package org.endeavourhealth.enterprise.core.entity;
  */
 public enum ExecutionStatus {
     Executing(0),
-    Successded(1),
+    Succeeded(1),
     Failed(2);
 
     private int value;

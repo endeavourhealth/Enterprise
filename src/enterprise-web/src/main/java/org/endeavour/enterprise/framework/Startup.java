@@ -18,7 +18,8 @@ public final class Startup implements ServletContextListener {
         DatabaseManager.db().registerLogbackDbAppender();
 
         try {
-            Examples.findingPendingRequestsAndCreateJob();
+            //Examples.findingPendingRequestsAndCreateJob();
+            //Examples.findNonCompletedJobsAndContents();
         }
         catch (Exception e) {
             e.printStackTrace();

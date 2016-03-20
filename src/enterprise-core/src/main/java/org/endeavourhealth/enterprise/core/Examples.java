@@ -64,12 +64,21 @@ public abstract class Examples {
             Report report = QueryDocumentParser.readReportFromXml(itemXml);
             List<ReportItem> items = report.getReportItem();
             for (ReportItem item: items) {
+
+                //report item may have a queryUuid or listOutputUuid
                 String queryUuidStr = item.getQueryLibraryItemUuid();
-                UUID queryUuid = UUID.fromString(queryUuidStr);
+                String listOutputUuidStr = item.getListReportLibraryItemUuid();
+
+                String uuidStr = queryUuidStr;
+                if (uuidStr == null) {
+                    uuidStr = listOutputUuidStr;
+                }
+
+                UUID uuid = UUID.fromString(uuidStr);
 
                 DbJobReportItem jobReportItem = new DbJobReportItem();
                 jobReportItem.setJobReportUuid(jobReportUuid);
-                jobReportItem.setItemUuid(queryUuid);
+                jobReportItem.setItemUuid(uuid);
                 toSave.add(jobReportItem);
             }
         }
@@ -93,6 +102,9 @@ public abstract class Examples {
                 UUID jobReportUuid = jobReport.getPrimaryUuid();
                 List<DbJobReportItem> jobReportItems = DbJobReportItem.retrieveForJobReport(jobReportUuid);
 
+                //also get the parameters objects and query document
+                RequestParameters requestParameters = getRequestParametersFromJobReport(jobReport);
+                QueryDocument queryDocument = getQueryDocumentComponentsFromJobReport(jobReport);
             }
         }
     }

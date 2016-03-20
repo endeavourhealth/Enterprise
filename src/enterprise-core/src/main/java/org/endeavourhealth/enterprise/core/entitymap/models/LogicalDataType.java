@@ -1,5 +1,5 @@
 
-package org.endeavourhealth.enterprise.core.entitymap;
+package org.endeavourhealth.enterprise.core.entitymap.models;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

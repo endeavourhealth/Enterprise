@@ -10,7 +10,7 @@ public enum DefinitionItemType {
     ListOutput(6),
     LibraryFolder(7);
 
-    private int value;
+    private final int value;
 
     DefinitionItemType(final int value) {
         this.value = value;

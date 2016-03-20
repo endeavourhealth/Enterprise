@@ -8,6 +8,10 @@
       <list>
         <option value="$PROJECT_DIR$/enterprise-core/pom.xml" />
         <option value="$PROJECT_DIR$/enterprise-web/pom.xml" />
+        <option value="$PROJECT_DIR$/enterprise-engine/pom.xml" />
+        <option value="$PROJECT_DIR$/enterprise-controller/pom.xml" />
+        <option value="$PROJECT_DIR$/enterprise-processornode/pom.xml" />
+        <option value="$PROJECT_DIR$/enterprise-enginecore/pom.xml" />
       </list>
     </option>
   </component>

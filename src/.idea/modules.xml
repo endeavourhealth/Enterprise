@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/enterprise-controller/enterprise-controller.iml" filepath="$PROJECT_DIR$/enterprise-controller/enterprise-controller.iml" />
       <module fileurl="file://$PROJECT_DIR$/enterprise-core/enterprise-core.iml" filepath="$PROJECT_DIR$/enterprise-core/enterprise-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/enterprise-engine/enterprise-engine.iml" filepath="$PROJECT_DIR$/enterprise-engine/enterprise-engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/enterprise-enginecore/enterprise-enginecore.iml" filepath="$PROJECT_DIR$/enterprise-enginecore/enterprise-enginecore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/enterprise-processornode/enterprise-processornode.iml" filepath="$PROJECT_DIR$/enterprise-processornode/enterprise-processornode.iml" />
       <module fileurl="file://$PROJECT_DIR$/enterprise-web/enterprise-web.iml" filepath="$PROJECT_DIR$/enterprise-web/enterprise-web.iml" />
     </modules>
   </component>

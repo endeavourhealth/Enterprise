@@ -49,6 +49,30 @@
         </dependency>
         <!-- End Gson -->
 
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+        <!-- End Guava -->
+
+        <!--Message queue client-->
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>3.5.5</version>
+        </dependency>
+        <!--End Message queue client-->
+
+        <!--Extensions to the java language-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+        <!--End Extensions to the java language-->
+
     </dependencies>
 
     <build>

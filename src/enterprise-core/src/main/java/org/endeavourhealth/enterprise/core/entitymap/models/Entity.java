@@ -1,5 +1,5 @@
 
-package org.endeavourhealth.enterprise.core.entitymap;
+package org.endeavourhealth.enterprise.core.entitymap.models;
 
 import java.util.ArrayList;
 import java.util.List;

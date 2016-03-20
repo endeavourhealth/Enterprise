@@ -4,7 +4,7 @@ public enum EndUserRole {
     USER(1),
     ADMIN(2);
 
-    private int value;
+    private final int value;
 
     EndUserRole(int value) {
         this.value = value;

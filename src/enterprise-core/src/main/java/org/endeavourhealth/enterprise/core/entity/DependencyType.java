@@ -8,7 +8,7 @@ public enum DependencyType {
     IsContainedWithin(1),
     Uses(2);
 
-    private int value;
+    private final int value;
 
     DependencyType(final int value) {
         this.value = value;

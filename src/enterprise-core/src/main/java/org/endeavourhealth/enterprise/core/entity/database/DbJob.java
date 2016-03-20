@@ -23,8 +23,14 @@ public final class DbJob extends DbAbstractTable {
     public static List<DbJob> retrieveRecent(int count) throws Exception {
         return DatabaseManager.db().retrieveRecentJobs(count);
     }
+
     public static List<DbJob> retrieveForStatus(ExecutionStatus status) throws Exception {
         return DatabaseManager.db().retrieveJobsForStatus(status);
+    }
+
+    public void markAsFinished(ExecutionStatus status) {
+        setEndDateTime(new Date());
+        setStatusId(status);
     }
 
     @Override

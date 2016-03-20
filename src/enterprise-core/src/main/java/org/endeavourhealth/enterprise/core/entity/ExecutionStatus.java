@@ -6,9 +6,10 @@ package org.endeavourhealth.enterprise.core.entity;
 public enum ExecutionStatus {
     Executing(0),
     Succeeded(1),
-    Failed(2);
+    Failed(2),
+    NoJobRequests(3);
 
-    private int value;
+    private final int value;
 
     ExecutionStatus(int value) {
         this.value = value;

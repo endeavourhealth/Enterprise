@@ -1,15 +1,10 @@
 package org.endeavour.enterprise.framework;
 
-import org.endeavourhealth.enterprise.core.Examples;
-import org.endeavourhealth.enterprise.core.entity.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 public final class Startup implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent contextEvent) {

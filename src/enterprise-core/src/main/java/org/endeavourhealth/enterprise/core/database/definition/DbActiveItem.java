@@ -1,32 +1,31 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.definition;
 
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.DependencyType;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.DependencyType;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 25/02/2016.
- */
 public final class DbActiveItem extends DbAbstractTable {
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItem", "Definition",
-            "ActiveItemUuid,OrganisationUuid,ItemUuid,Version,ItemTypeId", "ActiveItemUuid");
+            "ActiveItemUuid,OrganisationUuid,ItemUuid,AuditUuid,ItemTypeId,IsDeleted", "ActiveItemUuid");
 
     private UUID organisationUuid = null;
     private UUID itemUuid = null;
-    private int version = -1;
+    private UUID auditUuid = null;
     private DefinitionItemType itemTypeId = null;
+    private boolean isDeleted = false;
 
     public DbActiveItem() {
     }
 
     public static DbActiveItem factoryNew(DbItem item, UUID organisationUuid, DefinitionItemType itemType) {
         UUID itemUuid = item.getPrimaryUuid();
-        int version = item.getVersion();
+        UUID auditUuid = item.getAuditUuid();
 
         if (itemUuid == null) {
             throw new RuntimeException("Cannot create ActiveItem without first saving Item to DB");
@@ -35,18 +34,14 @@ public final class DbActiveItem extends DbAbstractTable {
         DbActiveItem ret = new DbActiveItem();
         ret.setOrganisationUuid(organisationUuid);
         ret.setItemUuid(itemUuid);
-        ret.setVersion(version);
+        ret.setAuditUuid(auditUuid);
         ret.setItemTypeId(itemType);
 
         return ret;
     }
 
     public static DbActiveItem retrieveForItemUuid(UUID itemUuid) throws Exception {
-        return (DbActiveItem) DatabaseManager.db().retrieveActiveItemForItemUuid(itemUuid);
-    }
-
-    public static DbActiveItem retrieveForUuid(UUID uuid) throws Exception {
-        return (DbActiveItem) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return DatabaseManager.db().retrieveActiveItemForItemUuid(itemUuid);
     }
 
     public static int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception {
@@ -67,8 +62,9 @@ public final class DbActiveItem extends DbAbstractTable {
         builder.add(getPrimaryUuid());
         builder.add(organisationUuid);
         builder.add(itemUuid);
-        builder.add(version);
-        builder.add(itemTypeId.getValue());
+        builder.add(auditUuid);
+        builder.add(itemTypeId);
+        builder.add(isDeleted);
     }
 
     @Override
@@ -76,8 +72,9 @@ public final class DbActiveItem extends DbAbstractTable {
         setPrimaryUuid(reader.readUuid());
         organisationUuid = reader.readUuid();
         itemUuid = reader.readUuid();
-        version = reader.readInt();
+        auditUuid = reader.readUuid();
         itemTypeId = DefinitionItemType.get(reader.readInt());
+        isDeleted = reader.readBoolean();
     }
 
     /**
@@ -99,12 +96,12 @@ public final class DbActiveItem extends DbAbstractTable {
         this.itemUuid = itemUuid;
     }
 
-    public int getVersion() {
-        return version;
+    public UUID getAuditUuid() {
+        return auditUuid;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public void setAuditUuid(UUID auditUuid) {
+        this.auditUuid = auditUuid;
     }
 
     public DefinitionItemType getItemTypeId() {
@@ -113,5 +110,13 @@ public final class DbActiveItem extends DbAbstractTable {
 
     public void setItemTypeId(DefinitionItemType itemType) {
         this.itemTypeId = itemType;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

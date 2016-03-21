@@ -1,15 +1,11 @@
 package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.DbEndUser;
+import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * Created by Drew on 18/02/2016.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonEndUser implements Serializable {
 
@@ -20,12 +16,14 @@ public final class JsonEndUser implements Serializable {
     private String forename = null;
     private String surname = null;
     private Boolean isSuperUser = null; //using non-primative types because serialisation to JSON can skip nulls, if we want
-    private Integer permissions = null;
+    private Boolean isAdmin = null;
+    private Integer permissions = null; //to be removed after isAdmin is adopted
+
 
     public JsonEndUser() {
     }
 
-    public JsonEndUser(DbEndUser endUser, EndUserRole role) {
+    public JsonEndUser(DbEndUser endUser, Boolean isAdmin) {
         this.uuid = endUser.getPrimaryUuid();
         this.username = endUser.getEmail();
         this.title = endUser.getTitle();
@@ -33,8 +31,15 @@ public final class JsonEndUser implements Serializable {
         this.surname = endUser.getSurname();
         this.isSuperUser = new Boolean(endUser.getIsSuperUser());
 
-        if (role != null) {
-            this.permissions = role.getValue();
+        if (isAdmin != null) {
+            this.isAdmin = new Boolean(isAdmin);
+
+            //to be removed once web client changed to use isAdmin
+            if (isAdmin) {
+                this.permissions = new Integer(2);
+            } else {
+                this.permissions = new Integer(1);
+            }
         }
     }
 
@@ -89,11 +94,19 @@ public final class JsonEndUser implements Serializable {
         this.surname = surname;
     }
 
-    public Boolean getIsSuperUser() {
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
+
+    public Boolean getSuperUser() {
         return isSuperUser;
     }
 
-    public void setIsSuperUser(Boolean superUser) {
+    public void setSuperUser(Boolean superUser) {
         isSuperUser = superUser;
     }
 

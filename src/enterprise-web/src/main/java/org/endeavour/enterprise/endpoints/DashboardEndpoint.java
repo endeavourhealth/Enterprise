@@ -1,8 +1,12 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.model.json.*;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.*;
+import org.endeavourhealth.enterprise.core.database.*;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,14 +15,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 @Path("/dashboard")
 public final class DashboardEndpoint extends AbstractEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardEndpoint.class);
@@ -37,7 +38,9 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         List<DbActiveItem> activeItems = DatabaseManager.db().retrieveActiveItemRecentItems(userUuid, count);
         for (DbActiveItem activeItem: activeItems) {
             DbItem item = DbItem.retrieveForActiveItem(activeItem);
-            JsonFolderContent content = new JsonFolderContent(activeItem, item);
+            DbAudit audit = DbAudit.retrieveForUuid(item.getAuditUuid());
+
+            JsonFolderContent content = new JsonFolderContent(activeItem, item, audit);
             ret.add(content);
         }
 
@@ -62,10 +65,12 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         List<DbJobReport> jobReports = DbJobReport.retrieveRecent(orgUuid, count);
         for (DbJobReport jobReport: jobReports) {
 
+            DbJob job = DbJob.retrieveForUuid(jobReport.getJobUuid());
             UUID itemUuid = jobReport.getReportUuid();
-            DbItem item = DbItem.retrieveForUuidLatestVersion(orgUuid, itemUuid);
+            DbItem item = DbItem.retrieveForUUid(itemUuid);
             String name = item.getTitle();
-            Date date = jobReport.getTimeStamp();
+
+            Instant date = job.getStartDateTime();
             ret.add(new JsonJobReport(name, date));
         }
 

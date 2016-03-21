@@ -1,16 +1,21 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database;
 
-import ch.qos.logback.core.db.ConnectionSource;
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.DependencyType;
-import org.endeavourhealth.enterprise.core.entity.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.DependencyType;
+import org.endeavourhealth.enterprise.core.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.database.administration.*;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
+import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
+import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
 
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 29/02/2016.
- */
 public interface DatabaseI {
 
     //setting up logging to db
@@ -44,11 +49,11 @@ public interface DatabaseI {
 
     public DbOrganisationEndUserLink retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception;
 
-    public List<DbItem> retrieveDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception;
+    public DbItem retrieveItemForUuid(UUID itemUuid) throws Exception;
+
+    public List<DbItem> retrieveDependentItems(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception;
 
     public List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception;
-
-    public DbItem retrieveForUuidLatestVersion(UUID organisationUuid, UUID itemUuid) throws Exception;
 
     public DbActiveItem retrieveActiveItemForItemUuid(UUID itemUuid) throws Exception;
 
@@ -58,13 +63,13 @@ public interface DatabaseI {
 
     public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception;
 
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItem(UUID itemUuid) throws Exception;
+    public List<DbItemDependency> retrieveItemDependenciesForItem(UUID itemUuid, UUID auditUuid) throws Exception;
 
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForItemType(UUID itemUuid, DependencyType dependencyType) throws Exception;
+    public List<DbItemDependency> retrieveItemDependenciesForItemType(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception;
 
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItem(UUID dependentItemUuid) throws Exception;
+    public List<DbItemDependency> retrieveItemDependenciesForDependentItem(UUID dependentItemUuid) throws Exception;
 
-    public List<DbActiveItemDependency> retrieveActiveItemDependenciesForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception;
+    public List<DbItemDependency> retrieveItemDependenciesForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception;
 
     public List<DbRequest> retrievePendingRequestsForItems(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
 
@@ -74,6 +79,8 @@ public interface DatabaseI {
 
     public List<DbJob> retrieveJobsForStatus(ExecutionStatus status) throws Exception;
 
+    public List<DbJob> retrieveJobsForUuids(List<UUID> uuids) throws Exception;
+
     public List<DbJobReport> retrieveJobReports(UUID organisationUuid, int count) throws Exception;
 
     public List<DbJobReport> retrieveJobReportsForJob(UUID jobUuid) throws Exception;
@@ -81,5 +88,7 @@ public interface DatabaseI {
     public List<DbJobReport> retrieveLatestJobReportsForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
 
     public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception;
+
+    public List<DbAudit> retrieveAuditsForUuids(List<UUID> uuids) throws Exception;
 
 }

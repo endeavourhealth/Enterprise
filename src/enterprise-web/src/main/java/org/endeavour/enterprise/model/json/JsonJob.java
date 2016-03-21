@@ -1,16 +1,12 @@
 package org.endeavour.enterprise.model.json;
 
-import org.endeavourhealth.enterprise.core.entity.ExecutionStatus;
-import org.endeavourhealth.enterprise.core.entity.database.DbJob;
+import org.endeavourhealth.enterprise.core.database.execution.DbJob;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 public final class JsonJob implements Serializable {
-    private Date date = null;
+    private Instant date = null;
     private String status = null;
 
     public JsonJob() {}
@@ -22,11 +18,11 @@ public final class JsonJob implements Serializable {
     /**
      * gets/sets
      */
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

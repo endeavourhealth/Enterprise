@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 
 /**
- * Created by Drew on 17/03/2016.
  * Test script at https://gitlab.com/noesisinformatica/termlex-tutorial/blob/master/src/etc/termlex-test.sh
  */
 abstract class Snomed {

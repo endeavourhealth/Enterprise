@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 
-/**
- * Created by Drew on 22/02/2016.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonEmailInviteParameters implements Serializable {
     private String token = null;

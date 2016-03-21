@@ -1,9 +1,17 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.model.json.*;
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.DependencyType;
-import org.endeavourhealth.enterprise.core.entity.database.*;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.DependencyType;
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
+import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,13 +20,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.util.Date;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by Drew on 17/02/2016.
  * Endpoint for functions related to creating and managing folders
  */
 @Path("/folder")
@@ -72,17 +80,18 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         //validate that we're not making a folder a child of itself
         if (parentUuid != null
                 && folderUuid != null) {
+
             UUID currentParentUuid = parentUuid;
             while (currentParentUuid != null) {
                 if (currentParentUuid.equals(folderUuid)) {
                     throw new BadRequestException("Cannot move a folder to be a child of itself");
                 }
 
-                List<DbActiveItemDependency> parents = DbActiveItemDependency.retrieveForDependentItemType(currentParentUuid, DependencyType.IsChildOf);
+                List<DbItemDependency> parents = DbItemDependency.retrieveForDependentItemType(currentParentUuid, DependencyType.IsChildOf);
                 if (parents.isEmpty()) {
                     currentParentUuid = null;
                 } else {
-                    DbActiveItemDependency parent = parents.get(0);
+                    DbItemDependency parent = parents.get(0);
                     currentParentUuid = parent.getItemUuid();
                 }
             }
@@ -172,8 +181,11 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         }
         //if we have a parent, then we want the child folders under it
         else {
-            UUID parentUuid = UUID.fromString(parentUuidStr);
-            items = DbItem.retrieveDependentItems(orgUuid, parentUuid, DependencyType.IsChildOf);
+            UUID parentUuid = parseUuidFromStr(parentUuidStr);
+            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(parentUuid);
+            UUID auditUuid = activeItem.getAuditUuid();
+
+            items = DbItem.retrieveDependentItems(parentUuid, auditUuid, DependencyType.IsChildOf);
         }
 
         LOG.trace("Found {} child folders", items.size());
@@ -211,8 +223,15 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             throw new RuntimeException("Trying to create folder for type " + itemType);
         }
 
-        DbItem item = DbItem.factoryNew(userUuid, title);
-        item.writeToDb();
+        List<DbAbstractTable> toSave = new ArrayList<>();
+
+        DbAudit audit = DbAudit.factoryNow(userUuid);
+        toSave.add(audit);
+
+        DbItem item = DbItem.factoryNew(title, audit);
+        toSave.add(item);
+
+        DatabaseManager.db().writeEntities(toSave);
 
         DbActiveItem activeItemReports = DbActiveItem.factoryNew(item, organisationUuid, itemType);
         activeItemReports.writeToDb();
@@ -226,12 +245,9 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         UUID folderUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        //retrieve the folder and validate it's for our org
-        //DbItem folder = DbItem.retrieveForUuidLatestVersion(orgUuid, folderUuid);
+        LOG.trace("GettingFolderContents for folder {}", folderUuid);
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
-
-        LOG.trace("GettingFolderContents for folder {}", folderUuid);
 
         List<DbActiveItem> childActiveItems = DbActiveItem.retrieveDependentItems(orgUuid, folderUuid, DependencyType.IsContainedWithin);
 
@@ -247,31 +263,40 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             hmLastJobReportsByItem.put(jobReport.getReportUuid(), jobReport);
         }
 
+        HashMap<UUID, DbJob> hmJobsByUuid = new HashMap<>();
+        List<DbJob> jobs = DbJob.retrieveForJobReports(jobReports);
+        for (DbJob job: jobs) {
+            hmJobsByUuid.put(job.getPrimaryUuid(), job);
+        }
+
+        HashMap<UUID, DbAudit> hmAuditsByAuditUuid = new HashMap<>();
+        List<DbAudit> audits = DbAudit.retrieveForActiveItems(childActiveItems);
+        for (DbAudit audit: audits) {
+            hmAuditsByAuditUuid.put(audit.getPrimaryUuid(), audit);
+        }
 
         for (int i = 0; i < childActiveItems.size(); i++) {
             DbActiveItem activeItem = childActiveItems.get(i);
-            UUID uuid = activeItem.getItemUuid();
-            int version = activeItem.getVersion();
-            DbItem item = DbItem.retrieveForUuidVersion(uuid, version);
+            DbItem item = DbItem.retrieveForActiveItem(activeItem);
+
             DefinitionItemType itemType = activeItem.getItemTypeId();
+            DbAudit audit = hmAuditsByAuditUuid.get(item.getAuditUuid());
 
-            JsonFolderContent c = new JsonFolderContent(item);
-            c.setTypeEnum(itemType);
-            c.setLastModified(item.getTimeStamp());
-
+            JsonFolderContent c = new JsonFolderContent(activeItem, item, audit);
             ret.addContent(c);
 
             //and set any extra data we need
             if (itemType == DefinitionItemType.Report) {
 
                 //for reports, indicate if it's currently scheduled to be run
-                DbRequest pendingRequest = hmPendingRequestsByItem.get(uuid);
+                DbRequest pendingRequest = hmPendingRequestsByItem.get(item.getPrimaryUuid());
                 c.setIsScheduled(pendingRequest != null);
 
                 //show when a report was last executed
-                DbJobReport jobReport = hmLastJobReportsByItem.get(uuid);
+                DbJobReport jobReport = hmLastJobReportsByItem.get(item.getPrimaryUuid());
                 if (jobReport != null) {
-                    c.setLastRun(jobReport.getTimeStamp());
+                    DbJob job = hmJobsByUuid.get(jobReport.getJobUuid());
+                    c.setLastRun(job.getStartDateTime());
                 }
 
             } else if (itemType == DefinitionItemType.Query) {

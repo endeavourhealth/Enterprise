@@ -1,11 +1,10 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
 /**
- * Created by Drew on 17/02/2016.
  * Base class for all DB entities, containing common methods for saving and retrieving. All actual
  * persistence is done in the TableAdapter class
  */

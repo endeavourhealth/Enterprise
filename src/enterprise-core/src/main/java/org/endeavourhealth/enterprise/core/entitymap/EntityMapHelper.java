@@ -1,11 +1,10 @@
 package org.endeavourhealth.enterprise.core.entitymap;
 
-import org.endeavourhealth.enterprise.core.AbstractXmlParser;
+import org.endeavourhealth.enterprise.core.XmlSerializer;
 import org.endeavourhealth.enterprise.core.Resources;
-import org.endeavourhealth.enterprise.core.entitymap.models.Entity;
 import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
 
-public class EntityMapHelper extends AbstractXmlParser {
+public class EntityMapHelper extends XmlSerializer {
 
     public static EntityMap loadEntityMap() throws Exception {
 

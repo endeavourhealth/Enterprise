@@ -6,9 +6,6 @@ import org.endeavourhealth.enterprise.core.querydocument.models.CodingSystem;
 import java.util.HashSet;
 import java.util.List;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 public final class TerminologyService {
 
     public static HashSet<String> enumerateConcepts(CodeSet codeSet) {

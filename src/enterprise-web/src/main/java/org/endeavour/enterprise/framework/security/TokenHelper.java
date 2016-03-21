@@ -4,9 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.DbEndUser;
-import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
+import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 
 import javax.naming.AuthenticationException;
 import javax.ws.rs.core.NewCookie;
@@ -22,12 +21,12 @@ public class TokenHelper {
     private static final String TOKEN_ORGANISATION = "org";
 
 
-    public static NewCookie createTokenAsCookie(DbEndUser person, DbOrganisation org, EndUserRole endUserRole) {
-        String token = createToken(person, org, endUserRole);
+    public static NewCookie createTokenAsCookie(DbEndUser person, DbOrganisation org, boolean isAdmin) {
+        String token = createToken(person, org, isAdmin);
         return createCookie(token);
     }
 
-    private static String createToken(DbEndUser person, DbOrganisation org, EndUserRole endUserRole) {
+    private static String createToken(DbEndUser person, DbOrganisation org, boolean isAdmin) {
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
 
@@ -39,7 +38,7 @@ public class TokenHelper {
         //if the person has multiple orgs they can log on to, then we may pass in null until they select one
         if (org != null) {
             bodyParameterMap.put(TOKEN_ORGANISATION, org.getPrimaryUuid());
-            bodyParameterMap.put(TOKEN_ROLE, endUserRole.name());
+            bodyParameterMap.put(TOKEN_ROLE, isAdmin);
         }
 
         JwtBuilder builder = Jwts.builder()
@@ -89,15 +88,15 @@ public class TokenHelper {
         //a token may not have an orgaisation selected, if they have access to multiple organisations
         //but haven't selected one to operate at yet
         UUID organisationUuid = null;
-        EndUserRole endUserRole = null;
+        boolean isAdmin = false;
 
         String orgUuidStr = (String) claims.get(TOKEN_ORGANISATION);
         if (orgUuidStr != null) {
             organisationUuid = UUID.fromString(orgUuidStr);
-            endUserRole = Enum.valueOf(EndUserRole.class, (String) claims.get(TOKEN_ROLE));
+            isAdmin = ((Boolean)claims.get(TOKEN_ROLE)).booleanValue();
         }
 
-        return new UserContext(userUuid, organisationUuid, endUserRole, tokenIssued);
+        return new UserContext(userUuid, organisationUuid, isAdmin, tokenIssued);
     }
 
 }

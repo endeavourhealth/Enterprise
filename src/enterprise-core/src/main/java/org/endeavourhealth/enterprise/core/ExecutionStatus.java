@@ -1,8 +1,5 @@
-package org.endeavourhealth.enterprise.core.entity;
+package org.endeavourhealth.enterprise.core;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 public enum ExecutionStatus {
     Executing(0),
     Succeeded(1),
@@ -25,6 +22,6 @@ public enum ExecutionStatus {
                 return e;
             }
         }
-        return null;// not found
+        throw new RuntimeException("No ExectionStatus " + value);
     }
 }

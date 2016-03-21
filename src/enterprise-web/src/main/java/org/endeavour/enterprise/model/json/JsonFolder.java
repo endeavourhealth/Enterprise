@@ -1,13 +1,12 @@
 package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.entity.database.DbItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 
 import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Created by Drew on 17/02/2016.
  * JSON object used to manipulate folders, such as creating, moving and renaming
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)

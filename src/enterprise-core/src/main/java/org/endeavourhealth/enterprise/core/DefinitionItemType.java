@@ -1,4 +1,4 @@
-package org.endeavourhealth.enterprise.core.entity;
+package org.endeavourhealth.enterprise.core;
 
 public enum DefinitionItemType {
     ReportFolder(0),
@@ -26,6 +26,6 @@ public enum DefinitionItemType {
                 return e;
             }
         }
-        return null; // not found
+        throw new RuntimeException("No DefinitionItemType " + value);
     }
 }

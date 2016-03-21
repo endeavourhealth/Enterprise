@@ -1,16 +1,18 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.execution;
 
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.ResultReader;
+import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 public final class DbRequest extends DbAbstractTable {
 
     private static final TableAdapter adapter = new TableAdapter(DbRequest.class, "Request", "Execution",
@@ -19,7 +21,7 @@ public final class DbRequest extends DbAbstractTable {
     private UUID reportUuid = null;
     private UUID organisationUuuid = null;
     private UUID endUserUuid = null;
-    private Date timeStamp = null;
+    private Instant timeStamp = null;
     private String parameters = null;
     private UUID jobUuid = null;
 
@@ -103,11 +105,11 @@ public final class DbRequest extends DbAbstractTable {
         this.reportUuid = reportUuid;
     }
 
-    public Date getTimeStamp() {
+    public Instant getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Date timeStamp) {
+    public void setTimeStamp(Instant timeStamp) {
         this.timeStamp = timeStamp;
     }
 

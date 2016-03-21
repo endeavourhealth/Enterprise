@@ -1,11 +1,8 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by Drew on 17/02/2016.
- */
 public final class TableAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(TableAdapter.class);
 

@@ -1,27 +1,28 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.execution;
 
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.ResultReader;
+import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 public final class DbJobReport extends DbAbstractTable {
 
     private static final TableAdapter adapter = new TableAdapter(DbJobReport.class, "JobReport", "Execution",
-            "JobReportUuid,JobUuid,ReportUuid,OrganisationUuid,EndUserUuid,TimeStamp,Parameters,StatusId", "JobReportUuid");
+            "JobReportUuid,JobUuid,ReportUuid,AuditUuid,OrganisationUuid,EndUserUuid,Parameters,StatusId", "JobReportUuid");
 
     private UUID jobUuid = null;
     private UUID reportUuid = null;
+    private UUID auditUuid = null;
     private UUID organisationUuid = null;
     private UUID endUserUuid = null;
-    private Date timeStamp = null;
     private String parameters = null;
     private ExecutionStatus statusId = ExecutionStatus.Executing;
 
@@ -56,9 +57,9 @@ public final class DbJobReport extends DbAbstractTable {
         builder.add(getPrimaryUuid());
         builder.add(jobUuid);
         builder.add(reportUuid);
+        builder.add(auditUuid);
         builder.add(organisationUuid);
         builder.add(endUserUuid);
-        builder.add(timeStamp);
         builder.add(parameters);
         builder.add(statusId);
     }
@@ -68,9 +69,9 @@ public final class DbJobReport extends DbAbstractTable {
         setPrimaryUuid(reader.readUuid());
         jobUuid = reader.readUuid();
         reportUuid = reader.readUuid();
+        auditUuid = reader.readUuid();
         organisationUuid = reader.readUuid();
         endUserUuid = reader.readUuid();
-        timeStamp = reader.readDateTime();
         parameters = reader.readString();
         statusId = ExecutionStatus.get(reader.readInt());
     }
@@ -78,6 +79,14 @@ public final class DbJobReport extends DbAbstractTable {
     /**
      * gets/sets
      */
+    public UUID getAuditUuid() {
+        return auditUuid;
+    }
+
+    public void setAuditUuid(UUID auditUuid) {
+        this.auditUuid = auditUuid;
+    }
+
     public UUID getEndUserUuid() {
         return endUserUuid;
     }
@@ -116,14 +125,6 @@ public final class DbJobReport extends DbAbstractTable {
 
     public void setReportUuid(UUID reportUuid) {
         this.reportUuid = reportUuid;
-    }
-
-    public Date getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(Date timeStamp) {
-        this.timeStamp = timeStamp;
     }
 
     public ExecutionStatus getStatusId() {

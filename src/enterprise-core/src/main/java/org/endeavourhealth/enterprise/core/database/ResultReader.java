@@ -1,13 +1,12 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * Created by Drew on 18/02/2016.
- */
 public final class ResultReader {
 
     private static final int FIRST_COL = 1; //keep forgetting this, as it's not zero, so made a constant
@@ -38,8 +37,9 @@ public final class ResultReader {
         return rs.getBoolean(currentCol++);
     }
 
-    public Date readDateTime() throws SQLException {
-        return rs.getDate(currentCol++);
+    public Instant readDateTime() throws SQLException {
+        Timestamp ts = rs.getTimestamp(currentCol++);
+        return ts.toInstant();
     }
 
     public boolean nextResult() throws SQLException {

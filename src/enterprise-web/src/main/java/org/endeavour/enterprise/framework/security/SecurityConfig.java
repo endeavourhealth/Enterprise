@@ -1,8 +1,5 @@
 package org.endeavour.enterprise.framework.security;
 
-/**
- * Created by Drew on 16/03/2016.
- */
 public abstract class SecurityConfig {
 
     public static final String TOKEN_SIGNING_SECRET = "DLKV342nNaCapGgSieNde18OFRYwg3etCabRfsPcrnc=";

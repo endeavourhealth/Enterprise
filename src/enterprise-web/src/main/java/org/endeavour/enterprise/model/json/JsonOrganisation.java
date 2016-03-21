@@ -1,31 +1,33 @@
 package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * Created by Drew on 18/02/2016.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonOrganisation implements Serializable {
     private UUID uuid = null;
     private String name = null;
     private String nationalId = null;
-    private Integer permissions = null;
+    private Boolean isAdmin = null;
+    private Integer permissions = null; //to be removed once web client changed to use isAdmin
+
 
     public JsonOrganisation() {
     }
 
-    public JsonOrganisation(DbOrganisation org, EndUserRole permissions) {
+    public JsonOrganisation(DbOrganisation org, boolean isAdmin) {
         this.uuid = org.getPrimaryUuid();
         this.name = org.getName();
         this.nationalId = org.getNationalId();
-        if (permissions != null) {
-            this.permissions = new Integer(permissions.getValue());
+        this.isAdmin = isAdmin;
+
+        if (isAdmin) {
+            this.permissions = new Integer(2);
+        } else {
+            this.permissions = new Integer(1);
         }
     }
 

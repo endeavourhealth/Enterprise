@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Drew on 11/03/2016.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonDeleteResponse {
     private boolean deletedOk = true;

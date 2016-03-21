@@ -3,9 +3,8 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.framework.security.UserPrincipal;
 import org.endeavour.enterprise.framework.security.UserContext;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.DbEndUser;
-import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
+import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
@@ -53,11 +52,11 @@ public abstract class AbstractEndpoint {
         return orgUuid;
     }
 
-    protected EndUserRole getRoleFromSession(SecurityContext sc) throws Exception {
+    protected boolean isAdminFromSession(SecurityContext sc) throws Exception {
         UserPrincipal up = (UserPrincipal) sc.getUserPrincipal();
 
         UserContext uc = up.getUserContext();
-        return uc.getEndUserRole();
+        return uc.isAdmin();
     }
 
 }

@@ -1,21 +1,24 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.execution;
 
-import javax.xml.crypto.Data;
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.ResultReader;
+import org.endeavourhealth.enterprise.core.database.TableAdapter;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 19/03/2016.
- */
 public final class DbJobReportItem extends DbAbstractTable {
 
     private static final TableAdapter adapter = new TableAdapter(DbJobReportItem.class, "JobReportItem", "Execution",
-            "JobReportItemUuid,JobReportUuid,ItemUuid,ResultCount", "JobReportItemUuid");
+            "JobReportItemUuid,JobReportUuid,ParentJobReportItemUuid,ItemUuid,AuditUuid,ResultCount", "JobReportItemUuid");
 
     private UUID jobReportUuid = null;
+    private UUID parentJobReportItemUuid = null;
     private UUID itemUuid = null;
+    private UUID auditUuid = null;
     private int resultCount = -1;
 
 
@@ -32,7 +35,9 @@ public final class DbJobReportItem extends DbAbstractTable {
     public void writeForDb(ArrayList<Object> builder) {
         builder.add(getPrimaryUuid());
         builder.add(jobReportUuid);
+        builder.add(parentJobReportItemUuid);
         builder.add(itemUuid);
+        builder.add(auditUuid);
         builder.add(resultCount);
     }
 
@@ -40,19 +45,21 @@ public final class DbJobReportItem extends DbAbstractTable {
     public void readFromDb(ResultReader reader) throws SQLException {
         setPrimaryUuid(reader.readUuid());
         jobReportUuid = reader.readUuid();
+        parentJobReportItemUuid = reader.readUuid();
         itemUuid = reader.readUuid();
+        auditUuid = reader.readUuid();
         resultCount = reader.readInt();
     }
 
     /**
      * gets/sets
      */
-    public UUID getJobReportUuid() {
-        return jobReportUuid;
+    public UUID getAuditUuid() {
+        return auditUuid;
     }
 
-    public void setJobReportUuid(UUID jobReportUuid) {
-        this.jobReportUuid = jobReportUuid;
+    public void setAuditUuid(UUID auditUuid) {
+        this.auditUuid = auditUuid;
     }
 
     public UUID getItemUuid() {
@@ -61,6 +68,22 @@ public final class DbJobReportItem extends DbAbstractTable {
 
     public void setItemUuid(UUID itemUuid) {
         this.itemUuid = itemUuid;
+    }
+
+    public UUID getJobReportUuid() {
+        return jobReportUuid;
+    }
+
+    public void setJobReportUuid(UUID jobReportUuid) {
+        this.jobReportUuid = jobReportUuid;
+    }
+
+    public UUID getParentJobReportItemUuid() {
+        return parentJobReportItemUuid;
+    }
+
+    public void setParentJobReportItemUuid(UUID parentJobReportItemUuid) {
+        this.parentJobReportItemUuid = parentJobReportItemUuid;
     }
 
     public int getResultCount() {

@@ -4,9 +4,11 @@ import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.model.json.JsonEndUser;
 import org.endeavour.enterprise.model.json.JsonEndUserList;
 import org.endeavour.enterprise.model.json.JsonOrganisation;
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.*;
+import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
+import org.endeavourhealth.enterprise.core.database.administration.DbEndUserEmailInvite;
+import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.administration.DbOrganisationEndUserLink;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,12 +17,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by Drew on 18/02/2016.
  * Endpoint for the functions related to managing person and organisation entities
  */
 @Path("/admin")
@@ -103,9 +104,9 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveUser")
     public Response saveUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
+
         //first, verify the user is an admin
-        EndUserRole currentRole = super.getRoleFromSession(sc);
-        if (currentRole != EndUserRole.ADMIN) {
+        if (!super.isAdminFromSession(sc)) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
 
@@ -116,9 +117,15 @@ public final class AdminEndpoint extends AbstractEndpoint {
         String forename = userParameters.getForename();
         String surname = userParameters.getSurname();
         Integer permissions = userParameters.getPermissions();
-        Boolean isSuperUser = userParameters.getIsSuperUser();
+        Boolean isAdmin = userParameters.getAdmin();
+        Boolean isSuperUser = userParameters.getSuperUser();
 
-        LOG.trace("SavingUser UserUUID {}, Email {} Title {} Forename {} Surname {} Permissions {} IsSuperUser", uuid, email, title, forename, surname, permissions, isSuperUser);
+        //until the web client is changed, we need to use the permissions value
+        if (isAdmin == null && permissions != null) {
+            isAdmin = permissions.intValue() == 2;
+        }
+
+        LOG.trace("SavingUser UserUUID {}, Email {} Title {} Forename {} Surname {} IsAdmin {} IsSuperUser", uuid, email, title, forename, surname, isAdmin, isSuperUser);
 
         DbOrganisation org = getOrganisationFromSession(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -142,6 +149,9 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
         if (isSuperUser == null) {
             isSuperUser = new Boolean(false);
+        }
+        if (isAdmin == null) {
+            isAdmin = new Boolean(false);
         }
 
         //if doing anything to a super user, verify the current user is a super-user
@@ -199,8 +209,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 link = new DbOrganisationEndUserLink();
                 link.setOrganisationUuid(orgUuid);
                 link.setEndUserUuid(uuid);
-                link.setPermissions(permissions);
-                link.setDtExpired(DatabaseManager.getEndOfTime());
+                link.setAdmin(isAdmin);
             }
         }
         //if we have a uuid, we're updating an existing person
@@ -234,7 +243,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
             //the link will be null if we're a super-user, so that's fine
             if (link != null) {
-                link.setPermissions(permissions);
+                link.setAdmin(isAdmin);
             }
         }
 
@@ -275,7 +284,6 @@ public final class AdminEndpoint extends AbstractEndpoint {
         DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
         invite.setEndUserUuid(userUuid);
         invite.setUniqueToken("" + UUID.randomUUID());
-        invite.setDtCompleted(DatabaseManager.getEndOfTime());
 
         //send the invite email before saving to the DB
         invite.sendInviteEmail(user, org);
@@ -290,8 +298,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Path("/deleteUser")
     public Response deleteUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
         //first, verify the user is an admin
-        EndUserRole currentRole = super.getRoleFromSession(sc);
-        if (currentRole != EndUserRole.ADMIN) {
+        boolean isAdmin = super.isAdminFromSession(sc);
+        if (!isAdmin) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
 
@@ -313,7 +321,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         for (int i = 0; i < links.size(); i++) {
             DbOrganisationEndUserLink link = links.get(i);
             if (link.getOrganisationUuid().equals(orgUuid)) {
-                link.setDtExpired(new Date());
+                link.setDtExpired(Instant.now());
                 link.writeToDb();
             }
         }
@@ -342,10 +350,10 @@ public final class AdminEndpoint extends AbstractEndpoint {
         for (int i = 0; i < links.size(); i++) {
             DbOrganisationEndUserLink link = links.get(i);
             UUID endUserUuid = link.getEndUserUuid();
-            EndUserRole role = link.getRole();
+            boolean isAdmin = link.isAdmin();
             DbEndUser endUser = DbEndUser.retrieveForUuid(endUserUuid);
 
-            ret.add(endUser, role);
+            ret.add(endUser, isAdmin);
         }
 
         //if we're a super-user then we should also include all other super-users in the result
@@ -356,7 +364,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 DbEndUser superUser = superUsers.get(i);
 
                 //super-users are always treated as admins
-                ret.add(superUser, EndUserRole.ADMIN);
+                ret.add(superUser, true);
             }
         }
 
@@ -372,8 +380,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Path("/resendInviteEmail")
     public Response resendInviteEmail(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
         //first, verify the user is an admin
-        EndUserRole currentRole = super.getRoleFromSession(sc);
-        if (currentRole != EndUserRole.ADMIN) {
+        boolean isAdmin = super.isAdminFromSession(sc);
+        if (!isAdmin) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
 
@@ -388,7 +396,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         List<DbEndUserEmailInvite> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
         for (int i = 0; i < invites.size(); i++) {
             DbEndUserEmailInvite invite = invites.get(i);
-            invite.setDtCompleted(new Date());
+            invite.setDtCompleted(Instant.now());
             invite.writeToDb();
         }
 

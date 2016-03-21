@@ -6,9 +6,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Drew on 22/02/2016.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolderList implements Serializable {
 

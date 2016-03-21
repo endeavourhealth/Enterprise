@@ -5,9 +5,6 @@ import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import java.util.List;
 import java.util.Stack;
 
-/**
- * Created by Drew on 11/03/2016.
- */
 public abstract class AbstractQueryDocumentReader {
 
     private QueryDocument doc = null;

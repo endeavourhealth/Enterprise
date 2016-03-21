@@ -1,39 +1,40 @@
 package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
-import org.endeavourhealth.enterprise.core.entity.database.DbItem;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Created by Drew on 25/02/2016.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolderContent implements Serializable {
     private UUID uuid = null;
     private Integer type = null;
     private String typeDesc = null;
     private String name = null;
-    private Date lastModified = null;
-    private Date lastRun = null; //only applicable when showing reports
+    private Instant lastModified = null;
+    private Instant lastRun = null; //only applicable when showing reports
     private Boolean isScheduled = null; //only applicable when showing reports
 
     public JsonFolderContent() {
 
     }
 
-    public JsonFolderContent(DbActiveItem activeItem, DbItem item) {
-        this(item);
+    public JsonFolderContent(DbActiveItem activeItem, DbItem item, DbAudit audit) {
+        this(item, audit);
         setTypeEnum(activeItem.getItemTypeId());
     }
-    public JsonFolderContent(DbItem item) {
+    public JsonFolderContent(DbItem item, DbAudit audit) {
         this.uuid = item.getPrimaryUuid();
         this.name = item.getTitle();
-        this.lastModified = item.getTimeStamp();
+
+        if (audit != null) {
+            this.lastModified = audit.getTimeStamp();
+        }
     }
 
     public void setTypeEnum(DefinitionItemType t) {
@@ -77,19 +78,19 @@ public final class JsonFolderContent implements Serializable {
         this.name = name;
     }
 
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 
-    public Date getLastRun() {
+    public Instant getLastRun() {
         return lastRun;
     }
 
-    public void setLastRun(Date lastRun) {
+    public void setLastRun(Instant lastRun) {
         this.lastRun = lastRun;
     }
 

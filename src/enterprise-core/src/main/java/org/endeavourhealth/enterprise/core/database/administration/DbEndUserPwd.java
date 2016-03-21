@@ -1,13 +1,15 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.administration;
+
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.ResultReader;
+import org.endeavourhealth.enterprise.core.database.TableAdapter;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
 
-/**
- * Created by Drew on 18/02/2016.
- */
 public class DbEndUserPwd extends DbAbstractTable {
 
     //register as a DB entity
@@ -17,7 +19,7 @@ public class DbEndUserPwd extends DbAbstractTable {
 
     private UUID endUserUuid = null;
     private String pwdHash = null;
-    private Date dtExpired = null;
+    private Instant dtExpired = null;
     //TODO: 2016-02-22 DL - should have number of lives and expiry date for passwords?
 
 
@@ -74,11 +76,11 @@ public class DbEndUserPwd extends DbAbstractTable {
         this.pwdHash = pwdHash;
     }
 
-    public Date getDtExpired() {
+    public Instant getDtExpired() {
         return dtExpired;
     }
 
-    public void setDtExpired(Date dtExpired) {
+    public void setDtExpired(Instant dtExpired) {
         this.dtExpired = dtExpired;
     }
 

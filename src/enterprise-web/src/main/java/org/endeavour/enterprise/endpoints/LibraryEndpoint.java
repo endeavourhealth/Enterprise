@@ -3,11 +3,11 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.model.json.JsonDeleteResponse;
 import org.endeavour.enterprise.model.json.JsonFolderContent;
 import org.endeavour.enterprise.model.json.JsonFolderContentsList;
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
-import org.endeavourhealth.enterprise.core.entity.database.DbActiveItemDependency;
-import org.endeavourhealth.enterprise.core.entity.database.DbItem;
-import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +20,6 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 11/03/2016.
- */
 @Path("/library")
 public final class LibraryEndpoint extends AbstractItemEndpoint {
 
@@ -34,17 +31,13 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Path("/getLibraryItem")
     public Response getLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
         UUID libraryItemUuid = UUID.fromString(uuidStr);
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         LOG.trace("GettingLibraryItem for UUID {}", libraryItemUuid);
 
-        //retrieve the activeItem, so we know the latest version
-        DbActiveItem activeItem = super.retrieveActiveItem(libraryItemUuid, orgUuid);
-        DbItem item = super.retrieveItem(activeItem);
-
+        DbItem item = DbItem.retrieveForUUid(libraryItemUuid);
         String xml = item.getXmlContent();
 
-        LibraryItem ret = QueryDocumentParser.readLibraryItemFromXml(xml);
+        LibraryItem ret = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
         return Response
                 .ok()
@@ -143,12 +136,14 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
-        List<DbActiveItemDependency> dependentItems = DbActiveItemDependency.retrieveForItem(reportUuid);
-        for (DbActiveItemDependency dependentItem: dependentItems) {
-            UUID itemUuid = dependentItem.getDependentItemUuid();
-            DbItem item = DbItem.retrieveForUuidLatestVersion(orgUuid, itemUuid);
+        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(reportUuid);
+        List<DbItemDependency> dependentItems = DbItemDependency.retrieveForActiveItem(activeItem);
 
-            JsonFolderContent content = new JsonFolderContent(item);
+        for (DbItemDependency dependentItem: dependentItems) {
+            UUID itemUuid = dependentItem.getDependentItemUuid();
+            DbItem item = DbItem.retrieveForUUid(itemUuid);
+
+            JsonFolderContent content = new JsonFolderContent(item, null);
             ret.addContent(content);
         }
 

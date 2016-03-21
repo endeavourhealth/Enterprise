@@ -1,13 +1,15 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.administration;
+
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.ResultReader;
+import org.endeavourhealth.enterprise.core.database.TableAdapter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 17/02/2016.
- */
 public final class DbOrganisation extends DbAbstractTable {
 
     //register as a DB entity

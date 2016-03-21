@@ -1,8 +1,5 @@
-package org.endeavourhealth.enterprise.core.entity;
+package org.endeavourhealth.enterprise.core;
 
-/**
- * Created by Drew on 29/02/2016.
- */
 public enum DependencyType {
     IsChildOf(0),
     IsContainedWithin(1),
@@ -24,6 +21,6 @@ public enum DependencyType {
                 return e;
             }
         }
-        return null; // not found
+        throw new RuntimeException("No DependencyType " + value);
     }
 }

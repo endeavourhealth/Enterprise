@@ -1,7 +1,5 @@
 package org.endeavour.enterprise.framework.security;
 
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-
 import javax.ws.rs.core.SecurityContext;
 import java.util.Date;
 import java.util.UUID;
@@ -9,13 +7,13 @@ import java.util.UUID;
 public class UserContext {
     private UUID userUuid;
     private UUID organisationUuid;
-    private EndUserRole endUserRole;
+    private boolean isAdmin;
     private Date tokenIssued;
 
-    public UserContext(UUID userUuid, UUID organisationUuid, EndUserRole endUserRole, Date tokenIssued) {
+    public UserContext(UUID userUuid, UUID organisationUuid, boolean isAdmin, Date tokenIssued) {
         this.userUuid = userUuid;
         this.organisationUuid = organisationUuid;
-        this.endUserRole = endUserRole;
+        this.isAdmin = isAdmin;
         this.tokenIssued = tokenIssued;
     }
 
@@ -27,8 +25,8 @@ public class UserContext {
         return organisationUuid;
     }
 
-    public EndUserRole getEndUserRole() {
-        return endUserRole;
+    public boolean isAdmin() {
+        return isAdmin;
     }
 
     public Date getTokenIssued() {

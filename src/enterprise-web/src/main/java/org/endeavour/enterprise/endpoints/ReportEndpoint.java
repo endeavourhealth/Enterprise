@@ -1,14 +1,14 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.model.json.JsonDeleteResponse;
-import org.endeavourhealth.enterprise.core.entity.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.entity.database.DbActiveItem;
-import org.endeavourhealth.enterprise.core.entity.database.DbItem;
-import org.endeavourhealth.enterprise.core.entity.database.DbRequest;
-import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentParser;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
-import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersParser;
+import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +18,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 23/02/2016.
- */
 @Path("/report")
 public final class ReportEndpoint extends AbstractItemEndpoint
 {
@@ -38,17 +35,15 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     public Response getReport(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception
     {
         UUID reportUuid = UUID.fromString(uuidStr);
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         LOG.trace("GettingReport for UUID {}", reportUuid);
 
         //retrieve the activeItem, so we know the latest version
-        DbActiveItem activeItem = super.retrieveActiveItem(reportUuid, orgUuid, DefinitionItemType.Report);
-        DbItem item = super.retrieveItem(activeItem);
+        DbItem item = DbItem.retrieveForUUid(reportUuid);
 
         String xml = item.getXmlContent();
 
-        Report ret = QueryDocumentParser.readReportFromXml(xml);
+        Report ret = QueryDocumentSerializer.readReportFromXml(xml);
 
         return Response
                 .ok()
@@ -123,7 +118,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         UUID userUuid = getEndUserUuidFromToken(sc);
 
         UUID reportUuid = parseUuidFromStr(requestParameters.getReportUuid());
-        String parameterXml = RequestParametersParser.writeToXml(requestParameters);
+        String parameterXml = RequestParametersSerializer.writeToXml(requestParameters);
 
         if (reportUuid == null) {
             throw new BadRequestException("Missing report UUID");
@@ -133,7 +128,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         request.setReportUuid(reportUuid);
         request.setOrganisationUuuid(orgUuid);
         request.setEndUserUuid(userUuid);
-        request.setTimeStamp(new Date());
+        request.setTimeStamp(Instant.now());
         request.setParameters(parameterXml);
 
         request.writeToDb();
@@ -161,7 +156,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         List<DbRequest> requests = DbRequest.retrievePendingForItemUuids(orgUuid, v);
         for (DbRequest request: requests) {
             String xml = request.getParameters();
-            RequestParameters requestObj = RequestParametersParser.readFromXml(xml);
+            RequestParameters requestObj = RequestParametersSerializer.readFromXml(xml);
             ret.add(requestObj);
         }
 

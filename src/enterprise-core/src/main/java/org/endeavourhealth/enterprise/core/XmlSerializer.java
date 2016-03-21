@@ -1,9 +1,5 @@
 package org.endeavourhealth.enterprise.core;
 
-import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
-import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
-import org.endeavourhealth.enterprise.core.querydocument.models.Report;
-import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -16,12 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-/**
- * Created by Drew on 19/03/2016.
- */
-public abstract class AbstractXmlParser {
+public abstract class XmlSerializer {
 
-    protected static <T> T readFromXml(Class cls, String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+    public static <T> T readFromXml(Class cls, String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+
+        //TODO: validate XML against XSD
 
         //parse XML string into DOM
         InputStream is = new ByteArrayInputStream(xml.getBytes());
@@ -31,7 +26,7 @@ public abstract class AbstractXmlParser {
         return readObjectFromXml(cls, document);
     }
 
-    protected static <T> T readObjectFromXml(Class cls, Document doc) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+    private static <T> T readObjectFromXml(Class cls, Document doc) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
         //parse DOM into POJOs
         JAXBContext context = JAXBContext.newInstance(cls);
@@ -40,7 +35,7 @@ public abstract class AbstractXmlParser {
         return loader.getValue();
     }
 
-    protected static String writeObjectToXml(JAXBElement element) {
+    public static String writeObjectToXml(JAXBElement element) {
         StringWriter sw = new StringWriter();
         Class cls = element.getValue().getClass();
 
@@ -54,7 +49,7 @@ public abstract class AbstractXmlParser {
             throw new RuntimeException(e);
         }
 
-        //TODO: validate XML
+        //TODO: validate XML against XSD
 /*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new StreamSource(xsd));
         javax.xml.validation.Validator validator = schema.newValidator();

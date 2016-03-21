@@ -1,14 +1,16 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.administration;
+
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.ResultReader;
+import org.endeavourhealth.enterprise.core.database.TableAdapter;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 22/02/2016.
- */
 public final class DbEndUserEmailInvite extends DbAbstractTable {
 
 
@@ -19,7 +21,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
 
     private UUID endUserUuid = null;
     private String uniqueToken = null;
-    private Date dtCompleted = null;
+    private Instant dtCompleted = null;
 
 
     public DbEndUserEmailInvite() {
@@ -97,11 +99,11 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
         this.uniqueToken = uniqueToken;
     }
 
-    public Date getDtCompleted() {
+    public Instant getDtCompleted() {
         return dtCompleted;
     }
 
-    public void setDtCompleted(Date dtCompleted) {
+    public void setDtCompleted(Instant dtCompleted) {
         this.dtCompleted = dtCompleted;
     }
 }

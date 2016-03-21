@@ -1,14 +1,10 @@
 package org.endeavour.enterprise.model.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 
 import java.io.Serializable;
 
-/**
- * Created by Drew on 18/02/2016.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonOrganisationList implements Serializable {
     private JsonEndUser user = null;
@@ -30,8 +26,8 @@ public final class JsonOrganisationList implements Serializable {
         throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");
     }
 
-    public void add(DbOrganisation org, EndUserRole permissions) {
-        JsonOrganisation jsonOrg = new JsonOrganisation(org, permissions);
+    public void add(DbOrganisation org, boolean isAdmin) {
+        JsonOrganisation jsonOrg = new JsonOrganisation(org, isAdmin);
         add(jsonOrg);
     }
 

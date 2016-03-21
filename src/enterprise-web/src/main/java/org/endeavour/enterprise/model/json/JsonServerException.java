@@ -3,7 +3,6 @@ package org.endeavour.enterprise.model.json;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Created by Drew on 17/02/2016.
  * JSON object to allow sending back an exception message to clients after
  * a request has gone wrong on the server
  */

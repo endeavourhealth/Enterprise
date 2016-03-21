@@ -7,9 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by Drew on 11/03/2016.
- */
 public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDocumentReader {
 
     private HashSet<UUID> uuids = new HashSet<UUID>();

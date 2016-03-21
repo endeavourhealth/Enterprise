@@ -1,15 +1,17 @@
-package org.endeavourhealth.enterprise.core.entity.database;
+package org.endeavourhealth.enterprise.core.database.administration;
 
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.ResultReader;
+import org.endeavourhealth.enterprise.core.database.TableAdapter;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by Drew on 18/02/2016.
  * DB entity linking endUsers to organisations
  */
 public final class DbOrganisationEndUserLink extends DbAbstractTable {
@@ -21,8 +23,8 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
 
     private UUID organisationUuid = null;
     private UUID endUserUuid = null;
-    private int permissions = -1;
-    private Date dtExpired = null;
+    private boolean isAdmin = false;
+    private Instant dtExpired = null;
 
 
     public DbOrganisationEndUserLink() {
@@ -54,7 +56,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
         builder.add(getPrimaryUuid());
         builder.add(organisationUuid);
         builder.add(endUserUuid);
-        builder.add(permissions);
+        builder.add(isAdmin);
         builder.add(dtExpired);
     }
 
@@ -63,17 +65,9 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
         setPrimaryUuid(reader.readUuid());
         organisationUuid = reader.readUuid();
         endUserUuid = reader.readUuid();
-        permissions = reader.readInt();
+        isAdmin = reader.readBoolean();
         dtExpired = reader.readDateTime();
     }
-
-    /**
-     * non-db gets/sets
-     */
-    public EndUserRole getRole() {
-        return EndUserRole.get(permissions);
-    }
-
 
     /**
      * gets/sets
@@ -94,19 +88,19 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
         this.endUserUuid = endUserUuid;
     }
 
-    public int getPermissions() {
-        return permissions;
+    public boolean isAdmin() {
+        return isAdmin;
     }
 
-    public void setPermissions(int permissions) {
-        this.permissions = permissions;
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
-    public Date getDtExpired() {
+    public Instant getDtExpired() {
         return dtExpired;
     }
 
-    public void setDtExpired(Date dtExpired) {
+    public void setDtExpired(Instant dtExpired) {
         this.dtExpired = dtExpired;
     }
 }

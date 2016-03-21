@@ -7,15 +7,17 @@ import org.endeavour.enterprise.model.json.JsonEmailInviteParameters;
 import org.endeavour.enterprise.model.json.JsonEndUser;
 import org.endeavour.enterprise.model.json.JsonOrganisation;
 import org.endeavour.enterprise.model.json.JsonOrganisationList;
-import org.endeavourhealth.enterprise.core.entity.EndUserRole;
-import org.endeavourhealth.enterprise.core.entity.database.*;
+import org.endeavourhealth.enterprise.core.Resources;
+import org.endeavourhealth.enterprise.core.database.*;
+import org.endeavourhealth.enterprise.core.database.administration.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.io.File;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +35,18 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         String password = personParameters.getPassword();
 
         LOG.trace("Login for {}", email);
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("EntityMap.xsd").getFile());
+        LOG.trace("{}", file);
+
+        file = new File(classLoader.getResource("logback.xml").getFile());
+        LOG.trace("{}", file);
+
+        String s = Resources.getResourceAsString("EntityMap.xsd");
+        LOG.trace(s);
+        s = Resources.getResourceAsString("logback.xml");
+        LOG.trace(s);
 
         if (email == null
                 || email.length() == 0
@@ -62,7 +76,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         JsonOrganisationList ret = null;
         DbOrganisation orgToAutoSelect = null;
-        EndUserRole endUserRoleToAutoSelect = null;
+        boolean isAdminForAutoSelect = false;
 
         //now see what organisations the person can access
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
@@ -71,17 +85,16 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             ret = new JsonOrganisationList(orgs.size());
 
             //super-users are assumed to be admins at every organisation
-            EndUserRole endUserRole = EndUserRole.ADMIN;
+            isAdminForAutoSelect = true;
 
             for (int i = 0; i < orgs.size(); i++) {
                 DbOrganisation o = orgs.get(i);
 
-                ret.add(o, endUserRole);
+                ret.add(o, isAdminForAutoSelect);
 
                 //if there's only one organisation, automatically select it
                 if (orgs.size() == 1) {
                     orgToAutoSelect = o;
-                    endUserRoleToAutoSelect = endUserRole;
                 }
             }
         }
@@ -98,13 +111,13 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 DbOrganisationEndUserLink orgLink = orgLinks.get(i);
                 UUID orgUuid = orgLink.getOrganisationUuid();
                 DbOrganisation o = DbOrganisation.retrieveForUuid(orgUuid);
-                EndUserRole role = orgLink.getRole();
-                ret.add(o, role);
+                boolean isAdmin = orgLink.isAdmin();
+                ret.add(o, isAdmin);
 
                 //if there's only one organisation, automatically select it
                 if (orgLinks.size() == 1) {
                     orgToAutoSelect = o;
-                    endUserRoleToAutoSelect = role;
+                    isAdminForAutoSelect = isAdmin;
                 }
             }
         }
@@ -112,7 +125,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //set the user details in the return object as well
         ret.setUser(new JsonEndUser(user, null));
 
-        NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, endUserRoleToAutoSelect);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
 
         return Response
                 .ok()
@@ -141,12 +154,12 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         }
 
         //validate the person can log on there
-        EndUserRole role = null;
+        boolean isAdmin = false;
 
         DbEndUser user = getEndUserFromSession(sc);
         if (user.getIsSuperUser()) {
             //super users are always admin
-            role = EndUserRole.ADMIN;
+            isAdmin = true;
         } else {
             DbOrganisationEndUserLink link = null;
             List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
@@ -162,14 +175,14 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 throw new BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
             }
 
-            role = link.getRole();
+            isAdmin = link.isAdmin();
         }
 
         //issue a new cookie, with the newly selected organisation
-        NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, role);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, isAdmin);
 
         //return the full org details and the user's role at this place
-        JsonOrganisation ret = new JsonOrganisation(org, role);
+        JsonOrganisation ret = new JsonOrganisation(org, isAdmin);
 
         return Response
                 .ok()
@@ -189,7 +202,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
 
         //replace the cookie on the client with an empty one
-        NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, null);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);
 
         return Response
                 .ok()
@@ -226,13 +239,12 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         DbEndUserPwd p = new DbEndUserPwd();
         p.setEndUserUuid(uuid);
         p.setPwdHash(hash);
-        p.setDtExpired(DatabaseManager.getEndOfTime());
 
         //save both old and new passwords atomically
         List<DbAbstractTable> toSave = new ArrayList<>();
         toSave.add(p);
         if (oldPwd != null) {
-            oldPwd.setDtExpired(new Date());
+            oldPwd.setDtExpired(Instant.now());
             toSave.add(oldPwd);
         }
 
@@ -282,25 +294,24 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         DbEndUserPwd p = new DbEndUserPwd();
         p.setEndUserUuid(userUuid);
         p.setPwdHash(hash);
-        p.setDtExpired(DatabaseManager.getEndOfTime());
 
         //save
         p.writeToDb();
 
         //now we've correctly set up the new password for the user, we can delete the invite
-        invite.setDtCompleted(new Date());
+        invite.setDtCompleted(Instant.now());
         invite.writeToDb();
 
         //retrieve the link entity for the org and person
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         DbOrganisationEndUserLink link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, userUuid);
-        EndUserRole role = link.getRole();
+        boolean isAdmin = link.isAdmin();
 
         //create cookie
         DbEndUser user = DbEndUser.retrieveForUuid(userUuid);
         DbOrganisation org = getOrganisationFromSession(sc);
 
-        NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, role);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, isAdmin);
 
         return Response
                 .ok()

@@ -36,7 +36,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         LOG.trace("Login for {}", email);
 
-        ClassLoader classLoader = getClass().getClassLoader();
+        /*ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("EntityMap.xsd").getFile());
         LOG.trace("{}", file);
 
@@ -46,7 +46,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         String s = Resources.getResourceAsString("EntityMap.xsd");
         LOG.trace(s);
         s = Resources.getResourceAsString("logback.xml");
-        LOG.trace(s);
+        LOG.trace(s);*/
 
         if (email == null
                 || email.length() == 0

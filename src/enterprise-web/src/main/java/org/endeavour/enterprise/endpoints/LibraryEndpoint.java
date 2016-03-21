@@ -72,7 +72,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         if (query != null) {
             type = DefinitionItemType.Query;
         } else if (dataSource != null) {
-            type = DefinitionItemType.Datasource;
+            type = DefinitionItemType.DataSource;
         } else if (test != null) {
             type = DefinitionItemType.Test;
         } else if (codeSet != null) {

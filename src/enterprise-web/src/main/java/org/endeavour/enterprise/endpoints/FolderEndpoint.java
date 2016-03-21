@@ -20,7 +20,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -303,7 +302,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
             } else if (itemType == DefinitionItemType.Test) {
 
-            } else if (itemType == DefinitionItemType.Datasource) {
+            } else if (itemType == DefinitionItemType.DataSource) {
 
             } else if (itemType == DefinitionItemType.CodeSet) {
 

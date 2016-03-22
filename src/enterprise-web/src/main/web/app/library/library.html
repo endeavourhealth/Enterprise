@@ -82,7 +82,7 @@
 		<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
 			<span class="show-child-on-hover folder-item"
 						ng-class="{'selection': node.uuid == ctrl.selectedNode.uuid}">
-				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-sm glyphicon-blank text-muted"></span>
 				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
 							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
 							ng-click="ctrl.toggleExpansion(node)"></span>

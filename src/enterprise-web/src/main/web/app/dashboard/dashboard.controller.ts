@@ -1,18 +1,13 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../core/library.service.ts" />
 /// <reference path="../blocks/logger.service.ts" />
-/// <reference path="../models/EngineState.ts" />
-/// <reference path="../models/EngineHistoryItem.ts" />
-/// <reference path="../models/RecentDocumentItem.ts" />
-/// <reference path="../models/ReportActivityItem.ts" />
-
 
 module app.dashboard {
 	'use strict';
 
 	class DashboardController {
 		engineHistoryData:app.models.EngineHistoryItem[];
-		recentDocumentsData:app.models.RecentDocumentItem[];
+		recentDocumentsData:app.models.FolderItem[];
 		engineState:app.models.EngineState;
 		reportActivityData:app.models.ReportActivityItem[];
 
@@ -36,7 +31,7 @@ module app.dashboard {
 		getRecentDocumentsData() {
 			var vm:DashboardController = this;
 			this.libraryService.getRecentDocumentsData()
-				.then(function (data:app.models.RecentDocumentItem[]) {
+				.then(function (data:app.models.FolderItem[]) {
 					vm.recentDocumentsData = data;
 				});
 		}

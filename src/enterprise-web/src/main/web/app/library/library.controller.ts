@@ -39,8 +39,13 @@ module app.library {
 			vm.libraryService.getFolders(1, null)
 				.then(function (data) {
 					vm.treeData = data.folders;
-					// Set folder type (not retrieved by API)
-					vm.treeData.forEach((item) => { item.folderType = FolderType.Library; } );
+
+					if (vm.treeData && vm.treeData.length > 0) {
+						// Set folder type (not retrieved by API)
+						vm.treeData.forEach((item) => { item.folderType = FolderType.Library; } );
+						// Expand top level by default
+						vm.toggleExpansion(vm.treeData[0]);
+					}
 				});
 		}
 
@@ -50,6 +55,7 @@ module app.library {
 
 			vm.selectedNode = node;
 			node.loading = true;
+
 			vm.libraryService.getFolderContents(node.uuid)
 				.then(function(data) {
 					vm.itemSummaryList = data;

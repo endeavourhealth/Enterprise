@@ -17,10 +17,26 @@ module app.core {
 		login(username:string, password:string) : IPromise<app.models.User>;
 		logout() : void;
 		getUserList() : IPromise<app.models.UserList>;
+		setPendingChanges() : void;
+		clearPendingChanges() : void;
+		getPendingChanges() : boolean;
 	}
 
 	export class AdminService extends BaseHttpService implements IAdminService {
+		pendingChanges : boolean;
 		currentUser:app.models.User;
+
+		setPendingChanges() : void {
+			this.pendingChanges = true;
+		}
+
+		clearPendingChanges() : void {
+			this.pendingChanges = false;
+		}
+
+		getPendingChanges() : boolean {
+			return this.pendingChanges;
+		}
 
 		getCurrentUser() : app.models.User {
 			return this.currentUser;

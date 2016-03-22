@@ -751,11 +751,14 @@ final class SqlServerDatabase implements DatabaseI {
             return ret;
         }
 
-        String where = "WHERE OrganisationUuid = " + convertToString(organisationUuid)
+        String where = "INNER JOIN Execution.Job j"
+                + " ON j.JobUuid = " + ALIAS + ".JobUuid"
+                + " WHERE OrganisationUuid = " + convertToString(organisationUuid)
                 + " AND ReportUuid IN (" + convertToString(itemUuids) + ")"
-                + " AND NOT EXISTS (SELECT 1 FROM Execution.JobReport later"
-                + " WHERE later.JobReportUuid = " + ALIAS + ".JobReportUuid"
-                + " AND later.TimeStamp > " + ALIAS + ".TimeStamp)";
+                + " AND NOT EXISTS (SELECT 1 FROM Execution.JobReport laterJobReport, Execution.Job laterJob"
+                + " WHERE laterJobReport.JobReportUuid = " + ALIAS + ".JobReportUuid"
+                + " AND laterJob.JobUuid = laterJobReport.JobUuid"
+                + " AND laterJob.StartDateTime > j.StartDateTime)";
         retrieveForWhere(new DbJobReport().getAdapter(), where, ret);
         return ret;
     }

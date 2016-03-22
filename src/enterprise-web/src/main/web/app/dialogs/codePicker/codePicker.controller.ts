@@ -85,11 +85,11 @@ module app.dialogs {
 			vm.selectedMatch = itemToDisplay;
 		}
 
-		select(match : Code, includeChildren : boolean) {
+		select(match : Code) {
 			var item : CodeSelection = {
 				id : match.id,
 				label : match.label,
-				includeChildren : includeChildren,
+				includeChildren : true,
 				exclusions : []
 			};
 			this.resultData.push(item);

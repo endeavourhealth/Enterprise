@@ -2,25 +2,25 @@
 	<div class="row">
 		<div class="col-md-12">
 			<div class="panel panel-primary">
-				<div class="panel-heading">Report details</div>
+				<div class="panel-heading">Report</div>
 				<div class="panel-body">
 					<form>
 						<div class="form-group">
 							<div class="row">
 								<div class="col-md-6">
-									<label for="report-name">Report name</label>
+									<label for="report-name">Name</label>
 									<input type="text" class="form-control" id="report-name" ng-model="reportCtrl.report.name">
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-12">
-									<label for="report-description">Report description</label>
+									<label for="report-description">Description</label>
 									<input type="text" class="form-control" id="report-description" ng-model="reportCtrl.report.description">
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-12">
-									<label>Report content</label>
+									<label>Content</label>
 								</div>
 							</div>
 							<div class="row">
@@ -93,7 +93,7 @@
 	<script type="text/ng-template" id="folder_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
 			<span class="show-child-on-hover folder-item" ng-class="{'selection': node.uuid == reportCtrl.selectedNode.uuid}">
-				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-blank text-muted"></span>
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-sm glyphicon-blank text-muted"></span>
 				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
 							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
 							ng-click="reportCtrl.toggleExpansion(node)"></span>

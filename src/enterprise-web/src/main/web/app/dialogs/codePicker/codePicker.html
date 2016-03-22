@@ -25,21 +25,21 @@
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="parent in codePicker.parents"
 							 ng-dblclick="codePicker.displayCode(parent, true)"
-							 class="hover-box"
+							 class="hover-box striped"
 							 ng-class="{'previous-selection': parent.id == codePicker.previousSelection.id}">
 						{{ parent.label }}
 					</div>
 				</div>
 			</div>
 			<div class="form-group col-md-4">
-				<label class="control-label">Matches</label>
+				<label class="control-label">Codes</label>
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="match in codePicker.searchResults"
 							 ng-click="codePicker.displayCode(match, false)"
-							 class="hover-box show-child-on-hover"
+							 class="hover-box show-child-on-hover striped"
 							 ng-class="{'selection': match.id == codePicker.selectedMatch.id}">
 						 {{ match.label }}
-						<button type="button" class="btn btn-xs btn-default pull-right child-to-show" ng-click="codePicker.select(match, true)">
+						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" ng-click="codePicker.select(match)">
 							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
 						</button>
 					</div>
@@ -50,7 +50,7 @@
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="child in codePicker.children"
 							 ng-dblclick="codePicker.displayCode(child, true)"
-							 class="hover-box"
+							 class="hover-box striped"
 							 ng-class="{'previous-selection': child.id == codePicker.previousSelection.id}">
 						{{ child.label }}
 					</div>
@@ -61,16 +61,19 @@
 		<!-- Selection -->
 		<div class="row">
 			<div class="form-group col-md-6">
-			<label class="control-label">Selection</label>
+				<label class="control-label">Selected codes</label>
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="selection in codePicker.resultData"
 							 ng-click="codePicker.displayExclusionTree(selection)"
-							 class="hover-box"
+							 class="hover-box show-child-on-hover striped"
 							 ng-class="{'selection': selection == codePicker.selectedExclusion}">
 						{{ selection.label }}
 						<span class="label label-success" ng-show="selection.includeChildren && (selection.exclusions.length == 0)">All children</span>
 						<span class="label label-warning" ng-show="selection.includeChildren && (selection.exclusions.length > 0)">Some children</span>
 						<span class="label label-danger" ng-show="!selection.includeChildren">No children</span>
+						<button type="button" class="btn btn-xs btn-danger pull-right child-to-show" ng-click="codePicker.unselect(selection)">
+							<span class="glyphicon glyphicon-sm glyphicon-minus"></span>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -81,6 +84,7 @@
 						<ol ui-tree-nodes ng-model="codePicker.exclusionTreeData">
 							<li ng-repeat="node in codePicker.exclusionTreeData" ui-tree-node ng-include="'nodes_renderer.html'"></li>
 						</ol>
+					</div>
 				</div>
 			</div>
 		</div>

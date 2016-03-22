@@ -1,8 +1,4 @@
 /// <reference path="../../typings/tsd.d.ts" />
-/// <reference path="../models/EngineState.ts" />
-/// <reference path="../models/EngineHistoryItem.ts" />
-/// <reference path="../models/RecentDocumentItem.ts" />
-/// <reference path="../models/ReportActivityItem.ts" />
 
 module app.core {
 	import ItemSummaryList = app.models.ItemSummaryList;
@@ -15,7 +11,7 @@ module app.core {
 
 	export interface ILibraryService {
 		getEngineHistory() : ng.IPromise<app.models.EngineHistoryItem[]>;
-		getRecentDocumentsData() : ng.IPromise<app.models.RecentDocumentItem[]>;
+		getRecentDocumentsData() : ng.IPromise<app.models.FolderItem[]>;
 		getEngineState() : ng.IPromise<app.models.EngineState>;
 		getReportActivityData() : ng.IPromise<app.models.ReportActivityItem[]>;
 		getFolders(moduleId : number, folderUuid : string):ng.IPromise<{folders : FolderNode[]}>;
@@ -30,11 +26,23 @@ module app.core {
 	export class LibraryService extends BaseHttpService implements ILibraryService {
 
 		getEngineHistory():ng.IPromise<app.models.EngineHistoryItem[]> {
-			return this.httpGet('app/core/data/enginehistory.json');
+			var request = {
+				params: {
+					'count': 3
+				}
+			};
+
+			return this.httpGet('api/dashboard/getEngineHistory', request);
 		}
 
-		getRecentDocumentsData():ng.IPromise<app.models.RecentDocumentItem[]> {
-			return this.httpGet('app/core/data/recentdocuments.json');
+		getRecentDocumentsData():ng.IPromise<app.models.FolderItem[]> {
+			var request = {
+				params: {
+					'count': 3
+				}
+			};
+
+			return this.httpGet('api/dashboard/getRecentDocuments', request);
 		}
 
 		getEngineState():ng.IPromise<app.models.EngineState> {
@@ -42,7 +50,13 @@ module app.core {
 		}
 
 		getReportActivityData():ng.IPromise<app.models.ReportActivityItem[]> {
-			return this.httpGet('app/core/data/reportactivity.json');
+			var request = {
+				params: {
+					'count': 3
+				}
+			};
+
+			return this.httpGet('api/dashboard/getReportActivity', request);
 		}
 
 		getFolders(moduleId : number, folderUuid : string):ng.IPromise<{folders : FolderNode[]}> {

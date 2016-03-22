@@ -1,7 +1,26 @@
 /* Endeavour specific CSS */
 
+.striped {
+    border-top: 1px solid #eee;
+    background-color: #ffffff;
+}
+
+.striped:nth-of-type(odd) {
+    background-color: #f8f8f8;
+}
+
 .scroll-box-150 {
     height: 150px;
+    overflow-y: scroll;
+}
+
+.scroll-box-300 {
+    height: 300px;
+    overflow-y: scroll;
+}
+
+.scroll-box-450 {
+    height: 450px;
     overflow-y: scroll;
 }
 
@@ -33,14 +52,8 @@
     background: #f8faff !important;
 }
 
-.hover-box {
-    padding: 1px;
-}
-
 .hover-box:hover {
-    border: 1px solid #dae2ea !important;
-    padding: 0px;
-    background: #f8faff !important;
+    background: #d3e9f6 !important;
 }
 
 .logo {

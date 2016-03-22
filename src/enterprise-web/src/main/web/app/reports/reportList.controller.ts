@@ -35,8 +35,13 @@ module app.reports {
 			vm.libraryService.getFolders(2, null)
 				.then(function (data) {
 					vm.treeData = data.folders;
-					// Set folder type (not retrieved by API)
-					vm.treeData.forEach((item) => { item.folderType = FolderType.Report; } );
+
+					if (vm.treeData && vm.treeData.length > 0) {
+						// Set folder type (not retrieved by API)
+						vm.treeData.forEach((item) => { item.folderType = FolderType.Report; });
+						// Expand top level by default
+						vm.toggleExpansion(vm.treeData[0]);
+					}
 				});
 		}
 

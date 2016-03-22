@@ -12,6 +12,7 @@ module app.listOuput {
 	import InputBoxController = app.dialogs.InputBoxController;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import FieldOutput = app.models.FieldOutput;
+	import IWindowService = angular.IWindowService;
 	'use strict';
 
 	export class ListOuputController {
@@ -21,14 +22,15 @@ module app.listOuput {
 		selectedListReportGroup : ListReportGroup;
 		selectedFieldOutput : FieldOutput;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope', '$uibModal', 'AdminService'];
+		static $inject = ['LibraryService', 'LoggerService', '$scope', '$uibModal', 'AdminService', '$window'];
 
 		constructor(
 			protected libraryService:ILibraryService,
 			protected logger : ILoggerService,
 			protected $scope : IScope,
 			protected $modal : IModalService,
-			protected adminService : IAdminService) {
+			protected adminService : IAdminService,
+			protected $window : IWindowService) {
 			this.name = 'Asthmatic meds';
 			this.description = 'List of medication (and latest issue date) for all asthmatic patients';
 			this.listReport = {
@@ -69,6 +71,23 @@ module app.listOuput {
 					vm.adminService.setPendingChanges();
 			});
 		}
+
+		save() {
+			// Save to db and if successful...
+			this.adminService.clearPendingChanges();
+		}
+
+		saveAndClose() {
+			if (this.save()) {
+				this.close();
+			}
+		}
+
+		close() {
+			this.adminService.clearPendingChanges();
+			this.$window.history.back();
+		}
+
 	}
 
 	angular

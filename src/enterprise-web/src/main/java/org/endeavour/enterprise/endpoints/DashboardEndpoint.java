@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,7 +71,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
             DbItem item = DbItem.retrieveForUUid(itemUuid);
             String name = item.getTitle();
 
-            Instant date = job.getStartDateTime();
+            Date date = new Date(job.getStartDateTime().toEpochMilli());
             ret.add(new JsonJobReport(name, date));
         }
 

@@ -4,25 +4,26 @@ import org.endeavourhealth.enterprise.core.database.execution.DbJob;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
 
 public final class JsonJob implements Serializable {
-    private Instant date = null;
+    private Date date = null;
     private String status = null;
 
     public JsonJob() {}
     public JsonJob(DbJob job) {
-        this.date = job.getStartDateTime();
+        this.date = new Date(job.getStartDateTime().toEpochMilli());
         this.status = job.getStatusId().toString();
     }
 
     /**
      * gets/sets
      */
-    public Instant getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Instant date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

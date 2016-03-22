@@ -2,22 +2,23 @@ package org.endeavour.enterprise.model.json;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
 
 public final class JsonJobReport implements Serializable {
     private String name = null;
-    private Instant date = null;
+    private Date date = null;
 
     public JsonJobReport() {}
-    public JsonJobReport(String name, Instant date) {
+    public JsonJobReport(String name, Date date) {
         this.name = name;
         this.date = date;
     }
 
-    public Instant getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Instant date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

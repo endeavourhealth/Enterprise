@@ -1,6 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.model.json.*;
+import org.endeavour.enterprise.json.*;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
@@ -20,8 +20,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.awt.image.DataBufferInt;
-import java.sql.Timestamp;
 import java.util.*;
 
 /**

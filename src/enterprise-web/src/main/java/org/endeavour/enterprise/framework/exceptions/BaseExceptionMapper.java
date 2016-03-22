@@ -1,10 +1,8 @@
 package org.endeavour.enterprise.framework.exceptions;
 
-import org.endeavour.enterprise.model.json.JsonServerException;
+import org.endeavour.enterprise.json.JsonServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

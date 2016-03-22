@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.model.json.JsonDeleteResponse;
-import org.endeavour.enterprise.model.utility.QueryDocumentReaderFindDependentUuids;
+import org.endeavour.enterprise.json.JsonDeleteResponse;
+import org.endeavour.enterprise.utility.QueryDocumentReaderFindDependentUuids;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
@@ -13,7 +13,6 @@ import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 
 import javax.ws.rs.BadRequestException;
-import java.time.Instant;
 import java.util.*;
 
 public abstract class AbstractItemEndpoint extends AbstractEndpoint {

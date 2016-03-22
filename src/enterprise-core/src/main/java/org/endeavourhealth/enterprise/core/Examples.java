@@ -54,6 +54,7 @@ public abstract class Examples {
             UUID jobReportUuid = jobReport.assignPrimaryUUid();
             jobReport.setJobUuid(jobUuid);
             jobReport.setReportUuid(reportUuid);
+            jobReport.setAuditUuid(auditUuid);
             jobReport.setOrganisationUuid(orgUuid);
             jobReport.setEndUserUuid(request.getEndUserUuid());
             jobReport.setParameters(request.getParameters());

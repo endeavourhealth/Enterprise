@@ -1,9 +1,9 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
-import org.endeavour.enterprise.model.json.JsonEndUser;
-import org.endeavour.enterprise.model.json.JsonEndUserList;
-import org.endeavour.enterprise.model.json.JsonOrganisation;
+import org.endeavour.enterprise.json.JsonEndUser;
+import org.endeavour.enterprise.json.JsonEndUserList;
+import org.endeavour.enterprise.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUserEmailInvite;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;

@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.model.json;
+package org.endeavour.enterprise.json;
 
 import org.endeavourhealth.enterprise.core.database.execution.DbJob;
 

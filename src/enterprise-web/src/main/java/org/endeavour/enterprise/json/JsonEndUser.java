@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.model.json;
+package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;

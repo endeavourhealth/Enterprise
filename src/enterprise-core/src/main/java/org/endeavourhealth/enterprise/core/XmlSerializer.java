@@ -1,5 +1,7 @@
 package org.endeavourhealth.enterprise.core;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.*;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -10,10 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URL;
 
 public abstract class XmlSerializer {
@@ -22,6 +21,16 @@ public abstract class XmlSerializer {
 
         //parse XML string into DOM
         InputStream is = new ByteArrayInputStream(xml.getBytes());
+        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document document = docBuilder.parse(is);
+
+        return deserializeFromXmlDocument(cls, document, xsdName);
+    }
+    public static <T> T deserializeFromResource(Class cls, String xmlResourceName, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+
+        //parse XML string into DOM
+        URL url = cls.getClassLoader().getResource(xmlResourceName);
+        FileInputStream is = new FileInputStream(url.getFile());
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = docBuilder.parse(is);
 

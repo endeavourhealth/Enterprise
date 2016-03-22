@@ -36,6 +36,7 @@ public final class DatabaseManager {
 
         //this would be where we plug in support for different databases
         this.databaseImplementation = new SqlServerDatabase();
+
         this.url = url;
         this.username = username;
         this.password = password;
@@ -47,9 +48,9 @@ public final class DatabaseManager {
 
             cpds = new ComboPooledDataSource();
             cpds.setDriverClass("net.sourceforge.jtds.jdbc.Driver");
-            cpds.setJdbcUrl(SqlServerConfig.URL);
-            cpds.setUser(SqlServerConfig.USERNAME);
-            cpds.setPassword(SqlServerConfig.PASSWORD);
+            cpds.setJdbcUrl(url);
+            cpds.setUser(username);
+            cpds.setPassword(password);
 
             //arbitrary pool settings
             cpds.setInitialPoolSize(5);

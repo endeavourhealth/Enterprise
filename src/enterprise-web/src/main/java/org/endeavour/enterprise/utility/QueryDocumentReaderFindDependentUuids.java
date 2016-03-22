@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.model.utility;
+package org.endeavour.enterprise.utility;
 
 import org.endeavourhealth.enterprise.core.querydocument.AbstractQueryDocumentReader;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;

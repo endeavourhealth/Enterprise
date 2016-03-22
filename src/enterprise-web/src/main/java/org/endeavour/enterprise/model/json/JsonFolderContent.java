@@ -7,7 +7,10 @@ import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 
 import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,8 +19,8 @@ public final class JsonFolderContent implements Serializable {
     private Integer type = null;
     private String typeDesc = null;
     private String name = null;
-    private Instant lastModified = null;
-    private Instant lastRun = null; //only applicable when showing reports
+    private Date lastModified = null;
+    private Date lastRun = null; //only applicable when showing reports
     private Boolean isScheduled = null; //only applicable when showing reports
 
     public JsonFolderContent() {
@@ -33,7 +36,7 @@ public final class JsonFolderContent implements Serializable {
         this.name = item.getTitle();
 
         if (audit != null) {
-            this.lastModified = audit.getTimeStamp();
+            this.lastModified = new Date(audit.getTimeStamp().toEpochMilli());
         }
     }
 
@@ -78,19 +81,19 @@ public final class JsonFolderContent implements Serializable {
         this.name = name;
     }
 
-    public Instant getLastModified() {
+    public Date getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Instant lastModified) {
+    public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
 
-    public Instant getLastRun() {
+    public Date getLastRun() {
         return lastRun;
     }
 
-    public void setLastRun(Instant lastRun) {
+    public void setLastRun(Date lastRun) {
         this.lastRun = lastRun;
     }
 

@@ -20,10 +20,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Endpoint for functions related to creating and managing folders
@@ -297,7 +295,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
                 DbJobReport jobReport = hmLastJobReportsByItem.get(item.getPrimaryUuid());
                 if (jobReport != null) {
                     DbJob job = hmJobsByUuid.get(jobReport.getJobUuid());
-                    c.setLastRun(job.getStartDateTime());
+                    c.setLastRun(new Date(job.getStartDateTime().toEpochMilli()));
                 }
 
             } else if (itemType == DefinitionItemType.Query) {

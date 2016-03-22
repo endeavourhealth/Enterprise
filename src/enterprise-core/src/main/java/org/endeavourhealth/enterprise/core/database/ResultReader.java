@@ -22,8 +22,13 @@ public final class ResultReader {
         return rs.getString(currentCol++);
     }
 
-    public int readInt() throws SQLException {
-        return rs.getInt(currentCol++);
+    public Integer readInt() throws SQLException {
+        int ret = rs.getInt(currentCol++);
+        if (rs.wasNull()) {
+            return null;
+        } else {
+            return new Integer(ret);
+        }
     }
 
     public UUID readUuid() throws SQLException {

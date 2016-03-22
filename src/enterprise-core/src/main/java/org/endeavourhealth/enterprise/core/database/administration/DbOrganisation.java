@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public final class DbOrganisation extends DbAbstractTable {
 
-    //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class,
             "OrganisationUuid,Name,NationalId", "OrganisationUuid");
 

@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.beans.PropertyVetoException;
 import java.sql.*;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -35,40 +34,6 @@ import java.util.*;
 final class SqlServerDatabase implements DatabaseI {
     private static final Logger LOG = LoggerFactory.getLogger(SqlServerDatabase.class);
     private static final String ALIAS = "z";
-    private static final String LOGGING_SCHEMA_PREFIX = "Logging.";
-
-    /*private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
-                    .withLocale( Locale.UK )
-                    .withZone( ZoneId.systemDefault() );*/
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.UK).withZone(ZoneOffset.UTC);
-
-    private ComboPooledDataSource cpds = null;
-
-    public SqlServerDatabase() {
-
-        try {
-
-            //need to force the loading of the Driver class before we try to create any connections
-            Class.forName(net.sourceforge.jtds.jdbc.Driver.class.getCanonicalName());
-
-            cpds = new ComboPooledDataSource();
-            cpds.setDriverClass("net.sourceforge.jtds.jdbc.Driver");
-            cpds.setJdbcUrl(SqlServerConfig.DB_URL);
-            cpds.setUser(SqlServerConfig.DB_USER);
-            cpds.setPassword(SqlServerConfig.DB_PASSWORD);
-
-            //arbitrary pool settings
-            cpds.setMinPoolSize(5);
-            cpds.setAcquireIncrement(5);
-            cpds.setMaxPoolSize(20);
-            cpds.setMaxStatements(180);
-
-        } catch (ClassNotFoundException | PropertyVetoException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 
     /**
      * converts objects to Strings for SQL, escaping as required
@@ -116,7 +81,7 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     private int executeScalarCountQuery(String sql) throws Exception {
-        Connection connection = getConnection();
+        Connection connection = DatabaseManager.getConnection();
         Statement s = connection.createStatement();
         try {
             LOG.trace("Executing {}", sql);
@@ -133,53 +98,14 @@ final class SqlServerDatabase implements DatabaseI {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         } finally {
-            closeConnection(connection);
-        }
-    }
-
-
-    private synchronized Connection getConnection() throws ClassNotFoundException, SQLException {
-        Connection conn = cpds.getConnection();
-        conn.setAutoCommit(false); //never want auto-commit
-        return conn;
-    }
-
-    private synchronized void closeConnection(Connection connection) throws SQLException {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                LOG.error("Error closing connection", e);
-            }
+            DatabaseManager.closeConnection(connection);
         }
     }
 
     @Override
-    public void registerLogbackDbAppender() {
-
-        //we need our own implementation of a conneciton source, because logback fails to detect the DB type when against Azure
-        LogbackConnectionSource connectionSource = new LogbackConnectionSource();
-
-        //because the three logging tables are in a schema, we need to override the resolver to insert the schema name
-        DefaultDBNameResolver r = new DefaultDBNameResolver(){
-            @Override
-            public <N extends Enum<?>> String getTableName(N tableName) {
-                return LOGGING_SCHEMA_PREFIX + super.getTableName(tableName);
-            }
-        };
-
-        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-
-        DBAppender dbAppender = new DBAppender();
-        dbAppender.setContext(rootLogger.getLoggerContext());
-        dbAppender.setConnectionSource(connectionSource);
-        dbAppender.setName("DB Appender");
-        dbAppender.setDbNameResolver(r);
-        dbAppender.start();
-
-        rootLogger.addAppender(dbAppender);
+    public SQLDialectCode getLogbackDbDialectCode() {
+        return SQLDialectCode.MSSQL_DIALECT;
     }
-
 
     @Override
     public void writeEntity(DbAbstractTable entity) throws Exception {
@@ -196,7 +122,7 @@ final class SqlServerDatabase implements DatabaseI {
 
         LOG.trace("Writing {} entities to DB", entities.size());
 
-        Connection connection = getConnection();
+        Connection connection = DatabaseManager.getConnection();
         Statement statement = connection.createStatement();
 
         StringJoiner sqlLogging = new StringJoiner("\r\n");
@@ -220,7 +146,7 @@ final class SqlServerDatabase implements DatabaseI {
             //don't return the connection, since the problem maybe at the connection level
             throw sqlEx;
         } finally {
-            closeConnection(connection);
+            DatabaseManager.closeConnection(connection);
         }
 
     }
@@ -451,7 +377,7 @@ final class SqlServerDatabase implements DatabaseI {
 
         String sql = sb.toString();
 
-        Connection connection = getConnection();
+        Connection connection = DatabaseManager.getConnection();
         Statement s = connection.createStatement();
         try {
             LOG.trace("Executing {}", sql);
@@ -473,7 +399,7 @@ final class SqlServerDatabase implements DatabaseI {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
         } finally {
-            closeConnection(connection);
+            DatabaseManager.closeConnection(connection);
         }
     }
 
@@ -603,6 +529,37 @@ final class SqlServerDatabase implements DatabaseI {
                 + " AND da.ItemUuid = d.ItemUuid"
                 + " AND da.AuditUuid = d.AuditUuid"
                 + ")";
+
+        retrieveForWhere(new DbItem().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public List<DbItem> retrieveItemsForActiveItems(List<DbActiveItem> activeItems) throws Exception {
+        List<DbItem> ret = new ArrayList<DbItem>();
+        if (activeItems.isEmpty()) {
+            return ret;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("WHERE ");
+
+        for (int i=0; i<activeItems.size(); i++) {
+            DbActiveItem activeItem = activeItems.get(i);
+            UUID itemUuid = activeItem.getItemUuid();
+            UUID auditUuid = activeItem.getAuditUuid();
+
+            if (i > 0){
+                sb.append(" OR ");
+            }
+            sb.append("(");
+            sb.append("ItemUuid = ");
+            sb.append(convertToString(itemUuid));
+            sb.append(" AND AuditUuid = ");
+            sb.append(convertToString(auditUuid));
+            sb.append(")");
+        }
+        String where = sb.toString();
 
         retrieveForWhere(new DbItem().getAdapter(), where, ret);
         return ret;
@@ -812,48 +769,11 @@ final class SqlServerDatabase implements DatabaseI {
                 + " INNER JOIN Definition.Audit a"
                 + " ON a.AuditUuid = i.AuditUuid"
                 + " AND a.EndUserUuid = " + convertToString(userUuid)
+                + " WHERE " + ALIAS + ".ItemTypeId NOT IN (" + DefinitionItemType.LibraryFolder.getValue() + ", " + DefinitionItemType.ReportFolder.getValue() + ")"
                 + " ORDER BY a.TimeStamp DESC";
 
         retrieveForWhere(new DbActiveItem().getAdapter(), count, where, ret);
         return ret;
     }
 
-    /**
-     * Connection source implementation for LogBack, as it seems unable to correctly work out it should use SQL Server dialect
-     */
-    class LogbackConnectionSource implements ConnectionSource {
-
-        public LogbackConnectionSource() {}
-
-        @Override
-        public Connection getConnection() throws SQLException {
-            return cpds.getConnection();
-        }
-
-        @Override
-        public SQLDialectCode getSQLDialectCode() {
-            return SQLDialectCode.MSSQL_DIALECT;
-        }
-
-        @Override
-        public boolean supportsGetGeneratedKeys() {
-            return false;
-        }
-
-        @Override
-        public boolean supportsBatchUpdates() {
-            return false;
-        }
-
-        @Override
-        public void start() {}
-
-        @Override
-        public void stop() {}
-
-        @Override
-        public boolean isStarted() {
-            return true;
-        }
-    }
 }

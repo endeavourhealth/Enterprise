@@ -54,6 +54,10 @@ public final class DbItem extends DbAbstractTable {
         return DatabaseManager.db().retrieveNonDependentItems(organisationUuid, dependencyType, itemType);
     }
 
+    public static List<DbItem> retrieveForActiveItems(List<DbActiveItem> activeItems) throws Exception {
+        return DatabaseManager.db().retrieveItemsForActiveItems(activeItems);
+    }
+
     @Override
     public TableAdapter getAdapter() {
         return adapter;

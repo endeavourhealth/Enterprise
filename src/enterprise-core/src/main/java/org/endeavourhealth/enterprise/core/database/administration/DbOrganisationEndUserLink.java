@@ -16,10 +16,8 @@ import java.util.UUID;
  */
 public final class DbOrganisationEndUserLink extends DbAbstractTable {
 
-    //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class,
             "OrganisationEndUserLinkUuid,OrganisationUuid,EndUserUuid,IsAdmin,DtExpired", "OrganisationEndUserLinkUuid");
-
 
     private UUID organisationUuid = null;
     private UUID endUserUuid = null;

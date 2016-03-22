@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.core.database;
 
+import ch.qos.logback.core.db.dialect.SQLDialectCode;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
@@ -18,8 +19,8 @@ import java.util.UUID;
 
 public interface DatabaseI {
 
-    //setting up logging to db
-    public void registerLogbackDbAppender();
+    //used for setting up logging to db
+    public SQLDialectCode getLogbackDbDialectCode();
 
     //generic read/write functions
     public void writeEntity(DbAbstractTable entity) throws Exception;
@@ -54,6 +55,8 @@ public interface DatabaseI {
     public List<DbItem> retrieveDependentItems(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception;
 
     public List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception;
+
+    public List<DbItem> retrieveItemsForActiveItems(List<DbActiveItem> activeItems) throws Exception;
 
     public DbActiveItem retrieveActiveItemForItemUuid(UUID itemUuid) throws Exception;
 

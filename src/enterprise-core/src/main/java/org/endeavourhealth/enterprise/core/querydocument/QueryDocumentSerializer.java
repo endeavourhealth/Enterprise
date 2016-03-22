@@ -14,28 +14,28 @@ import java.io.IOException;
 
 public abstract class QueryDocumentSerializer {
 
-    private static ObjectFactory queryDocumentObjectFactory = new ObjectFactory();
-
+    private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
+    private static final String XSD = "QueryDocument.xsd";
 
     public static LibraryItem readLibraryItemFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.readFromXml(LibraryItem.class, item.getXmlContent());
+        return XmlSerializer.deserializeFromString(LibraryItem.class, item.getXmlContent(), XSD);
     }
     public static Report readReportFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.readFromXml(Report.class, item.getXmlContent());
+        return XmlSerializer.deserializeFromString(Report.class, item.getXmlContent(), XSD);
     }
     public static QueryDocument readQueryDocumentFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.readFromXml(QueryDocument.class, item.getXmlContent());
+        return XmlSerializer.deserializeFromString(QueryDocument.class, item.getXmlContent(), XSD);
     }
 
 
     public static LibraryItem readLibraryItemFromXml(String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.readFromXml(LibraryItem.class, xml);
+        return XmlSerializer.deserializeFromString(LibraryItem.class, xml, XSD);
     }
     public static Report readReportFromXml(String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.readFromXml(Report.class, xml);
+        return XmlSerializer.deserializeFromString(Report.class, xml, XSD);
     }
     public static QueryDocument readQueryDocumentFromXml(String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.readFromXml(QueryDocument.class, xml);
+        return XmlSerializer.deserializeFromString(QueryDocument.class, xml, XSD);
     }
 
 
@@ -45,21 +45,21 @@ public abstract class QueryDocumentSerializer {
                 && q.getReport().size() == 1) {
 
             Report report = q.getReport().get(0);
-            JAXBElement element = queryDocumentObjectFactory.createReport(report);
-            return XmlSerializer.writeObjectToXml(element);
+            JAXBElement element = OBJECT_FACTORY.createReport(report);
+            return XmlSerializer.serializeToString(element, XSD);
 
         } else if (q.getFolder().isEmpty()
                 && q.getLibraryItem().size() == 1
                 && q.getReport().isEmpty()) {
 
             LibraryItem libraryItem = q.getLibraryItem().get(0);
-            JAXBElement element = queryDocumentObjectFactory.createLibraryItem(libraryItem);
-            return XmlSerializer.writeObjectToXml(element);
+            JAXBElement element = OBJECT_FACTORY.createLibraryItem(libraryItem);
+            return XmlSerializer.serializeToString(element, XSD);
         }
         else
         {
-            JAXBElement element = queryDocumentObjectFactory.createQueryDocument(q);
-            return XmlSerializer.writeObjectToXml(element);
+            JAXBElement element = OBJECT_FACTORY.createQueryDocument(q);
+            return XmlSerializer.serializeToString(element, XSD);
         }
     }
 

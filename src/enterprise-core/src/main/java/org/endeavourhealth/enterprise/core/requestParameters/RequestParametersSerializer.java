@@ -12,18 +12,19 @@ import java.io.IOException;
 
 public abstract class RequestParametersSerializer {
 
-    private static ObjectFactory objectFactory = new ObjectFactory();
+    private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
+    private static final String XSD = "RequestParameters.xsd";
 
     public static RequestParameters readFromJobReport(DbJobReport jobReport) throws ParserConfigurationException, JAXBException, IOException, SAXException {
         return readFromXml(jobReport.getParameters());
     }
     public static RequestParameters readFromXml(String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.readFromXml(RequestParameters.class, xml);
+        return XmlSerializer.deserializeFromString(RequestParameters.class, xml, XSD);
     }
 
     public static String writeToXml(RequestParameters r) {
-        JAXBElement element = objectFactory.createRequestParameters(r);
-        return XmlSerializer.writeObjectToXml(element);
+        JAXBElement element = OBJECT_FACTORY.createRequestParameters(r);
+        return XmlSerializer.serializeToString(element, XSD);
     }
 
 

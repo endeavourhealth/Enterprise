@@ -19,7 +19,7 @@ public final class DbJobReportItem extends DbAbstractTable {
     private UUID parentJobReportItemUuid = null;
     private UUID itemUuid = null;
     private UUID auditUuid = null;
-    private int resultCount = -1;
+    private Integer resultCount = null;
 
 
     public static List<DbJobReportItem> retrieveForJobReport(UUID jobReportUuid) throws Exception {
@@ -86,11 +86,11 @@ public final class DbJobReportItem extends DbAbstractTable {
         this.parentJobReportItemUuid = parentJobReportItemUuid;
     }
 
-    public int getResultCount() {
+    public Integer getResultCount() {
         return resultCount;
     }
 
-    public void setResultCount(int resultCount) {
+    public void setResultCount(Integer resultCount) {
         this.resultCount = resultCount;
     }
 }

@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public final class DbEndUser extends DbAbstractTable {
 
-    //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
             "EndUserUuid,Title,Forename,Surname,Email,IsSuperUser", "EndUserUuid");
 

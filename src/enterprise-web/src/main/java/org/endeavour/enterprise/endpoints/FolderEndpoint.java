@@ -20,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.awt.image.DataBufferInt;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -250,22 +251,33 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         List<DbActiveItem> childActiveItems = DbActiveItem.retrieveDependentItems(orgUuid, folderUuid, DependencyType.IsContainedWithin);
 
+        //for reports, we want extra information (last run date etc.)
         HashMap<UUID, DbRequest> hmPendingRequestsByItem = new HashMap<>();
-        List<DbRequest> pendingRequests = DbRequest.retrievePendingForActiveItems(orgUuid, childActiveItems);
-        for (DbRequest pendingRequest: pendingRequests ) {
-            hmPendingRequestsByItem.put(pendingRequest.getReportUuid(), pendingRequest);
-        }
-
         HashMap<UUID, DbJobReport> hmLastJobReportsByItem = new HashMap<>();
-        List<DbJobReport> jobReports = DbJobReport.retrieveLatestForActiveItems(orgUuid, childActiveItems);
-        for (DbJobReport jobReport: jobReports) {
-            hmLastJobReportsByItem.put(jobReport.getReportUuid(), jobReport);
-        }
-
         HashMap<UUID, DbJob> hmJobsByUuid = new HashMap<>();
-        List<DbJob> jobs = DbJob.retrieveForJobReports(jobReports);
-        for (DbJob job: jobs) {
-            hmJobsByUuid.put(job.getPrimaryUuid(), job);
+
+        List<DbActiveItem> reportActiveItems = new ArrayList<>();
+        for (DbActiveItem activeItem: childActiveItems) {
+            if (activeItem.getItemTypeId() == DefinitionItemType.Report) {
+                reportActiveItems.add(activeItem);
+            }
+        }
+        if (!reportActiveItems.isEmpty()) {
+
+            List<DbRequest> pendingRequests = DbRequest.retrievePendingForActiveItems(orgUuid, childActiveItems);
+            for (DbRequest pendingRequest: pendingRequests ) {
+                hmPendingRequestsByItem.put(pendingRequest.getReportUuid(), pendingRequest);
+            }
+
+            List<DbJobReport> jobReports = DbJobReport.retrieveLatestForActiveItems(orgUuid, childActiveItems);
+            for (DbJobReport jobReport: jobReports) {
+                hmLastJobReportsByItem.put(jobReport.getReportUuid(), jobReport);
+            }
+
+            List<DbJob> jobs = DbJob.retrieveForJobReports(jobReports);
+            for (DbJob job: jobs) {
+                hmJobsByUuid.put(job.getPrimaryUuid(), job);
+            }
         }
 
         HashMap<UUID, DbAudit> hmAuditsByAuditUuid = new HashMap<>();
@@ -274,10 +286,16 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             hmAuditsByAuditUuid.put(audit.getPrimaryUuid(), audit);
         }
 
-        for (int i = 0; i < childActiveItems.size(); i++) {
-            DbActiveItem activeItem = childActiveItems.get(i);
-            DbItem item = DbItem.retrieveForActiveItem(activeItem);
+        HashMap<UUID, DbItem> hmItemsByItemUuid = new HashMap<>();
+        List<DbItem> items = DbItem.retrieveForActiveItems(childActiveItems);
+        for (DbItem item: items) {
+            hmItemsByItemUuid.put(item.getPrimaryUuid(), item);
+        }
 
+        for (int i = 0; i < childActiveItems.size(); i++) {
+
+            DbActiveItem activeItem = childActiveItems.get(i);
+            DbItem item = hmItemsByItemUuid.get(activeItem.getItemUuid());
             DefinitionItemType itemType = activeItem.getItemTypeId();
             DbAudit audit = hmAuditsByAuditUuid.get(item.getAuditUuid());
 

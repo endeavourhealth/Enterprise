@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class DbActiveItem extends DbAbstractTable {
-    //register as a DB entity
+
     private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class,
             "ActiveItemUuid,OrganisationUuid,ItemUuid,AuditUuid,ItemTypeId,IsDeleted", "ActiveItemUuid");
 

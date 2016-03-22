@@ -3,39 +3,49 @@ package org.endeavourhealth.enterprise.core;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 
 public abstract class XmlSerializer {
 
-    public static <T> T readFromXml(Class cls, String xml) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-
-        //TODO: validate XML against XSD
+    public static <T> T deserializeFromString(Class cls, String xml, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
         //parse XML string into DOM
         InputStream is = new ByteArrayInputStream(xml.getBytes());
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = docBuilder.parse(is);
 
-        return readObjectFromXml(cls, document);
+        return deserializeFromXmlDocument(cls, document, xsdName);
     }
 
-    private static <T> T readObjectFromXml(Class cls, Document doc) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+    private static <T> T deserializeFromXmlDocument(Class cls, Document doc, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
-        //parse DOM into POJOs
         JAXBContext context = JAXBContext.newInstance(cls);
         Unmarshaller unmarshaller = context.createUnmarshaller();
+
+        //if a schema was provided, set it in the unmarshaller
+        if (xsdName != null) {
+            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            URL url = cls.getClassLoader().getResource(xsdName);
+            Schema schema = sf.newSchema(url);
+            unmarshaller.setSchema(schema);
+        }
+
         JAXBElement<T> loader = unmarshaller.unmarshal(doc, cls);
         return loader.getValue();
     }
 
-    public static String writeObjectToXml(JAXBElement element) {
+    public static String serializeToString(JAXBElement element, String xsdName) {
         StringWriter sw = new StringWriter();
         Class cls = element.getValue().getClass();
 
@@ -43,23 +53,20 @@ public abstract class XmlSerializer {
             JAXBContext context = JAXBContext.newInstance(cls);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); //just makes output easier to read
+
+            if (xsdName != null) {
+                SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                URL url = cls.getClassLoader().getResource(xsdName);
+                Schema schema = sf.newSchema(url);
+                marshaller.setSchema(schema);
+            }
+
             marshaller.marshal(element, sw);
 
-        } catch (JAXBException e) {
+        } catch (JAXBException|SAXException e) {
             throw new RuntimeException(e);
         }
 
-        //TODO: validate XML against XSD
-/*        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(xsd));
-        javax.xml.validation.Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xml));*/
-
-        String ret = sw.toString();
-
-
-
-        return ret;
+        return sw.toString();
     }
-
 }

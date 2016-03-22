@@ -13,11 +13,8 @@ import java.util.UUID;
 
 public final class DbEndUserEmailInvite extends DbAbstractTable {
 
-
-    //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUserEmailInvite.class,
             "EndUserEmailInviteUuid,EndUserUuid,UniqueToken,DtCompleted", "EndUserEmailInviteUuid");
-
 
     private UUID endUserUuid = null;
     private String uniqueToken = null;

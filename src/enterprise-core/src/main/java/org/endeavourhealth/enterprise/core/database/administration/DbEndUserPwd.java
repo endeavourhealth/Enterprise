@@ -12,10 +12,8 @@ import java.util.UUID;
 
 public class DbEndUserPwd extends DbAbstractTable {
 
-    //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
             "EndUserPwdUuid,EndUserUuid,PwdHash,DtExpired", "EndUserPwdUuid");
-
 
     private UUID endUserUuid = null;
     private String pwdHash = null;

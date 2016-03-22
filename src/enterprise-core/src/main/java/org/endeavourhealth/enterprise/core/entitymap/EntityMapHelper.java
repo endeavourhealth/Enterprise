@@ -4,14 +4,16 @@ import org.endeavourhealth.enterprise.core.XmlSerializer;
 import org.endeavourhealth.enterprise.core.Resources;
 import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
 
-public class EntityMapHelper extends XmlSerializer {
+public class EntityMapHelper {
+
+    private static final String XSD = "EntityMap.xsd";
 
     public static EntityMap loadEntityMap() throws Exception {
 
         String xml = Resources.getResourceAsString("entitymap.xml");
         //"src/discovery-controller/src/main/resources/controller.config";
 
-        return readFromXml(EntityMap.class, xml);
+        return XmlSerializer.deserializeFromString(EntityMap.class, xml, XSD);
     }
 //
 //    public static Entity getPrimaryEntity(EntityMap map) {

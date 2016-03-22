@@ -21,7 +21,7 @@ public final class DbJob extends DbAbstractTable {
     private ExecutionStatus statusId = ExecutionStatus.Executing;
     private Instant startDateTime = null;
     private Instant endDateTime = null;
-    private int patientsInDatabase = -1;
+    private Integer patientsInDatabase = null;
 
     public static List<DbJob> retrieveForJobReports(List<DbJobReport> jobReports) throws Exception {
         List<UUID> uuids = new ArrayList<>();
@@ -86,11 +86,11 @@ public final class DbJob extends DbAbstractTable {
         this.endDateTime = endDateTime;
     }
 
-    public int getPatientsInDatabase() {
+    public Integer getPatientsInDatabase() {
         return patientsInDatabase;
     }
 
-    public void setPatientsInDatabase(int patientsInDatabase) {
+    public void setPatientsInDatabase(Integer patientsInDatabase) {
         this.patientsInDatabase = patientsInDatabase;
     }
 

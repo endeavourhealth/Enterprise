@@ -14,6 +14,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.net.URL;
+import java.net.URLDecoder;
 
 public abstract class XmlSerializer {
 
@@ -30,7 +31,7 @@ public abstract class XmlSerializer {
 
         //parse XML string into DOM
         URL url = cls.getClassLoader().getResource(xmlResourceName);
-        FileInputStream is = new FileInputStream(url.getFile());
+        FileInputStream is = new FileInputStream(URLDecoder.decode( url.getFile(), "UTF-8" ));
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = docBuilder.parse(is);
 

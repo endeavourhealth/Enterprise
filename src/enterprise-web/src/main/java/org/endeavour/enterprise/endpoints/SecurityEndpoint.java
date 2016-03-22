@@ -74,27 +74,25 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             throw new NotAuthorizedException("Invalid password");
         }
 
-        JsonOrganisationList ret = null;
+        JsonOrganisationList ret = ret = new JsonOrganisationList();
         DbOrganisation orgToAutoSelect = null;
-        boolean isAdminForAutoSelect = false;
+        Boolean isAdminForAutoSelect = null;
 
         //now see what organisations the person can access
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
-        if (user.getIsSuperUser()) {
+        if (user.isSuperUser()) {
             List<DbOrganisation> orgs = DbOrganisation.retrieveForAll();
-            ret = new JsonOrganisationList(orgs.size());
-
-            //super-users are assumed to be admins at every organisation
-            isAdminForAutoSelect = true;
 
             for (int i = 0; i < orgs.size(); i++) {
                 DbOrganisation o = orgs.get(i);
 
-                ret.add(o, isAdminForAutoSelect);
+                //super-users are assumed to be admins at every organisation
+                ret.add(o, new Boolean(true));
 
                 //if there's only one organisation, automatically select it
                 if (orgs.size() == 1) {
                     orgToAutoSelect = o;
+                    isAdminForAutoSelect = new Boolean(true);
                 }
             }
         }
@@ -105,19 +103,17 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 throw new NotAuthorizedException("No organisations to log on to");
             }
 
-            ret = new JsonOrganisationList(orgLinks.size());
-
             for (int i = 0; i < orgLinks.size(); i++) {
                 DbOrganisationEndUserLink orgLink = orgLinks.get(i);
                 UUID orgUuid = orgLink.getOrganisationUuid();
                 DbOrganisation o = DbOrganisation.retrieveForUuid(orgUuid);
-                boolean isAdmin = orgLink.isAdmin();
+                Boolean isAdmin = new Boolean(orgLink.isAdmin());
                 ret.add(o, isAdmin);
 
                 //if there's only one organisation, automatically select it
                 if (orgLinks.size() == 1) {
                     orgToAutoSelect = o;
-                    isAdminForAutoSelect = isAdmin;
+                    isAdminForAutoSelect = new Boolean(isAdmin);
                 }
             }
         }
@@ -157,7 +153,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         boolean isAdmin = false;
 
         DbEndUser user = getEndUserFromSession(sc);
-        if (user.getIsSuperUser()) {
+        if (user.isSuperUser()) {
             //super users are always admin
             isAdmin = true;
         } else {

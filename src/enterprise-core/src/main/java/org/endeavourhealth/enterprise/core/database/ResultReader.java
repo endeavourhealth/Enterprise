@@ -39,7 +39,11 @@ public final class ResultReader {
 
     public Instant readDateTime() throws SQLException {
         Timestamp ts = rs.getTimestamp(currentCol++);
-        return ts.toInstant();
+        if (ts == null) {
+            return null;
+        } else {
+            return ts.toInstant();
+        }
     }
 
     public boolean nextResult() throws SQLException {

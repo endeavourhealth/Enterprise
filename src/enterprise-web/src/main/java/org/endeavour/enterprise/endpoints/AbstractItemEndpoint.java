@@ -198,9 +198,9 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         } else {
             activeItem = retrieveActiveItem(itemUuid, orgUuid, itemType);
             item = DbItem.retrieveForActiveItem(activeItem);
-
-            item.setSaveMode(TableSaveMode.INSERT); //force the insert every time, since we allow duplicate rows in the Item table for the same UUID
         }
+
+        item.setSaveMode(TableSaveMode.INSERT); //force the insert every time, since we allow duplicate rows in the Item table for the same UUID
 
         //update the AuditUuid on both objects
         DbAudit audit = DbAudit.factoryNow(userUuid);

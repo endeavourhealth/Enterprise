@@ -4,29 +4,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonOrganisationList implements Serializable {
     private JsonEndUser user = null;
-    private JsonOrganisation[] organisations = null;
+    private List<JsonOrganisation> organisations = new ArrayList<>();
 
-    public JsonOrganisationList(int size) {
-        organisations = new JsonOrganisation[size];
-    }
+    public JsonOrganisationList() {}
 
     public void add(JsonOrganisation jsonOrg) {
-        //find the next non-null index
-        for (int i = 0; i < organisations.length; i++) {
-            if (organisations[i] == null) {
-                organisations[i] = jsonOrg;
-                return;
-            }
-        }
-
-        throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");
+        organisations.add(jsonOrg);
     }
 
-    public void add(DbOrganisation org, boolean isAdmin) {
+    public void add(DbOrganisation org, Boolean isAdmin) {
         JsonOrganisation jsonOrg = new JsonOrganisation(org, isAdmin);
         add(jsonOrg);
     }
@@ -43,11 +35,11 @@ public final class JsonOrganisationList implements Serializable {
         this.user = user;
     }
 
-    public JsonOrganisation[] getOrganisations() {
+    public List<JsonOrganisation> getOrganisations() {
         return organisations;
     }
 
-    public void setOrganisations(JsonOrganisation[] organisations) {
+    public void setOrganisations(List<JsonOrganisation> organisations) {
         this.organisations = organisations;
     }
 }

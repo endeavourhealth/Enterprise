@@ -228,6 +228,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         toSave.add(audit);
 
         DbItem item = DbItem.factoryNew(title, audit);
+        item.setXmlContent(""); //need non-null values
+        item.setDescription("");
         toSave.add(item);
 
         DatabaseManager.db().writeEntities(toSave);

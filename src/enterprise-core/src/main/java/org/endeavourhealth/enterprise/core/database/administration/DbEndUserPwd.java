@@ -14,7 +14,7 @@ public class DbEndUserPwd extends DbAbstractTable {
 
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
-            "EndUserPwd", "Administration", "EndUserPwdUuid,EndUserUuid,PwdHash,DtExpired", "EndUserPwdUuid");
+            "EndUserPwdUuid,EndUserUuid,PwdHash,DtExpired", "EndUserPwdUuid");
 
 
     private UUID endUserUuid = null;

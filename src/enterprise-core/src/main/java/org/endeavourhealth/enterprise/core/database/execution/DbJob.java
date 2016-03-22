@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public final class DbJob extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbJob.class, "Job", "Execution",
+    private static final TableAdapter adapter = new TableAdapter(DbJob.class,
             "JobUuid,StatusId,StartDateTime,EndDateTime,PatientsInDatabase", "JobUuid");
 
     private ExecutionStatus statusId = ExecutionStatus.Executing;

@@ -29,7 +29,7 @@ public final class JsonEndUser implements Serializable {
         this.title = endUser.getTitle();
         this.forename = endUser.getForename();
         this.surname = endUser.getSurname();
-        this.isSuperUser = new Boolean(endUser.getIsSuperUser());
+        this.isSuperUser = new Boolean(endUser.isSuperUser());
 
         if (isAdmin != null) {
             this.isAdmin = new Boolean(isAdmin);

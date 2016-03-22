@@ -23,7 +23,10 @@ import org.slf4j.LoggerFactory;
 import java.beans.PropertyVetoException;
 import java.sql.*;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 /**
@@ -33,6 +36,11 @@ final class SqlServerDatabase implements DatabaseI {
     private static final Logger LOG = LoggerFactory.getLogger(SqlServerDatabase.class);
     private static final String ALIAS = "z";
     private static final String LOGGING_SCHEMA_PREFIX = "Logging.";
+
+    /*private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME
+                    .withLocale( Locale.UK )
+                    .withZone( ZoneId.systemDefault() );*/
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.UK).withZone(ZoneOffset.UTC);
 
     private ComboPooledDataSource cpds = null;
 
@@ -60,6 +68,8 @@ final class SqlServerDatabase implements DatabaseI {
         }
     }
 
+
+
     /**
      * converts objects to Strings for SQL, escaping as required
      */
@@ -80,7 +90,13 @@ final class SqlServerDatabase implements DatabaseI {
                 return "0";
             }
         } else if (o instanceof Instant) {
-            return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format((Instant)o);
+            Timestamp ts = Timestamp.from((Instant)o);
+            return "'" + ts.toString() + "'";
+//            String s = ((Instant)o).toString();
+//            String s2 = formatter.format((Instant)o);
+//            return formatter.format((Instant)o);
+            //return DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss").format((Instant)o);
+            //return DateTimeFormatter.ISO_DATE_TIME.format((Instant)o);
         } else if (o instanceof DependencyType) {
             return "" + ((DependencyType) o).getValue();
         } else if (o instanceof DefinitionItemType) {
@@ -227,9 +243,7 @@ final class SqlServerDatabase implements DatabaseI {
 
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ");
-        sb.append(a.getSchema());
-        sb.append("");
-        sb.append(a.getTableName());
+        a.appendSchemaAndTableName(sb);
         sb.append(" VALUES (");
 
         ArrayList<Object> values = new ArrayList<Object>();
@@ -286,9 +300,7 @@ final class SqlServerDatabase implements DatabaseI {
 
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE ");
-        sb.append(a.getSchema());
-        sb.append("");
-        sb.append(a.getTableName());
+        a.appendSchemaAndTableName(sb);
         sb.append(" SET ");
 
         for (int i = 0; i < nonKeyCols.size(); i++) {
@@ -343,9 +355,7 @@ final class SqlServerDatabase implements DatabaseI {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DELETE FROM ");
-        sb.append(a.getSchema());
-        sb.append("");
-        sb.append(a.getTableName());
+        a.appendSchemaAndTableName(sb);
         sb.append(" WHERE ");
 
         for (int i = 0; i < primaryKeyCols.length; i++) {
@@ -428,14 +438,12 @@ final class SqlServerDatabase implements DatabaseI {
             }
 
             sb.append(ALIAS);
-            sb.append("");
+            sb.append(".");
             sb.append(col);
         }
 
         sb.append(" FROM ");
-        sb.append(a.getSchema());
-        sb.append("");
-        sb.append(a.getTableName());
+        a.appendSchemaAndTableName(sb);
         sb.append(" ");
         sb.append(ALIAS);
         sb.append(" ");
@@ -625,7 +633,7 @@ final class SqlServerDatabase implements DatabaseI {
         List<DbItemDependency> ret = new ArrayList<DbItemDependency>();
 
         String where = "WHERE ItemUuid = " + convertToString(itemUuid)
-                + " AND AuditId = " + convertToString(auditUuid)
+                + " AND AuditUuid = " + convertToString(auditUuid)
                 + " AND DependencyTypeId = " + convertToString(dependencyType);
         retrieveForWhere(new DbItemDependency().getAdapter(), where, ret);
         return ret;
@@ -706,6 +714,9 @@ final class SqlServerDatabase implements DatabaseI {
     @Override
     public List<DbJob> retrieveJobsForUuids(List<UUID> uuids) throws Exception {
         List<DbJob> ret = new ArrayList<>();
+        if (uuids.isEmpty()) {
+            return ret;
+        }
 
         String where = "WHERE JobUuid IN (" + convertToString(uuids) + ")";
         retrieveForWhere(new DbJob().getAdapter(), where, ret);
@@ -793,11 +804,11 @@ final class SqlServerDatabase implements DatabaseI {
 
         String where = "INNER JOIN Definition.Item i"
                 + " ON i.ItemUuid = " + ALIAS + ".ItemUuid"
-                + " AND i.Version = " + ALIAS + ".Version"
-                + " AND i.EndUserUuid = " + convertToString(userUuid)
+                + " AND i.AuditUuid = " + ALIAS + ".AuditUuid"
                 + " AND " + ALIAS + ".IsDeleted = 0"
                 + " INNER JOIN Definition.Audit a"
-                + " ON a.AuditId = i.AuditId"
+                + " ON a.AuditUuid = i.AuditUuid"
+                + " AND a.EndUserUuid = " + convertToString(userUuid)
                 + " ORDER BY a.TimeStamp DESC";
 
         retrieveForWhere(new DbActiveItem().getAdapter(), count, where, ret);

@@ -14,7 +14,7 @@ public final class DbEndUser extends DbAbstractTable {
 
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
-            "EndUser", "Administration", "EndUserUuid,Title,Forename,Surname,Email,IsSuperUser", "EndUserUuid");
+            "EndUserUuid,Title,Forename,Surname,Email,IsSuperUser", "EndUserUuid");
 
     private String title = null;
     private String forename = null;
@@ -101,13 +101,12 @@ public final class DbEndUser extends DbAbstractTable {
         this.email = email;
     }
 
-    public boolean getIsSuperUser() {
+    public boolean isSuperUser() {
         return isSuperUser;
     }
 
-    public void setIsSuperUser(boolean superUser) {
+    public void setSuperUser(boolean superUser) {
         isSuperUser = superUser;
     }
-
 
 }

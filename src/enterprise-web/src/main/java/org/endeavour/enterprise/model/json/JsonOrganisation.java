@@ -18,13 +18,13 @@ public final class JsonOrganisation implements Serializable {
     public JsonOrganisation() {
     }
 
-    public JsonOrganisation(DbOrganisation org, boolean isAdmin) {
+    public JsonOrganisation(DbOrganisation org, Boolean isAdmin) {
         this.uuid = org.getPrimaryUuid();
         this.name = org.getName();
         this.nationalId = org.getNationalId();
         this.isAdmin = isAdmin;
 
-        if (isAdmin) {
+        if (isAdmin != null) {
             this.permissions = new Integer(2);
         } else {
             this.permissions = new Integer(1);
@@ -56,6 +56,14 @@ public final class JsonOrganisation implements Serializable {
 
     public void setNationalId(String nationalId) {
         this.nationalId = nationalId;
+    }
+
+    public Boolean getAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        isAdmin = admin;
     }
 
     public Integer getPermissions() {

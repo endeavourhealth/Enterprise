@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public final class DbRequest extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbRequest.class, "Request", "Execution",
+    private static final TableAdapter adapter = new TableAdapter(DbRequest.class,
             "RequestUuid,ReportUuid,OrganisationUuid,EndUserUuid,TimeStamp,Parameters,JobUuid", "RequestUuid");
 
     private UUID reportUuid = null;

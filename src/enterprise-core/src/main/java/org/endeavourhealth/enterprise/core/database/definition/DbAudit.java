@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public final class DbAudit extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbAudit.class, "Audit", "Definition",
+    private static final TableAdapter adapter = new TableAdapter(DbAudit.class,
             "AuditUuid,EndUserUuid,TimeStamp", "AuditUuid");
 
     private UUID endUserUuid = null;

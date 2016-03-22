@@ -14,7 +14,7 @@ import java.util.UUID;
 public final class DbItemDependency extends DbAbstractTable {
 
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbItemDependency.class, "ItemDependency", "Definition",
+    private static final TableAdapter adapter = new TableAdapter(DbItemDependency.class,
             "ItemDependencyUuid,ItemUuid,AuditUuid,DependentItemUuid,DependencyTypeId", "ItemDependencyUuid");
 
     private UUID itemUuid = null;

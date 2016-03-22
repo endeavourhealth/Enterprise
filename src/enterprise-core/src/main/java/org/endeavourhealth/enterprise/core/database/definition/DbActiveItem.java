@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public final class DbActiveItem extends DbAbstractTable {
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class, "ActiveItem", "Definition",
+    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class,
             "ActiveItemUuid,OrganisationUuid,ItemUuid,AuditUuid,ItemTypeId,IsDeleted", "ActiveItemUuid");
 
     private UUID organisationUuid = null;

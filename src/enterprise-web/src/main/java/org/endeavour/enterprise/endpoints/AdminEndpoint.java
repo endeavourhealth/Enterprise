@@ -35,7 +35,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
     public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Exception {
         //validate our user is a super user
         DbEndUser user = getEndUserFromSession(sc);
-        if (!user.getIsSuperUser()) {
+        if (!user.isSuperUser()) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
 
@@ -157,7 +157,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         //if doing anything to a super user, verify the current user is a super-user
         if (isSuperUser.booleanValue()) {
             DbEndUser user = getEndUserFromSession(sc);
-            if (!user.getIsSuperUser()) {
+            if (!user.isSuperUser()) {
                 throw new NotAuthorizedException("Non-super user cannot create or modify super users");
             }
         }
@@ -179,7 +179,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 user.setTitle(title);
                 user.setForename(forename);
                 user.setSurname(surname);
-                user.setIsSuperUser(isSuperUser);
+                user.setSuperUser(isSuperUser);
 
                 //we need the UUID of this person, so save right now to generate it
                 user.writeToDb();
@@ -226,7 +226,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
 
             //we can turn a super-user into a NON-super user, but don't allow going the other way
-            if (!user.getIsSuperUser()
+            if (!user.isSuperUser()
                     && isSuperUser.booleanValue()) {
                 throw new BadRequestException("Cannot promote a user to super-user status");
             }
@@ -235,7 +235,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             user.setTitle(title);
             user.setForename(forename);
             user.setSurname(surname);
-            user.setIsSuperUser(isSuperUser);
+            user.setSuperUser(isSuperUser);
             user.writeToDb();
 
             //retrieve the link entity, as we may want to change the permissions on there
@@ -247,9 +247,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        //save our things to db
-        user.writeToDb();
-
+        //if we created or changed a link, save it
         if (link != null) {
             link.writeToDb();
         }
@@ -358,7 +356,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         //if we're a super-user then we should also include all other super-users in the result
         DbEndUser user = getEndUserFromSession(sc);
-        if (user.getIsSuperUser()) {
+        if (user.isSuperUser()) {
             List<DbEndUser> superUsers = DbEndUser.retrieveSuperUsers();
             for (int i = 0; i < superUsers.size(); i++) {
                 DbEndUser superUser = superUsers.get(i);

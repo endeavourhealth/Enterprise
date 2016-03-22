@@ -16,7 +16,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
 
     //register as a DB entity
     private static final TableAdapter adapter = new TableAdapter(DbEndUserEmailInvite.class,
-            "EndUserEmailInvite", "Administration", "EndUserEmailInviteUuid,EndUserUuid,UniqueToken,DtCompleted", "EndUserEmailInviteUuid");
+            "EndUserEmailInviteUuid,EndUserUuid,UniqueToken,DtCompleted", "EndUserEmailInviteUuid");
 
 
     private UUID endUserUuid = null;

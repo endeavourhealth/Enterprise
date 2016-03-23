@@ -1,9 +1,10 @@
 /* Additions/customizations to Bootstrap CSS */
 
-.content-area {
-    padding-top: 45px;
-    padding-left: 35px;
-    padding-right: 10px;
+.container-fluid {
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .glyphicon-2x {

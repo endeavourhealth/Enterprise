@@ -1,5 +1,35 @@
 /* Endeavour specific CSS */
 
+.dashboard {
+    padding-top: 75px;
+    padding-left: 70px;
+    padding-right: 10px;
+}
+
+.module {
+    padding-top: 60px;
+    padding-left: 60px;
+    padding-right: 0px;
+}
+
+.module-heading {
+    position: fixed;
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f8f8;
+    width: 100%;
+    font-size: 2em;
+    height: 2em;
+}
+
+.module-body {
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
 .striped {
     border-top: 1px solid #eee;
     background-color: #ffffff;

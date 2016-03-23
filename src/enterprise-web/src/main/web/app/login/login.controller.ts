@@ -22,13 +22,17 @@ module app.login {
 			AdminService.logout();
 		}
 
-		login() {
+		login(scope : any) {
 			var vm = this;
 			vm.AdminService.login(vm.username, vm.password)
 				.then(function (response) {
 					vm.logger.success('User logged in', vm.username, 'Logged In');
 					vm.Idle.watch();
-					vm.$state.transitionTo('app.dashboard');
+					if (scope.$close) {
+						scope.$close();
+					} else {
+						vm.$state.transitionTo('app.dashboard');
+					}
 				})
 				.catch(function (data) {
 					vm.logger.error(data.statusText, data, 'Login error!');

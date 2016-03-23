@@ -12,7 +12,10 @@ module app.layout {
 
 		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state'];
 
-		constructor($scope : IRootScopeService, $modal : IModalService, $modalStack : IModalStackService, $state : IStateService) {
+		constructor($scope : IRootScopeService,
+								$modal : IModalService,
+								$modalStack : IModalStackService,
+								$state : IStateService) {
 			var vm = this;
 
 			function closeModals() {
@@ -43,11 +46,14 @@ module app.layout {
 			$scope.$on('IdleTimeout', function () {
 				closeModals();
 				$modalStack.dismissAll();
-				$state.transitionTo('login');
-				vm.timedout = $modal.open({
-					templateUrl: 'timedout-dialog.html',
-					windowClass: 'modal-danger'
-				});
+				var options = {
+					templateUrl:'app/login/loginModal.html',
+					controller:'LoginController',
+					controllerAs:'login',
+					backdrop:'static'
+				};
+
+				$modal.open(options);
 			});
 		}
 	}

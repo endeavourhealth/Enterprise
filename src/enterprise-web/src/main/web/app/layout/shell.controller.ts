@@ -6,16 +6,18 @@ module app.layout {
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 	import IModalStackService = angular.ui.bootstrap.IModalStackService;
+	import AdminService = app.login.AdminService;
 	class ShellController {
 		warning : IModalServiceInstance;
 		timedout : IModalServiceInstance;
 
-		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state'];
+		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state', 'AdminService'];
 
 		constructor($scope : IRootScopeService,
 								$modal : IModalService,
 								$modalStack : IModalStackService,
-								$state : IStateService) {
+								$state : IStateService,
+								adminService : IAdminService) {
 			var vm = this;
 
 			function closeModals() {
@@ -46,11 +48,15 @@ module app.layout {
 			$scope.$on('IdleTimeout', function () {
 				closeModals();
 				$modalStack.dismissAll();
+				var userName = adminService.getCurrentUser().username;
 				var options = {
 					templateUrl:'app/login/loginModal.html',
 					controller:'LoginController',
 					controllerAs:'login',
-					backdrop:'static'
+					backdrop:'static',
+					resolve: {
+						userName: () => userName
+					}
 				};
 
 				$modal.open(options);

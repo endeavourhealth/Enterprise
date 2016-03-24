@@ -14,13 +14,13 @@
 					<div class="row">
 						<div class="col-md-6">
 							<label for="name">Name</label>
-							<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.name">
+							<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.libraryItem.name">
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-md-12">
 							<label for="description">Description</label>
-							<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.description">
+							<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.libraryItem.description">
 						</div>
 					</div>
 					<div class="row">
@@ -38,7 +38,7 @@
 									</thead>
 									<tbody>
 										<tr class="hover-box show-child-on-hover"
-												ng-repeat="item in listOutputCtrl.listReport.groups"
+												ng-repeat="item in listOutputCtrl.libraryItem.listReport.group"
 												ng-click="listOutputCtrl.selectedListReportGroup = item"
 												ng-class="{'selection': item == listOutputCtrl.selectedListReportGroup}">
 											<td>{{item.heading}}</td>
@@ -63,7 +63,10 @@
 								<div ng-show="listOutputCtrl.selectedListReportGroup.fieldBased">
 									<label for="fieldBased-dataSource">Data source</label>
 									<div class="input-group">
-										<input type="text" class="form-control" id="fieldBased-dataSource" ng-model="listOutputCtrl.selectedListReportGroup.fieldBased.dataSource" disabled>
+										<input type="text"
+													 class="form-control"
+													 id="fieldBased-dataSource"
+													 value="{{listOutputCtrl.dataSourceMap[listOutputCtrl.selectedListReportGroup.fieldBased.dataSourceUuid]}}" disabled>
 										<span class="input-group-addon" ng-click="listOutputCtrl.selectDataSource(listOutputCtrl.selectedListReportGroup.fieldBased)" style="cursor: pointer">
 											<i class="glyphicon glyphicon-hdd" id="fieldBased-dataSource" aria-hidden="true"></i>
 										</span>
@@ -108,10 +111,6 @@
 											</tbody>
 										</table>
 									</div>
-								</div>
-
-								<div ng-show="listOutputCtrl.selectedListReportGroup.summary">
-
 								</div>
 							</div>
 						</div>

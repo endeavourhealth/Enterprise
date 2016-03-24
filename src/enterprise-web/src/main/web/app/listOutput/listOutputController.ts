@@ -13,16 +13,18 @@ module app.listOuput {
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import FieldOutput = app.models.FieldOutput;
 	import IWindowService = angular.IWindowService;
+	import LibraryItem = app.models.LibraryItem;
+	import UuidNameKVP = app.models.UuidNameKVP;
 	'use strict';
 
 	export class ListOuputController {
-		name : string;
-		description : string;
-		listReport : ListReport;
+		libraryItem : LibraryItem;
+		dataSourceMap : any;
 		selectedListReportGroup : ListReportGroup;
 		selectedFieldOutput : FieldOutput;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope', '$uibModal', 'AdminService', '$window'];
+		static $inject = ['LibraryService', 'LoggerService', '$scope',
+			'$uibModal', 'AdminService', '$window', '$stateParams'];
 
 		constructor(
 			protected libraryService:ILibraryService,
@@ -30,37 +32,22 @@ module app.listOuput {
 			protected $scope : IScope,
 			protected $modal : IModalService,
 			protected adminService : IAdminService,
-			protected $window : IWindowService) {
-			this.name = 'Asthmatic meds';
-			this.description = 'List of medication (and latest issue date) for all asthmatic patients';
-			this.listReport = {
-				groups : [
-					{
-						heading : 'Patient',
-						summary : null,
-						fieldBased : {
-							dataSource : 'Patient',
-							fieldOutput : [
-								{heading : 'DOB', field : 'DateOfBirth'},
-								{heading : 'Forename', field : 'FirstName'},
-								{heading : 'Surname', field : 'LastName'}
-							]
-						}
-					},
-					{
-						heading : 'Issues',
-						summary : null,
-						fieldBased : {
-							dataSource : 'MedicationIssue',
-							fieldOutput : [
-								{heading : 'Medication', field : 'DrugName'},
-								{heading : 'Dose', field : 'Doseage'},
-								{heading : 'Last Issue', field : 'LastIssued'}
-							]
-						}
-					}
-				]
-			};
+			protected $window : IWindowService,
+			protected $stateParams : {itemAction : string, itemUuid : string}) {
+
+			this.performAction($stateParams.itemAction, $stateParams.itemUuid);
+		}
+
+		// General report methods
+		performAction(action:string, itemUuid:string) {
+			switch (action) {
+				case 'add':
+					this.create(itemUuid);
+					break;
+				case 'view':
+					this.load(itemUuid);
+					break;
+			}
 		}
 
 		selectDataSource(datasourceContainer : { dataSource : any }) {
@@ -72,15 +59,75 @@ module app.listOuput {
 			});
 		}
 
+		create(folderUuid : string) {
+			this.libraryItem = {
+				uuid : null,
+				name : 'New item',
+				description : '',
+				folderUuid : folderUuid,
+				codeSet : null,
+				listReport : {
+					group: [
+						{
+							heading: 'Patient',
+							summary: null,
+							fieldBased: {
+								dataSourceUuid: '2ee82b03-7b40-425c-a687-2fd96d46c59b',
+								fieldOutput: [
+									{heading: 'DOB', field: 'DateOfBirth'},
+									{heading: 'Forename', field: 'FirstName'},
+									{heading: 'Surname', field: 'LastName'}
+								]
+							}
+						},
+						{
+							heading: 'Issues',
+							summary: null,
+							fieldBased: {
+								dataSourceUuid: 'a8f952d4-1055-4689-8589-7e9fbf80c69b',
+								fieldOutput: [
+									{heading: 'Medication', field: 'DrugName'},
+									{heading: 'Dose', field: 'Doseage'},
+									{heading: 'Last Issue', field: 'LastIssued'}
+								]
+							}
+						}
+					]
+				}
+			};
+			this.dataSourceMap = {};
+			this.dataSourceMap['2ee82b03-7b40-425c-a687-2fd96d46c59b'] = 'Patient DS';
+			this.dataSourceMap['a8f952d4-1055-4689-8589-7e9fbf80c69b'] = 'Medication DS';
+		}
+
+		load(uuid : string) {
+			var vm = this;
+			vm.libraryService.getLibraryItem(uuid)
+				.then(function(libraryItem : LibraryItem) {
+					vm.libraryService.getContentNamesForReportLibraryItem(uuid)
+						.then(function (data) {
+							vm.libraryItem = libraryItem;
+							vm.dataSourceMap = UuidNameKVP.toAssociativeArray(data.contents);
+						});
+				});
+		}
+
 		save() {
-			// Save to db and if successful...
-			this.adminService.clearPendingChanges();
+			var vm = this;
+			vm.libraryService.saveLibraryItem(vm.libraryItem)
+				.then(function(libraryItem : LibraryItem) {
+					vm.libraryItem.uuid = libraryItem.uuid;
+					vm.adminService.clearPendingChanges();
+				});
 		}
 
 		saveAndClose() {
-			if (this.save()) {
-				this.close();
-			}
+			var vm = this;
+			vm.libraryService.saveLibraryItem(vm.libraryItem)
+				.then(function(libraryItem : LibraryItem) {
+					vm.libraryItem.uuid = libraryItem.uuid;
+					vm.close();
+				});
 		}
 
 		close() {

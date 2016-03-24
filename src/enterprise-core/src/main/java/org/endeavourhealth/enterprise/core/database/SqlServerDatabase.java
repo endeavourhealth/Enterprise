@@ -482,7 +482,7 @@ final class SqlServerDatabase implements DatabaseI {
         String where = "INNER JOIN Definition.ActiveItem a"
                 + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
                 + " AND a.AuditUuid = " + ALIAS + ".AuditUuid"
-                + "WHERE ItemUuid = " + convertToString(itemUuid);
+                + " WHERE a.ItemUuid = " + convertToString(itemUuid);
         return (DbItem) retrieveSingleForWhere(new DbItem().getAdapter(), where);
     }
 

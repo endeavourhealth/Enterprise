@@ -26,6 +26,7 @@ module app.reports {
 		report : Report;
 		reportContent : ReportNode[];
 		contentTreeCallbackOptions : ICallbacks;
+		dataSourceMap : any;
 
 		static $inject = ['LibraryService', 'LoggerService', '$stateParams'];
 
@@ -69,9 +70,10 @@ module app.reports {
 				.then(function (data) {
 					vm.report = data;
 					vm.reportContent = [];
-					vm.libraryService.getLibraryItemNamesForReport(reportUuid)
+					vm.libraryService.getContentNamesForReportLibraryItem(reportUuid)
 						.then(function(data) {
-						vm.populateTreeFromReportLists(vm.report, vm.reportContent, '', data.contents);
+							vm.dataSourceMap = UuidNameKVP.toAssociativeArray(data.contents);
+							vm.populateTreeFromReportLists(vm.report, vm.reportContent, '');
 					})
 					.catch(function(data) {
 						vm.logger.error('Error loading report item names', data, 'Error');
@@ -84,9 +86,8 @@ module app.reports {
 
 		populateTreeFromReportLists(report : Report,
 																nodeList : ReportNode[],
-																parentUuid : string,
-																nameMap : UuidNameKVP[]) {
-
+																parentUuid : string) {
+			var vm = this;
 			if (report.reportItem == null) { report.reportItem = []; }
 
 			for (var i = 0; i < report.reportItem.length; i++) {
@@ -106,19 +107,19 @@ module app.reports {
 					if (uuid != null) {
 						var reportNode:ReportNode = {
 							uuid : uuid,
-							name : $.grep(nameMap, (e:UuidNameKVP) => {return e.uuid === uuid; })[0].name,
+							name : vm.dataSourceMap[uuid],
 							type : type,
 							children : []
 						};
 
 						nodeList.push(reportNode);
-						this.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid, nameMap);
+						vm.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid);
 					}
 				}
 			}
 		}
 
-		saveReport() {
+		save() {
 			var vm = this;
 			vm.report.reportItem = [];
 			vm.populateReportListsFromTree(vm.report, '', vm.reportContent);

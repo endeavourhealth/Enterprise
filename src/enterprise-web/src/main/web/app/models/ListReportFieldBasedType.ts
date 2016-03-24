@@ -2,7 +2,7 @@ module app.models {
 	'use strict';
 
 	export class ListReportFieldBasedType {
-		dataSource : string;
+		dataSourceUuid : string;
 		fieldOutput : FieldOutput[];
 	}
 }

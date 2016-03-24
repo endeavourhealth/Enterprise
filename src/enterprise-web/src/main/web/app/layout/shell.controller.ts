@@ -6,7 +6,8 @@ module app.layout {
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 	import IModalStackService = angular.ui.bootstrap.IModalStackService;
-	import AdminService = app.login.AdminService;
+	import IAdminService = app.core.IAdminService;
+
 	class ShellController {
 		warning : IModalServiceInstance;
 		timedout : IModalServiceInstance;

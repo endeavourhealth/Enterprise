@@ -2,9 +2,9 @@
 	<div class="container-fluid">
 		<div class="module-heading">Report
 			<div class="pull-right">
-				<button type="button" class="btn btn-success" data-ng-click="listOutputCtrl.save()">Save</button>
-				<button type="button" class="btn btn-warning" data-ng-click="listOutputCtrl.saveAndClose()">Save & Close</button>
-				<button type="button" class="btn btn-danger" data-ng-click="listOutputCtrl.close()">Cancel</button>
+				<button type="button" class="btn btn-success" data-ng-click="reportCtrl.save()">Save</button>
+				<button type="button" class="btn btn-warning" data-ng-click="reportCtrl.saveAndClose()">Save & Close</button>
+				<button type="button" class="btn btn-danger" data-ng-click="reportCtrl.close()">Cancel</button>
 			</div>
 		</div>
 		<div class="module-body">
@@ -120,14 +120,13 @@
 
 <script type="text/ng-template" id="report_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content show-child-on-hover">
-				<span>
-					<span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
-					{{node.name}}
-				</span>
-				<button type="button" class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)">
-					<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-				</button>
+			<span>
+				<span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
+				{{node.name}}
 			</span>
+			<button type="button" class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)">
+				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+			</button>
 		</div>
 		<ol ui-tree-nodes="" ng-model="node.children">
 			<li ng-repeat="node in node.children" ui-tree-node ng-include="'report_template.html'">

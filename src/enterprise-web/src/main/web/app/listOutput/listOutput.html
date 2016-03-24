@@ -41,7 +41,7 @@
 								<tbody>
 									<tr class="hover-box show-child-on-hover"
 											ng-repeat="item in listOutputCtrl.libraryItem.listReport.group"
-											ng-click="listOutputCtrl.selectedListReportGroup = item"
+											ng-click="listOutputCtrl.selectedListReportGroup = item; listOutputCtrl.loadDataSourceAvailableFieldList()"
 											ng-class="{'selection': item == listOutputCtrl.selectedListReportGroup}">
 										<td>{{item.heading}}</td>
 										<td><span class="glyphicon glyphicon-right-pad {{ item | listReportGroupToIcon }} text-muted"></span>{{ item | listReportGroupToTypeName }}</td>
@@ -94,29 +94,26 @@
 										</thead>
 										<tbody>
 											<tr class="hover-box show-child-on-hover"
-													ng-repeat="item in listOutputCtrl.selectedListReportGroup.fieldBased.fieldOutput"
-													ng-class="{'selection': item == listOutputCtrl.selectedFieldOutput}">
+													ng-repeat="item in listOutputCtrl.selectedListReportGroup.fieldBased.fieldOutput">
 												<td>
-													<span ng-hide="item == listOutputCtrl.selectedFieldOutput">{{ item.heading }}</span>
-													<input ng-show="item == listOutputCtrl.selectedFieldOutput" type="text" class="form-control input-sm" ng-model="item.heading">
+													<span class="child-to-hide">{{ item.heading }}</span>
+													<input type="text" class="form-control input-sm child-to-show" ng-model="item.heading">
 												</td>
 												<td>
-													<span ng-hide="item == listOutputCtrl.selectedFieldOutput">{{ item.field }}</span>
-													<input ng-show="item == listOutputCtrl.selectedFieldOutput" type="text" class="form-control input-sm" ng-model="item.field">
-												</td>
-												<td>
-													<div class="btn-group child-to-show pull-right" ng-hide="item == listOutputCtrl.selectedFieldOutput">
-														<button type="button" class="btn btn-success btn-xs" ng-click="listOutputCtrl.selectedFieldOutput = item">
-															<span class="glyphicon glyphicon-pencil"></span>
+													<span class="child-to-hide">{{ item.field }}</span>
+													<div class="btn-group child-to-show" role="group" uib-dropdown>
+														<button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle aria-haspopup="true" aria-expanded="false">
+															{{ item.field }}
+															<span class="caret"></span>
 														</button>
-														<button type="button" class="btn btn-danger btn-xs" ng-click="listOutputCtrl.removeFieldOutput(this)">
-															<span class="glyphicon glyphicon-remove"></span>
-														</button>
+														<ul uib-dropdown-menu>
+															<li ng-repeat="field in listOutputCtrl.dataSourceAvailableFields"><a ng-click="item.field = field">{{ field }}</a></li>
+														</ul>
 													</div>
-													<button type="button" class="btn btn-success btn-xs pull-right"
-																	ng-click="listOutputCtrl.selectedFieldOutput = null"
-																	ng-show="item == listOutputCtrl.selectedFieldOutput">
-														<span class="glyphicon glyphicon-ok"></span>
+												</td>
+												<td>
+													<button type="button" class="btn btn-danger btn-xs child-to-show" ng-click="listOutputCtrl.removeFieldOutput(this)">
+														<span class="glyphicon glyphicon-remove"></span>
 													</button>
 												</td>
 											</tr>

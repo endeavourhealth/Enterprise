@@ -56,6 +56,14 @@
     display: inline;
 }
 
+.show-child-on-hover .child-to-hide {
+    display: inline;
+}
+
+.show-child-on-hover:hover .child-to-hide {
+    display: none;
+}
+
 .folder-item {
     display:inline-block;
     width: 100%;

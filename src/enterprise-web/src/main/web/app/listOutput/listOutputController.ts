@@ -7,14 +7,11 @@ module app.listOuput {
 	import ILibraryService = app.core.ILibraryService;
 	import ListReport = app.models.ListReport;
 	import ListReportGroup = app.models.ListReportGroup;
-	import MessageBoxController = app.dialogs.MessageBoxController;
-	import IModalProvider = angular.ui.bootstrap.IModalProvider;
 	import InputBoxController = app.dialogs.InputBoxController;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import FieldOutput = app.models.FieldOutput;
 	import IWindowService = angular.IWindowService;
 	import LibraryItem = app.models.LibraryItem;
-	import UuidNameKVP = app.models.UuidNameKVP;
 	import DataSource = app.models.DataSource;
 	'use strict';
 
@@ -59,8 +56,13 @@ module app.listOuput {
 				JSON.stringify(datasourceContainer.dataSource))
 				.result.then(function(dataSource:any) {
 					datasourceContainer.dataSource = dataSource;
+					vm.loadDataSourceAvailableFieldList();
 					vm.adminService.setPendingChanges();
 			});
+		}
+
+		loadDataSourceAvailableFieldList() {
+			this.dataSourceAvailableFields = ['Forename', 'Surname', 'DateOfBirth'];
 		}
 
 		addListGroup() {

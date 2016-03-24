@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="dataSourceUuid" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="dataSource" type="{}dataSource"/>
  *         &lt;element name="fieldOutput" type="{}fieldOutput" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -31,38 +31,38 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "listReportFieldBasedType", propOrder = {
-    "dataSourceUuid",
+    "dataSource",
     "fieldOutput"
 })
 public class ListReportFieldBasedType {
 
     @XmlElement(required = true)
-    protected String dataSourceUuid;
+    protected DataSource dataSource;
     @XmlElement(required = true)
     protected List<FieldOutput> fieldOutput;
 
     /**
-     * Gets the value of the dataSourceUuid property.
+     * Gets the value of the dataSource property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link DataSource }
      *     
      */
-    public String getDataSourceUuid() {
-        return dataSourceUuid;
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
     /**
-     * Sets the value of the dataSourceUuid property.
+     * Sets the value of the dataSource property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link DataSource }
      *     
      */
-    public void setDataSourceUuid(String value) {
-        this.dataSourceUuid = value;
+    public void setDataSource(DataSource value) {
+        this.dataSource = value;
     }
 
     /**

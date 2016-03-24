@@ -22,6 +22,7 @@ module app.listOuput {
 		libraryItem : LibraryItem;
 		selectedListReportGroup : ListReportGroup;
 		selectedFieldOutput : FieldOutput;
+		dataSourceAvailableFields : string[];
 
 		static $inject = ['LibraryService', 'LoggerService', '$scope',
 			'$uibModal', 'AdminService', '$window', '$stateParams'];
@@ -52,11 +53,47 @@ module app.listOuput {
 
 		selectDataSource(datasourceContainer : { dataSource : DataSource }) {
 			var vm = this;
-			InputBoxController.open(this.$modal, 'Data source', 'Please select a data source', JSON.stringify(datasourceContainer.dataSource))
+			InputBoxController.open(this.$modal,
+				'Data source',
+				'Please select a data source',
+				JSON.stringify(datasourceContainer.dataSource))
 				.result.then(function(dataSource:any) {
 					datasourceContainer.dataSource = dataSource;
 					vm.adminService.setPendingChanges();
 			});
+		}
+
+		addListGroup() {
+			this.selectedListReportGroup = {
+				heading: 'New list group',
+				fieldBased: {
+					dataSource: {},
+					fieldOutput: []
+				}
+			} as ListReportGroup;
+			this.libraryItem.listReport.group.push(this.selectedListReportGroup);
+		}
+
+		removeListGroup(scope : any) {
+			this.libraryItem.listReport.group.splice(scope.$index, 1);
+			if (this.selectedListReportGroup === scope.item) {
+				this.selectedListReportGroup = null;
+			}
+		}
+
+		addFieldOutput() {
+			this.selectedFieldOutput = {
+				heading : '',
+				field : ''
+			} as FieldOutput;
+			this.selectedListReportGroup.fieldBased.fieldOutput.push(this.selectedFieldOutput);
+		}
+
+		removeFieldOutput(scope : any) {
+			this.selectedListReportGroup.fieldBased.fieldOutput.splice(scope.$index, 1);
+			if (this.selectedFieldOutput === scope.item) {
+				this.selectedFieldOutput = null;
+			}
 		}
 
 		create(folderUuid : string) {

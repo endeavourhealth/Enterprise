@@ -10,111 +10,117 @@
 		</div>
 		<div class="module-body">
 			<form>
-				<div class="form-group">
-					<div class="row">
-						<div class="col-md-6">
-							<label for="name">Name</label>
-							<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.libraryItem.name">
+				<div class="row">
+					<div class="form-group col-md-6">
+						<label for="name">Name</label>
+						<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.libraryItem.name">
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-12">
+						<label for="description">Description</label>
+						<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.libraryItem.description">
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-8">
+						<label>List groups</label>
+						<div class="table scroll-box-450 form-control">
+							<table class="table table-striped table-condensed">
+								<thead>
+									<tr>
+										<th class="col-md-4">Heading</th>
+										<th class="col-md-2">Type</th>
+										<th class="col-md-4">Details</th>
+										<th class="col-md-2"></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="hover-box show-child-on-hover"
+											ng-repeat="item in listOutputCtrl.libraryItem.listReport.group"
+											ng-click="listOutputCtrl.selectedListReportGroup = item"
+											ng-class="{'selection': item == listOutputCtrl.selectedListReportGroup}">
+										<td>{{item.heading}}</td>
+										<td><span class="glyphicon glyphicon-right-pad {{ item | listReportGroupToIcon }} text-muted"></span>{{ item | listReportGroupToTypeName }}</td>
+										<td>{{ item | listReportGroupToDescription }}</td>
+										<td>
+											<div class="child-to-show">
+												<button type="button" class="btn btn-danger btn-xs pull-right" ng-click="listOutputCtrl.removeListReportGroup(item)">
+													<span class="glyphicon glyphicon-remove"></span>
+												</button>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
-					<div class="row">
-						<div class="col-md-12">
-							<label for="description">Description</label>
-							<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.libraryItem.description">
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-8">
-							<label>List groups</label>
-							<div class="table scroll-box-450 form-control">
-								<table class="table table-striped table-condensed">
-									<thead>
-										<tr>
-											<th class="col-md-4">Heading</th>
-											<th class="col-md-2">Type</th>
-											<th class="col-md-4">Details</th>
-											<th class="col-md-2"></th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr class="hover-box show-child-on-hover"
-												ng-repeat="item in listOutputCtrl.libraryItem.listReport.group"
-												ng-click="listOutputCtrl.selectedListReportGroup = item"
-												ng-class="{'selection': item == listOutputCtrl.selectedListReportGroup}">
-											<td>{{item.heading}}</td>
-											<td><span class="glyphicon glyphicon-right-pad {{ item | listReportGroupToIcon }} text-muted"></span>{{ item | listReportGroupToTypeName }}</td>
-											<td>{{ item | listReportGroupToDescription }}</td>
-											<td>
-												<div class="child-to-show">
-													<button type="button" class="btn btn-danger btn-xs pull-right" ng-click="listOutputCtrl.removeListReportGroup(item)">
-														<span class="glyphicon glyphicon-remove"></span>
-													</button>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="col-md-4" ng-show="listOutputCtrl.selectedListReportGroup">
+					<div class="form-group col-md-4" ng-show="listOutputCtrl.selectedListReportGroup">
+						<div class="row">
+							<div class="form-group col-md-12">
 								<label for="group-heading">Heading</label>
 								<input type="text" class="form-control" id="group-heading" ng-model="listOutputCtrl.selectedListReportGroup.heading">
-
-								<div ng-show="listOutputCtrl.selectedListReportGroup.fieldBased">
-									<label for="fieldBased-dataSource">Data source</label>
-									<div class="input-group">
-										<input type="text"
-													 class="form-control"
-													 id="fieldBased-dataSource"
-													 value="{{listOutputCtrl.dataSourceMap[listOutputCtrl.selectedListReportGroup.fieldBased.dataSourceUuid]}}" disabled>
-										<span class="input-group-addon" ng-click="listOutputCtrl.selectDataSource(listOutputCtrl.selectedListReportGroup.fieldBased)" style="cursor: pointer">
-											<i class="glyphicon glyphicon-hdd" id="fieldBased-dataSource" aria-hidden="true"></i>
-										</span>
-									</div>
-
-									<label for="fieldBased-dataSource">Field output</label>
-									<div class="table scroll-box-300 form-control">
-										<table class="table table-striped">
-											<thead>
-												<th class="col-md-4">Heading</th>
-												<th class="col-md-5">Field</th>
-												<th class="col-md-3"></th>
-											</thead>
-											<tbody>
-												<tr class="hover-box show-child-on-hover"
-														ng-repeat="item in listOutputCtrl.selectedListReportGroup.fieldBased.fieldOutput"
-														ng-class="{'selection': item == listOutputCtrl.selectedFieldOutput}">
-													<td>
-														<span ng-hide="item == listOutputCtrl.selectedFieldOutput">{{ item.heading }}</span>
-														<input ng-show="item == listOutputCtrl.selectedFieldOutput" type="text" class="form-control input-sm" ng-model="item.heading">
-													</td>
-													<td>
-														<span ng-hide="item == listOutputCtrl.selectedFieldOutput">{{ item.field }}</span>
-														<input ng-show="item == listOutputCtrl.selectedFieldOutput" type="text" class="form-control input-sm" ng-model="item.field">
-													</td>
-													<td>
-														<div class="btn-group child-to-show pull-right" ng-hide="item == listOutputCtrl.selectedFieldOutput">
-															<button type="button" class="btn btn-success btn-xs" ng-click="listOutputCtrl.selectedFieldOutput = item">
-																<span class="glyphicon glyphicon-pencil"></span>
-															</button>
-															<button type="button" class="btn btn-danger btn-xs" ng-click="listOutputCtrl.removeListReportGroup(item)">
-																<span class="glyphicon glyphicon-remove"></span>
-															</button>
-														</div>
-														<button type="button" class="btn btn-success btn-xs pull-right"
-																		ng-click="listOutputCtrl.selectedFieldOutput = null"
-																		ng-show="item == listOutputCtrl.selectedFieldOutput">
-															<span class="glyphicon glyphicon-ok"></span>
+							</div>
+						</div>
+						<div class="row" ng-show="listOutputCtrl.selectedListReportGroup.fieldBased">
+							<div class="form-group col-md-12">
+								<label for="fieldBased-dataSource">Data source</label>
+								<div class="input-group">
+									<input type="text"
+												 class="form-control"
+												 id="fieldBased-dataSource"
+												 value="{{listOutputCtrl.selectedListReportGroup.fieldBased.dataSource.entity}}" disabled>
+									<span class="input-group-addon" ng-click="listOutputCtrl.selectDataSource(listOutputCtrl.selectedListReportGroup.fieldBased)" style="cursor: pointer">
+										<i class="glyphicon glyphicon-hdd" id="fieldBased-dataSource" aria-hidden="true"></i>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group col-md-12">
+								<label for="fieldBased-dataSource">Field output</label>
+								<div class="table scroll-box-300 form-control">
+									<table class="table table-striped">
+										<thead>
+											<th class="col-md-4">Heading</th>
+											<th class="col-md-5">Field</th>
+											<th class="col-md-3"></th>
+										</thead>
+										<tbody>
+											<tr class="hover-box show-child-on-hover"
+													ng-repeat="item in listOutputCtrl.selectedListReportGroup.fieldBased.fieldOutput"
+													ng-class="{'selection': item == listOutputCtrl.selectedFieldOutput}">
+												<td>
+													<span ng-hide="item == listOutputCtrl.selectedFieldOutput">{{ item.heading }}</span>
+													<input ng-show="item == listOutputCtrl.selectedFieldOutput" type="text" class="form-control input-sm" ng-model="item.heading">
+												</td>
+												<td>
+													<span ng-hide="item == listOutputCtrl.selectedFieldOutput">{{ item.field }}</span>
+													<input ng-show="item == listOutputCtrl.selectedFieldOutput" type="text" class="form-control input-sm" ng-model="item.field">
+												</td>
+												<td>
+													<div class="btn-group child-to-show pull-right" ng-hide="item == listOutputCtrl.selectedFieldOutput">
+														<button type="button" class="btn btn-success btn-xs" ng-click="listOutputCtrl.selectedFieldOutput = item">
+															<span class="glyphicon glyphicon-pencil"></span>
 														</button>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
+														<button type="button" class="btn btn-danger btn-xs" ng-click="listOutputCtrl.removeListReportGroup(item)">
+															<span class="glyphicon glyphicon-remove"></span>
+														</button>
+													</div>
+													<button type="button" class="btn btn-success btn-xs pull-right"
+																	ng-click="listOutputCtrl.selectedFieldOutput = null"
+																	ng-show="item == listOutputCtrl.selectedFieldOutput">
+														<span class="glyphicon glyphicon-ok"></span>
+													</button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
 							</div>
 						</div>
 					</div>
+				</div>
 			</form>
 		</div>
 	</div>

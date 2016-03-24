@@ -15,11 +15,11 @@ module app.listOuput {
 	import IWindowService = angular.IWindowService;
 	import LibraryItem = app.models.LibraryItem;
 	import UuidNameKVP = app.models.UuidNameKVP;
+	import DataSource = app.models.DataSource;
 	'use strict';
 
 	export class ListOuputController {
 		libraryItem : LibraryItem;
-		dataSourceMap : any;
 		selectedListReportGroup : ListReportGroup;
 		selectedFieldOutput : FieldOutput;
 
@@ -50,9 +50,9 @@ module app.listOuput {
 			}
 		}
 
-		selectDataSource(datasourceContainer : { dataSource : any }) {
+		selectDataSource(datasourceContainer : { dataSource : DataSource }) {
 			var vm = this;
-			InputBoxController.open(this.$modal, 'Data source', 'Please select a data source', datasourceContainer.dataSource)
+			InputBoxController.open(this.$modal, 'Data source', 'Please select a data source', JSON.stringify(datasourceContainer.dataSource))
 				.result.then(function(dataSource:any) {
 					datasourceContainer.dataSource = dataSource;
 					vm.adminService.setPendingChanges();
@@ -65,14 +65,14 @@ module app.listOuput {
 				name : 'New item',
 				description : '',
 				folderUuid : folderUuid,
-				codeSet : null,
 				listReport : {
 					group: [
 						{
 							heading: 'Patient',
-							summary: null,
 							fieldBased: {
-								dataSourceUuid: '2ee82b03-7b40-425c-a687-2fd96d46c59b',
+								dataSource: {
+									entity : 'Patient'
+								},
 								fieldOutput: [
 									{heading: 'DOB', field: 'DateOfBirth'},
 									{heading: 'Forename', field: 'FirstName'},
@@ -82,9 +82,10 @@ module app.listOuput {
 						},
 						{
 							heading: 'Issues',
-							summary: null,
 							fieldBased: {
-								dataSourceUuid: 'a8f952d4-1055-4689-8589-7e9fbf80c69b',
+								dataSource: {
+									entity : 'Medication'
+								},
 								fieldOutput: [
 									{heading: 'Medication', field: 'DrugName'},
 									{heading: 'Dose', field: 'Doseage'},
@@ -94,21 +95,14 @@ module app.listOuput {
 						}
 					]
 				}
-			};
-			this.dataSourceMap = {};
-			this.dataSourceMap['2ee82b03-7b40-425c-a687-2fd96d46c59b'] = 'Patient DS';
-			this.dataSourceMap['a8f952d4-1055-4689-8589-7e9fbf80c69b'] = 'Medication DS';
+			} as LibraryItem;
 		}
 
 		load(uuid : string) {
 			var vm = this;
 			vm.libraryService.getLibraryItem(uuid)
 				.then(function(libraryItem : LibraryItem) {
-					vm.libraryService.getContentNamesForReportLibraryItem(uuid)
-						.then(function (data) {
-							vm.libraryItem = libraryItem;
-							vm.dataSourceMap = UuidNameKVP.toAssociativeArray(data.contents);
-						});
+					vm.libraryItem = libraryItem;
 				});
 		}
 

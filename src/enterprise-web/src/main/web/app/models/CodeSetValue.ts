@@ -3,7 +3,8 @@ module app.models {
 
 	export class CodeSetValue {
 		code : string;
+		term : string;
 		includeChildren : boolean;
-		exclusions : CodeSetValue[];
+		exclusion : CodeSetValue[];
 	}
 }

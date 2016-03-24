@@ -3,6 +3,11 @@
 var flowchart : any;
 
 module app.query {
+	import TestEditorController = app.dialogs.TestEditorController;
+	import IModalService = angular.ui.bootstrap.IModalService;
+	import IModalSettings = angular.ui.bootstrap.IModalSettings;
+	import Test = app.models.Test;
+
 	'use strict';
 
 	class QueryController {
@@ -10,313 +15,245 @@ module app.query {
 
 	angular
 		.module('app.query')
-		//
-		// Simple service to create a prompt.
-		//
-		.factory('prompt', function () {
-			// Return the browsers prompt function.
-			return prompt;
-		})
-		.controller('QueryController', ['$scope', '$stateParams', 'prompt', function QueryController ($scope : any, $stateParams : any, prompt : any) {
-			//
-			// Selects the next node id.
-			//
-			var nextNodeID = 10;
-
-			//
-			// Setup the data-model for the chart.
-			//
-			var chartDataModel = {
-
-				"nodes": [
-				{
-					"name": "PATIENTS: Age 30-74",
-					"id": 10,
-					"x": 34,
-					"y": 121,
-					"inputConnectors": [
-						{
-							"name": "Start Query"
-						}
-					],
-					"outputConnectors": [
-						{
-							"name": "Then"
-						}
-					]
-				},
-				{
-					"name": "HYPERTENSION",
-					"id": 11,
-					"x": 355,
-					"y": 121,
-					"inputConnectors": [
-						{
-							"name": "Narrow down to patients with"
-						}
-					],
-					"outputConnectors": [
-						{
-							"name": "Then"
-						}
-					]
-				},
-				{
-					"name": "Pre-existing CVD/ STROKE/Diabetes",
-					"id": 12,
-					"x": 668.9999923706055,
-					"y": 121,
-					"inputConnectors": [
-						{
-							"name": "Remove patients with"
-						}
-					],
-					"outputConnectors": [
-						{
-							"name": "Then"
-						}
-					]
-				},
-				{
-					"name": " CVD RISK SCORE >= 20%",
-					"id": 13,
-					"x": 1008.9999923706055,
-					"y": 120,
-					"inputConnectors": [
-						{
-							"name": "Narrow down to patients with"
-						}
-					],
-					"outputConnectors": [
-						{
-							"name": "Then"
-						},
-						{
-							"name": "Also"
-						}
-					]
-				},
-				{
-					"name": "TOTAL NO. OF PATIENTS",
-					"id": 14,
-					"x": 1369,
-					"y": 74,
-					"inputConnectors": [
-						{
-							"name": "Count patients remaining"
-						}
-					],
-					"outputConnectors": [
-						{
-							"name": "Then"
-						}
-					]
-				},
-				{
-					"name": "CURRENTLY ON STATINS",
-					"id": 15,
-					"x": 1369,
-					"y": 211,
-					"inputConnectors": [
-						{
-							"name": "Count patients who are"
-						}
-					],
-					"outputConnectors": [
-						{
-							"name": "Then"
-						}
-					]
-				},
-				{
-					"name": " % ON STATINS",
-					"id": 16,
-					"x": 1740,
-					"y": 138,
-					"inputConnectors": [
-						{
-							"name": "Calculate"
-						}
-					]
+		.directive('clearQuery', function () {
+			return {
+				template: '<div>' +
+				'<div class="modal-dialog">' +
+				'<div class="modal-content">' +
+				'<div class="modal-header">' +
+				'<button type="button" class="close" ng-click="toggleClearQuery()" aria-hidden="true">&times;</button>' +
+				'<h4 class="modal-title">{{ title }}</h4>' +
+				'</div>' +
+				'<div class="modal-body" ng-transclude></div>' +
+				'</div>' +
+				'</div>' +
+				'</div>',
+				restrict: 'E',
+				transclude: true,
+				replace:true,
+				scope:true,
+				link: function postLink(scope: any, element: any, attrs: any) {
+					scope.title = attrs.title;
 				}
-			],
-				"connections": [
-				{
-					"source": {
-						"nodeID": 10,
-						"connectorIndex": 0
-					},
-					"dest": {
-						"nodeID": 11,
-						"connectorIndex": 0
-					}
-				},
-				{
-					"source": {
-						"nodeID": 11,
-						"connectorIndex": 0
-					},
-					"dest": {
-						"nodeID": 12,
-						"connectorIndex": 0
-					}
-				},
-				{
-					"source": {
-						"nodeID": 12,
-						"connectorIndex": 0
-					},
-					"dest": {
-						"nodeID": 13,
-						"connectorIndex": 0
-					}
-				},
-				{
-					"source": {
-						"nodeID": 13,
-						"connectorIndex": 0
-					},
-					"dest": {
-						"nodeID": 14,
-						"connectorIndex": 0
-					}
-				},
-				{
-					"source": {
-						"nodeID": 13,
-						"connectorIndex": 1
-					},
-					"dest": {
-						"nodeID": 15,
-						"connectorIndex": 0
-					}
-				},
-				{
-					"source": {
-						"nodeID": 14,
-						"connectorIndex": 0
-					},
-					"dest": {
-						"nodeID": 16,
-						"connectorIndex": 0
-					}
-				},
-				{
-					"source": {
-						"nodeID": 15,
-						"connectorIndex": 0
-					},
-					"dest": {
-						"nodeID": 16,
-						"connectorIndex": 0
-					}
-				}
-			]
-
 			};
+		})
+		.controller('QueryController', ['$scope', '$stateParams', '$uibModal',
+			function QueryController ($scope : any, $stateParams : any, $modal : IModalService) {
 
-			// TODO: Parameter based routing actions
-			// alert($stateParams.itemAction + ':' + $stateParams.itemUuid);
+				var itemAction = $stateParams.itemAction;
+				var itemUuid = $stateParams.itemUuid;
 
+				$scope.queryFolderUuid = "";
+				$scope.queryFolderName = "";
+				$scope.queryUuid = "";
+				$scope.queryName = "";
+				$scope.queryDescription = "";
 
-
-			//
-			// Add a new node to the chart.
-			//
-			$scope.addNewNode = function () {
-
-				var nodeName = prompt("Enter a node name:", "New node");
-				if (!nodeName) {
-					return;
+				switch(itemAction) {
+					case "add":
+						$scope.queryFolderUuid = itemUuid;
+						break;
+					case "edit":
+						$scope.queryUuid = itemUuid;
+						break;
+					case "view":
+						$scope.queryUuid = itemUuid;
+						break;
+					default:
 				}
 
 				//
-				// Template for a new node.
+				// Setup the data-model for the chart.
 				//
-				var newNodeDataModel = {
-					name: nodeName,
-					id: nextNodeID++,
-					x: 0,
-					y: 0,
-					inputConnectors: [
-						{
-							name: ""
-						}
-					],
-					outputConnectors: [
-						{
-							name: "YES"
+				var document = {
+					queryDocument: {
+						folder: {
+							uuid: $scope.queryFolderUuid,
+							name: $scope.queryFolderName
 						},
-						{
-							name: "NO"
+						libraryItem: {
+							uuid: $scope.queryUuid,
+							name: $scope.queryName,
+							description: $scope.queryDescription,
+							folderUuid: $scope.queryFolderUuid,
+							query: {
+								startingRules: {
+									ruleId : <any>[]
+								},
+								rule: <any>[]
+							}
 						}
-					],
+					}
 				};
 
-				$scope.chartViewModel.addNode(newNodeDataModel);
-			};
+				$scope.queryNameChange = function () {
+					$scope.chartViewModel.data.queryDocument.libraryItem.name = $scope.queryName;
+				};
 
-			//
-			// Add an input connector to selected nodes.
-			//
-			$scope.addNewInputConnector = function () {
-				var connectorName = prompt("Enter a connector name:", "New connector");
-				if (!connectorName) {
-					return;
-				}
+				$scope.queryDescriptionChange = function () {
+					$scope.chartViewModel.data.queryDocument.libraryItem.description = $scope.queryDescription;
+				};
 
-				var selectedNodes = $scope.chartViewModel.getSelectedNodes();
-				for (var i = 0; i < selectedNodes.length; ++i) {
-					var node = selectedNodes[i];
-					node.addInputConnector({
-						name: connectorName,
-					});
-				}
-			};
+				$scope.ruleDescriptionChange = function () {
+					var selectedRule = $scope.chartViewModel.getSelectedRule();
+					selectedRule.data.description = $scope.ruleDescription;
+				};
 
-			//
-			// Add an output connector to selected nodes.
-			//
-			$scope.addNewOutputConnector = function () {
-				var connectorName = prompt("Enter a connector name:", "New connector");
-				if (!connectorName) {
-					return;
-				}
+				$scope.rulePassActionChange = function () {
+					var selectedRule = $scope.chartViewModel.getSelectedRule();
+					selectedRule.data.onPass.action = $scope.rulePassAction;
+					if ($scope.rulePassAction!="Next Rule") {
+						selectedRule.data.onPass.ruleId = <any>[];
+					}
+				};
 
-				var selectedNodes = $scope.chartViewModel.getSelectedNodes();
-				for (var i = 0; i < selectedNodes.length; ++i) {
-					var node = selectedNodes[i];
-					node.addOutputConnector({
-						name: connectorName,
-					});
-				}
-			};
+				$scope.ruleFailActionChange = function () {
+					var selectedRule = $scope.chartViewModel.getSelectedRule();
+					selectedRule.data.onFail.action = $scope.ruleFailAction;
+					if ($scope.ruleFailAction!="Next Rule") {
+						selectedRule.data.onFail.ruleId = <any>[];
+					}
+				};
 
-			//
-			// Delete selected nodes and connections.
-			//
-			$scope.deleteSelected = function () {
-				$scope.chartViewModel.deleteSelected();
-			};
+				$scope.nextRuleID = 0;
+
+				$scope.results = ['','Next Rule','Include Patient in Final Result','No Action'];
+
+				$scope.$on('editTest', function(event : any, ruleId : any) {
+					if (ruleId!="0") {
+						$scope.ruleId = ruleId;
+
+						var selectedRule = $scope.chartViewModel.getSelectedRule();
+
+						var test : Test = selectedRule.data.test;
+
+						TestEditorController.open($modal, test)
+							.result.then(function(resultData : Test){
+
+							selectedRule.data.test = resultData;
+						});
+					}
+				});
+
+				$scope.$on('ruleDescription', function(event : any, description : any) {
+					$scope.ruleDescription = description;
+				});
+
+				$scope.$on('rulePassAction', function(event : any, action : any) {
+					$scope.rulePassAction = action;
+				});
+
+				$scope.$on('ruleFailAction', function(event : any, action : any) {
+					$scope.ruleFailAction = action;
+				});
+
+				$scope.dataModel = false;
+				$scope.ShowDataModel = function () {
+					$scope.dataModel = !$scope.dataModel;
+				};
+
+				$scope.showClearQuery = false;
+				$scope.toggleClearQuery = function () {
+					$scope.showClearQuery = !$scope.showClearQuery;
+				};
+
+				$scope.clearQueryYes = function () {
+					$scope.chartViewModel.clearQuery();
+					$scope.nextRuleID = 0;
+					$scope.ruleDescription = "";
+					$scope.rulePassAction = "";
+					$scope.ruleFailAction = "";
+					this.toggleClearQuery();
+				};
+
+				//
+				// Add a new rule to the chart.
+				//
+				$scope.addNewRule = function () {
+					//
+					// Template for a new rule.
+					//
+
+					if ($scope.nextRuleID==0) {
+
+						var newStartRuleDataModel = {
+							description: "START",
+							id: $scope.nextRuleID++,
+							layout: {
+								x: -162,
+								y: 25
+							},
+							onPass: {
+								action: "",
+								ruleId : <any>[]
+							},
+							onFail: {
+								action: "",
+								ruleId: <any>[]
+							}
+						};
+
+						$scope.chartViewModel.addRule(newStartRuleDataModel);
+
+						var newRuleDataModel = {
+							description: "Rule Description",
+							id: $scope.nextRuleID++,
+							layout: {
+								x: 194,
+								y: 5
+							},
+							onPass: {
+								action: "",
+								ruleId: <any>[]
+							},
+							onFail: {
+								action: "",
+								ruleId: <any>[]
+							}
+						};
+
+						$scope.chartViewModel.addRule(newRuleDataModel);
+
+						$scope.chartViewModel.addStartingRule(1);
+					}
+					else {
+						var newRuleDataModel = {
+							description: "Rule Description",
+							id: $scope.nextRuleID++,
+							layout: {
+								x: 100,
+								y: 10
+							},
+							onPass: {
+								action: "",
+								ruleId: <any>[]
+							},
+							onFail: {
+								action: "",
+								ruleId: <any>[]
+							}
+						};
+
+						$scope.chartViewModel.addRule(newRuleDataModel);
+					}
+				};
+
+				//
+				// Delete selected rule and connections.
+				//
+				$scope.deleteSelected = function () {
+					$scope.chartViewModel.deleteSelected();
+				};
+
+				//
+				// Create the view-model for the chart and attach to the scope.
+				//
+				$scope.chartViewModel = new flowchart.ChartViewModel(document);
+
+				$scope.queryName = $scope.chartViewModel.data.queryDocument.libraryItem.name;
+				$scope.queryDescription = $scope.chartViewModel.data.queryDocument.libraryItem.description;
 
 
-			$scope.ShowDataModel = function () {
-				$scope.dataModel = $scope.showDataModel;
-			};
-
-			$scope.ShowCriteria = function () {
-				$scope.nodeCriteria = $scope.showCriteria;
-			};
-
-			//
-			// Create the view-model for the chart and attach to the scope.
-			//
-			$scope.chartViewModel = new flowchart.ChartViewModel(chartDataModel);
-		}])
+			}])
 
 }
-
-
-
-
-

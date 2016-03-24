@@ -5,7 +5,7 @@ module app.models {
 		entity : string;
 		dataSourceUuid : string[];
 		calculation : CalculationType;
-		filter : FieldTest;
+		filter : FieldTest[];
 		restriction : Restriction;
 	}
 }

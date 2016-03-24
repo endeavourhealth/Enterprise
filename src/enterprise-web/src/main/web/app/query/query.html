@@ -1,77 +1,112 @@
 <div class="module">
-	<div class="container-fluid">
-		<div class="module-heading">Query editor</div>
-		<div class="module-body">
-			<div style="padding:10px;position:fixed;" >
-					<div ng-show="dataModel" style="width:400px; height: 500px;position: absolute; top: 70px; left: 800px;">
-							<div style="height: inherit; overflow: auto;">
-									<div style="height:1500px;">
-											<textarea style="padding:10px;height:500px;width:400px"
-																chart-json-edit
-																view-model="chartViewModel"
-											>
+    <div class="container-fluid">
+        <div class="module-heading">Query editor</div>
+        <div class="module-body">
+            <div id="queryPage">
+                <section class="query-section">
 
-											</textarea>
-									</div>
-							</div>
-					</div>
+                    <clear-query title="Clear Rules" ng-show="showClearQuery">
+                        <div class="modal-body">
+                            <p>Are you sure you want to clear the rules in this query (changes will not be saved) ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" ng-click="toggleClearQuery()" class="btn btn-default">Cancel</button>
+                            <button type="submit" ng-click="clearQueryYes()" class="btn btn-default">Yes</button>
+                        </div>
 
-					<div ng-show="nodeCriteria" style="width:400px; height: 500px;position: absolute; top: 70px; left: 800px;">
-							<div style="height: inherit; overflow: auto;">
-									<div style="height:1500px;">
-											<textarea style="height:500px;width:400px">
-													Query Node Criteria
-											</textarea>
-									</div>
-							</div>
-					</div>
+                    </clear-query>
 
-					<div>
-							<button class="btn btn-default"
-											ng-click="addNewNode()"
-											title="Add a new node to the chart"
-							>
-									Add Query Node
-							</button>
-							<button class="btn btn-default"
-											ng-click="addNewInputConnector()"
-											ng-disabled="chartViewModel.getSelectedNodes().length == 0"
-											title="Add a new input connector to the selected node"
-							>
-									Add Input Connector
-							</button>
-							<button class="btn btn-default"
-											ng-click="addNewOutputConnector()"
-											ng-disabled="chartViewModel.getSelectedNodes().length == 0"
-											title="Add a new output connector to the selected node"
-							>
-									Add Output Connector
-							</button>
-							<button class="btn btn-default"
-											ng-click="deleteSelected()"
-											ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
-											title="Delete selected nodes and connections"
-							>
-									Delete Selected
-							</button>
-							<div class="checkbox" style="float: right; padding-left: 20px;">
-									<label>
-											<input type="checkbox" ng-model="showDataModel" ng-click = "ShowDataModel()"/> Show Data Model
-									</label>
-									<label  style="margin-left: 10px">
-											<input type="checkbox" ng-model="showCriteria" ng-click = "ShowCriteria()"/> Show Node Criteria
-									</label>
-							</div>
-					</div>
+                    <flow-chart
+                            mouse-capture
+                            chart="chartViewModel">
+                    </flow-chart>
+                </section>
 
-			</div>
-			<div>
-					<flow-chart
-									mouse-capture
-									chart="chartViewModel"
-					>
-					</flow-chart>
-			</div>
-		</div>
-	</div>
+                <aside class="query-aside">
+                    <div style="margin-bottom: 10px">
+                        <header class="query-header">
+                            <button class="btn btn-default"
+                                    ng-click="addNewRule()"
+                                    title="Add a new rule to this query">
+                                Add Rule
+                            </button>
+
+                            <button class="btn btn-default"
+                                    ng-click="deleteSelected()"
+                                    ng-disabled="chartViewModel.getSelectedRule().length == 0"
+                                    title="Delete selected rule and connections">
+                                Delete
+                            </button>
+                            <button class="btn btn-default"
+                                    ng-click="toggleClearQuery()"
+                                    title="Clear the rules in this this query without saving">
+                                Clear Rules
+                            </button>
+                        </header>
+                    </div>
+
+                    <div class="queryDiv">
+                        <div class="queryHeader">
+                            Query Properties
+                <span style="float: right; cursor: pointer" class="glyphicon glyphicon-info-sign" ng-click = "ShowDataModel()"
+                      title="View Query Document Data Model"></span>
+                        </div>
+
+                        <div class="ruleFields">
+                            <div class="row">
+                                <form class="form">
+                                    <fieldset>
+                                        <label class="control-label" style="padding: 0px 10px 0px 15px;">Query Name:</label>
+                                        <input class="form-control" type="text" name="input" ng-model="queryName" style="margin: 0px 0px 15px 10px;width:275px" ng-change="queryNameChange()">
+                                        <label class="control-label" style="padding: 0px 10px 0px 15px;">Query Description:</label>
+                            <textarea class="form-control" ng-model="queryDescription" style="height: 55px; margin: 0px 0px 15px 10px;width:275px" ng-change="queryDescriptionChange()">
+                                </textarea>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="ruleDiv">
+                        <div class="ruleHeader">
+                            Rule Properties
+                        </div>
+
+                        <div class="ruleFields">
+                            <div class="row">
+                                <form class="form">
+                                    <fieldset>
+                                        <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule Description:</label>
+                                        <input class="form-control" type="text" name="input" ng-model="ruleDescription" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleDescriptionChange()">
+                                        <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule PASS Action:</label>
+                                        <select class="form-control" ng-model="rulePassAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="rulePassActionChange()">
+                                            <option ng-repeat="result in results" value="{{result}}">{{result}}</option>
+                                        </select>
+                                        <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule FAIL Action:</label>
+                                        <select class="form-control" ng-model="ruleFailAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleFailActionChange()">
+                                            <option ng-repeat="result in results" value="{{result}}">{{result}}</option>
+                                        </select>
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="jsonDiv" ng-show="dataModel">
+                <div class="jsonHeader">
+                    Query Document Data Model
+                    <span style="float: right; cursor: pointer" class="glyphicon glyphicon-remove" ng-click = "ShowDataModel()"></span>
+                </div>
+                <div style="overflow: auto; height:2000px;">
+                   <textarea style="padding:10px;height:488px;width:700px; border:0px"
+                             chart-json-edit
+                             view-model="chartViewModel">
+                   </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+

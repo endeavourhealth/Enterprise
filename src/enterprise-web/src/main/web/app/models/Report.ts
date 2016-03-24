@@ -1,4 +1,6 @@
-module app.models {
+
+
+ module app.models {
 	'use strict';
 
 	export class Report {

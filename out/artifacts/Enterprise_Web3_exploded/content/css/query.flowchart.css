@@ -1,0 +1,200 @@
+
+/*
+Styles for nodes and connectors.
+*/
+
+.node-text {
+	font-size: 12px;
+	fill: black;
+	font-weight: bold;
+
+}
+
+.connector-text-in {
+	font-size: 12px;
+	fill: midnightblue;
+}
+
+.connector-text-out {
+	font-size: 12px;
+	fill: green;
+}
+
+.connector-text-start {
+	font-size: 12px;
+	fill: green;
+}
+
+.connector-text-end {
+	font-size: 12px;
+	fill: red;
+}
+
+.node-rect {
+	stroke: black;
+	stroke-width: 1;
+}
+
+.mouseover-node-rect {
+	stroke: black;
+	stroke-width: 2;
+}
+
+.selected-node-rect {
+	stroke: red;
+	stroke-width: 2;
+}
+
+.connector-circle {
+    fill: white;
+    stroke: black;
+    stroke-width: 1;
+}
+
+.connector-circle-start {
+	fill: green;
+	stroke: black;
+	stroke-width: 1;
+}
+
+.connector-circle-end {
+	fill: red;
+	stroke: black;
+	stroke-width: 1;
+}
+.mouseover-connector-circle {
+    fill: white;
+    stroke: green;
+    stroke-width: 2;
+}
+
+/*
+Style for connections.
+*/
+
+.connection {
+}
+
+.connection-line {
+	stroke: grey;
+	stroke-width: 2;
+	fill: transparent;
+}	
+
+.mouseover-connection-line {
+	stroke: black;
+	stroke-width: 3;
+	fill: transparent;
+}	
+
+.selected-connection-line {
+	stroke: red;
+	stroke-width: 3;
+	fill: transparent;
+}	
+
+.connection-endpoint {
+	fill: gray;
+}
+
+.selected-connection-endpoint {
+	fill: red;
+}	
+
+.mouseover-connection-endpoint {
+	fill: gray;
+}
+
+/*
+Style for the connection being dragged out.
+*/
+
+.dragging-connection {
+	pointer-events: none;
+}
+
+.dragging-connection-line {
+	stroke: gray;
+	stroke-width: 2;
+	fill: transparent;
+}	
+
+.dragging-connection-endpoint {
+	fill: gray;
+}
+
+/*
+The element (in this case the SVG element) that contains the draggable elements.
+*/
+
+.draggable-container {
+	border: 0px;
+	margin-top: 10px;
+	padding:0px;
+	width: 5000px;
+	height:5000px;
+}
+
+/*
+Drag selection rectangle.
+*/
+
+.drag-selection-rect {
+	stroke: blue;
+	stroke-width: 1;
+	fill: transparent;
+}
+
+#queryPage {
+	width: 100%;
+}
+
+.query-header {
+	vertical-align: top;
+	display: inline-block;
+	padding: 5px;
+}
+.query-section {
+	vertical-align: top;
+	display: inline-block;
+	width: 75%;
+	height: 100%;
+	overflow: auto
+}
+
+.query-aside {
+	display: inline-block;
+	width: 25%;
+	height: 100%;
+	position: fixed;
+	margin-left: 10px;
+
+}
+
+.criteriaTable {
+	margin: 5px;
+}
+
+.criteriaTable TD {
+	padding: 4px;
+}
+
+.criteriaHeader {
+	padding: 10px;
+	font-weight: bold;
+	font-size: 15px;
+	border-bottom: 1px solid #80bdff;
+	background: -webkit-linear-gradient(#80bdff, #cce5ff); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(#80bdff, #cce5ff); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(#80bdff, #cce5ff); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(#80bdff, #cce5ff); /* Standard syntax */
+}
+
+.criteriaDiv {
+	height: 500px;
+	width:300px;
+	border: 2px solid #99caff;
+	background-color: #e6f2ff;
+	overflow: auto;
+
+}

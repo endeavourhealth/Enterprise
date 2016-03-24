@@ -6,13 +6,19 @@ module app.layout {
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 	import IModalStackService = angular.ui.bootstrap.IModalStackService;
+	import IAdminService = app.core.IAdminService;
+
 	class ShellController {
 		warning : IModalServiceInstance;
 		timedout : IModalServiceInstance;
 
-		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state'];
+		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state', 'AdminService'];
 
-		constructor($scope : IRootScopeService, $modal : IModalService, $modalStack : IModalStackService, $state : IStateService) {
+		constructor($scope : IRootScopeService,
+								$modal : IModalService,
+								$modalStack : IModalStackService,
+								$state : IStateService,
+								adminService : IAdminService) {
 			var vm = this;
 
 			function closeModals() {
@@ -43,11 +49,18 @@ module app.layout {
 			$scope.$on('IdleTimeout', function () {
 				closeModals();
 				$modalStack.dismissAll();
-				$state.transitionTo('login');
-				vm.timedout = $modal.open({
-					templateUrl: 'timedout-dialog.html',
-					windowClass: 'modal-danger'
-				});
+				var userName = adminService.getCurrentUser().username;
+				var options = {
+					templateUrl:'app/login/loginModal.html',
+					controller:'LoginController',
+					controllerAs:'login',
+					backdrop:'static',
+					resolve: {
+						userName: () => userName
+					}
+				};
+
+				$modal.open(options);
 			});
 		}
 	}

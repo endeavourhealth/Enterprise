@@ -32,7 +32,11 @@ angular.module('app', [
 
 	])
 	.run(['$state', '$rootScope', 'AdminService', 'LoggerService', '$uibModal',
-		function ($state:IStateService, $rootScope:IRootScopeService, adminService:IAdminService, logger:ILoggerService, $modal : IModalService) {
+		function ($state:IStateService,
+							$rootScope:IRootScopeService,
+							adminService:IAdminService,
+							logger:ILoggerService,
+							$modal : IModalService) {
 			$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 				if (toState.unsecured !== true && !adminService.isAuthenticated()) {
 					logger.error('You are not logged in');

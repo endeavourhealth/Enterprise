@@ -35,7 +35,7 @@ module app.models {
 				return 'Summary description';
 			}
 			if (listReportGroup.fieldBased != null) {
-				return listReportGroup.fieldBased.dataSource + ' (' + listReportGroup.fieldBased.fieldOutput.length + ' fields)';
+				return ' (' + listReportGroup.fieldBased.fieldOutput.length + ' fields)';
 			}
 		};
 	}

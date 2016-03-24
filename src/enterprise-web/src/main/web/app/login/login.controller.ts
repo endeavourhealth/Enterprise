@@ -12,23 +12,29 @@ module app.login {
 		username:string;
 		password:string;
 
-		static $inject = ['LoggerService', 'Idle', '$state', 'AdminService'];
+		static $inject = ['LoggerService', 'Idle', '$state', 'AdminService', 'userName'];
 
 		constructor(private logger:app.blocks.ILoggerService,
 								private Idle:IIdleService,
 								private $state : IStateService,
-								private AdminService:IAdminService) {
+								private AdminService:IAdminService,
+								username : string) {
+			this.username = username;
 			Idle.unwatch();
 			AdminService.logout();
 		}
 
-		login() {
+		login(scope : any) {
 			var vm = this;
 			vm.AdminService.login(vm.username, vm.password)
 				.then(function (response) {
 					vm.logger.success('User logged in', vm.username, 'Logged In');
 					vm.Idle.watch();
-					vm.$state.transitionTo('app.dashboard');
+					if (scope.$close) {
+						scope.$close();
+					} else {
+						vm.$state.transitionTo('app.dashboard');
+					}
 				})
 				.catch(function (data) {
 					vm.logger.error(data.statusText, data, 'Login error!');

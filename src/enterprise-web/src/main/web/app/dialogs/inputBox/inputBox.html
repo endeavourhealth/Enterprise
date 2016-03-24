@@ -8,7 +8,10 @@
 		<div class="row">
 			<div class="form-group col-md-12">
 				<label class="control-label">{{ ctrl.message }}</label>
-				<input type="text" class="form-control" placeholder="{{ ctrl.resultData}}" ng-model="ctrl.resultData">
+				<input type="text" class="form-control"
+							 placeholder="{{ ctrl.resultData}}"
+							 ng-model="ctrl.resultData"
+							 ng-keyup="$event.keyCode == 13 && ctrl.ok()">
 			</div>
 		</div>
 	</form>

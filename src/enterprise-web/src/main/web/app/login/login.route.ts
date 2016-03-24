@@ -23,7 +23,10 @@ module app.login {
 						templateUrl: 'app/login/login.html',
 						controller: 'LoginController',
 						controllerAs: 'login',
-						unsecured: true
+						unsecured: true,
+						resolve: {
+							userName: () => ''
+						}
 					}
 				}
 			];

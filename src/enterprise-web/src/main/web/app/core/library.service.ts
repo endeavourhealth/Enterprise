@@ -7,6 +7,8 @@ module app.core {
 	import TermlexCode = app.models.Code;
 	import Folder = app.models.Folder;
 	import UuidNameKVP = app.models.UuidNameKVP;
+	import ListReport = app.models.ListReport;
+	import LibraryItem = app.models.LibraryItem;
 	'use strict';
 
 	export interface ILibraryService {
@@ -18,9 +20,11 @@ module app.core {
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
-		getLibraryItemNamesForReport(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}>;
+		getContentNamesForReportLibraryItem(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}>;
 		saveFolder(folder : Folder):ng.IPromise<string>;
 		deleteFolder(folder : Folder):ng.IPromise<any>;
+		getLibraryItem(uuid : string):ng.IPromise<LibraryItem>;
+		saveLibraryItem(libraryItem : LibraryItem):ng.IPromise<LibraryItem>;
 	}
 
 	export class LibraryService extends BaseHttpService implements ILibraryService {
@@ -92,7 +96,7 @@ module app.core {
 			return this.httpGet('api/report/getReport', request);
 		}
 
-		getLibraryItemNamesForReport(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}> {
+		getContentNamesForReportLibraryItem(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}> {
 			var request = {
 				params: {
 					'uuid': uuid
@@ -129,6 +133,19 @@ module app.core {
 			};
 
 			return this.httpPost('api/folder/deleteFolder', request);
+		}
+
+		getLibraryItem(uuid : string):ng.IPromise<LibraryItem> {
+			var request = {
+				params: {
+					'uuid': uuid
+				}
+			};
+			return this.httpGet('api/library/getLibraryItem', request);
+		}
+
+		saveLibraryItem(libraryItem : LibraryItem):ng.IPromise<LibraryItem> {
+			return this.httpPost('api/library/saveLibraryItem', libraryItem);
 		}
 	}
 

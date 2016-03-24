@@ -1,73 +1,77 @@
-<div style="padding:10px;position:fixed;" >
-    <div ng-show="dataModel" style="width:400px; height: 500px;position: absolute; top: 70px; left: 800px;">
-        <div style="height: inherit; overflow: auto;">
-            <div style="height:1500px;">
-                <textarea style="padding:10px;height:500px;width:400px"
-                          chart-json-edit
-                          view-model="chartViewModel"
-                >
+<div class="module">
+	<div class="container-fluid">
+		<div class="module-heading">Query editor</div>
+		<div class="module-body">
+			<div style="padding:10px;position:fixed;" >
+					<div ng-show="dataModel" style="width:400px; height: 500px;position: absolute; top: 70px; left: 800px;">
+							<div style="height: inherit; overflow: auto;">
+									<div style="height:1500px;">
+											<textarea style="padding:10px;height:500px;width:400px"
+																chart-json-edit
+																view-model="chartViewModel"
+											>
 
-                </textarea>
-            </div>
-        </div>
-    </div>
+											</textarea>
+									</div>
+							</div>
+					</div>
 
-    <div ng-show="nodeCriteria" style="width:400px; height: 500px;position: absolute; top: 70px; left: 800px;">
-        <div style="height: inherit; overflow: auto;">
-            <div style="height:1500px;">
-                <textarea style="height:500px;width:400px">
-                    Query Node Criteria
-                </textarea>
-            </div>
-        </div>
-    </div>
+					<div ng-show="nodeCriteria" style="width:400px; height: 500px;position: absolute; top: 70px; left: 800px;">
+							<div style="height: inherit; overflow: auto;">
+									<div style="height:1500px;">
+											<textarea style="height:500px;width:400px">
+													Query Node Criteria
+											</textarea>
+									</div>
+							</div>
+					</div>
 
-    <div>
-        <button class="btn btn-default"
-                ng-click="addNewNode()"
-                title="Add a new node to the chart"
-        >
-            Add Query Node
-        </button>
-        <button class="btn btn-default"
-                ng-click="addNewInputConnector()"
-                ng-disabled="chartViewModel.getSelectedNodes().length == 0"
-                title="Add a new input connector to the selected node"
-        >
-            Add Input Connector
-        </button>
-        <button class="btn btn-default"
-                ng-click="addNewOutputConnector()"
-                ng-disabled="chartViewModel.getSelectedNodes().length == 0"
-                title="Add a new output connector to the selected node"
-        >
-            Add Output Connector
-        </button>
-        <button class="btn btn-default"
-                ng-click="deleteSelected()"
-                ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
-                title="Delete selected nodes and connections"
-        >
-            Delete Selected
-        </button>
-        <div class="checkbox" style="float: right; padding-left: 20px;">
-            <label>
-                <input type="checkbox" ng-model="showDataModel" ng-click = "ShowDataModel()"/> Show Data Model
-            </label>
-            <label  style="margin-left: 10px">
-                <input type="checkbox" ng-model="showCriteria" ng-click = "ShowCriteria()"/> Show Node Criteria
-            </label>
-        </div>
-    </div>
+					<div>
+							<button class="btn btn-default"
+											ng-click="addNewNode()"
+											title="Add a new node to the chart"
+							>
+									Add Query Node
+							</button>
+							<button class="btn btn-default"
+											ng-click="addNewInputConnector()"
+											ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+											title="Add a new input connector to the selected node"
+							>
+									Add Input Connector
+							</button>
+							<button class="btn btn-default"
+											ng-click="addNewOutputConnector()"
+											ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+											title="Add a new output connector to the selected node"
+							>
+									Add Output Connector
+							</button>
+							<button class="btn btn-default"
+											ng-click="deleteSelected()"
+											ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
+											title="Delete selected nodes and connections"
+							>
+									Delete Selected
+							</button>
+							<div class="checkbox" style="float: right; padding-left: 20px;">
+									<label>
+											<input type="checkbox" ng-model="showDataModel" ng-click = "ShowDataModel()"/> Show Data Model
+									</label>
+									<label  style="margin-left: 10px">
+											<input type="checkbox" ng-model="showCriteria" ng-click = "ShowCriteria()"/> Show Node Criteria
+									</label>
+							</div>
+					</div>
 
+			</div>
+			<div>
+					<flow-chart
+									mouse-capture
+									chart="chartViewModel"
+					>
+					</flow-chart>
+			</div>
+		</div>
+	</div>
 </div>
-<div>
-    <flow-chart
-            mouse-capture
-            chart="chartViewModel"
-    >
-    </flow-chart>
-</div>
-
-
-

@@ -154,26 +154,14 @@ module app.listOuput {
 				});
 		}
 
-		save() {
+		save(close : boolean) {
 			var vm = this;
 			vm.libraryService.saveLibraryItem(vm.libraryItem)
 				.then(function(libraryItem : LibraryItem) {
 					vm.libraryItem.uuid = libraryItem.uuid;
 					vm.adminService.clearPendingChanges();
 					vm.logger.success('List output saved', vm.libraryItem, 'Saved');
-				})
-				.catch(function(data) {
-					vm.logger.error('Error saving list output', data, 'Error');
-				});
-		}
-
-		saveAndClose() {
-			var vm = this;
-			vm.libraryService.saveLibraryItem(vm.libraryItem)
-				.then(function(libraryItem : LibraryItem) {
-					vm.libraryItem.uuid = libraryItem.uuid;
-					vm.logger.success('List output saved', vm.libraryItem, 'Saved');
-					vm.close();
+					if (close) { vm.$window.history.back(); }
 				})
 				.catch(function(data) {
 					vm.logger.error('Error saving list output', data, 'Error');

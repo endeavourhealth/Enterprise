@@ -17,6 +17,7 @@ module app.reports {
 	import ReportItem = app.models.ReportItem;
 	import UuidNameKVP = app.models.UuidNameKVP;
 	import IScope = angular.IScope;
+	import IWindowService = angular.IWindowService;
 	'use strict';
 
 	class ReportController {
@@ -28,12 +29,14 @@ module app.reports {
 		contentTreeCallbackOptions : ICallbacks;
 		dataSourceMap : any;
 
-		static $inject = ['LibraryService', 'LoggerService', '$stateParams'];
+		static $inject = ['LibraryService', 'LoggerService', '$stateParams', 'AdminService', '$window'];
 
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger : ILoggerService,
-			protected $stateParams : {itemAction : string, itemUuid : string}) {
+			protected $stateParams : {itemAction : string, itemUuid : string},
+			protected adminService : IAdminService,
+			protected $window : IWindowService) {
 			this.contentTreeCallbackOptions = {dropped: this.contentTreeDroppedCallback, accept: null, dragStart: null};
 
 			this.getLibraryRootFolders();
@@ -118,7 +121,7 @@ module app.reports {
 			}
 		}
 
-		save() {
+		save(close : boolean) {
 			var vm = this;
 			vm.report.reportItem = [];
 			vm.populateReportListsFromTree(vm.report.reportItem, vm.reportContent);
@@ -126,11 +129,18 @@ module app.reports {
 			vm.libraryService.saveReport(vm.report)
 				.then(function (data:Report) {
 					vm.report.uuid = data.uuid;
+					vm.adminService.clearPendingChanges();
 					vm.logger.success('Report saved', vm.report, 'Saved');
+					if (close) { vm.$window.history.back(); }
 				})
 				.catch(function(data) {
 					vm.logger.error('Error saving report', data, 'Error');
 				});
+		}
+
+		close() {
+			this.adminService.clearPendingChanges();
+			this.$window.history.back();
 		}
 
 		populateReportListsFromTree(reportItems : ReportItem[], nodes : ReportNode[]) {

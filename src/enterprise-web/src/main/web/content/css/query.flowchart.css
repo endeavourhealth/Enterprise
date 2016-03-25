@@ -240,7 +240,7 @@ The element (in this case the SVG element) that contains the draggable elements.
 
 .jsonDiv {
 	position:absolute;
-	top:150px;
+	top:120px;
 	left:150px;
 	height: 530px;
 	width: 700px;

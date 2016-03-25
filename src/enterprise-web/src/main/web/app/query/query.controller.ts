@@ -37,8 +37,8 @@ module app.query {
 				}
 			};
 		})
-		.controller('QueryController', ['$scope', '$stateParams', '$uibModal',
-			function QueryController ($scope : any, $stateParams : any, $modal : IModalService) {
+		.controller('QueryController', ['$scope', '$stateParams', '$uibModal','$window',
+			function QueryController ($scope : any, $stateParams : any, $modal : IModalService, $window : any) {
 
 				var itemAction = $stateParams.itemAction;
 				var itemUuid = $stateParams.itemUuid;
@@ -244,6 +244,16 @@ module app.query {
 				$scope.deleteSelected = function () {
 					$scope.chartViewModel.deleteSelected();
 				};
+
+				$scope.close = function () {
+					// put code in here to check for changes
+					$window.history.back();
+				}
+
+				$scope.saveAndClose = function () {
+					// save code here
+					$window.history.back();
+				}
 
 				//
 				// Create the view-model for the chart and attach to the scope.

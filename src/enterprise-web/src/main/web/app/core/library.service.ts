@@ -20,11 +20,13 @@ module app.core {
 		getFolderContents(folderId : string):ng.IPromise<ItemSummaryList>;
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
+		deleteReport(report : Report):ng.IPromise<any>;
 		getContentNamesForReportLibraryItem(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}>;
 		saveFolder(folder : Folder):ng.IPromise<string>;
 		deleteFolder(folder : Folder):ng.IPromise<any>;
 		getLibraryItem(uuid : string):ng.IPromise<LibraryItem>;
 		saveLibraryItem(libraryItem : LibraryItem):ng.IPromise<LibraryItem>;
+		deleteLibraryItem(libraryItem : LibraryItem):ng.IPromise<any>;
 	}
 
 	export class LibraryService extends BaseHttpService implements ILibraryService {
@@ -87,6 +89,10 @@ module app.core {
 			return this.httpPost('api/report/saveReport', report);
 		}
 
+		deleteReport(report: Report):ng.IPromise<any> {
+			return this.httpPost('api/report/deleteReport', report);
+		}
+
 		getReport(uuid : string):ng.IPromise<Report> {
 			var request = {
 				params: {
@@ -146,6 +152,10 @@ module app.core {
 
 		saveLibraryItem(libraryItem : LibraryItem):ng.IPromise<LibraryItem> {
 			return this.httpPost('api/library/saveLibraryItem', libraryItem);
+		}
+
+		deleteLibraryItem(libraryItem : LibraryItem):ng.IPromise<any> {
+			return this.httpPost('api/library/deleteLibraryItem', libraryItem);
 		}
 	}
 

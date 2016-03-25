@@ -113,6 +113,14 @@ module app.reports {
 					});
 			});
 		}
+
+		deleteItem(scope : any) {
+			var vm = this;
+			vm.libraryService.deleteReport(scope.$modelValue)
+				.then(function(result) {
+					scope.remove();
+				});
+		}
 	}
 
 	angular

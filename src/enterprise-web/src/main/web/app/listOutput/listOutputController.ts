@@ -148,6 +148,9 @@ module app.listOuput {
 			vm.libraryService.getLibraryItem(uuid)
 				.then(function(libraryItem : LibraryItem) {
 					vm.libraryItem = libraryItem;
+				})
+				.catch(function(data) {
+					vm.logger.error('Error loading list output', data, 'Error');
 				});
 		}
 
@@ -157,6 +160,10 @@ module app.listOuput {
 				.then(function(libraryItem : LibraryItem) {
 					vm.libraryItem.uuid = libraryItem.uuid;
 					vm.adminService.clearPendingChanges();
+					vm.logger.success('List output saved', vm.libraryItem, 'Saved');
+				})
+				.catch(function(data) {
+					vm.logger.error('Error saving list output', data, 'Error');
 				});
 		}
 
@@ -165,7 +172,11 @@ module app.listOuput {
 			vm.libraryService.saveLibraryItem(vm.libraryItem)
 				.then(function(libraryItem : LibraryItem) {
 					vm.libraryItem.uuid = libraryItem.uuid;
+					vm.logger.success('List output saved', vm.libraryItem, 'Saved');
 					vm.close();
+				})
+				.catch(function(data) {
+					vm.logger.error('Error saving list output', data, 'Error');
 				});
 		}
 

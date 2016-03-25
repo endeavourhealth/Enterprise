@@ -118,6 +118,7 @@ module app.dialogs {
 
 		initialiseEditMode(resultData : Test) {
 			var vm = this;
+
 			vm.ruleDatasource = resultData.dataSource.entity;
 			this.dataSourceChange(resultData.dataSource.entity);
 
@@ -361,20 +362,20 @@ module app.dialogs {
 			if (value!="" && value!=null)
 				datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
 
-			var valueFromOperator : ValueFromOperator = {
+			/*var valueFromOperator : ValueFromOperator = {
 				value: "greaterThanOrEqualTo"
 			}
 
 			var valueAbsoluteUnit : ValueAbsoluteUnit = {
 				value: "date"
-			}
+			}*/
 
 			var valueFrom : ValueFrom = {
 				constant: datestring,
 				parameter: null,
-				absoluteUnit: valueAbsoluteUnit,
+				absoluteUnit: "date",
 				relativeUnit: null,
-				operator: valueFromOperator
+				operator: "greaterThanOrEqualTo"
 			}
 
 			var fieldTest : FieldTest = {
@@ -414,20 +415,20 @@ module app.dialogs {
 			if (value!="" && value!=null)
 				datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
 
-			var valueToOperator : ValueToOperator = {
+			/*var valueToOperator : ValueToOperator = {
 				value: "lessThanOrEqualTo"
 			}
 
 			var valueAbsoluteUnit : ValueAbsoluteUnit = {
 				value: "date"
-			}
+			}*/
 
 			var valueTo : ValueTo = {
 				constant: datestring,
 				parameter: null,
-				absoluteUnit: valueAbsoluteUnit,
+				absoluteUnit: "date",
 				relativeUnit: null,
-				operator: valueToOperator
+				operator: "lessThanOrEqualTo"
 			}
 
 			var fieldTest : FieldTest = {
@@ -471,14 +472,14 @@ module app.dialogs {
 		filterValueChange(value : any, valueField : any) {
 			var vm = this;
 
-			var valueAbsoluteUnit : ValueAbsoluteUnit = {
+			/*var valueAbsoluteUnit : ValueAbsoluteUnit = {
 				value: "value"
-			}
+			}*/
 
 			var valueEqualTo : Value = {
 				constant: value,
 				parameter: null,
-				absoluteUnit: valueAbsoluteUnit,
+				absoluteUnit: "value",
 				relativeUnit: null
 			}
 
@@ -514,20 +515,20 @@ module app.dialogs {
 		filterValueFromChange(value : any) {
 			var vm = this;
 
-			var valueAbsoluteUnit : ValueAbsoluteUnit = {
+			/*var valueAbsoluteUnit : ValueAbsoluteUnit = {
 				value: "numeric"
 			}
 
 			var valueFromOperator : ValueFromOperator = {
 				value: "greaterThanOrEqualTo"
-			}
+			}*/
 
 			var valueFrom : ValueFrom = {
 				constant: value,
 				parameter: null,
-				absoluteUnit: valueAbsoluteUnit,
+				absoluteUnit: "numeric",
 				relativeUnit: null,
-				operator: valueFromOperator
+				operator: "greaterThanOrEqualTo"
 			}
 
 			var fieldTest : FieldTest = {
@@ -562,19 +563,20 @@ module app.dialogs {
 		filterValueToChange(value : any) {
 			var vm = this;
 
-			var valueAbsoluteUnit : ValueAbsoluteUnit = {
+			/*var valueAbsoluteUnit : ValueAbsoluteUnit = {
 				value: "numeric"
 			}
 
 			var valueToOperator : ValueToOperator = {
 				value: "lessThanOrEqualTo"
-			}
+			}*/
+
 			var valueTo : ValueTo = {
 				constant: value,
 				parameter: null,
-				absoluteUnit: valueAbsoluteUnit,
+				absoluteUnit: "numeric",
 				relativeUnit: null,
-				operator: valueToOperator
+				operator: "lessThanOrEqualTo"
 			}
 
 			var fieldTest : FieldTest = {

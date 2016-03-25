@@ -8,15 +8,17 @@
 
 .module-heading {
     position: fixed;
-    padding-top: 10px;
+    padding-top: 12px;
+    padding-bottom: 10px;
     padding-left: 20px;
     padding-right: 70px;
     border-bottom: 1px solid #eee;
     color: #fff;
     background-color: #337ab7;
     width: 100%;
-    font-size: 16px;
-    height: 40px;
+    font-size: 20px;
+    height: 55px;
+
 }
 
 .module-body {

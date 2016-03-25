@@ -4,7 +4,7 @@ module app.models {
 	export class Value {
 		constant : string;
 		parameter : ParameterType;
-		absoluteUnit : ValueAbsoluteUnit;
-		relativeUnit : ValueRelativeUnit;
+		absoluteUnit : string;
+		relativeUnit : string;
 	}
 }

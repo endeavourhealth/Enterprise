@@ -73,7 +73,7 @@ module app.reports {
 					vm.libraryService.getContentNamesForReportLibraryItem(reportUuid)
 						.then(function(data) {
 							vm.dataSourceMap = UuidNameKVP.toAssociativeArray(data.contents);
-							vm.populateTreeFromReportLists(vm.report, vm.reportContent, '');
+							vm.populateTreeFromReportLists(vm.report.reportItem, vm.reportContent);
 					})
 					.catch(function(data) {
 						vm.logger.error('Error loading report item names', data, 'Error');
@@ -84,36 +84,35 @@ module app.reports {
 				});
 		}
 
-		populateTreeFromReportLists(report : Report,
-																nodeList : ReportNode[],
-																parentUuid : string) {
+		populateTreeFromReportLists(reportItems : ReportItem[], nodeList : ReportNode[]) {
 			var vm = this;
-			if (report.reportItem == null) { report.reportItem = []; }
+			if (reportItems == null) { reportItems = []; }
 
-			for (var i = 0; i < report.reportItem.length; i++) {
-				var reportItem:ReportItem = report.reportItem[i];
-				if (reportItem.parentUuid === parentUuid) {
-					var uuid:string = null;
-					var type:ItemType = null;
+			for (var i = 0; i < reportItems.length; i++) {
+				var reportItem:ReportItem = reportItems[i];
 
-					if (reportItem.queryLibraryItemUuid && reportItem.queryLibraryItemUuid !== '') {
-						uuid = reportItem.queryLibraryItemUuid;
-						type = ItemType.Query;
-					} else if (reportItem.listReportLibraryItemUuid && reportItem.listReportLibraryItemUuid !== '') {
-						uuid = reportItem.listReportLibraryItemUuid;
-						type = ItemType.ListOutput;
-					}
+				var uuid:string = null;
+				var type:ItemType = null;
 
-					if (uuid != null) {
-						var reportNode:ReportNode = {
-							uuid : uuid,
-							name : vm.dataSourceMap[uuid],
-							type : type,
-							children : []
-						};
+				if (reportItem.queryLibraryItemUuid && reportItem.queryLibraryItemUuid !== '') {
+					uuid = reportItem.queryLibraryItemUuid;
+					type = ItemType.Query;
+				} else if (reportItem.listReportLibraryItemUuid && reportItem.listReportLibraryItemUuid !== '') {
+					uuid = reportItem.listReportLibraryItemUuid;
+					type = ItemType.ListOutput;
+				}
 
-						nodeList.push(reportNode);
-						vm.populateTreeFromReportLists(report, reportNode.children, reportNode.uuid);
+				if (uuid != null) {
+					var reportNode:ReportNode = {
+						uuid : uuid,
+						name : vm.dataSourceMap[uuid],
+						type : type,
+						children : []
+					};
+
+					nodeList.push(reportNode);
+					if (reportItem.reportItem && reportItem.reportItem.length > 0) {
+						vm.populateTreeFromReportLists(reportItem.reportItem, reportNode.children);
 					}
 				}
 			}
@@ -122,7 +121,7 @@ module app.reports {
 		save() {
 			var vm = this;
 			vm.report.reportItem = [];
-			vm.populateReportListsFromTree(vm.report, '', vm.reportContent);
+			vm.populateReportListsFromTree(vm.report.reportItem, vm.reportContent);
 
 			vm.libraryService.saveReport(vm.report)
 				.then(function (data:Report) {
@@ -134,12 +133,12 @@ module app.reports {
 				});
 		}
 
-		populateReportListsFromTree(report : Report, parentUuid : string, nodes : ReportNode[]) {
+		populateReportListsFromTree(reportItems : ReportItem[], nodes : ReportNode[]) {
 			for (var i = 0; i < nodes.length; i++) {
 				var reportItem : ReportItem = {
 					queryLibraryItemUuid : null,
 					listReportLibraryItemUuid : null,
-					parentUuid : parentUuid
+					reportItem : []
 				};
 
 				switch (nodes[i].type) {
@@ -150,9 +149,9 @@ module app.reports {
 						reportItem.listReportLibraryItemUuid = nodes[i].uuid;
 						break;
 				}
-				report.reportItem.push(reportItem);
+				reportItems.push(reportItem);
 				if (nodes[i].children && nodes[i].children.length > 0) {
-					this.populateReportListsFromTree(report, nodes[i].uuid, nodes[i].children);
+					this.populateReportListsFromTree(reportItem.reportItem, nodes[i].children);
 				}
 			}
 		}

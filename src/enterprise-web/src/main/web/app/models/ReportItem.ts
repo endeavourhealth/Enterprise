@@ -4,6 +4,6 @@ module app.models {
 	export class ReportItem {
 		queryLibraryItemUuid : string;
 		listReportLibraryItemUuid : string;
-		parentUuid : string;
+		reportItem : ReportItem[];
 	}
 }

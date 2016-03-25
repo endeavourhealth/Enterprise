@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="enterprise-web:war exploded">
+  <artifact type="exploded-war" build-on-make="true" name="enterprise-web:war exploded">
     <output-path>$PROJECT_DIR$/out/artifacts/enterprise_web_war_exploded</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
@@ -35,7 +35,6 @@
           <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.5.4" />
           <element id="library" level="project" name="Maven: io.jsonwebtoken:jjwt:0.6.0" />
           <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.2" />
-          <element id="library" level="project" name="Maven: org.endeavour:enterprise-core:1.0-SNAPSHOT" />
           <element id="library" level="project" name="Maven: ch.qos.logback:logback-classic:1.1.3" />
           <element id="library" level="project" name="Maven: ch.qos.logback:logback-core:1.1.3" />
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.7" />
@@ -46,6 +45,7 @@
           <element id="library" level="project" name="Maven: com.google.guava:guava:19.0" />
           <element id="library" level="project" name="Maven: com.rabbitmq:amqp-client:3.5.5" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.4" />
+          <element id="library" level="project" name="Maven: javax.servlet:servlet-api:2.5" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="enterprise-web/web/Web" />

@@ -7,12 +7,13 @@ module app.listOuput {
 	import ILibraryService = app.core.ILibraryService;
 	import ListReport = app.models.ListReport;
 	import ListReportGroup = app.models.ListReportGroup;
-	import InputBoxController = app.dialogs.InputBoxController;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import FieldOutput = app.models.FieldOutput;
 	import IWindowService = angular.IWindowService;
 	import LibraryItem = app.models.LibraryItem;
 	import DataSource = app.models.DataSource;
+	import TestEditorController = app.dialogs.TestEditorController;
+	import Test = app.models.Test;
 	'use strict';
 
 	export class ListOuputController {
@@ -50,12 +51,15 @@ module app.listOuput {
 
 		selectDataSource(datasourceContainer : { dataSource : DataSource }) {
 			var vm = this;
-			InputBoxController.open(this.$modal,
-				'Data source',
-				'Please select a data source',
-				JSON.stringify(datasourceContainer.dataSource))
-				.result.then(function(dataSource:any) {
-					datasourceContainer.dataSource = dataSource;
+			var test : Test = null;
+
+			if (datasourceContainer.dataSource) {
+				test = {dataSource: datasourceContainer.dataSource} as Test;
+			}
+
+			TestEditorController.open(this.$modal, test)
+				.result.then(function(dataSourceContainer : { dataSource : DataSource }) {
+					datasourceContainer.dataSource = dataSourceContainer.dataSource;
 					vm.loadDataSourceAvailableFieldList();
 					vm.adminService.setPendingChanges();
 			});
@@ -69,7 +73,7 @@ module app.listOuput {
 			this.selectedListReportGroup = {
 				heading: 'New list group',
 				fieldBased: {
-					dataSource: {},
+					dataSource: null,
 					fieldOutput: []
 				}
 			} as ListReportGroup;
@@ -110,7 +114,8 @@ module app.listOuput {
 							heading: 'Patient',
 							fieldBased: {
 								dataSource: {
-									entity : 'Patient'
+									entity : 'PATIENT',
+									filter : []
 								},
 								fieldOutput: [
 									{heading: 'DOB', field: 'DateOfBirth'},
@@ -123,7 +128,8 @@ module app.listOuput {
 							heading: 'Issues',
 							fieldBased: {
 								dataSource: {
-									entity : 'Medication'
+									entity : 'MEDICATION_ISSUE',
+									filter : []
 								},
 								fieldOutput: [
 									{heading: 'Medication', field: 'DrugName'},

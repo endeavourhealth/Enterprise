@@ -89,7 +89,7 @@
 				<xs:element name="queryLibraryItemUuid" type="xs:string"/>
 				<xs:element name="listReportLibraryItemUuid" type="xs:string"/>
 			</xs:choice>
-			<xs:element name="parentUuid" type="xs:string" minOccurs="0"/>
+			<xs:element name="reportItem" type="reportItem" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="fieldTest">

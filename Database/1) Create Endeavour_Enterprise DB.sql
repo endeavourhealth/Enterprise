@@ -701,7 +701,7 @@ REFERENCES [Administration].[EndUser] ([EndUserUuid])
 GO
 ALTER TABLE [Execution].[JobReport] CHECK CONSTRAINT [FK_JobReport_EndUser]
 GO
-ALTER TABLE [Execution].[JobReport]  WITH CHECK ADD  CONSTRAINT [FK_JobReport_Item] FOREIGN KEY([JobReportUuid], [AuditUuid])
+ALTER TABLE [Execution].[JobReport]  WITH CHECK ADD  CONSTRAINT [FK_JobReport_Item] FOREIGN KEY([ReportUuid], [AuditUuid])
 REFERENCES [Definition].[Item] ([ItemUuid], [AuditUuid])
 GO
 ALTER TABLE [Execution].[JobReport] CHECK CONSTRAINT [FK_JobReport_Item]

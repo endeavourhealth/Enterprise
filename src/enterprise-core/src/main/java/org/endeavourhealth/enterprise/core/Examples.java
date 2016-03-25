@@ -74,7 +74,7 @@ public abstract class Examples {
                 //report item may have a queryUuid or listOutputUuid
                 String queryUuidStr = item.getQueryLibraryItemUuid();
                 String listOutputUuidStr = item.getListReportLibraryItemUuid();
-                String parentUuidStr = item.getParentUuid();
+//                String parentUuidStr = item.getParentUuid();
 
                 String uuidStr = queryUuidStr;
                 if (uuidStr == null) {
@@ -82,15 +82,15 @@ public abstract class Examples {
                 }
                 UUID uuid = UUID.fromString(uuidStr);
 
-                UUID parentUuid = null;
-                if (parentUuidStr != null) {
-                    parentUuid = UUID.fromString(parentUuidStr);
-                }
+//                UUID parentUuid = null;
+//                if (parentUuidStr != null) {
+//                    parentUuid = UUID.fromString(parentUuidStr);
+//                }
 
                 DbJobReportItem jobReportItem = new DbJobReportItem();
                 jobReportItem.setJobReportUuid(jobReportUuid);
                 jobReportItem.setItemUuid(uuid);
-                jobReportItem.setParentJobReportItemUuid(parentUuid);
+                //jobReportItem.setParentJobReportItemUuid(parentUuid);
                 toSave.add(jobReportItem);
             }
         }

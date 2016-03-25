@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.core.querydocument;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 
 import java.util.List;
@@ -555,7 +556,7 @@ public abstract class AbstractQueryDocumentReader {
             stack.push(report);
 
             List<ReportItem> reportItems = report.getReportItem();
-            if (reportItems != null && !reportItems.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(reportItems)) {
                 for (ReportItem reportItem: reportItems) {
                     processReportItem(reportItem);
                 }
@@ -564,10 +565,20 @@ public abstract class AbstractQueryDocumentReader {
         } finally {
             stack.pop();
         }
-
     }
 
     protected void processReportItem(ReportItem reportItem) {
-        //no child complex types to recurse to
+        try {
+            stack.push(reportItem);
+
+            if (CollectionUtils.isNotEmpty(reportItem.getReportItem())) {
+                for (ReportItem child: reportItem.getReportItem()) {
+                    processReportItem(child);
+                }
+            }
+
+        } finally {
+            stack.pop();
+        }
     }
 }

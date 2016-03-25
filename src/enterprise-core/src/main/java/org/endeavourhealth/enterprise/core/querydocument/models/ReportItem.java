@@ -1,6 +1,8 @@
 
 package org.endeavourhealth.enterprise.core.querydocument.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
@@ -20,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element name="queryLibraryItemUuid" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *           &lt;element name="listReportLibraryItemUuid" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;/choice>
- *         &lt;element name="parentUuid" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="reportItem" type="{}reportItem" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -33,13 +35,13 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "reportItem", propOrder = {
     "queryLibraryItemUuid",
     "listReportLibraryItemUuid",
-    "parentUuid"
+    "reportItem"
 })
 public class ReportItem {
 
     protected String queryLibraryItemUuid;
     protected String listReportLibraryItemUuid;
-    protected String parentUuid;
+    protected List<ReportItem> reportItem;
 
     /**
      * Gets the value of the queryLibraryItemUuid property.
@@ -90,27 +92,32 @@ public class ReportItem {
     }
 
     /**
-     * Gets the value of the parentUuid property.
+     * Gets the value of the reportItem property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getParentUuid() {
-        return parentUuid;
-    }
-
-    /**
-     * Sets the value of the parentUuid property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the reportItem property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getReportItem().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ReportItem }
+     * 
+     * 
      */
-    public void setParentUuid(String value) {
-        this.parentUuid = value;
+    public List<ReportItem> getReportItem() {
+        if (reportItem == null) {
+            reportItem = new ArrayList<ReportItem>();
+        }
+        return this.reportItem;
     }
 
 }

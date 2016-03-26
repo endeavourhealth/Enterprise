@@ -39,8 +39,8 @@ module app.query {
 				}
 			};
 		})
-		.controller('QueryController', ['LoggerService', '$scope', '$stateParams', '$uibModal','$window','LibraryService','AdminService',
-			function QueryController (logger : app.blocks.ILoggerService, $scope : any, $stateParams : any, $modal : IModalService, $window : any,
+		.controller('QueryController', ['$scope', '$stateParams', '$uibModal','$window','LibraryService','AdminService',
+			function QueryController ($scope : any, $stateParams : any, $modal : IModalService, $window : any,
 									  libraryService : ILibraryService, adminService : IAdminService) {
 
 				var libraryItem : LibraryItem;
@@ -255,20 +255,19 @@ module app.query {
 
 					libraryService.saveLibraryItem(libraryItem)
 						.then(function(libraryItem : LibraryItem) {
-							$scope.chartViewModel.data.queryDocument.libraryItem.uuid = libraryItem.uuid;
+							libraryItem.uuid = libraryItem.uuid;
+							alert(libraryItem.folderUuid+" : "+ libraryItem.uuid);
 							adminService.clearPendingChanges();
-							logger.success('Query saved successfully');
 						});
 				}
 
 				$scope.close = function () {
 					// put code in here to check for changes
-					logger.error('Query not saved');
 					$window.history.back();
 				}
 
 				$scope.saveAndClose = function () {
-					$scope.save();
+					// save code here
 					$window.history.back();
 				}
 

@@ -4,6 +4,7 @@ typings/
 out/
 target/
 *.map
+*.js
 uiDesigner.xml
 workspace.xml
 vcs.xml

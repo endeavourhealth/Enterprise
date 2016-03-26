@@ -50,6 +50,10 @@ public final class DbAudit extends DbAbstractTable {
         return (DbAudit) DatabaseManager.db().retrieveForPrimaryKeys(adapter, auditUuid);
     }
 
+    public static int retrieveMaxAuditVersion() throws Exception {
+        return DatabaseManager.db().retrieveMaxAuditVersion();
+    }
+
     @Override
     public TableAdapter getAdapter() {
         return adapter;

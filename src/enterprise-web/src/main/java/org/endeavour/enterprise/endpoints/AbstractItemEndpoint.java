@@ -255,6 +255,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             newDependency.setAuditUuid(newAuditUuid);
             newDependency.setDependentItemUuid(itemDependency.getDependentItemUuid());
             newDependency.setDependencyTypeId(itemDependency.getDependencyTypeId());
+            newDependency.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
 
             toSave.add(newDependency);
         }
@@ -278,6 +279,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             dependency.setAuditUuid(activeItem.getAuditUuid());
             dependency.setDependentItemUuid(uuidInDoc);
             dependency.setDependencyTypeId(DependencyType.Uses);
+            dependency.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
 
             toSave.add(dependency);
         }
@@ -322,6 +324,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
                 linkToParent = new DbItemDependency();
                 linkToParent.setDependentItemUuid(itemUuid);
                 linkToParent.setDependencyTypeId(dependencyType);
+                linkToParent.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
             }
 
             DbActiveItem containingFolderActiveItem = DbActiveItem.retrieveForItemUuid(containingFolderUuid);

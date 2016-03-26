@@ -1,10 +1,6 @@
 package org.endeavourhealth.enterprise.core.database;
 
-import ch.qos.logback.classic.db.DBAppender;
-import ch.qos.logback.classic.db.names.DefaultDBNameResolver;
-import ch.qos.logback.core.db.ConnectionSource;
 import ch.qos.logback.core.db.dialect.SQLDialectCode;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
@@ -13,21 +9,12 @@ import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+import org.endeavourhealth.enterprise.core.database.execution.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyVetoException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.sql.*;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.*;
 
 /**
@@ -82,7 +69,7 @@ final class SqlServerDatabase implements DatabaseI {
         }
     }
 
-    private int executeScalarCountQuery(String sql) throws Exception {
+    private int executeScalarQuery(String sql) throws Exception {
         Connection connection = DatabaseManager.getConnection();
         Statement s = connection.createStatement();
         try {
@@ -574,7 +561,7 @@ final class SqlServerDatabase implements DatabaseI {
                 + " WHERE ItemUuid = " + convertToString(itemUuid)
                 + " AND DependencyTypeId = " + convertToString(dependencyType);
 
-        return executeScalarCountQuery(sql);
+        return executeScalarQuery(sql);
     }
 
     @Override
@@ -740,6 +727,21 @@ final class SqlServerDatabase implements DatabaseI {
 
         String where = "WHERE AuditUuid IN (" + convertToString(uuids) + ")";
         retrieveForWhere(new DbAudit().getAdapter(), where, ret);
+        return ret;
+    }
+
+    @Override
+    public int retrieveMaxAuditVersion() throws Exception {
+        String sql = "SELECT MAX(AuditVersion)"
+                + " FROM Definition.Audit";
+        return executeScalarQuery(sql);
+    }
+
+    @Override
+    public List<DbJobContent> retrieveJobContentsForJob(UUID jobUuid) throws Exception {
+        List<DbJobContent> ret = new ArrayList<>();
+        String where = "WHERE JobUuid = " + convertToString(jobUuid);
+        retrieveForWhere(new DbJobContent().getAdapter(), where, ret);
         return ret;
     }
 

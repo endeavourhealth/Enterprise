@@ -2,11 +2,10 @@ package org.endeavourhealth.enterprise.core;
 
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
+import org.endeavourhealth.enterprise.core.database.execution.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
@@ -30,15 +29,17 @@ public abstract class Examples {
         List<DbAbstractTable> toSave = new ArrayList<>();
 
         int patientsInDb = 0; //get count of patients
+        int maxAuditVersion = DbAudit.retrieveMaxAuditVersion();
 
         //create the job
         DbJob job = new DbJob();
         job.assignPrimaryUUid();
-        UUID jobUuid = job.getJobUuid();
-        job.setJobUuid(jobUuid);
         job.setStartDateTime(Instant.now());
         job.setPatientsInDatabase(patientsInDb);
+        job.setBaselineAuditVersion(maxAuditVersion);
         toSave.add(job);
+
+        UUID jobUuid = job.getJobUuid();
 
         //retrieve pending requests
         for (DbRequest request: pendingRequests) {
@@ -66,40 +67,78 @@ public abstract class Examples {
             request.setJobUuid(jobUuid);
             toSave.add(request);
 
-            //then create the sub-items for each query in the report being requested
+            //then create the JobReportItem objects for each query and listOutput in the report being requested
             DbItem dbItem = DbItem.retrieveForUuidAndAudit(reportUuid, auditUuid);
             String itemXml = dbItem.getXmlContent();
             Report report = QueryDocumentSerializer.readReportFromXml(itemXml);
-            List<ReportItem> items = report.getReportItem();
-            for (ReportItem item: items) {
-
-                //report item may have a queryUuid or listOutputUuid
-                String queryUuidStr = item.getQueryLibraryItemUuid();
-                String listOutputUuidStr = item.getListReportLibraryItemUuid();
-//                String parentUuidStr = item.getParentUuid();
-
-                String uuidStr = queryUuidStr;
-                if (uuidStr == null) {
-                    uuidStr = listOutputUuidStr;
-                }
-                UUID uuid = UUID.fromString(uuidStr);
-
-//                UUID parentUuid = null;
-//                if (parentUuidStr != null) {
-//                    parentUuid = UUID.fromString(parentUuidStr);
-//                }
-
-                DbJobReportItem jobReportItem = new DbJobReportItem();
-                jobReportItem.setJobReportUuid(jobReportUuid);
-                jobReportItem.setItemUuid(uuid);
-                //jobReportItem.setParentJobReportItemUuid(parentUuid);
-                toSave.add(jobReportItem);
-            }
+            List<ReportItem> reportItems = report.getReportItem();
+            createReportItems(jobUuid, jobReportUuid, null, reportItems, toSave);
         }
 
         //commit all changes to the DB in one atomic batch
         DatabaseManager.db().writeEntities(toSave);
     }
+    private static void createReportItems(UUID jobUuid, UUID jobReportUuid, UUID parentJobReportItemUuid, List<ReportItem> reportItems, List<DbAbstractTable> toSave) throws Exception {
+
+        for (ReportItem reportItem: reportItems) {
+
+            //report item may have a queryUuid OR listOutputUuid
+            String queryUuidStr = reportItem.getQueryLibraryItemUuid();
+            String listOutputUuidStr = reportItem.getListReportLibraryItemUuid();
+
+            String uuidStr = queryUuidStr;
+            if (uuidStr == null) {
+                uuidStr = listOutputUuidStr;
+            }
+            UUID itemUuid = UUID.fromString(uuidStr);
+
+            DbJobReportItem jobReportItem = new DbJobReportItem();
+            jobReportItem.assignPrimaryUUid();
+            jobReportItem.setJobReportUuid(jobReportUuid);
+            jobReportItem.setItemUuid(itemUuid);
+            jobReportItem.setParentJobReportItemUuid(parentJobReportItemUuid);
+            toSave.add(jobReportItem);
+
+            UUID jobReportItemUuid = jobReportItem.getJobReportItemUuid();
+
+            //create the jobContent objects for ALL dependent items
+            createReportContents(jobUuid, itemUuid, toSave);
+
+            //then recurse for any child reportItems
+            List<ReportItem> childReportItems = reportItem.getReportItem();
+            createReportItems(jobUuid, jobReportUuid, jobReportItemUuid, childReportItems, toSave);
+        }
+    }
+    private static void createReportContents(UUID jobUuid, UUID itemUuid, List<DbAbstractTable> toSave) throws Exception {
+
+        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
+        UUID auditUuid = activeItem.getAuditUuid();
+
+        //if the same query is in a report more than once, we don't want to create duplicate jobContents for it
+        for (DbAbstractTable entity: toSave) {
+            if (entity instanceof DbJobContent) {
+                DbJobContent existingJobContent = (DbJobContent)entity;
+                if (existingJobContent.getItemUuid().equals(itemUuid)) {
+                    return;
+                }
+            }
+        }
+
+        DbJobContent jobContent = new DbJobContent();
+        jobContent.setJobUuid(jobUuid);
+        jobContent.setItemUuid(itemUuid);
+        jobContent.setAuditUuid(auditUuid);
+        jobContent.setSaveMode(TableSaveMode.INSERT); //because the primary keys have been explicitly set, we need to force insert mode
+        toSave.add(jobContent);
+
+        //then recurse to find the dependent items on this item
+        List<DbItemDependency> itemDependencies = DbItemDependency.retrieveForActiveItem(activeItem);
+        for (DbItemDependency itemDependency: itemDependencies) {
+            UUID childItemUuid = itemDependency.getDependentItemUuid();
+            createReportContents(jobUuid, childItemUuid, toSave);
+        }
+    }
+
 
     public static void findNonCompletedJobsAndContents() throws Exception {
 
@@ -110,6 +149,7 @@ public abstract class Examples {
             //retrieve JobReports for job
             UUID jobUuid = job.getJobUuid();
             List<DbJobReport> jobReports = DbJobReport.retrieveForJob(jobUuid);
+            List<DbJobContent> jobContents = DbJobContent.retrieveForJob(jobUuid);
 
             for (DbJobReport jobReport: jobReports) {
 

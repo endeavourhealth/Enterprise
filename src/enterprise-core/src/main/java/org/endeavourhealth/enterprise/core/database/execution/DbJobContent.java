@@ -1,10 +1,8 @@
 package org.endeavourhealth.enterprise.core.database.execution;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseColumn;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.PrimaryKeyColumn;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
+import java.util.List;
 import java.util.UUID;
 
 public final class DbJobContent extends DbAbstractTable {
@@ -25,6 +23,9 @@ public final class DbJobContent extends DbAbstractTable {
         return adapter;
     }
 
+    public static List<DbJobContent> retrieveForJob(UUID jobUuid) throws Exception {
+        return DatabaseManager.db().retrieveJobContentsForJob(jobUuid);
+    }
 
     /**
      * gets/sets

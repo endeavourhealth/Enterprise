@@ -15,12 +15,12 @@ public final class DbItemDependency extends DbAbstractTable {
 
     @DatabaseColumn
     @PrimaryKeyColumn
-    private UUID itemDependencyUuid = null;
-    @DatabaseColumn
     private UUID itemUuid = null;
     @DatabaseColumn
+    @PrimaryKeyColumn
     private UUID auditUuid = null;
     @DatabaseColumn
+    @PrimaryKeyColumn
     private UUID dependentItemUuid = null;
     @DatabaseColumn
     private DependencyType dependencyTypeId = null;
@@ -79,14 +79,6 @@ public final class DbItemDependency extends DbAbstractTable {
     /**
      * gets/sets
      */
-    public UUID getItemDependencyUuid() {
-        return itemDependencyUuid;
-    }
-
-    public void setItemDependencyUuid(UUID itemDependencyUuid) {
-        this.itemDependencyUuid = itemDependencyUuid;
-    }
-
     public UUID getItemUuid() {
         return itemUuid;
     }

@@ -9,10 +9,7 @@ import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+import org.endeavourhealth.enterprise.core.database.execution.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -93,5 +90,9 @@ public interface DatabaseI {
     public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception;
 
     public List<DbAudit> retrieveAuditsForUuids(List<UUID> uuids) throws Exception;
+
+    public int retrieveMaxAuditVersion() throws Exception;
+
+    public List<DbJobContent> retrieveJobContentsForJob(UUID jobUuid) throws Exception;
 
 }

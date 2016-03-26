@@ -312,14 +312,14 @@ var flowchart = {};
 			}
 			else {
 				if (connectorIndex==0) {
-					sourceRule.data.onPass.action = "Next Rule";
+					sourceRule.data.onPass.action = "GOTO_RULES";
 					if (!sourceRule.data.onPass.ruleId) {
 						sourceRule.data.onPass.ruleId = [];
 					}
 					sourceRule.data.onPass.ruleId.push(destRuleId);
 				}
 				else if (connectorIndex==1) {
-					sourceRule.data.onFail.action = "Next Rule";
+					sourceRule.data.onFail.action = "GOTO_RULES";
 					if (!sourceRule.data.onFail.ruleId) {
 						sourceRule.data.onFail.ruleId = [];
 					}
@@ -439,7 +439,7 @@ var flowchart = {};
 				for (var nextRulesIndex = 0; nextRulesIndex < r.data.onPass.ruleId.length; ++nextRulesIndex) {
 					var ruleId = r.data.onPass.ruleId[nextRulesIndex];
 					if (selectedRuleId!=ruleId) {
-						// Only retain non-selected next rules.
+						// Only retain non-selected GOTO_RULESs.
 						newNextRuleViewModels.push(ruleId);
 					}
 				}
@@ -459,7 +459,7 @@ var flowchart = {};
 				for (var nextRulesIndex = 0; nextRulesIndex < r.data.onFail.ruleId.length; ++nextRulesIndex) {
 					var ruleId = r.data.onFail.ruleId[nextRulesIndex];
 					if (selectedRuleId!=ruleId) {
-						// Only retain non-selected next rules.
+						// Only retain non-selected GOTO_RULESs.
 						newNextRuleViewModels.push(ruleId);
 					}
 				}

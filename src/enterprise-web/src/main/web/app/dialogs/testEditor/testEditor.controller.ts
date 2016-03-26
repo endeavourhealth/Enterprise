@@ -14,13 +14,13 @@ module app.dialogs {
 	import FieldTest = app.models.FieldTest;
 	import CodeSet = app.models.CodeSet;
 	import CodeSetValue = app.models.CodeSetValue;
-	import CodingSystem = app.models.CodingSystem;
 	import ValueFrom = app.models.ValueFrom;
 	import ValueTo = app.models.ValueTo;
 	import Value = app.models.Value;
 	import ValueAbsoluteUnit = app.models.ValueAbsoluteUnit;
 	import ValueFromOperator = app.models.ValueFromOperator;
 	import ValueToOperator = app.models.ValueToOperator;
+	import IsAny = app.models.IsAny;
 
 	'use strict';
 
@@ -103,10 +103,12 @@ module app.dialogs {
 				 restriction: null
 			 };
 
+			var isAny : IsAny = {}
+
 			 var newTest : Test = {
 				 dataSource: ds,
 				 dataSourceUuid: null,
-				 isAny: null,
+				 isAny: isAny,
 				 fieldTest: null
 			 };
 
@@ -209,7 +211,7 @@ module app.dialogs {
 				.result.then(function(resultData : TermlexCodeSelection[]){
 
 				var codeSet : CodeSet = {
-					codingSystem : 2,
+					codingSystem : "SNOMED_CT",
 					codeSetValue : []
 				}
 
@@ -362,20 +364,12 @@ module app.dialogs {
 			if (value!="" && value!=null)
 				datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
 
-			/*var valueFromOperator : ValueFromOperator = {
-				value: "greaterThanOrEqualTo"
-			}
-
-			var valueAbsoluteUnit : ValueAbsoluteUnit = {
-				value: "date"
-			}*/
-
 			var valueFrom : ValueFrom = {
 				constant: datestring,
 				parameter: null,
-				absoluteUnit: "date",
+				absoluteUnit: "DATE",
 				relativeUnit: null,
-				operator: "greaterThanOrEqualTo"
+				operator: "GREATER_THAN_OR_EQUAL_TO"
 			}
 
 			var fieldTest : FieldTest = {
@@ -415,20 +409,12 @@ module app.dialogs {
 			if (value!="" && value!=null)
 				datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
 
-			/*var valueToOperator : ValueToOperator = {
-				value: "lessThanOrEqualTo"
-			}
-
-			var valueAbsoluteUnit : ValueAbsoluteUnit = {
-				value: "date"
-			}*/
-
 			var valueTo : ValueTo = {
 				constant: datestring,
 				parameter: null,
-				absoluteUnit: "date",
+				absoluteUnit: "DATE",
 				relativeUnit: null,
-				operator: "lessThanOrEqualTo"
+				operator: "LESS_THAN_OR_EQUAL_TO"
 			}
 
 			var fieldTest : FieldTest = {
@@ -472,14 +458,10 @@ module app.dialogs {
 		filterValueChange(value : any, valueField : any) {
 			var vm = this;
 
-			/*var valueAbsoluteUnit : ValueAbsoluteUnit = {
-				value: "value"
-			}*/
-
 			var valueEqualTo : Value = {
 				constant: value,
 				parameter: null,
-				absoluteUnit: "value",
+				absoluteUnit: "NUMERIC",
 				relativeUnit: null
 			}
 
@@ -515,20 +497,12 @@ module app.dialogs {
 		filterValueFromChange(value : any) {
 			var vm = this;
 
-			/*var valueAbsoluteUnit : ValueAbsoluteUnit = {
-				value: "numeric"
-			}
-
-			var valueFromOperator : ValueFromOperator = {
-				value: "greaterThanOrEqualTo"
-			}*/
-
 			var valueFrom : ValueFrom = {
 				constant: value,
 				parameter: null,
-				absoluteUnit: "numeric",
+				absoluteUnit: "NUMERIC",
 				relativeUnit: null,
-				operator: "greaterThanOrEqualTo"
+				operator: "GREATER_THAN_OR_EQUAL_TO"
 			}
 
 			var fieldTest : FieldTest = {
@@ -563,20 +537,12 @@ module app.dialogs {
 		filterValueToChange(value : any) {
 			var vm = this;
 
-			/*var valueAbsoluteUnit : ValueAbsoluteUnit = {
-				value: "numeric"
-			}
-
-			var valueToOperator : ValueToOperator = {
-				value: "lessThanOrEqualTo"
-			}*/
-
 			var valueTo : ValueTo = {
 				constant: value,
 				parameter: null,
-				absoluteUnit: "numeric",
+				absoluteUnit: "NUMERIC",
 				relativeUnit: null,
-				operator: "lessThanOrEqualTo"
+				operator: "LESS_THAN_OR_EQUAL_TO"
 			}
 
 			var fieldTest : FieldTest = {

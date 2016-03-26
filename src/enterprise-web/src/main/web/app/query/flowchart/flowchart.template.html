@@ -93,7 +93,7 @@
                     cx="250"
                     cy="30"/>
 
-            <path ng-if="rule.description()!='START' && rule.onPassAction() == 'No Action'"
+            <path ng-if="rule.description()!='START' && rule.onPassAction() == 'EXCLUDE'"
                   class="connection-line-exclusion"
                   d="M 260, 30
                      L 280, 30,
@@ -101,13 +101,13 @@
                      280, 45">
             </path>
 
-            <path ng-if="rule.description()!='START' && rule.onPassAction() == 'Include Patient in Final Result'"
+            <path ng-if="rule.description()!='START' && rule.onPassAction() == 'INCLUDE'"
                   class="connection-line-exclusion"
                   d="M 260, 30
                  L 280, 30">
             </path>
 
-            <text ng-if="rule.description()!='START' && rule.onPassAction() == 'Include Patient in Final Result'"
+            <text ng-if="rule.description()!='START' && rule.onPassAction() == 'INCLUDE'"
                   class="connector-text-out-include-tick"
                   x="285"
                   y="30"
@@ -133,7 +133,7 @@
                     cx="250"
                     cy="85"/>
 
-            <path ng-if="rule.description()!='START' && rule.onFailAction() == 'No Action'"
+            <path ng-if="rule.description()!='START' && rule.onFailAction() == 'EXCLUDE'"
                   class="connection-line-exclusion"
                   d="M 260, 85
                      L 280, 85,
@@ -141,13 +141,13 @@
                      280, 100">
             </path>
 
-            <path ng-if="rule.description()!='START' && rule.onFailAction() == 'Include Patient in Final Result'"
+            <path ng-if="rule.description()!='START' && rule.onFailAction() == 'INCLUDE'"
                   class="connection-line-exclusion"
                   d="M 260, 85
                  L 280, 85">
             </path>
 
-            <text ng-if="rule.description()!='START' && rule.onFailAction() == 'Include Patient in Final Result'"
+            <text ng-if="rule.description()!='START' && rule.onFailAction() == 'INCLUDE'"
                   class="connector-text-out-include-tick"
                   x="285"
                   y="85"

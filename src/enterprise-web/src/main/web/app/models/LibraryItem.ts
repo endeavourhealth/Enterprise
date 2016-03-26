@@ -6,7 +6,7 @@ module app.models {
 		name:string;
 		description:string;
 		folderUuid:string;
-		// query:Query;
+		query:Query;
 		// dataSource:DataSource;
 		// test:Test;
 		codeSet:CodeSet;

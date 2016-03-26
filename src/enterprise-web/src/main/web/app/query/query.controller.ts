@@ -7,6 +7,8 @@ module app.query {
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import Test = app.models.Test;
+	import ILibraryService = app.core.ILibraryService;
+	import LibraryItem = app.models.LibraryItem;
 
 	'use strict';
 
@@ -37,15 +39,18 @@ module app.query {
 				}
 			};
 		})
-		.controller('QueryController', ['$scope', '$stateParams', '$uibModal','$window',
-			function QueryController ($scope : any, $stateParams : any, $modal : IModalService, $window : any) {
+		.controller('QueryController', ['$scope', '$stateParams', '$uibModal','$window','LibraryService','AdminService',
+			function QueryController ($scope : any, $stateParams : any, $modal : IModalService, $window : any,
+									  libraryService : ILibraryService, adminService : IAdminService) {
+
+				var libraryItem : LibraryItem;
 
 				var itemAction = $stateParams.itemAction;
 				var itemUuid = $stateParams.itemUuid;
 
-				$scope.queryFolderUuid = "";
+				$scope.queryFolderUuid = null;
 				$scope.queryFolderName = "";
-				$scope.queryUuid = "";
+				$scope.queryUuid = null;
 				$scope.queryName = "";
 				$scope.queryDescription = "";
 
@@ -102,7 +107,7 @@ module app.query {
 				$scope.rulePassActionChange = function () {
 					var selectedRule = $scope.chartViewModel.getSelectedRule();
 					selectedRule.data.onPass.action = $scope.rulePassAction;
-					if ($scope.rulePassAction!="Next Rule") {
+					if ($scope.rulePassAction!="GOTO_RULES") {
 						selectedRule.data.onPass.ruleId = <any>[];
 					}
 				};
@@ -110,14 +115,14 @@ module app.query {
 				$scope.ruleFailActionChange = function () {
 					var selectedRule = $scope.chartViewModel.getSelectedRule();
 					selectedRule.data.onFail.action = $scope.ruleFailAction;
-					if ($scope.ruleFailAction!="Next Rule") {
+					if ($scope.ruleFailAction!="GOTO_RULES") {
 						selectedRule.data.onFail.ruleId = <any>[];
 					}
 				};
 
 				$scope.nextRuleID = 0;
 
-				$scope.results = ['','Next Rule','Include Patient in Final Result','No Action'];
+				$scope.results = ['','GOTO_RULES','INCLUDE','EXCLUDE'];
 
 				$scope.$on('editTest', function(event : any, ruleId : any) {
 					if (ruleId!="0") {
@@ -244,6 +249,17 @@ module app.query {
 				$scope.deleteSelected = function () {
 					$scope.chartViewModel.deleteSelected();
 				};
+
+				$scope.save = function () {
+					libraryItem = $scope.chartViewModel.data.queryDocument.libraryItem;
+
+					libraryService.saveLibraryItem(libraryItem)
+						.then(function(libraryItem : LibraryItem) {
+							libraryItem.uuid = libraryItem.uuid;
+							alert(libraryItem.folderUuid+" : "+ libraryItem.uuid);
+							adminService.clearPendingChanges();
+						});
+				}
 
 				$scope.close = function () {
 					// put code in here to check for changes

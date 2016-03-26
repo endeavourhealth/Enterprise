@@ -4,7 +4,7 @@ module app.models {
 	export class Test {
 		dataSource: DataSource;
 		dataSourceUuid: string;
-		isAny: string;
+		isAny: IsAny;
 		fieldTest: FieldTest[];
 	}
 }

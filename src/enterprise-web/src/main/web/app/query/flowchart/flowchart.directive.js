@@ -47,7 +47,7 @@ angular.module('flowChart', ['dragging'] )
 						if (value === null) {
 							delete JsonObj[key];
 						} else if (typeof(value) === "object") {
-							JsonObj[key] = removeAllNull(value);
+							//JsonObj[key] = removeAllNull(value);
 						}
 					});
 					return JsonObj;
@@ -346,10 +346,10 @@ angular.module('flowChart', ['dragging'] )
 							//
 							$scope.chart.createNewConnection(rule, sourceRuleId, destRuleId, connectorIndex);
 							if (connectorIndex==0) {
-								$scope.$emit('rulePassAction', 'Next Rule');
+								$scope.$emit('rulePassAction', 'GOTO_RULES');
 							}
 							else if (connectorIndex==1) {
-								$scope.$emit('ruleFailAction', 'Next Rule');
+								$scope.$emit('ruleFailAction', 'GOTO_RULES');
 							}
 							$scope.destRuleId = 0;
 						}

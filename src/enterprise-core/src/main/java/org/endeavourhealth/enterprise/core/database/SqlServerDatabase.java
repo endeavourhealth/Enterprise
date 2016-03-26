@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -345,6 +347,18 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     private void retrieveForWhere(TableAdapter a, int count, String conditions, List ret) throws Exception {
+
+        /*Field[] flds2 = a.getCls().getDeclaredFields();
+        for (Field fld: flds2) {
+            if (fld.isAnnotationPresent(DatabaseColumn.class)) {
+                System.out.println("fld "  + fld.getName() + " has annotation");
+            }
+            if (fld.isAnnotationPresent(PrimaryKeyColumn.class)) {
+                System.out.println("fld "  + fld.getName() + " has is primary key");
+            }
+        }*/
+
+
         StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");

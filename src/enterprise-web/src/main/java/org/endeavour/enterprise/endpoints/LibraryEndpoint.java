@@ -124,24 +124,35 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 .build();
     }
 
+    /**
+     * to be removed once web client uses getContentNamesforReportLibraryItem
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getLibraryItemNamesForReport")
     public Response getLibraryItemNamesForReport(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
-        UUID reportUuid = UUID.fromString(uuidStr);
+        return getContentNamesforReportLibraryItem(sc, uuidStr);
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getContentNamesforReportLibraryItem")
+    public Response getContentNamesforReportLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
+        UUID itemUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        LOG.trace("GettingLibraryItemNamesForReport for UUID {}", reportUuid);
+        LOG.trace("getContentNamesforReportLibraryItem for UUID {}", itemUuid);
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
-        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(reportUuid);
+        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
         List<DbItemDependency> dependentItems = DbItemDependency.retrieveForActiveItem(activeItem);
 
         for (DbItemDependency dependentItem: dependentItems) {
-            UUID itemUuid = dependentItem.getDependentItemUuid();
-            DbItem item = DbItem.retrieveForUUid(itemUuid);
+            UUID dependentItemUuid = dependentItem.getDependentItemUuid();
+            DbItem item = DbItem.retrieveForUUid(dependentItemUuid);
 
             JsonFolderContent content = new JsonFolderContent(item, null);
             ret.addContent(content);

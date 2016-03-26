@@ -1,9 +1,6 @@
 package org.endeavourhealth.enterprise.core.database.administration;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,10 +12,16 @@ public final class DbEndUser extends DbAbstractTable {
     private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
             "EndUserUuid,Title,Forename,Surname,Email,IsSuperUser", "EndUserUuid");
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
     private String title = null;
+    @DatabaseColumn
     private String forename = null;
+    @DatabaseColumn
     private String surname = null;
+    @DatabaseColumn
     private String email = null;
+    @DatabaseColumn
     private boolean isSuperUser = false;
 
 

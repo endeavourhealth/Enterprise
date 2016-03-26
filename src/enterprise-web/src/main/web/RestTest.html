@@ -277,6 +277,7 @@
 	<br/>
 	Permissions:
 	<select id="saveUserPermissions">
+		<option value="0"></option>
 		<option value="1">User</option>
 		<option value="2">Admin</option>
 	</select>
@@ -304,32 +305,33 @@
 				}
 
 				s = document.getElementById('saveUserTitle').value;
-				if (s.length > 0)
-				{
+				if (s.length > 0) {
 					params["title"] = s;
 				}
 
 				s = document.getElementById('saveUserForename').value;
-				if (s.length > 0)
-				{
+				if (s.length > 0) {
 					params["forename"] = s;
 				}
 
 				s = document.getElementById('saveUserSurname').value;
-				if (s.length > 0)
-				{
+				if (s.length > 0) {
 					params["surname"] = s;
 				}
 
 				var s = document.getElementById('saveUserPermissions').value;
 				if (s.length > 0)
 				{
-					params["permissions"] = s;
+					if (s == '1') {
+						params["admin"] = false;
+					} else if (s == '2') {
+						params["admin"] = true;
+					}
 				}
 
 				if (document.getElementById("saveUserSuperUser").checked)
 				{
-					params["isSuperUser"] = 'true';
+					params["superUser"] = true;
 				}
 
 				post('/api/admin/saveUser/', params);

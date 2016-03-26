@@ -1,10 +1,7 @@
 package org.endeavourhealth.enterprise.core.database.execution;
 
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 
 import java.sql.SQLException;
@@ -15,14 +12,22 @@ import java.util.UUID;
 
 public final class DbRequest extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbRequest.class,
-            "RequestUuid,ReportUuid,OrganisationUuid,EndUserUuid,TimeStamp,Parameters,JobUuid", "RequestUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbRequest.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID requestUuid = null;
+    @DatabaseColumn
     private UUID reportUuid = null;
+    @DatabaseColumn
     private UUID organisationUuuid = null;
+    @DatabaseColumn
     private UUID endUserUuid = null;
+    @DatabaseColumn
     private Instant timeStamp = null;
+    @DatabaseColumn
     private String parameters = null;
+    @DatabaseColumn
     private UUID jobUuid = null;
 
     public static List<DbRequest> retrievePendingForActiveItems(UUID organisationUuid, List<DbActiveItem> activeItems) throws Exception {
@@ -48,31 +53,17 @@ public final class DbRequest extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(reportUuid);
-        builder.add(organisationUuuid);
-        builder.add(endUserUuid);
-        builder.add(timeStamp);
-        builder.add(parameters);
-        builder.add(jobUuid);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        reportUuid = reader.readUuid();
-        organisationUuuid = reader.readUuid();
-        endUserUuid = reader.readUuid();
-        timeStamp = reader.readDateTime();
-        parameters = reader.readString();
-        jobUuid = reader.readUuid();
-    }
-
     /**
      * gets/sets
      */
+    public UUID getRequestUuid() {
+        return requestUuid;
+    }
+
+    public void setRequestUuid(UUID requestUuid) {
+        this.requestUuid = requestUuid;
+    }
+
     public UUID getEndUserUuid() {
         return endUserUuid;
     }

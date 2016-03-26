@@ -1,10 +1,7 @@
 package org.endeavourhealth.enterprise.core.database.execution;
 
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 
 import java.sql.SQLException;
@@ -15,12 +12,18 @@ import java.util.UUID;
 
 public final class DbJob extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbJob.class,
-            "JobUuid,StatusId,StartDateTime,EndDateTime,PatientsInDatabase", "JobUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbJob.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID jobUuid = null;
+    @DatabaseColumn
     private ExecutionStatus statusId = ExecutionStatus.Executing;
+    @DatabaseColumn
     private Instant startDateTime = null;
+    @DatabaseColumn
     private Instant endDateTime = null;
+    @DatabaseColumn
     private Integer patientsInDatabase = null;
 
     public static List<DbJob> retrieveForJobReports(List<DbJobReport> jobReports) throws Exception {
@@ -57,27 +60,17 @@ public final class DbJob extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(statusId);
-        builder.add(startDateTime);
-        builder.add(endDateTime);
-        builder.add(patientsInDatabase);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        statusId = ExecutionStatus.get(reader.readInt());
-        startDateTime = reader.readDateTime();
-        endDateTime = reader.readDateTime();
-        patientsInDatabase = reader.readInt();
-    }
-
     /**
      * gets/sets
      */
+    public UUID getJobUuid() {
+        return jobUuid;
+    }
+
+    public void setJobUuid(UUID jobUuid) {
+        this.jobUuid = jobUuid;
+    }
+
     public Instant getEndDateTime() {
         return endDateTime;
     }

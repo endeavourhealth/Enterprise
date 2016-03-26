@@ -190,12 +190,12 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         for (int i = 0; i < items.size(); i++) {
             DbItem item = items.get(i);
-            UUID itemUuid = item.getPrimaryUuid();
+            UUID itemUuid = item.getItemUuid();
 
             int childFolders = DbActiveItem.retrieveCountDependencies(itemUuid, DependencyType.IsChildOf);
             int contentCount = DbActiveItem.retrieveCountDependencies(itemUuid, DependencyType.IsContainedWithin);
 
-            LOG.trace("Child folder {}, UUID {} has {} child folders and {} contents", item.getTitle(), item.getPrimaryUuid(), childFolders, contentCount);
+            LOG.trace("Child folder {}, UUID {} has {} child folders and {} contents", item.getTitle(), item.getItemUuid(), childFolders, contentCount);
 
             JsonFolder folder = new JsonFolder(item, contentCount, childFolders > 0);
             ret.add(folder);
@@ -274,20 +274,20 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
             List<DbJob> jobs = DbJob.retrieveForJobReports(jobReports);
             for (DbJob job: jobs) {
-                hmJobsByUuid.put(job.getPrimaryUuid(), job);
+                hmJobsByUuid.put(job.getJobUuid(), job);
             }
         }
 
         HashMap<UUID, DbAudit> hmAuditsByAuditUuid = new HashMap<>();
         List<DbAudit> audits = DbAudit.retrieveForActiveItems(childActiveItems);
         for (DbAudit audit: audits) {
-            hmAuditsByAuditUuid.put(audit.getPrimaryUuid(), audit);
+            hmAuditsByAuditUuid.put(audit.getAuditUuid(), audit);
         }
 
         HashMap<UUID, DbItem> hmItemsByItemUuid = new HashMap<>();
         List<DbItem> items = DbItem.retrieveForActiveItems(childActiveItems);
         for (DbItem item: items) {
-            hmItemsByItemUuid.put(item.getPrimaryUuid(), item);
+            hmItemsByItemUuid.put(item.getItemUuid(), item);
         }
 
         for (int i = 0; i < childActiveItems.size(); i++) {
@@ -304,11 +304,11 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             if (itemType == DefinitionItemType.Report) {
 
                 //for reports, indicate if it's currently scheduled to be run
-                DbRequest pendingRequest = hmPendingRequestsByItem.get(item.getPrimaryUuid());
+                DbRequest pendingRequest = hmPendingRequestsByItem.get(item.getItemUuid());
                 c.setIsScheduled(pendingRequest != null);
 
                 //show when a report was last executed
-                DbJobReport jobReport = hmLastJobReportsByItem.get(item.getPrimaryUuid());
+                DbJobReport jobReport = hmLastJobReportsByItem.get(item.getItemUuid());
                 if (jobReport != null) {
                     DbJob job = hmJobsByUuid.get(jobReport.getJobUuid());
                     c.setLastRun(new Date(job.getStartDateTime().toEpochMilli()));
@@ -323,8 +323,6 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             } else if (itemType == DefinitionItemType.CodeSet) {
 
             } else if (itemType == DefinitionItemType.ListOutput) {
-
-            } else if (itemType == DefinitionItemType.CodeSet) {
 
             } else {
                 throw new RuntimeException("Unexpected content " + item + " in folder");

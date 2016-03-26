@@ -1,10 +1,7 @@
 package org.endeavourhealth.enterprise.core.database.definition;
 
 import org.endeavourhealth.enterprise.core.DependencyType;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,12 +11,18 @@ import java.util.UUID;
 public final class DbItemDependency extends DbAbstractTable {
 
     //register as a DB entity
-    private static final TableAdapter adapter = new TableAdapter(DbItemDependency.class,
-            "ItemDependencyUuid,ItemUuid,AuditUuid,DependentItemUuid,DependencyTypeId", "ItemDependencyUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbItemDependency.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID itemDependencyUuid = null;
+    @DatabaseColumn
     private UUID itemUuid = null;
+    @DatabaseColumn
     private UUID auditUuid = null;
+    @DatabaseColumn
     private UUID dependentItemUuid = null;
+    @DatabaseColumn
     private DependencyType dependencyTypeId = null;
 
     public DbItemDependency() {
@@ -73,27 +76,17 @@ public final class DbItemDependency extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(itemUuid);
-        builder.add(auditUuid);
-        builder.add(dependentItemUuid);
-        builder.add(dependencyTypeId.getValue());
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        itemUuid = reader.readUuid();
-        auditUuid = reader.readUuid();
-        dependentItemUuid = reader.readUuid();
-        dependencyTypeId = DependencyType.get(reader.readInt());
-    }
-
     /**
      * gets/sets
      */
+    public UUID getItemDependencyUuid() {
+        return itemDependencyUuid;
+    }
+
+    public void setItemDependencyUuid(UUID itemDependencyUuid) {
+        this.itemDependencyUuid = itemDependencyUuid;
+    }
+
     public UUID getItemUuid() {
         return itemUuid;
     }

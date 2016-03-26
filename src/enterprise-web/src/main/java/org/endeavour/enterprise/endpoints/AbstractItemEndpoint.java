@@ -67,7 +67,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
 
         DbAudit audit = DbAudit.factoryNow(userUuid);
         toSave.add(audit);
-        UUID auditUuid = audit.getPrimaryUuid();
+        UUID auditUuid = audit.getAuditUuid();
 
         for (DbItem itemToDelete: itemsToDelete) {
             itemToDelete.setAuditUuid(auditUuid);
@@ -109,13 +109,13 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         //create a hash of all our items being deleted
         HashSet<UUID> hsUuidsToDelete = new HashSet<>();
         for (DbItem item: itemsToDelete) {
-            hsUuidsToDelete.add(item.getPrimaryUuid());
+            hsUuidsToDelete.add(item.getItemUuid());
         }
 
         //see if there are any items USING something that we're trying to delete
         for (int i = 0; i < itemsToDelete.size(); i++) {
             DbItem item = itemsToDelete.get(i);
-            UUID itemUuid = item.getPrimaryUuid();
+            UUID itemUuid = item.getItemUuid();
             List<DbItemDependency> dependencies = DbItemDependency.retrieveForDependentItemType(itemUuid, DependencyType.Uses);
             for (int j = 0; j < dependencies.size(); j++) {
                 DbItemDependency dependency = dependencies.get(i);
@@ -192,7 +192,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             activeItem.setItemTypeId(itemType);
 
             item = new DbItem();
-            item.setPrimaryUuid(itemUuid);
+            item.setItemUuid(itemUuid);
             item.setXmlContent(""); //when creating folders, we don't store XML, so this needs to be non-null
         } else {
             activeItem = retrieveActiveItem(itemUuid, orgUuid, itemType);
@@ -204,8 +204,8 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         //update the AuditUuid on both objects
         DbAudit audit = DbAudit.factoryNow(userUuid);
         UUID previousAuditUuid = item.getAuditUuid();
-        activeItem.setAuditUuid(audit.getPrimaryUuid());
-        item.setAuditUuid(audit.getPrimaryUuid());
+        activeItem.setAuditUuid(audit.getAuditUuid());
+        item.setAuditUuid(audit.getAuditUuid());
 
         if (name != null) {
             item.setTitle(name);

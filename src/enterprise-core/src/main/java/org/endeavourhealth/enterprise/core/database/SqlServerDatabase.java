@@ -166,7 +166,7 @@ final class SqlServerDatabase implements DatabaseI {
         }
     }
 
-    private static String writeInsertSql(DbAbstractTable entity) {
+    private static String writeInsertSql(DbAbstractTable entity) throws Exception {
         TableAdapter a = entity.getAdapter();
 
         StringBuilder sb = new StringBuilder();
@@ -175,7 +175,7 @@ final class SqlServerDatabase implements DatabaseI {
         sb.append(" VALUES (");
 
         ArrayList<Object> values = new ArrayList<Object>();
-        entity.writeForDb(values);
+        a.writeForDb(entity, values);
 
         for (int i = 0; i < values.size(); i++) {
             Object value = values.get(i);
@@ -193,11 +193,11 @@ final class SqlServerDatabase implements DatabaseI {
         return sb.toString();
     }
 
-    private static String writeUpdateSql(DbAbstractTable entity) {
+    private static String writeUpdateSql(DbAbstractTable entity) throws Exception {
         TableAdapter a = entity.getAdapter();
 
         ArrayList<Object> values = new ArrayList<Object>();
-        entity.writeForDb(values);
+        a.writeForDb(entity, values);
 
         String[] primaryKeyCols = a.getPrimaryKeyColumns();
         String[] cols = a.getColumns();
@@ -262,11 +262,11 @@ final class SqlServerDatabase implements DatabaseI {
         return sb.toString();
     }
 
-    private static String writeDeleteSql(DbAbstractTable entity) {
+    private static String writeDeleteSql(DbAbstractTable entity) throws Exception {
         TableAdapter a = entity.getAdapter();
 
         ArrayList<Object> values = new ArrayList<Object>();
-        entity.writeForDb(values);
+        a.writeForDb(entity, values);
 
         String[] primaryKeyCols = a.getPrimaryKeyColumns();
         String[] cols = a.getColumns();
@@ -347,18 +347,6 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     private void retrieveForWhere(TableAdapter a, int count, String conditions, List ret) throws Exception {
-
-        /*Field[] flds2 = a.getCls().getDeclaredFields();
-        for (Field fld: flds2) {
-            if (fld.isAnnotationPresent(DatabaseColumn.class)) {
-                System.out.println("fld "  + fld.getName() + " has annotation");
-            }
-            if (fld.isAnnotationPresent(PrimaryKeyColumn.class)) {
-                System.out.println("fld "  + fld.getName() + " has is primary key");
-            }
-        }*/
-
-
         StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");
@@ -403,7 +391,7 @@ final class SqlServerDatabase implements DatabaseI {
 
             while (rr.nextResult()) {
                 DbAbstractTable entity = a.newEntity();
-                entity.readFromDb(rr);
+                a.readFromDb(entity, rr);
                 ret.add(entity);
             }
 

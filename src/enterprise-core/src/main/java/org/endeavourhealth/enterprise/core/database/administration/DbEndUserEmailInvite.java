@@ -1,9 +1,6 @@
 package org.endeavourhealth.enterprise.core.database.administration;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -13,11 +10,16 @@ import java.util.UUID;
 
 public final class DbEndUserEmailInvite extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbEndUserEmailInvite.class,
-            "EndUserEmailInviteUuid,EndUserUuid,UniqueToken,DtCompleted", "EndUserEmailInviteUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbEndUserEmailInvite.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID endUserEmailInviteUuid = null;
+    @DatabaseColumn
     private UUID endUserUuid = null;
+    @DatabaseColumn
     private String uniqueToken = null;
+    @DatabaseColumn
     private Instant dtCompleted = null;
 
 
@@ -39,22 +41,6 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     @Override
     public TableAdapter getAdapter() {
         return adapter;
-    }
-
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(endUserUuid);
-        builder.add(uniqueToken);
-        builder.add(dtCompleted);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        endUserUuid = reader.readUuid();
-        uniqueToken = reader.readString();
-        dtCompleted = reader.readDateTime();
     }
 
     /**
@@ -80,6 +66,14 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     /**
      * gets/sets
      */
+    public UUID getEndUserEmailInviteUuid() {
+        return endUserEmailInviteUuid;
+    }
+
+    public void setEndUserEmailInviteUuid(UUID endUserEmailInviteUuid) {
+        this.endUserEmailInviteUuid = endUserEmailInviteUuid;
+    }
+
     public UUID getEndUserUuid() {
         return endUserUuid;
     }

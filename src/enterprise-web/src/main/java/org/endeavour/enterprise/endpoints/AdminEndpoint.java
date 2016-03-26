@@ -83,7 +83,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         //if we've created new root folders, save them now
         if (creteRootFolders) {
             UUID userUuid = getEndUserUuidFromToken(sc);
-            UUID orgUuid = org.getPrimaryUuid();
+            UUID orgUuid = org.getOrganisationUuid();
 
             FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.ReportFolder);
             FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.LibraryFolder);
@@ -91,7 +91,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         //return the organisation UUID
         JsonOrganisation ret = new JsonOrganisation();
-        ret.setUuid(org.getPrimaryUuid());
+        ret.setUuid(org.getOrganisationUuid());
 
         return Response
                 .ok()
@@ -120,38 +120,18 @@ public final class AdminEndpoint extends AbstractEndpoint {
         Boolean isAdmin = userParameters.getAdmin();
         Boolean isSuperUser = userParameters.getSuperUser();
 
+        LOG.trace("SavingUser UserUUID {}, Email {} Title {} Forename {} Surname {} IsAdmin {} IsSuperUser {}", uuid, email, title, forename, surname, isAdmin, isSuperUser);
+
         //until the web client is changed, we need to use the permissions value
         if (isAdmin == null && permissions != null) {
             isAdmin = permissions.intValue() == 2;
         }
 
-        LOG.trace("SavingUser UserUUID {}, Email {} Title {} Forename {} Surname {} IsAdmin {} IsSuperUser", uuid, email, title, forename, surname, isAdmin, isSuperUser);
-
         DbOrganisation org = getOrganisationFromSession(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        //validate the parameters passed in
-        if (email == null || email.length() == 0) {
-            throw new BadRequestException("Cannot set blank username");
-        }
-        if (title == null) {
-            //allow a blank title
-            title = "";
-        }
-        if (forename == null || forename.length() == 0) {
-            throw new BadRequestException("Cannot set blank forename");
-        }
-        if (surname == null || surname.length() == 0) {
-            throw new BadRequestException("Cannot set blank surname");
-        }
-        if (permissions == null) {
-            throw new BadRequestException("Cannot set blank permissions");
-        }
         if (isSuperUser == null) {
             isSuperUser = new Boolean(false);
-        }
-        if (isAdmin == null) {
-            isAdmin = new Boolean(false);
         }
 
         //if doing anything to a super user, verify the current user is a super-user
@@ -159,6 +139,21 @@ public final class AdminEndpoint extends AbstractEndpoint {
             DbEndUser user = getEndUserFromSession(sc);
             if (!user.isSuperUser()) {
                 throw new NotAuthorizedException("Non-super user cannot create or modify super users");
+            }
+        }
+
+        //currently support the "permissions" and "isAdmin" concept together. Ideally will just use isAdmin eventually.
+        if (isAdmin == null) {
+            if (permissions != null) {
+                if (permissions.intValue() == 1) {
+                    isAdmin = new Boolean(false);
+                } else if (permissions.intValue() == 2) {
+                    isAdmin = new Boolean(true);
+                } else {
+                    throw new BadRequestException("Unexpected Permissions value " + permissions);
+                }
+            } else {
+                isAdmin = new Boolean(false);
             }
         }
 
@@ -174,6 +169,20 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 //if the user doesn't already exist, create it and save to the DB
                 createdNewPerson = new Boolean(true);
 
+                if (email == null || email.length() == 0) {
+                    throw new BadRequestException("Cannot set blank username");
+                }
+                if (title == null) {
+                    //allow a blank title
+                    title = "";
+                }
+                if (forename == null || forename.length() == 0) {
+                    throw new BadRequestException("Cannot set blank forename");
+                }
+                if (surname == null || surname.length() == 0) {
+                    throw new BadRequestException("Cannot set blank surname");
+                }
+
                 user = new DbEndUser();
                 user.setEmail(email);
                 user.setTitle(title);
@@ -183,7 +192,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
                 //we need the UUID of this person, so save right now to generate it
                 user.writeToDb();
-                uuid = user.getPrimaryUuid();
+                uuid = user.getEndUserUuid();
             }
             //if we're trying to create a new user, but they already exist at another org,
             //then we can just use that same user record and link it to the new organisation
@@ -191,13 +200,13 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 createdNewPerson = new Boolean(false);
 
                 //validate the name matches what's already on the DB
-                if (!user.getForename().equals(forename)
-                        || !user.getForename().equals(surname)) {
+                if (!user.getForename().equalsIgnoreCase(forename)
+                        || !user.getSurname().equalsIgnoreCase(surname)) {
                     throw new BadRequestException("User already exists but with different name");
                 }
 
                 //validate the person isn't already a user at our org
-                uuid = user.getPrimaryUuid();
+                uuid = user.getEndUserUuid();
                 link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
                 if (link != null) {
                     throw new BadRequestException("User already is registered here");
@@ -231,10 +240,19 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 throw new BadRequestException("Cannot promote a user to super-user status");
             }
 
-            user.setEmail(email);
-            user.setTitle(title);
-            user.setForename(forename);
-            user.setSurname(surname);
+            if (email != null && email.length() > 0) {
+                user.setEmail(email);
+            }
+            if (title != null) {
+                user.setTitle(title);
+            }
+            if (forename != null && forename.length() > 0) {
+                user.setForename(forename);
+            }
+            if (surname != null && surname.length() > 0) {
+                user.setSurname(surname);
+            }
+
             user.setSuperUser(isSuperUser);
             user.writeToDb();
 
@@ -277,7 +295,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
     }
 
     private static void createAndSendInvite(DbEndUser user, DbOrganisation org) throws Exception {
-        UUID userUuid = user.getPrimaryUuid();
+        UUID userUuid = user.getEndUserUuid();
 
         DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
         invite.setEndUserUuid(userUuid);

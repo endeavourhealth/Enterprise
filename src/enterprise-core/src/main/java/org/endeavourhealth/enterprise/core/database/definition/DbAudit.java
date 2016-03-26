@@ -11,17 +11,21 @@ import java.util.UUID;
 
 public final class DbAudit extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbAudit.class,
-            "AuditUuid,EndUserUuid,TimeStamp", "AuditUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbAudit.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID auditUuid = null;
+    @DatabaseColumn
     private UUID endUserUuid = null;
+    @DatabaseColumn
     private Instant timeStamp = null;
 
     public DbAudit() {}
 
     public static DbAudit factoryNow(UUID endUserUuid) {
         DbAudit ret = new DbAudit();
-        ret.setPrimaryUuid(UUID.randomUUID());
+        ret.setAuditUuid(UUID.randomUUID()); //always explicitly set a new UUID as we'll always want to use it
         ret.setSaveMode(TableSaveMode.INSERT);
         ret.setEndUserUuid(endUserUuid);
         ret.setTimeStamp(Instant.now());
@@ -48,23 +52,18 @@ public final class DbAudit extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(endUserUuid);
-        builder.add(timeStamp);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        endUserUuid = reader.readUuid();
-        timeStamp = reader.readDateTime();
-    }
 
     /**
      * gets/sets
      */
+    public UUID getAuditUuid() {
+        return auditUuid;
+    }
+
+    public void setAuditUuid(UUID auditUuid) {
+        this.auditUuid = auditUuid;
+    }
+
     public UUID getEndUserUuid() {
         return endUserUuid;
     }

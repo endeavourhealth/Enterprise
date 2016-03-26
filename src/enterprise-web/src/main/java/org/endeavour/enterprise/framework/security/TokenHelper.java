@@ -32,12 +32,12 @@ public class TokenHelper {
 
         //when logging a user off, we create a token with a null person
         if (person != null) {
-            bodyParameterMap.put(TOKEN_USER, person.getPrimaryUuid());
+            bodyParameterMap.put(TOKEN_USER, person.getEndUserUuid());
         }
 
         //if the person has multiple orgs they can log on to, then we may pass in null until they select one
         if (org != null) {
-            bodyParameterMap.put(TOKEN_ORGANISATION, org.getPrimaryUuid());
+            bodyParameterMap.put(TOKEN_ORGANISATION, org.getOrganisationUuid());
             bodyParameterMap.put(TOKEN_ROLE, isAdmin);
         }
 

@@ -59,7 +59,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         }
 
         //retrieve the most recent password for the person
-        UUID uuid = user.getPrimaryUuid();
+        UUID uuid = user.getEndUserUuid();
 
         DbEndUserPwd pwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
         if (pwd == null) {
@@ -134,7 +134,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Path("/selectOrganisation")
     public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Exception {
         DbEndUser endUser = getEndUserFromSession(sc);
-        UUID endUserUuid = endUser.getPrimaryUuid();
+        UUID endUserUuid = endUser.getEndUserUuid();
 
         //the only parameter is the org UUID
         UUID orgUuid = orgParameters.getUuid();
@@ -226,7 +226,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         String hash = PasswordHash.createHash(newPwd);
 
         //retrieve the most recent password for the person
-        UUID uuid = user.getPrimaryUuid();
+        UUID uuid = user.getEndUserUuid();
         DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
 
         //create the new password entity

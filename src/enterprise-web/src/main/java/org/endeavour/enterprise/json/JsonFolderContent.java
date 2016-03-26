@@ -30,7 +30,7 @@ public final class JsonFolderContent implements Serializable {
         setTypeEnum(activeItem.getItemTypeId());
     }
     public JsonFolderContent(DbItem item, DbAudit audit) {
-        this.uuid = item.getPrimaryUuid();
+        this.uuid = item.getItemUuid();
         this.name = item.getTitle();
 
         if (audit != null) {

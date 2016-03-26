@@ -1,9 +1,6 @@
 package org.endeavourhealth.enterprise.core.database.administration;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -16,12 +13,18 @@ import java.util.UUID;
  */
 public final class DbOrganisationEndUserLink extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class,
-            "OrganisationEndUserLinkUuid,OrganisationUuid,EndUserUuid,IsAdmin,DtExpired", "OrganisationEndUserLinkUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbOrganisationEndUserLink.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID organisationEndUserLinkUuid = null;
+    @DatabaseColumn
     private UUID organisationUuid = null;
+    @DatabaseColumn
     private UUID endUserUuid = null;
+    @DatabaseColumn
     private boolean isAdmin = false;
+    @DatabaseColumn
     private Instant dtExpired = null;
 
 
@@ -49,27 +52,17 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(organisationUuid);
-        builder.add(endUserUuid);
-        builder.add(isAdmin);
-        builder.add(dtExpired);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        organisationUuid = reader.readUuid();
-        endUserUuid = reader.readUuid();
-        isAdmin = reader.readBoolean();
-        dtExpired = reader.readDateTime();
-    }
-
     /**
      * gets/sets
      */
+    public UUID getOrganisationEndUserLinkUuid() {
+        return organisationEndUserLinkUuid;
+    }
+
+    public void setOrganisationEndUserLinkUuid(UUID organisationEndUserLinkUuid) {
+        this.organisationEndUserLinkUuid = organisationEndUserLinkUuid;
+    }
+
     public UUID getOrganisationUuid() {
         return organisationUuid;
     }

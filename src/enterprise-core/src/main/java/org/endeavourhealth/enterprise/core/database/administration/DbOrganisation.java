@@ -1,9 +1,6 @@
 package org.endeavourhealth.enterprise.core.database.administration;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,10 +9,14 @@ import java.util.UUID;
 
 public final class DbOrganisation extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class,
-            "OrganisationUuid,Name,NationalId", "OrganisationUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbOrganisation.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID organisationUuid = null;
+    @DatabaseColumn
     private String name = null;
+    @DatabaseColumn
     private String nationalId = null;
 
 
@@ -25,20 +26,6 @@ public final class DbOrganisation extends DbAbstractTable {
     @Override
     public TableAdapter getAdapter() {
         return adapter;
-    }
-
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(name);
-        builder.add(nationalId);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        name = reader.readString();
-        nationalId = reader.readString();
     }
 
     public static List<DbOrganisation> retrieveForAll() throws Exception {
@@ -57,6 +44,14 @@ public final class DbOrganisation extends DbAbstractTable {
     /**
      * gets/sets
      */
+    public UUID getOrganisationUuid() {
+        return organisationUuid;
+    }
+
+    public void setOrganisationUuid(UUID organisationUuid) {
+        this.organisationUuid = organisationUuid;
+    }
+
     public String getName() {
         return name;
     }

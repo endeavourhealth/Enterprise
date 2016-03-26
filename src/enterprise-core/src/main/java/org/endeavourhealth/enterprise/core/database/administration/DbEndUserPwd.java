@@ -1,9 +1,6 @@
 package org.endeavourhealth.enterprise.core.database.administration;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -12,11 +9,16 @@ import java.util.UUID;
 
 public class DbEndUserPwd extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class,
-            "EndUserPwdUuid,EndUserUuid,PwdHash,DtExpired", "EndUserPwdUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbEndUserPwd.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID endUserPwdUuid = null;
+    @DatabaseColumn
     private UUID endUserUuid = null;
+    @DatabaseColumn
     private String pwdHash = null;
+    @DatabaseColumn
     private Instant dtExpired = null;
     //TODO: 2016-02-22 DL - should have number of lives and expiry date for passwords?
 
@@ -38,26 +40,17 @@ public class DbEndUserPwd extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(endUserUuid);
-        builder.add(pwdHash);
-        builder.add(dtExpired);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        endUserUuid = reader.readUuid();
-        pwdHash = reader.readString();
-        dtExpired = reader.readDateTime();
-    }
-
-
     /**
      * gets/sets
      */
+    public UUID getEndUserPwdUuid() {
+        return endUserPwdUuid;
+    }
+
+    public void setEndUserPwdUuid(UUID endUserPwdUuid) {
+        this.endUserPwdUuid = endUserPwdUuid;
+    }
+
     public UUID getEndUserUuid() {
         return endUserUuid;
     }

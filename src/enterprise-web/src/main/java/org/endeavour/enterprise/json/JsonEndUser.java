@@ -15,8 +15,8 @@ public final class JsonEndUser implements Serializable {
     private String title = null;
     private String forename = null;
     private String surname = null;
-    private Boolean isSuperUser = null; //using non-primative types because serialisation to JSON can skip nulls, if we want
-    private Boolean isAdmin = null;
+    private Boolean superUser = null; //using non-primative types because serialisation to JSON can skip nulls, if we want
+    private Boolean admin = null;
     private Integer permissions = null; //to be removed after isAdmin is adopted
 
 
@@ -24,15 +24,15 @@ public final class JsonEndUser implements Serializable {
     }
 
     public JsonEndUser(DbEndUser endUser, Boolean isAdmin) {
-        this.uuid = endUser.getPrimaryUuid();
+        this.uuid = endUser.getEndUserUuid();
         this.username = endUser.getEmail();
         this.title = endUser.getTitle();
         this.forename = endUser.getForename();
         this.surname = endUser.getSurname();
-        this.isSuperUser = new Boolean(endUser.isSuperUser());
+        this.superUser = new Boolean(endUser.isSuperUser());
 
         if (isAdmin != null) {
-            this.isAdmin = new Boolean(isAdmin);
+            this.admin = new Boolean(isAdmin);
 
             //to be removed once web client changed to use isAdmin
             if (isAdmin) {
@@ -95,19 +95,19 @@ public final class JsonEndUser implements Serializable {
     }
 
     public Boolean getAdmin() {
-        return isAdmin;
+        return admin;
     }
 
     public void setAdmin(Boolean admin) {
-        isAdmin = admin;
+        this.admin = admin;
     }
 
     public Boolean getSuperUser() {
-        return isSuperUser;
+        return superUser;
     }
 
     public void setSuperUser(Boolean superUser) {
-        isSuperUser = superUser;
+        this.superUser = superUser;
     }
 
     public Integer getPermissions() {

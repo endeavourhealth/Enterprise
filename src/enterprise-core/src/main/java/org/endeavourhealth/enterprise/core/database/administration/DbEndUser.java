@@ -9,11 +9,12 @@ import java.util.UUID;
 
 public final class DbEndUser extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbEndUser.class,
-            "EndUserUuid,Title,Forename,Surname,Email,IsSuperUser", "EndUserUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbEndUser.class);
 
-    @DatabaseColumn
     @PrimaryKeyColumn
+    @DatabaseColumn
+    private UUID endUserUuid = null;
+    @DatabaseColumn
     private String title = null;
     @DatabaseColumn
     private String forename = null;
@@ -47,30 +48,17 @@ public final class DbEndUser extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(title);
-        builder.add(forename);
-        builder.add(surname);
-        builder.add(email);
-        builder.add(isSuperUser);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        title = reader.readString();
-        forename = reader.readString();
-        surname = reader.readString();
-        email = reader.readString();
-        isSuperUser = reader.readBoolean();
-    }
-
-
     /**
      * gets/sets
      */
+    public UUID getEndUserUuid() {
+        return endUserUuid;
+    }
+
+    public void setEndUserUuid(UUID endUserUuid) {
+        this.endUserUuid = endUserUuid;
+    }
+
     public String getTitle() {
         return title;
     }

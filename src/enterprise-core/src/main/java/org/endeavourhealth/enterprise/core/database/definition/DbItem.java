@@ -2,10 +2,7 @@ package org.endeavourhealth.enterprise.core.database.definition;
 
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -15,13 +12,21 @@ import java.util.UUID;
 
 public final class DbItem extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbItem.class,
-            "ItemUuid,AuditUuid,XmlContent,Title,Description,IsDeleted", "ItemUuid,AuditUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbItem.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID itemUuid = null;
+    @DatabaseColumn
+    @PrimaryKeyColumn
     private UUID auditUuid = null;
-    private String xmlContent = null; //xml
+    @DatabaseColumn
+    private String xmlContent = null;
+    @DatabaseColumn
     private String title = null;
+    @DatabaseColumn
     private String description = null;
+    @DatabaseColumn
     private boolean isDeleted = false;
 
     public DbItem() {
@@ -29,7 +34,7 @@ public final class DbItem extends DbAbstractTable {
 
     public static DbItem factoryNew(String title, DbAudit audit) {
         DbItem ret = new DbItem();
-        ret.setAuditUuid(audit.getPrimaryUuid());
+        ret.setAuditUuid(audit.getAuditUuid());
         ret.setTitle(title);
         return ret;
     }
@@ -63,29 +68,17 @@ public final class DbItem extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(auditUuid);
-        builder.add(xmlContent);
-        builder.add(title);
-        builder.add(description);
-        builder.add(isDeleted);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        auditUuid = reader.readUuid();
-        xmlContent = reader.readString();
-        title = reader.readString();
-        description = reader.readString();
-        isDeleted = reader.readBoolean();
-    }
-
     /**
      * gets/sets
      */
+    public UUID getItemUuid() {
+        return itemUuid;
+    }
+
+    public void setItemUuid(UUID itemUuid) {
+        this.itemUuid = itemUuid;
+    }
+
     public UUID getAuditUuid() {
         return auditUuid;
     }

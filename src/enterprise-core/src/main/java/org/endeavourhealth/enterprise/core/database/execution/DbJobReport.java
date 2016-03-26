@@ -2,10 +2,7 @@ package org.endeavourhealth.enterprise.core.database.execution;
 
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.ResultReader;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 
 import java.sql.SQLException;
@@ -15,15 +12,24 @@ import java.util.UUID;
 
 public final class DbJobReport extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbJobReport.class,
-            "JobReportUuid,JobUuid,ReportUuid,AuditUuid,OrganisationUuid,EndUserUuid,Parameters,StatusId", "JobReportUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbJobReport.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID jobReportUuid = null;
+    @DatabaseColumn
     private UUID jobUuid = null;
+    @DatabaseColumn
     private UUID reportUuid = null;
+    @DatabaseColumn
     private UUID auditUuid = null;
+    @DatabaseColumn
     private UUID organisationUuid = null;
+    @DatabaseColumn
     private UUID endUserUuid = null;
+    @DatabaseColumn
     private String parameters = null;
+    @DatabaseColumn
     private ExecutionStatus statusId = ExecutionStatus.Executing;
 
     public static List<DbJobReport> retrieveRecent(UUID organisationUuid, int count) throws Exception {
@@ -52,33 +58,17 @@ public final class DbJobReport extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(jobUuid);
-        builder.add(reportUuid);
-        builder.add(auditUuid);
-        builder.add(organisationUuid);
-        builder.add(endUserUuid);
-        builder.add(parameters);
-        builder.add(statusId);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        jobUuid = reader.readUuid();
-        reportUuid = reader.readUuid();
-        auditUuid = reader.readUuid();
-        organisationUuid = reader.readUuid();
-        endUserUuid = reader.readUuid();
-        parameters = reader.readString();
-        statusId = ExecutionStatus.get(reader.readInt());
-    }
-
     /**
      * gets/sets
      */
+    public UUID getJobReportUuid() {
+        return jobReportUuid;
+    }
+
+    public void setJobReportUuid(UUID jobReportUuid) {
+        this.jobReportUuid = jobReportUuid;
+    }
+
     public UUID getAuditUuid() {
         return auditUuid;
     }

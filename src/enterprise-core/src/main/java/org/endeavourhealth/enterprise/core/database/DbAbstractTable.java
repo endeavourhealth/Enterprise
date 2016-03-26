@@ -2,6 +2,7 @@ package org.endeavourhealth.enterprise.core.database;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -9,18 +10,12 @@ import java.util.UUID;
  * persistence is done in the TableAdapter class
  */
 public abstract class DbAbstractTable {
-    private UUID primaryUuid = null;
+
     private TableSaveMode saveMode = null;
 
     public abstract TableAdapter getAdapter();
 
-    public abstract void writeForDb(ArrayList<Object> builder);
-
-    public abstract void readFromDb(ResultReader reader) throws SQLException;
-
-
     public void writeToDb() throws Exception {
-
         DatabaseManager.db().writeEntity(this);
     }
 
@@ -28,45 +23,32 @@ public abstract class DbAbstractTable {
     public boolean equals(Object o) {
         if (o instanceof DbAbstractTable) {
             DbAbstractTable other = (DbAbstractTable) o;
-            if (getPrimaryUuid() != null
-                    && other.getPrimaryUuid() != null
-                    && getPrimaryUuid().equals(other.getPrimaryUuid())) {
-                return true;
+            try {
+                List<Object> otherKeys = other.getAdapter().getPrimaryKeys(other);
+                List<Object> ourKeys = getAdapter().getPrimaryKeys(this);
+                return ourKeys.equals(otherKeys);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
             }
         }
         return super.equals(o);
     }
 
-    public UUID assignPrimaryUUid() {
-        if (primaryUuid != null) {
-            return primaryUuid;
-        }
-
-        primaryUuid = UUID.randomUUID();
+    public void assignPrimaryUUid() throws Exception {
+        getAdapter().assignPrimaryKeys(this);
         saveMode = TableSaveMode.INSERT;
-        return primaryUuid;
     }
 
     /**
-     * get/sets method only
+     * get/sets
      */
-    public UUID getPrimaryUuid() {
-        return primaryUuid;
-    }
+    public TableSaveMode getSaveMode() throws Exception {
 
-    public void setPrimaryUuid(UUID primaryUuid) {
-        this.primaryUuid = primaryUuid;
-    }
-
-    public TableSaveMode getSaveMode() {
-
-        //if we have no primary UUID, then generate one and go into insert mode
-        if (primaryUuid == null) {
+        if (!getAdapter().hasPrimaryKeysSet(this)) {
+            //if we have no primary UUID, then generate one and go into insert mode
             assignPrimaryUUid();
-        }
-
-        //if we have a UUID, but no explicity set save mode, then assume an update
-        else if (saveMode == null) {
+        } else if (saveMode == null) {
+            //if we have a UUID, but no explicity set save mode, then assume an update
             saveMode = TableSaveMode.UPDATE;
         }
 

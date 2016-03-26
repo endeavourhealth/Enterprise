@@ -11,20 +11,27 @@ import java.util.UUID;
 
 public final class DbActiveItem extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class,
-            "ActiveItemUuid,OrganisationUuid,ItemUuid,AuditUuid,ItemTypeId,IsDeleted", "ActiveItemUuid");
+    private static final TableAdapter adapter = new TableAdapter(DbActiveItem.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
+    private UUID activeItemUuid = null;
+    @DatabaseColumn
     private UUID organisationUuid = null;
+    @DatabaseColumn
     private UUID itemUuid = null;
+    @DatabaseColumn
     private UUID auditUuid = null;
+    @DatabaseColumn
     private DefinitionItemType itemTypeId = null;
+    @DatabaseColumn
     private boolean isDeleted = false;
 
     public DbActiveItem() {
     }
 
     public static DbActiveItem factoryNew(DbItem item, UUID organisationUuid, DefinitionItemType itemType) {
-        UUID itemUuid = item.getPrimaryUuid();
+        UUID itemUuid = item.getItemUuid();
         UUID auditUuid = item.getAuditUuid();
 
         if (itemUuid == null) {
@@ -57,29 +64,17 @@ public final class DbActiveItem extends DbAbstractTable {
         return adapter;
     }
 
-    @Override
-    public void writeForDb(ArrayList<Object> builder) {
-        builder.add(getPrimaryUuid());
-        builder.add(organisationUuid);
-        builder.add(itemUuid);
-        builder.add(auditUuid);
-        builder.add(itemTypeId);
-        builder.add(isDeleted);
-    }
-
-    @Override
-    public void readFromDb(ResultReader reader) throws SQLException {
-        setPrimaryUuid(reader.readUuid());
-        organisationUuid = reader.readUuid();
-        itemUuid = reader.readUuid();
-        auditUuid = reader.readUuid();
-        itemTypeId = DefinitionItemType.get(reader.readInt());
-        isDeleted = reader.readBoolean();
-    }
-
     /**
      * gets/sets
      */
+    public UUID getActiveItemUuid() {
+        return activeItemUuid;
+    }
+
+    public void setActiveItemUuid(UUID activeItemUuid) {
+        this.activeItemUuid = activeItemUuid;
+    }
+
     public UUID getOrganisationUuid() {
         return organisationUuid;
     }

@@ -33,8 +33,9 @@ public abstract class Examples {
 
         //create the job
         DbJob job = new DbJob();
-        UUID jobUuid = job.assignPrimaryUUid();
-        job.setPrimaryUuid(jobUuid);
+        job.assignPrimaryUUid();
+        UUID jobUuid = job.getJobUuid();
+        job.setJobUuid(jobUuid);
         job.setStartDateTime(Instant.now());
         job.setPatientsInDatabase(patientsInDb);
         toSave.add(job);
@@ -51,7 +52,8 @@ public abstract class Examples {
             UUID orgUuid = request.getOrganisationUuuid();
 
             DbJobReport jobReport = new DbJobReport();
-            UUID jobReportUuid = jobReport.assignPrimaryUUid();
+            jobReport.assignPrimaryUUid();
+            UUID jobReportUuid = jobReport.getJobReportUuid();
             jobReport.setJobUuid(jobUuid);
             jobReport.setReportUuid(reportUuid);
             jobReport.setAuditUuid(auditUuid);
@@ -106,12 +108,12 @@ public abstract class Examples {
         for (DbJob job: jobs) {
 
             //retrieve JobReports for job
-            UUID jobUuid = job.getPrimaryUuid();
+            UUID jobUuid = job.getJobUuid();
             List<DbJobReport> jobReports = DbJobReport.retrieveForJob(jobUuid);
 
             for (DbJobReport jobReport: jobReports) {
 
-                UUID jobReportUuid = jobReport.getPrimaryUuid();
+                UUID jobReportUuid = jobReport.getJobReportUuid();
                 List<DbJobReportItem> jobReportItems = DbJobReportItem.retrieveForJobReport(jobReportUuid);
 
                 //also get the parameters objects and query document
@@ -165,7 +167,7 @@ public abstract class Examples {
             LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromItem(dependentItem);
             queryDocument.getLibraryItem().add(libraryItem);
 
-            UUID libraryItemUuid = dependentItem.getPrimaryUuid();
+            UUID libraryItemUuid = dependentItem.getItemUuid();
             recursivelyGetDependentLibraryItems(libraryItemUuid, queryDocument);
         }
     }

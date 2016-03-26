@@ -26,7 +26,7 @@ public final class JsonFolder implements Serializable {
     }
 
     public JsonFolder(DbItem item, int contentCount, boolean hasChildren) {
-        this.uuid = item.getPrimaryUuid();
+        this.uuid = item.getItemUuid();
         this.folderName = item.getTitle();
 
         this.hasChildren = hasChildren;

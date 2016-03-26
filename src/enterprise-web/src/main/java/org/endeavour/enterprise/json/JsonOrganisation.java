@@ -19,7 +19,7 @@ public final class JsonOrganisation implements Serializable {
     }
 
     public JsonOrganisation(DbOrganisation org, Boolean isAdmin) {
-        this.uuid = org.getPrimaryUuid();
+        this.uuid = org.getOrganisationUuid();
         this.name = org.getName();
         this.nationalId = org.getNationalId();
         this.isAdmin = isAdmin;

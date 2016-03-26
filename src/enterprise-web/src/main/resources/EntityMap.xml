@@ -1,0 +1,16 @@
+<entityMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<entity>
+		<logicalName>PATIENT</logicalName>
+		<displayName>Patient</displayName>
+		<resultSetIndex>1</resultSetIndex>
+		<cardinality>single</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>DOB</logicalName>
+			<displayName>Date Of Birth</displayName>
+			<index>1</index>
+			<availability>search</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+	</entity>
+</entityMap>

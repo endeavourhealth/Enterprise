@@ -10,7 +10,7 @@ public class EntityMapHelper {
 
     public static EntityMap loadEntityMap() throws Exception {
 
-        String xml = Resources.getResourceAsString("entitymap.xml");
+        String xml = Resources.getResourceAsString("EntityMap.xml");
         //"src/discovery-controller/src/main/resources/controller.config";
 
         return XmlSerializer.deserializeFromString(EntityMap.class, xml, XSD);

@@ -175,7 +175,7 @@ final class SqlServerDatabase implements DatabaseI {
         sb.append(" VALUES (");
 
         ArrayList<Object> values = new ArrayList<Object>();
-        a.writeForDb(entity, values);
+        a.writeForDb(entity, values, true);
 
         for (int i = 0; i < values.size(); i++) {
             Object value = values.get(i);
@@ -197,7 +197,7 @@ final class SqlServerDatabase implements DatabaseI {
         TableAdapter a = entity.getAdapter();
 
         ArrayList<Object> values = new ArrayList<Object>();
-        a.writeForDb(entity, values);
+        a.writeForDb(entity, values, false);
 
         String[] primaryKeyCols = a.getPrimaryKeyColumns();
         String[] cols = a.getColumns();
@@ -266,7 +266,7 @@ final class SqlServerDatabase implements DatabaseI {
         TableAdapter a = entity.getAdapter();
 
         ArrayList<Object> values = new ArrayList<Object>();
-        a.writeForDb(entity, values);
+        a.writeForDb(entity, values, false);
 
         String[] primaryKeyCols = a.getPrimaryKeyColumns();
         String[] cols = a.getColumns();

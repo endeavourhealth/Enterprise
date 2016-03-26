@@ -25,6 +25,8 @@ public final class DbJob extends DbAbstractTable {
     private Instant endDateTime = null;
     @DatabaseColumn
     private Integer patientsInDatabase = null;
+    @DatabaseColumn
+    private Integer baselineAuditVersion = null;
 
     public static List<DbJob> retrieveForJobReports(List<DbJobReport> jobReports) throws Exception {
         List<UUID> uuids = new ArrayList<>();
@@ -101,5 +103,13 @@ public final class DbJob extends DbAbstractTable {
 
     public void setStatusId(ExecutionStatus statusId) {
         this.statusId = statusId;
+    }
+
+    public Integer getBaselineAuditVersion() {
+        return baselineAuditVersion;
+    }
+
+    public void setBaselineAuditVersion(Integer baselineAuditVersion) {
+        this.baselineAuditVersion = baselineAuditVersion;
     }
 }

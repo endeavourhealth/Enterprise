@@ -20,6 +20,9 @@ public final class DbAudit extends DbAbstractTable {
     private UUID endUserUuid = null;
     @DatabaseColumn
     private Instant timeStamp = null;
+    @DatabaseColumn
+    @IdentityColumn
+    private Integer auditVersion = null;
 
     public DbAudit() {}
 
@@ -52,7 +55,6 @@ public final class DbAudit extends DbAbstractTable {
         return adapter;
     }
 
-
     /**
      * gets/sets
      */
@@ -78,5 +80,13 @@ public final class DbAudit extends DbAbstractTable {
 
     public void setTimeStamp(Instant timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public Integer getAuditVersion() {
+        return auditVersion;
+    }
+
+    public void setAuditVersion(Integer auditVersion) {
+        this.auditVersion = auditVersion;
     }
 }

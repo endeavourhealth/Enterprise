@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="term" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="includeChildren" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *         &lt;element name="exclusion" type="{}codeSetValue" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
@@ -34,7 +33,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "codeSetValue", propOrder = {
     "code",
-    "term",
     "includeChildren",
     "exclusion"
 })
@@ -42,7 +40,6 @@ public class CodeSetValue {
 
     @XmlElement(required = true)
     protected String code;
-    protected String term;
     protected boolean includeChildren;
     protected List<CodeSetValue> exclusion;
 
@@ -68,30 +65,6 @@ public class CodeSetValue {
      */
     public void setCode(String value) {
         this.code = value;
-    }
-
-    /**
-     * Gets the value of the term property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getTerm() {
-        return term;
-    }
-
-    /**
-     * Sets the value of the term property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
-    public void setTerm(String value) {
-        this.term = value;
     }
 
     /**

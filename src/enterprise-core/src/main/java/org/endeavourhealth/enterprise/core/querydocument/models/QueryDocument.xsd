@@ -185,7 +185,6 @@
 	<xs:complexType name="codeSetValue">
 		<xs:sequence>
 			<xs:element name="code" type="xs:string"/>
-			<xs:element name="term" type="xs:string"/>
 			<xs:element name="includeChildren" type="xs:boolean"/>
 			<xs:element name="exclusion" type="codeSetValue" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>

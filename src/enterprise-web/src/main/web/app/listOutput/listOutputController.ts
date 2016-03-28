@@ -1,7 +1,7 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../core/library.service.ts" />
 
-module app.listOuput {
+module app.listOutput {
 	import ILoggerService = app.blocks.ILoggerService;
 	import IScope = angular.IScope;
 	import ILibraryService = app.core.ILibraryService;
@@ -19,7 +19,7 @@ module app.listOuput {
 	import Field = app.models.Field;
 	'use strict';
 
-	export class ListOuputController {
+	export class ListOutputController {
 		libraryItem : LibraryItem;
 		selectedListReportGroup : ListReportGroup;
 		selectedFieldOutput : FieldOutput;
@@ -219,5 +219,5 @@ module app.listOuput {
 
 	angular
 		.module('app.listOutput')
-		.controller('ListOutputController', ListOuputController);
+		.controller('ListOutputController', ListOutputController);
 }

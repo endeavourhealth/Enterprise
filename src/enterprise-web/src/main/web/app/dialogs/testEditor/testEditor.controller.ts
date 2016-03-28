@@ -58,7 +58,7 @@ module app.dialogs {
 
 		editMode : boolean = false;
 
-		codeSelection : TermlexCodeSelection[] = [];
+		codeSelection : CodeSetValue[] = [];
 
 		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE','CALCULATION'];
 		sortorders = ['','LATEST','EARLIEST','HIGHEST','LOWEST'];
@@ -142,7 +142,7 @@ module app.dialogs {
 							var term = codes.term;
 							terms+=", "+term;
 
-							var excludedCodes : Code[] = [];
+							var excludedCodes : CodeSetValue[] = [];
 
 							for (var e = 0; e < codes.exclusion.length; ++e) {
 								var exclusion = codes.exclusion[e];
@@ -150,19 +150,19 @@ module app.dialogs {
 								var term = exclusion.term;
 								terms+=", "+term+" (exclusion)";
 
-								var excl : Code = {
-									id: exclusion.code,
-									label: exclusion.term
-								}
+								var excl : CodeSetValue = {
+									code: exclusion.code,
+									term: exclusion.term
+								} as CodeSetValue;
 
 								excludedCodes.push(excl)
 							}
 
-							var selectedCodes : TermlexCodeSelection = {
-								id: codes.code,
-								label: codes.term,
+							var selectedCodes : CodeSetValue = {
+								code: codes.code,
+								term: codes.term,
 								includeChildren: codes.includeChildren,
-								exclusions: excludedCodes
+								exclusion: excludedCodes
 							}
 
 							this.codeSelection.push(selectedCodes);
@@ -208,7 +208,7 @@ module app.dialogs {
 			var vm = this;
 
 			CodePickerController.open(this.$modal, this.codeSelection)
-				.result.then(function(resultData : TermlexCodeSelection[]){
+				.result.then(function(resultData : CodeSetValue[]){
 
 				var codeSet : CodeSet = {
 					codingSystem : "SNOMED_CT",
@@ -227,15 +227,15 @@ module app.dialogs {
 						exclusion : []
 					}
 
-					codeSetVal.code = code.id;
-					codeSetVal.term = code.label;
+					codeSetVal.code = code.code;
+					codeSetVal.term = code.term;
 					codeSetVal.includeChildren = code.includeChildren;
 
-					var term = code.label;
+					var term = code.term;
 					terms+=", "+term;
 
-					for (var e = 0; e < code.exclusions.length; ++e) {
-						var exclusion = code.exclusions[e];
+					for (var e = 0; e < code.exclusion.length; ++e) {
+						var exclusion = code.exclusion[e];
 
 						var codeSetValExcl : CodeSetValue = {
 							code : "",
@@ -244,11 +244,11 @@ module app.dialogs {
 							exclusion : null
 						}
 
-						codeSetValExcl.code = exclusion.id;
-						codeSetValExcl.term = exclusion.label;
+						codeSetValExcl.code = exclusion.code;
+						codeSetValExcl.term = exclusion.term;
 						codeSetVal.exclusion.push(codeSetValExcl);
 
-						var term = exclusion.label;
+						var term = exclusion.term;
 						terms+=", "+term+" (exclusion)";
 
 					}

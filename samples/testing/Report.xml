@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="H:\Code\Enterprise\src\enterprise-core\src\main\resources\QueryDocument.xsd">
+	<uuid>A42495AD-E047-4E9D-A7B1-E0CDD4BB907D</uuid>
+	<name>Test report</name>
+	<folderUuid>FD9309C2-9D7E-4152-84CD-D934B7D81579</folderUuid>
+	<reportItem>
+		<queryLibraryItemUuid>7CFFD13B-9BA5-40F0-9A3D-8E6F0F33F9FF</queryLibraryItemUuid>
+	</reportItem>
+</report>

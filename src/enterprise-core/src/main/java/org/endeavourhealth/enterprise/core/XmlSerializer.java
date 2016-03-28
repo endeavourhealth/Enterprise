@@ -1,8 +1,7 @@
 package org.endeavourhealth.enterprise.core;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -20,23 +19,46 @@ public abstract class XmlSerializer {
 
     public static <T> T deserializeFromString(Class cls, String xml, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
+        //I can't figure out how to get the namespace set in the XML but overridden in Java.
+        String newXml = removeXmlStringNoNamespace(xml);
+
         //parse XML string into DOM
-        InputStream is = new ByteArrayInputStream(xml.getBytes());
+        InputStream is = new ByteArrayInputStream(newXml.getBytes());
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = docBuilder.parse(is);
 
         return deserializeFromXmlDocument(cls, document, xsdName);
     }
+
     public static <T> T deserializeFromResource(Class cls, String xmlResourceName, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-
-        //parse XML string into DOM
-        URL url = cls.getClassLoader().getResource(xmlResourceName);
-        FileInputStream is = new FileInputStream(URLDecoder.decode( url.getFile(), "UTF-8" ));
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document document = docBuilder.parse(is);
-
-        return deserializeFromXmlDocument(cls, document, xsdName);
+        String xml = Resources.getResourceAsString(xmlResourceName);
+        return deserializeFromString(cls, xml, xsdName);
     }
+
+    private static String removeXmlStringNoNamespace(String xmlString) {
+        return xmlString.replaceAll("xsi:noNamespaceSchemaLocation=.*?(\"|\').*?(\"|\')", ""); /* remove xmlns declaration */
+
+    }
+
+//    public static <T> T deserializeFromString(Class cls, String xml, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+//
+//        //parse XML string into DOM
+//        InputStream is = new ByteArrayInputStream(xml.getBytes());
+//        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//        Document document = docBuilder.parse(is);
+//
+//        return deserializeFromXmlDocument(cls, document, xsdName);
+//    }
+//
+//    public static <T> T deserializeFromResource(Class cls, String xmlResourceName, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+//
+//        URL url = Resources.getResourceAsURLObject(xmlResourceName);
+//        FileInputStream is = new FileInputStream(URLDecoder.decode( url.getFile(), "UTF-8" ));
+//        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//        Document document = docBuilder.parse(is);
+//
+//        return deserializeFromXmlDocument(cls, document, xsdName);
+//    }
 
     private static <T> T deserializeFromXmlDocument(Class cls, Document doc, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {
 
@@ -46,11 +68,12 @@ public abstract class XmlSerializer {
         //if a schema was provided, set it in the unmarshaller
         if (xsdName != null) {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL url = cls.getClassLoader().getResource(xsdName);
+            URL url = Resources.getResourceAsURLObject(xsdName);
             Schema schema = sf.newSchema(url);
             unmarshaller.setSchema(schema);
         }
 
+        @SuppressWarnings("unchecked")
         JAXBElement<T> loader = unmarshaller.unmarshal(doc, cls);
         return loader.getValue();
     }
@@ -66,14 +89,14 @@ public abstract class XmlSerializer {
 
             if (xsdName != null) {
                 SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                URL url = cls.getClassLoader().getResource(xsdName);
+                URL url = Resources.getResourceAsURLObject(xsdName);
                 Schema schema = sf.newSchema(url);
                 marshaller.setSchema(schema);
             }
 
             marshaller.marshal(element, sw);
 
-        } catch (JAXBException|SAXException e) {
+        } catch (JAXBException | SAXException | IOException e) {
             throw new RuntimeException(e);
         }
 

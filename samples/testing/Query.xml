@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libraryItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="H:\Code\Enterprise\src\enterprise-core\src\main\resources\QueryDocument.xsd">
+	<uuid>7CFFD13B-9BA5-40F0-9A3D-8E6F0F33F9FF</uuid>
+	<name>Test query</name>
+	<folderUuid>FD9309C2-9D7E-4152-84CD-D934B7D81579</folderUuid>
+	<query>
+		<startingRules>
+			<ruleId>1</ruleId>
+		</startingRules>
+		<rule>
+			<description>Date filter</description>
+			<id>1</id>
+			<test>
+				<dataSource>
+					<entity>OBSERVATION</entity>
+					<filter>
+						<field>EFFECTIVE_DATE</field>
+						<valueFrom>
+							<constant>2005-01-01</constant>
+							<absoluteUnit>date</absoluteUnit>
+							<operator>greaterThanOrEqualTo</operator>
+						</valueFrom>
+						<negate>false</negate>
+					</filter>
+				</dataSource>
+				<isAny></isAny>
+			</test>
+			<onPass>
+				<action>include</action>
+			</onPass>
+			<onFail>
+				<action>exclude</action>
+			</onFail>
+			<layout>
+				<x>10</x>
+				<y>10</y>
+			</layout>
+		</rule>
+	</query>
+</libraryItem>

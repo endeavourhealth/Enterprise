@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="configuration" type="configuration"/>
+	<xs:complexType name="configuration">
+		<xs:sequence>
+			<xs:element name="debugging" type="debugging" minOccurs="0"/>
+			<xs:element name="executionSchedule" type="executionSchedule"/>
+			<xs:element name="patientBatchSize" type="xs:int"/>
+			<xs:element name="coreDatabase" type="databaseConnection"/>
+			<xs:element name="messageQueuing" type="messageQueuing"/>
+			<xs:element name="patientDatabase" type="databaseConnection"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="executionSchedule">
+		<xs:sequence>
+			<xs:element name="startTimeInHours" type="xs:int"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="debugging">
+		<xs:sequence>
+			<xs:element name="startImmediately" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="messageQueuing">
+		<xs:sequence>
+			<xs:element name="ipAddress" type="xs:string"/>
+			<xs:element name="username" type="xs:string"/>
+			<xs:element name="password" type="xs:string"/>
+			<xs:element name="controllerQueueName" type="xs:string"/>
+			<xs:element name="processorNodesExchangeName" type="xs:string"/>
+			<xs:element name="workerQueuePrefix" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="databaseConnection">
+		<xs:sequence>
+			<xs:element name="url" type="xs:string"/>
+			<xs:element name="username" type="xs:string"/>
+			<xs:element name="password" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

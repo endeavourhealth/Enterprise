@@ -1,4 +1,4 @@
-use SampleCareRecord;
+use Endeavour_Enterprise_Data;
 
 go
 
@@ -27,8 +27,8 @@ begin
 
 	set transaction isolation level read committed;
 
-	select count(*), min(p.PatientId), max(p.PatientId)
-	from dbo.Patient as p;
+	select count(*), min(p.SK_PatientID), max(p.SK_PatientID)
+	from [07T].Patients as p;
 
 end;
 

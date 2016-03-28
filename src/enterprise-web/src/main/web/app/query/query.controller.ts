@@ -125,6 +125,7 @@ module app.query {
 					$scope.ruleDescription = "";
 					$scope.rulePassAction = "";
 					$scope.ruleFailAction = "";
+					$scope.nextRuleID = 1;
 					this.toggleClearQuery();
 				};
 
@@ -290,7 +291,8 @@ module app.query {
 				switch($stateParams.itemAction) {
 					case "view":
 					case "edit":
-						libraryService.getLibraryItem("fee2a6b7-0708-42b1-9513-705c0ebd2a13")
+						$stateParams.itemUuid = "A87A233D-293E-4220-AAA3-25AC1D201257";
+						libraryService.getLibraryItem($stateParams.itemUuid)
 							.then(function(libraryItem : LibraryItem) {
 								$scope.chartViewModel = new flowchart.ChartViewModel(libraryItem);
 

@@ -158,7 +158,8 @@ module app.dialogs {
 
 									vm.termLookup.push(concept);
 
-									terms += ", "+result.preferredTerm.replace(' (disorder)','');
+									terms += ", "+vm.termShorten(result.preferredTerm);
+
 									vm.filterCodes = terms.substring(2);
 								});
 						}
@@ -166,6 +167,8 @@ module app.dialogs {
 						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
 							var codes = filter.codeSet[0].codeSetValue[c];
 
+							if (codes.exclusion==null)
+								continue;
 							for (var e = 0; e < codes.exclusion.length; ++e) {
 								var exclusion = codes.exclusion[e];
 								vm.codingService.getPreferredTerm(exclusion.code)
@@ -179,7 +182,7 @@ module app.dialogs {
 
 										vm.termLookup.push(concept);
 
-										terms += ", "+result.preferredTerm.replace(' (disorder)','')+" (exclusion)";
+										terms += ", "+vm.termShorten(result.preferredTerm)+" (exclusion)";
 										vm.filterCodes = terms.substring(2);
 									});
 							}
@@ -233,16 +236,18 @@ module app.dialogs {
 
 							var excludedCodes : CodeSetValueWithTerm[] = [];
 
-							for (var e = 0; e < codes.exclusion.length; ++e) {
-								var exclusion = codes.exclusion[e];
+							if (codes.exclusion!=null) {
+								for (var e = 0; e < codes.exclusion.length; ++e) {
+									var exclusion = codes.exclusion[e];
 
-								var excl : CodeSetValueWithTerm = {
-									code: exclusion.code,
-									term: this.lookupTerm(exclusion.code)
+									var excl : CodeSetValueWithTerm = {
+										code: exclusion.code,
+										term: this.lookupTerm(exclusion.code)
 
-								} as CodeSetValueWithTerm;
+									} as CodeSetValueWithTerm;
 
-								excludedCodes.push(excl)
+									excludedCodes.push(excl)
+								}
 							}
 
 							var selectedCodes : CodeSetValueWithTerm = {
@@ -405,6 +410,9 @@ module app.dialogs {
 		filterDateFromChange(value : any, dateField : any) {
 			var vm = this;
 
+			if (!value)
+				return;
+
 			var datestring : string = "";
 
 			if (value!="" && value!=null)
@@ -449,6 +457,9 @@ module app.dialogs {
 
 		filterDateToChange(value : any, dateField : any) {
 			var vm = this;
+
+			if (!value)
+				return;
 
 			var datestring : string = "";
 
@@ -504,6 +515,9 @@ module app.dialogs {
 		filterValueChange(value : any, valueField : any) {
 			var vm = this;
 
+			if (!value)
+				return;
+
 			var valueEqualTo : Value = {
 				constant: value,
 				parameter: null,
@@ -542,6 +556,9 @@ module app.dialogs {
 
 		filterValueFromChange(value : any) {
 			var vm = this;
+
+			if (!value)
+				return;
 
 			var valueFrom : ValueFrom = {
 				constant: value,
@@ -582,6 +599,9 @@ module app.dialogs {
 
 		filterValueToChange(value : any) {
 			var vm = this;
+
+			if (!value)
+				return;
 
 			var valueTo : ValueTo = {
 				constant: value,
@@ -667,10 +687,17 @@ module app.dialogs {
 					break;
 				}
 			}
-			term = term.replace(' (disorder)','');
+			term = vm.termShorten(term);
+
 			return term;
 		}
 
+		termShorten(term : string) {
+			term = term.replace(' (disorder)','');
+			term = term.replace(' (observable entity)','');
+			term = term.replace(' (finding)','');
+			return term;
+		}
 
 	}
 

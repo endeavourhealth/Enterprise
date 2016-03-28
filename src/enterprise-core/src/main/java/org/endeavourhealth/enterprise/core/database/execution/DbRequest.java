@@ -20,7 +20,7 @@ public final class DbRequest extends DbAbstractTable {
     @DatabaseColumn
     private UUID reportUuid = null;
     @DatabaseColumn
-    private UUID organisationUuuid = null;
+    private UUID organisationUuid = null;
     @DatabaseColumn
     private UUID endUserUuid = null;
     @DatabaseColumn
@@ -72,12 +72,12 @@ public final class DbRequest extends DbAbstractTable {
         this.endUserUuid = endUserUuid;
     }
 
-    public UUID getOrganisationUuuid() {
-        return organisationUuuid;
+    public UUID getOrganisationUuid() {
+        return organisationUuid;
     }
 
-    public void setOrganisationUuuid(UUID organisationUuuid) {
-        this.organisationUuuid = organisationUuuid;
+    public void setOrganisationUuid(UUID organisationUuid) {
+        this.organisationUuid = organisationUuid;
     }
 
     public String getParameters() {

@@ -5,7 +5,6 @@ import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.execution.*;
 import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
 import org.endeavourhealth.enterprise.enginecore.carerecord.SourceStatistics;
@@ -81,6 +80,7 @@ class ExecutionJob {
         job.setStatusId(executionStatus);
         job.setStartDateTime(currentDate);
         job.setEndDateTime(currentDate);
+        job.setBaselineAuditVersion(0);
 
         if (primaryTableStats != null)
             job.setPatientsInDatabase(primaryTableStats.getRecordCount());
@@ -99,21 +99,46 @@ class ExecutionJob {
         dbJob = createJobAsStarted();
         toSave.add(dbJob);
 
+        JobContentRetriever jobContentRetriever = new JobContentRetriever(requests);
+
+        prepareJobContentTable(jobContentRetriever.getLibraryItemToAuditMap(), toSave);
+
         for (DbRequest request: requests) {
 
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(request.getReportUuid());
-
-            DbJobReport jobReport = createJobReport(request, activeItem.getAuditUuid());
+            DbJobReport jobReport = createJobReport(request, jobContentRetriever.getAuditUuid(request.getReportUuid()));
             toSave.add(jobReport);
 
-            RequestProcessor requestProcessor = new RequestProcessor(jobReport.getJobReportUuid(), request.getReportUuid(), activeItem.getAuditUuid());
-
-            for (DbJobReportItem reportItem: requestProcessor.getDbJobReportItems() ) {
-                toSave.add(reportItem);
-            }
+            prepareJobReportItemTable(jobReport.getJobReportUuid(), request.getReportUuid(), jobContentRetriever, toSave);
         }
 
         DatabaseManager.db().writeEntities(toSave);
+    }
+
+    private void prepareJobReportItemTable(
+            UUID jobReportUuid,
+            UUID reportUuid,
+            JobContentRetriever jobContentRetriever,
+            List<DbAbstractTable> toSave
+            ) throws Exception {
+
+        RequestProcessor requestProcessor = new RequestProcessor(jobReportUuid, reportUuid, jobContentRetriever);
+
+        for (DbJobReportItem reportItem: requestProcessor.getDbJobReportItems() ) {
+            toSave.add(reportItem);
+        }
+    }
+
+    private void prepareJobContentTable(Map<UUID, UUID> libraryItemToAuditMap, List<DbAbstractTable> toSave) {
+
+        for (UUID itemUuid: libraryItemToAuditMap.keySet()) {
+
+            DbJobContent jobContent = new DbJobContent();
+            jobContent.setJobUuid(executionUuid);
+            jobContent.setItemUuid(itemUuid);
+            jobContent.setAuditUuid(libraryItemToAuditMap.get(itemUuid));
+            jobContent.setSaveMode(TableSaveMode.INSERT); //because the primary keys have been explicitly set, we need to force insert mode
+            toSave.add(jobContent);
+        }
     }
 
     private DbJobReport createJobReport(DbRequest request, UUID auditUuid) throws Exception {
@@ -125,7 +150,7 @@ class ExecutionJob {
         jobReport.setJobUuid(executionUuid);
         jobReport.setReportUuid(request.getReportUuid());
         jobReport.setAuditUuid(auditUuid);
-        jobReport.setOrganisationUuid(request.getOrganisationUuuid());
+        jobReport.setOrganisationUuid(request.getOrganisationUuid());
         jobReport.setEndUserUuid(request.getEndUserUuid());
         jobReport.setParameters(request.getParameters());
         jobReport.setStatusId(ExecutionStatus.Executing);
@@ -140,6 +165,7 @@ class ExecutionJob {
         job.setJobUuid(executionUuid);
         job.setStatusId(ExecutionStatus.Executing);
         job.setStartDateTime(Instant.now());
+        job.setBaselineAuditVersion(0);
         job.setPatientsInDatabase(primaryTableStats.getRecordCount());
 
         return job;

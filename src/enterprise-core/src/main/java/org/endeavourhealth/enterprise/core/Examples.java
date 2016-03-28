@@ -50,7 +50,7 @@ public abstract class Examples {
             DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(reportUuid);
             UUID auditUuid = activeItem.getAuditUuid();
 
-            UUID orgUuid = request.getOrganisationUuuid();
+            UUID orgUuid = request.getOrganisationUuid();
 
             DbJobReport jobReport = new DbJobReport();
             jobReport.assignPrimaryUUid();

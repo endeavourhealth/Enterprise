@@ -125,7 +125,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         DbRequest request = new DbRequest();
         request.setReportUuid(reportUuid);
-        request.setOrganisationUuuid(orgUuid);
+        request.setOrganisationUuid(orgUuid);
         request.setEndUserUuid(userUuid);
         request.setTimeStamp(Instant.now());
         request.setParameters(parameterXml);

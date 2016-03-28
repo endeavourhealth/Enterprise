@@ -1,7 +1,6 @@
 package org.endeavourhealth.enterprise.controller;
 
 import org.apache.commons.lang3.StringUtils;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
@@ -12,18 +11,18 @@ import java.util.*;
 
 class RequestProcessor {
     private final List<DbJobReportItem> dbJobReportItems = new ArrayList<>();
-    private final Map<UUID, UUID> libraryItemToAudit = new HashMap<>();
     private final UUID jobReportUuid;
+    private final JobContentRetriever jobContentRetriever;
 
-    public RequestProcessor(UUID jobReportUuid, UUID reportUuid, UUID auditUuid) throws Exception {
+    public RequestProcessor(UUID jobReportUuid, UUID reportUuid, JobContentRetriever jobContentRetriever) throws Exception {
 
         this.jobReportUuid = jobReportUuid;
-        DbItem dbItem = DbItem.retrieveForUuidAndAudit(reportUuid, auditUuid);
+        this.jobContentRetriever = jobContentRetriever;
+
+        DbItem dbItem = DbItem.retrieveForUuidAndAudit(reportUuid, jobContentRetriever.getAuditUuid(reportUuid));
+
         String itemXml = dbItem.getXmlContent();
         Report report = QueryDocumentSerializer.readReportFromXml(itemXml);
-
-        HashSet<UUID> uniqueListOfLibraryItems = getUniqueListOfLibraryItems(report);
-        populateLibraryItemToAudit(uniqueListOfLibraryItems);
 
         processReportItems(report.getReportItem(), null);
     }
@@ -47,7 +46,7 @@ class RequestProcessor {
 
         jobReportItem.setJobReportUuid(jobReportUuid);
         jobReportItem.setItemUuid(reportItemUuid);
-        jobReportItem.setAuditUuid(libraryItemToAudit.get(reportItemUuid));
+        jobReportItem.setAuditUuid(jobContentRetriever.getAuditUuid(reportItemUuid));
 
         if (parent != null)
             jobReportItem.setParentJobReportItemUuid(parent.getJobReportItemUuid());
@@ -55,46 +54,15 @@ class RequestProcessor {
         return jobReportItem;
     }
 
-    private void populateLibraryItemToAudit(HashSet<UUID> uniqueListOfLibraryItems) throws Exception {
-
-        for (UUID uuid: uniqueListOfLibraryItems) {
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(uuid);
-            libraryItemToAudit.put(uuid, activeItem.getAuditUuid());
-        }
-    }
-
-    private HashSet<UUID> getUniqueListOfLibraryItems(Report report) {
-        HashSet<UUID> set = new HashSet<>();
-
-        addUniqueListOfLibraryItems(report.getReportItem(), set);
-
-        return set;
-    }
-
-    private void addUniqueListOfLibraryItems(List<ReportItem> reportItems, HashSet<UUID> set) {
-
-        if (reportItems == null)
-            return;
-
-        for (ReportItem item: reportItems) {
-            UUID uuid = getLibraryItemUuidFromReportItem(item);
-
-            if (!set.contains(uuid))
-                set.add(uuid);
-
-            addUniqueListOfLibraryItems(item.getReportItem(), set);
-        }
-    }
-
     private UUID getLibraryItemUuidFromReportItem(ReportItem item) {
-        String stringGuid;
+        String stringUuid;
 
         if (StringUtils.isNotEmpty(item.getListReportLibraryItemUuid()))
-            stringGuid = item.getListReportLibraryItemUuid();
+            stringUuid = item.getListReportLibraryItemUuid();
         else
-            stringGuid = item.getQueryLibraryItemUuid();
+            stringUuid = item.getQueryLibraryItemUuid();
 
-        return UUID.fromString(stringGuid);
+        return UUID.fromString(stringUuid);
     }
 
     public List<DbJobReportItem> getDbJobReportItems() {

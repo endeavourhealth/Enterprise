@@ -206,7 +206,8 @@ module app.dialogs {
 				}
 			}
 
-			vm.filterCodes = this.buildCodeSelectionDisplay();
+			// give it a second for the term lookup API to return all results
+			setTimeout(function(){ vm.buildCodeSelectionDisplay(); }, 1000);
 
 		}
 
@@ -676,7 +677,8 @@ module app.dialogs {
 				else
 					terms+=", "+term
 			}
-			return terms.substring(2);
+			vm.filterCodes = terms.substring(2);
+
 		}
 
 	}

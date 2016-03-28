@@ -8,21 +8,23 @@ module app.dialogs {
 	import ExclusionTreeNode = app.models.ExclusionTreeNode;
 	import ICodingService = app.core.ICodingService;
 	import CodeSetValue = app.models.CodeSetValue;
+	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
+
 	'use strict';
 
 	export class CodePickerController extends BaseDialogController {
-		selectedMatch : CodeSetValue;
-		previousSelection : CodeSetValue;
-		selectedExclusion : CodeSetValue;
+		selectedMatch : CodeSetValueWithTerm;
+		previousSelection : CodeSetValueWithTerm;
+		selectedExclusion : CodeSetValueWithTerm;
 
 		searchData : string;
-		searchResults : CodeSetValue[];
-		parents : CodeSetValue[];
-		children : CodeSetValue[];
+		searchResults : CodeSetValueWithTerm[];
+		parents : CodeSetValueWithTerm[];
+		children : CodeSetValueWithTerm[];
 
 		exclusionTreeData : ExclusionTreeNode[];
 
-		public static open($modal : IModalService, selection : CodeSetValue[]) : IModalServiceInstance {
+		public static open($modal : IModalService, selection : CodeSetValueWithTerm[]) : IModalServiceInstance {
 			var options : IModalSettings = {
 				templateUrl:'app/dialogs/codePicker/codePicker.html',
 				controller:'CodePickerController',
@@ -43,7 +45,7 @@ module app.dialogs {
 		constructor(protected $uibModalInstance : IModalServiceInstance,
 								private logger:app.blocks.ILoggerService,
 								private codingService : ICodingService,
-								private selection : CodeSetValue[]) {
+								private selection : CodeSetValueWithTerm[]) {
 			super($uibModalInstance);
 			this.searchData = 'Asthma';
 			this.resultData = selection;
@@ -53,12 +55,12 @@ module app.dialogs {
 			var vm = this;
 			//vm.searchResults = vm.termlexSearch.getFindings(vm.searchData, vm.searchOptions);
 			vm.codingService.searchCodes(vm.searchData)
-				.then(function(result:CodeSetValue[]) {
+				.then(function(result:CodeSetValueWithTerm[]) {
 					vm.searchResults = result;
 				});
 		}
 
-		displayCode(itemToDisplay : CodeSetValue, replace : boolean) {
+		displayCode(itemToDisplay : CodeSetValueWithTerm, replace : boolean) {
 			var vm = this;
 
 			if (vm.selectedMatch) {
@@ -70,20 +72,20 @@ module app.dialogs {
 			}
 
 			vm.codingService.getCodeChildren(itemToDisplay.code)
-				.then(function(result:CodeSetValue[]) {
+				.then(function(result:CodeSetValueWithTerm[]) {
 					vm.children = result;
 				});
 
 			vm.codingService.getCodeParents(itemToDisplay.code)
-				.then(function(result:CodeSetValue[]) {
+				.then(function(result:CodeSetValueWithTerm[]) {
 					vm.parents = result;
 				});
 
 			vm.selectedMatch = itemToDisplay;
 		}
 
-		select(match : CodeSetValue) {
-			var item : CodeSetValue = {
+		select(match : CodeSetValueWithTerm) {
+			var item : CodeSetValueWithTerm = {
 				code : match.code,
 				term : match.term,
 				includeChildren : true,
@@ -92,19 +94,19 @@ module app.dialogs {
 			this.resultData.push(item);
 		}
 
-		unselect(item : CodeSetValue) {
+		unselect(item : CodeSetValueWithTerm) {
 			var i = this.resultData.indexOf(item);
 			if (i !== -1) {
 				this.resultData.splice(i, 1);
 			}
 		}
 
-		displayExclusionTree(selection : CodeSetValue) {
+		displayExclusionTree(selection : CodeSetValueWithTerm) {
 			var vm = this;
 			vm.selectedExclusion = selection;
 
 			vm.codingService.getCodeChildren(selection.code)
-				.then(function(result:CodeSetValue[]) {
+				.then(function(result:CodeSetValueWithTerm[]) {
 					var exclusionTreeNode : ExclusionTreeNode = selection as ExclusionTreeNode;
 					exclusionTreeNode.children = result as ExclusionTreeNode[];
 					exclusionTreeNode.children.forEach((item) => {

@@ -21,6 +21,7 @@ module app.library {
 	import ItemType = app.models.ItemType;
 	import LibraryItem = app.models.LibraryItem;
 	import CodeSetValue = app.models.CodeSetValue;
+	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
 	'use strict';
 
 	export class LibraryController {
@@ -88,7 +89,7 @@ module app.library {
 		}
 
 		showCodePicker() {
-			var selection : CodeSetValue[] = [
+			var selection : CodeSetValueWithTerm[] = [
 				{
 					code: '195967001',
 					term: 'asthma',
@@ -113,7 +114,7 @@ module app.library {
 			];
 
 			CodePickerController.open(this.$modal, selection)
-				.result.then(function(resultData : CodeSetValue[]){
+				.result.then(function(resultData : CodeSetValueWithTerm[]){
 					console.log('Dialog closed');
 					console.log(resultData);
 				});

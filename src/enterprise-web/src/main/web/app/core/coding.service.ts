@@ -1,12 +1,15 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 module app.core {
-	import CodeSetValue = app.models.CodeSetValue;
+	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
+	import Concept = app.models.Concept;
 	'use strict';
 
 	export interface ICodingService {
-		searchCodes(searchData : string):ng.IPromise<CodeSetValue[]>;
-		getCodeChildren(code : string):ng.IPromise<CodeSetValue[]>;
-		getCodeParents(code : string):ng.IPromise<CodeSetValue[]>;
+		searchCodes(searchData : string):ng.IPromise<CodeSetValueWithTerm[]>;
+		getCodeChildren(code : string):ng.IPromise<CodeSetValueWithTerm[]>;
+		getCodeParents(code : string):ng.IPromise<CodeSetValueWithTerm[]>;
+		getPreferredTerm(id : string):ng.IPromise<Concept>;
+
 	}
 }

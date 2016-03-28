@@ -41,9 +41,9 @@
 							</thead>
 							<tbody>
 								<tr ng-repeat="item in dashboard.recentDocumentsData">
-									<td>{{item.Document.name}}</td>
-									<td>{{item.Document.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
-									<td>{{item.Document.type | itemTypeIdToString }}</td>
+									<td>{{item.name}}</td>
+									<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
+									<td>{{item.type | itemTypeIdToString }}</td>
 								</tr>
 							</tbody>
 						</table>

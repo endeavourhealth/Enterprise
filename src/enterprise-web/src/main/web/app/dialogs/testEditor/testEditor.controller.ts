@@ -142,6 +142,8 @@ module app.dialogs {
 
 				switch(field) {
 					case "CODE":
+						var terms = "";
+
 						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
 							var codes = filter.codeSet[0].codeSetValue[c];
 
@@ -155,6 +157,9 @@ module app.dialogs {
 									}
 
 									vm.termLookup.push(concept);
+
+									terms += ", "+result.preferredTerm.replace(' (disorder)','');
+									vm.filterCodes = terms.substring(2);
 								});
 						}
 
@@ -173,6 +178,9 @@ module app.dialogs {
 										}
 
 										vm.termLookup.push(concept);
+
+										terms += ", "+result.preferredTerm.replace(' (disorder)','')+" (exclusion)";
+										vm.filterCodes = terms.substring(2);
 									});
 							}
 						}
@@ -205,9 +213,6 @@ module app.dialogs {
 					default:
 				}
 			}
-
-			// give it a second for the term lookup API to return all results
-			setTimeout(function(){ vm.buildCodeSelectionDisplay(); }, 1000);
 
 		}
 
@@ -666,20 +671,6 @@ module app.dialogs {
 			return term;
 		}
 
-		buildCodeSelectionDisplay() {
-			var vm = this;
-			var terms = "";
-			for (var i = 0; i < vm.termLookup.length; ++i) {
-				var term = vm.termLookup[i].preferredTerm;
-				term = term.replace(' (disorder)','');
-				if (vm.termLookup[i].exclusion)
-					terms+=", "+term+" (exclusion)";
-				else
-					terms+=", "+term
-			}
-			vm.filterCodes = terms.substring(2);
-
-		}
 
 	}
 

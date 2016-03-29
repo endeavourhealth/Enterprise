@@ -24,6 +24,7 @@ module app.dialogs {
 	import ValueToOperator = app.models.ValueToOperator;
 	import IsAny = app.models.IsAny;
 	import Concept = app.models.Concept;
+	import Restriction = app.models.Restriction;
 
 	'use strict';
 
@@ -51,6 +52,9 @@ module app.dialogs {
 		filterValueFrom : string;
 		filterValueTo : string;
 		filterSex : string;
+		restrictionFieldName: string;
+		restrictionOrderDirection: string;
+		restrictionCount: string;
 		codeFilter : boolean = false;
 		dateFilter : boolean = false;
 		valueFilter : boolean = false;
@@ -65,7 +69,7 @@ module app.dialogs {
 		termLookup : Concept[] = [];
 
 		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE','CALCULATION'];
-		sortorders = ['','LATEST','EARLIEST','HIGHEST','LOWEST'];
+		sortorders = ['','ASCENDING','DESCENDING'];
 		periods = ['','DAYS','WEEKS','MONTHS','YEARS'];
 		rule = [''];
 		fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
@@ -121,8 +125,6 @@ module app.dialogs {
 				this.resultData = newTest;
 			else
 				this.initialiseEditMode(this.resultData);
-
-
 		}
 
 		initialiseEditMode(resultData : Test) {
@@ -215,6 +217,13 @@ module app.dialogs {
 						break;
 					default:
 				}
+			}
+
+			if (resultData.dataSource.restriction) {
+				vm.showRestriction = true;
+				vm.restrictionFieldName = resultData.dataSource.restriction.fieldName;
+				vm.restrictionOrderDirection = resultData.dataSource.restriction.orderDirection;
+				vm.restrictionCount = resultData.dataSource.restriction.count.toString();
 			}
 
 		}
@@ -639,6 +648,23 @@ module app.dialogs {
 			if (!foundEntry && value!="")
 				vm.resultData.dataSource.filter.push(fieldTest);
 
+		}
+
+		restrictionChange(value : any) {
+			var vm = this;
+
+			if (!value || vm.restrictionFieldName=="" || vm.restrictionOrderDirection=="" || vm.restrictionCount=="") {
+				vm.resultData.dataSource.restriction = null;
+				return;
+			}
+
+			var restriction : Restriction = {
+				fieldName: vm.restrictionFieldName,
+				orderDirection: vm.restrictionOrderDirection,
+				count: Number(vm.restrictionCount)
+			};
+
+			vm.resultData.dataSource.restriction = restriction;
 		}
 
 		showCalculationEditorFields() {

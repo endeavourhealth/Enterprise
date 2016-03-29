@@ -1,7 +1,7 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../core/library.service.ts" />
 
-module app.listOuput {
+module app.listOutput {
 	import ILoggerService = app.blocks.ILoggerService;
 	import IScope = angular.IScope;
 	import ILibraryService = app.core.ILibraryService;
@@ -14,13 +14,17 @@ module app.listOuput {
 	import DataSource = app.models.DataSource;
 	import TestEditorController = app.dialogs.TestEditorController;
 	import Test = app.models.Test;
+	import EntityMap = app.models.EntityMap;
+	import Entity = app.models.Entity;
+	import Field = app.models.Field;
 	'use strict';
 
-	export class ListOuputController {
+	export class ListOutputController {
 		libraryItem : LibraryItem;
 		selectedListReportGroup : ListReportGroup;
 		selectedFieldOutput : FieldOutput;
-		dataSourceAvailableFields : string[];
+		dataSourceAvailableFields : Field[];
+		entityMap : EntityMap;
 
 		static $inject = ['LibraryService', 'LoggerService', '$scope',
 			'$uibModal', 'AdminService', '$window', '$stateParams'];
@@ -34,6 +38,7 @@ module app.listOuput {
 			protected $window : IWindowService,
 			protected $stateParams : {itemAction : string, itemUuid : string}) {
 
+			this.loadEntityMap();
 			this.performAction($stateParams.itemAction, $stateParams.itemUuid);
 		}
 
@@ -47,6 +52,16 @@ module app.listOuput {
 					this.load(itemUuid);
 					break;
 			}
+		}
+
+		loadEntityMap() {
+			var vm = this;
+			vm.libraryService.getEntityMap().then(function (result : EntityMap) {
+				vm.entityMap = result;
+			})
+			.catch(function(data) {
+				vm.logger.error('Error loading entity map', data, 'Error');
+			});
 		}
 
 		selectDataSource(datasourceContainer : { dataSource : DataSource }) {
@@ -66,7 +81,35 @@ module app.listOuput {
 		}
 
 		loadDataSourceAvailableFieldList() {
-			this.dataSourceAvailableFields = ['Forename', 'Surname', 'DateOfBirth'];
+			// Find entity in entitymap
+			this.dataSourceAvailableFields = [];
+			var entityName : string = this.selectedListReportGroup.fieldBased.dataSource.entity;
+
+			var matchingEntities : Entity[] = $.grep(this.entityMap.entity, (e) => e.logicalName === entityName);
+			if (matchingEntities.length === 1) {
+				this.dataSourceAvailableFields = $.grep(matchingEntities[0].field, (e) => e.availability.indexOf('output') > -1);
+			}
+		}
+
+		getFieldDisplayName(logicalName : string) : string {
+			var matchingFields : Field[] = $.grep(this.dataSourceAvailableFields, (e) => e.logicalName === logicalName);
+			if (matchingFields.length === 1) {
+				return matchingFields[0].displayName;
+			}
+			return '<Unknown>';
+		}
+
+		getDatasourceDisplayName() : string {
+			if (this.selectedListReportGroup
+				&& this.selectedListReportGroup.fieldBased
+				&& this.selectedListReportGroup.fieldBased.dataSource) {
+				var logicalName = this.selectedListReportGroup.fieldBased.dataSource.entity;
+				var matchingEntities:Entity[] = $.grep(this.entityMap.entity, (e) => e.logicalName === logicalName);
+				if (matchingEntities.length === 1) {
+					return matchingEntities[0].displayName;
+				}
+			}
+			return '<Unknown>';
 		}
 
 		addListGroup() {
@@ -118,9 +161,9 @@ module app.listOuput {
 									filter : []
 								},
 								fieldOutput: [
-									{heading: 'DOB', field: 'DateOfBirth'},
-									{heading: 'Forename', field: 'FirstName'},
-									{heading: 'Surname', field: 'LastName'}
+									{heading: 'Birth Date', field: 'DOB'},
+									{heading: 'Gender', field: 'SEX'},
+									{heading: 'Surname', field: 'SURNAME'}
 								]
 							}
 						},
@@ -132,9 +175,8 @@ module app.listOuput {
 									filter : []
 								},
 								fieldOutput: [
-									{heading: 'Medication', field: 'DrugName'},
-									{heading: 'Dose', field: 'Doseage'},
-									{heading: 'Last Issue', field: 'LastIssued'}
+									{heading: 'Medication', field: 'TERM'},
+									{heading: 'Date', field: 'EFFECTIVEDATE'}
 								]
 							}
 						}
@@ -177,5 +219,5 @@ module app.listOuput {
 
 	angular
 		.module('app.listOutput')
-		.controller('ListOutputController', ListOuputController);
+		.controller('ListOutputController', ListOutputController);
 }

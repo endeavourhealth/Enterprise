@@ -9,6 +9,8 @@ module app.query {
 	import Test = app.models.Test;
 	import ILibraryService = app.core.ILibraryService;
 	import LibraryItem = app.models.LibraryItem;
+	import Query = app.models.Query;
+	import StartingRules = app.models.StartingRules;
 
 	'use strict';
 
@@ -43,60 +45,17 @@ module app.query {
 			function QueryController (logger : app.blocks.ILoggerService, $scope : any, $stateParams : any, $modal : IModalService, $window : any,
 									  libraryService : ILibraryService, adminService : IAdminService) {
 
-				var libraryItem : LibraryItem;
-
-				var itemAction = $stateParams.itemAction;
-				var itemUuid = $stateParams.itemUuid;
-
-				$scope.queryFolderUuid = null;
-				$scope.queryFolderName = "";
-				$scope.queryUuid = null;
 				$scope.queryName = "";
 				$scope.queryDescription = "";
 
-				switch(itemAction) {
-					case "add":
-						$scope.queryFolderUuid = itemUuid;
-						break;
-					case "edit":
-						$scope.queryUuid = itemUuid;
-						break;
-					case "view":
-						$scope.queryUuid = itemUuid;
-						break;
-					default:
-				}
-
-				//
-				// Setup the data-model for the chart.
-				//
-				var document = {
-					queryDocument: {
-						folder: {
-							uuid: $scope.queryFolderUuid,
-							name: $scope.queryFolderName
-						},
-						libraryItem: {
-							uuid: $scope.queryUuid,
-							name: $scope.queryName,
-							description: $scope.queryDescription,
-							folderUuid: $scope.queryFolderUuid,
-							query: {
-								startingRules: {
-									ruleId : <any>[]
-								},
-								rule: <any>[]
-							}
-						}
-					}
-				};
+				$scope.nextRuleID = 1;
 
 				$scope.queryNameChange = function () {
-					$scope.chartViewModel.data.queryDocument.libraryItem.name = $scope.queryName;
+					$scope.chartViewModel.data.name = $scope.queryName;
 				};
 
 				$scope.queryDescriptionChange = function () {
-					$scope.chartViewModel.data.queryDocument.libraryItem.description = $scope.queryDescription;
+					$scope.chartViewModel.data.description = $scope.queryDescription;
 				};
 
 				$scope.ruleDescriptionChange = function () {
@@ -119,8 +78,6 @@ module app.query {
 						selectedRule.data.onFail.ruleId = <any>[];
 					}
 				};
-
-				$scope.nextRuleID = 0;
 
 				$scope.results = ['','GOTO_RULES','INCLUDE','EXCLUDE'];
 
@@ -168,6 +125,7 @@ module app.query {
 					$scope.ruleDescription = "";
 					$scope.rulePassAction = "";
 					$scope.ruleFailAction = "";
+					$scope.nextRuleID = 1;
 					this.toggleClearQuery();
 				};
 
@@ -179,11 +137,11 @@ module app.query {
 					// Template for a new rule.
 					//
 
-					if ($scope.nextRuleID==0) {
+					if ($scope.nextRuleID==1) {
 
 						var newStartRuleDataModel = {
 							description: "START",
-							id: $scope.nextRuleID++,
+							id: 0,
 							layout: {
 								x: -162,
 								y: 25
@@ -250,35 +208,133 @@ module app.query {
 					$scope.chartViewModel.deleteSelected();
 				};
 
-				$scope.save = function () {
-					libraryItem = $scope.chartViewModel.data.queryDocument.libraryItem;
+				$scope.save = function (close : boolean) {
+					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+						if ($scope.chartViewModel.data.query.rule[i].description=="START") {
+							$scope.chartViewModel.data.query.rule.splice(i,1);
+							$scope.chartViewModel.rule.splice(i,1);
+						}
+
+					}
+
+					var libraryItem = $scope.chartViewModel.data;
 
 					libraryService.saveLibraryItem(libraryItem)
 						.then(function(libraryItem : LibraryItem) {
-							$scope.chartViewModel.data.queryDocument.libraryItem.uuid = libraryItem.uuid;
+							$scope.chartViewModel.data.uuid = libraryItem.uuid;
+
+							var newStartRuleDataModel = {
+								description: "START",
+								id: 0,
+								layout: {
+									x: -162,
+									y: 25
+								},
+								onPass: {
+									action: "",
+									ruleId : <any>[]
+								},
+								onFail: {
+									action: "",
+									ruleId: <any>[]
+								}
+							};
+
+							$scope.chartViewModel.addRule(newStartRuleDataModel);
+
 							adminService.clearPendingChanges();
-							logger.success('Query saved successfully');
-						});
+							logger.success('Query saved successfully', libraryItem, 'Saved');
+
+							if (close) { $window.history.back(); }
+						})
+						.catch(function(data) {
+							logger.error('Error saving query', data, 'Error');
+						});;
 				}
 
 				$scope.close = function () {
 					// put code in here to check for changes
+					adminService.clearPendingChanges();
 					logger.error('Query not saved');
 					$window.history.back();
 				}
 
-				$scope.saveAndClose = function () {
-					$scope.save();
-					$window.history.back();
+				//
+				// Setup the data-model for the chart.
+				//
+
+				var startingRules : StartingRules = {
+					ruleId : []
 				}
+
+				var query : Query = {
+					parentQueryUuid  : null,
+					startingRules : startingRules,
+					rule : []
+				}
+
+				var libraryItem : LibraryItem = {
+					uuid: null,
+					name: null,
+					description: null,
+					folderUuid: $stateParams.itemUuid,
+					query: query,
+					codeSet : null,
+					listReport : null
+				};
 
 				//
 				// Create the view-model for the chart and attach to the scope.
 				//
-				$scope.chartViewModel = new flowchart.ChartViewModel(document);
+				$scope.chartViewModel = new flowchart.ChartViewModel(libraryItem);
 
-				$scope.queryName = $scope.chartViewModel.data.queryDocument.libraryItem.name;
-				$scope.queryDescription = $scope.chartViewModel.data.queryDocument.libraryItem.description;
+				switch($stateParams.itemAction) {
+					case "view":
+					case "edit":
+						$stateParams.itemUuid = "A87A233D-293E-4220-AAA3-25AC1D201257";
+						libraryService.getLibraryItem($stateParams.itemUuid)
+							.then(function(libraryItem : LibraryItem) {
+								$scope.chartViewModel = new flowchart.ChartViewModel(libraryItem);
+
+								$scope.queryName = libraryItem.name;
+								$scope.queryDescription = libraryItem.description;
+
+
+								var newStartRuleDataModel = {
+									description: "START",
+									id: 0,
+									layout: {
+										x: -162,
+										y: 25
+									},
+									onPass: {
+										action: "",
+										ruleId : <any>[]
+									},
+									onFail: {
+										action: "",
+										ruleId: <any>[]
+									}
+								};
+
+								$scope.chartViewModel.addRule(newStartRuleDataModel);
+
+								var highestId = 1;
+								for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+									var id = $scope.chartViewModel.data.query.rule[i].id;
+									if (parseInt(id) > highestId) {
+										highestId = parseInt(id);
+									}
+								}
+								$scope.nextRuleID = highestId+1;
+
+							})
+							.catch(function(data) {
+								logger.error('Error loading query', data, 'Error');
+							});;
+						break;
+					default:
+				}
 
 
 			}])

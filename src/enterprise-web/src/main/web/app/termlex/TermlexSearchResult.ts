@@ -6,7 +6,7 @@ module app.models {
 		type: string;
 	}
 
-	export class TermlexSearchResultResult extends Code {
+	export class TermlexSearchResultResult extends TermlexCode {
 		dt: string;
 		lang: string;
 		matches: string[];

@@ -29,95 +29,6 @@ var flowchart = {};
 	};
 
 	//
-	// View model for a queryDocument.
-	//
-	flowchart.QueryDocumentViewModel = function (queryDocumentDataModel) {
-
-		this.data = queryDocumentDataModel;
-
-		this.folder = function () {
-			return this.data.folder;
-		}
-
-		this.libraryItem = function () {
-			return this.data.libraryItem;
-		}
-
-		this.report = function () {
-			return this.data.report;
-		}
-	};
-
-	//
-	// View model for a folder.
-	//
-	flowchart.FolderViewModel = function (folderDataModel) {
-
-		this.data = folderDataModel;
-
-		this.uuid = function () {
-			return this.data.uuid;
-		}
-
-		this.name = function () {
-			return this.data.name;
-		}
-
-		this.parentUuid = function () {
-			return this.data.parentUuid;
-		}
-	};
-
-	//
-	// View model for a libraryItem.
-	//
-	flowchart.LibraryItemViewModel = function (libraryItemDataModel) {
-
-		this.data = libraryItemDataModel;
-
-		this.uuid = function () {
-			return this.data.uuid;
-		}
-
-		this.name = function () {
-			return this.data.name;
-		}
-
-		this.description = function () {
-			return this.data.description;
-		}
-
-		this.folderUuid = function () {
-			return this.data.folderUuid;
-		}
-
-		this.query = function () {
-			return this.data.query;
-		}
-	};
-
-	//
-	// View model for a query.
-	//
-	flowchart.QueryViewModel = function (queryDataModel) {
-
-		this.data = queryDataModel;
-
-		this.parentQueryUuid = function () {
-			return this.data.parentQueryUuid;
-		}
-
-		this.startingRules = function () {
-			return this.data.startingRules;
-		}
-
-		this.rule = function () {
-			return this.data.rule;
-		}
-
-	};
-
-	//
 	// View model for a startingRule.
 	//
 	flowchart.StartingRulesViewModel = function (startingRulesDataModel) {
@@ -214,54 +125,6 @@ var flowchart = {};
 
 	};
 
-	var createQueryDocumentViewModel = function (queryDocumentDataModel) {
-		var queryDocumentViewModel = [];
-
-		if (queryDocumentDataModel) {
-			for (var i = 0; i < queryDocumentDataModel.length; ++i) {
-				queryDocumentViewModel.push(new flowchart.QueryDocumentViewModel(queryDocumentDataModel[i]));
-			}
-		}
-
-		return queryDocumentViewModel;
-	};
-
-	var createFolderViewModel = function (folderDataModel) {
-		var folderViewModel = [];
-
-		if (folderDataModel) {
-			for (var i = 0; i < folderDataModel.length; ++i) {
-				folderViewModel.push(new flowchart.FolderViewModel(folderDataModel[i]));
-			}
-		}
-
-		return folderViewModel;
-	};
-
-	var createLibraryItemViewModel = function (libraryItemDataModel) {
-		var libraryItemViewModel = [];
-
-		if (libraryItemDataModel) {
-			for (var i = 0; i < libraryItemDataModel.length; ++i) {
-				libraryItemViewModel.push(new flowchart.LibraryItemViewModel(libraryItemDataModel[i]));
-			}
-		}
-
-		return libraryItemViewModel;
-	};
-
-	var createQueryViewModel = function (queryDataModel) {
-		var queryViewModel = [];
-
-		if (queryDataModel) {
-			for (var i = 0; i < queryDataModel.length; ++i) {
-				queryViewModel.push(new flowchart.QueryViewModel(queryDataModel[i]));
-			}
-		}
-
-		return queryViewModel;
-	};
-
 	var createStartingRulesViewModel = function (startingRulesDataModel) {
 		var startingRulesViewModel = [];
 
@@ -289,18 +152,16 @@ var flowchart = {};
 	//
 	// View model for the chart.
 	//
-	flowchart.ChartViewModel = function (document) {
+	flowchart.ChartViewModel = function (libraryItem) {
 
-		// reference to the query document data
-		this.data = document;
+		// reference to the libraryItem data
+		this.data = libraryItem;
 
 		// create rules view model
-		this.rule = createRuleViewModel(this.data.queryDocument.libraryItem.query.rule);
+		this.rule = createRuleViewModel(this.data.query.rule);
 
 		// create startingRules view model
-		this.startingRules = createStartingRulesViewModel(this.data.queryDocument.libraryItem.query.startingRules.ruleId);
-
-		this.libraryItem = createLibraryItemViewModel(this.data.queryDocument.libraryItem);
+		this.startingRules = createStartingRulesViewModel(this.data.query.startingRules.ruleId);
 
 		//
 		// Create a view model for a new connection.
@@ -329,10 +190,10 @@ var flowchart = {};
 		};
 
 		this.addStartingRule = function (destRuleId) {
-			if (!this.data.queryDocument.libraryItem.query.startingRules.ruleId) {
-				this.data.queryDocument.libraryItem.query.startingRules.ruleId = [];
+			if (!this.data.query.startingRules.ruleId) {
+				this.data.query.startingRules.ruleId = [];
 			}
-			this.data.queryDocument.libraryItem.query.startingRules.ruleId.push(destRuleId);
+			this.data.query.startingRules.ruleId.push(destRuleId);
 			//
 			// Update the startingRules view model.
 			//
@@ -343,14 +204,14 @@ var flowchart = {};
 		// Add a rule to the view model.
 		//
 		this.addRule = function (ruleDataModel) {
-			if (!this.data.queryDocument.libraryItem.query.rule) {
-				this.data.queryDocument.libraryItem.query.rule = [];
+			if (!this.data.query.rule) {
+				this.data.query.rule = [];
 			}
 
 			//
 			// Update the query document data model.
 			//
-			this.data.queryDocument.libraryItem.query.rule.push(ruleDataModel);
+			this.data.query.rule.push(ruleDataModel);
 
 			//
 			// Update the rule view model.
@@ -359,8 +220,8 @@ var flowchart = {};
 		}
 
 		this.clearQuery = function () {
-			this.data.queryDocument.libraryItem.query.rule.length = 0;
-			this.data.queryDocument.libraryItem.query.startingRules.ruleId.length = 0;
+			this.data.query.rule.length = 0;
+			this.data.query.startingRules.ruleId.length = 0;
 			this.rule.length = 0;
 			this.startingRules.length = 0;
 
@@ -436,6 +297,9 @@ var flowchart = {};
 
 				var r = this.rule[ruleIndex];
 
+				if (r.data.onPass.ruleId==null)
+					continue;
+
 				for (var nextRulesIndex = 0; nextRulesIndex < r.data.onPass.ruleId.length; ++nextRulesIndex) {
 					var ruleId = r.data.onPass.ruleId[nextRulesIndex];
 					if (selectedRuleId!=ruleId) {
@@ -455,6 +319,9 @@ var flowchart = {};
 				var newNextRuleViewModels = [];
 
 				var r = this.rule[ruleIndex];
+
+				if (r.data.onFail.ruleId==null)
+					continue;
 
 				for (var nextRulesIndex = 0; nextRulesIndex < r.data.onFail.ruleId.length; ++nextRulesIndex) {
 					var ruleId = r.data.onFail.ruleId[nextRulesIndex];
@@ -501,10 +368,10 @@ var flowchart = {};
 			// Update rules
 			//
 			this.rule = newRuleViewModels;
-			this.data.queryDocument.libraryItem.query.rule = newRuleDataModels;
+			this.data.query.rule = newRuleDataModels;
 
 			this.startingRules = newStartingRuleViewModels;
-			this.data.queryDocument.libraryItem.query.startingRules.ruleId = newStartingRuleDataModels;
+			this.data.query.startingRules.ruleId = newStartingRuleDataModels;
 		};
 
 		//

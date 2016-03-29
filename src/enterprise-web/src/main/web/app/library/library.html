@@ -41,13 +41,13 @@
 									</thead>
 									<tbody>
 										<tr class="hover-box show-child-on-hover" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
-											<td><a ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'view'})">{{item.name}}</a></td>
+											<td><a ng-click="ctrl.actionItem(item,'view')">{{item.name}}</a></td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 											<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>
 												<div class="child-to-show">
-													<button type="button" class="btn btn-info btn-xs" ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'view'})">View</button>
-													<button type="button" class="btn btn-success btn-xs" ui-sref="app.queryAction({itemUuid: item.uuid, itemAction: 'edit'})">Edit</button>
+													<button type="button" class="btn btn-info btn-xs" ng-click="ctrl.actionItem(item,'view')">View</button>
+													<button type="button" class="btn btn-success btn-xs" ng-click="ctrl.actionItem(item,'edit')">Edit</button>
 													<span uib-dropdown>
 														<button type="button" class="btn btn-xs btn-default" uib-dropdown-toggle>...</button>
 														<ul uib-dropdown-menu>
@@ -88,7 +88,7 @@
 						<button type="button" class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
 						<ul uib-dropdown-menu>
 							<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
-							<li><a ui-sref="app.listOuputAction({itemUuid: node.uuid, itemAction: 'add'})">Add list output</a></li>
+							<li><a ui-sref="app.listOutputAction({itemUuid: node.uuid, itemAction: 'add'})">Add list output</a></li>
 							<li><a ng-click="ctrl.showCodePicker()">Add code set</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="#">Add child folder</a></li>

@@ -1,6 +1,6 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
-module app.listOuput {
+module app.listOutput {
 	'use strict';
 
 	class ListOutputRoute {
@@ -17,9 +17,9 @@ module app.listOuput {
 		static getRoutes() {
 			return [
 				{
-					state: 'app.listOuputAction',
+					state: 'app.listOutputAction',
 					config: {
-						url: '/listOuput/:itemUuid/:itemAction',
+						url: '/listOutput/:itemUuid/:itemAction',
 						templateUrl: 'app/listOutput/listOutput.html',
 						controller: 'ListOutputController',
 						controllerAs: 'listOutputCtrl'

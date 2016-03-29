@@ -17,6 +17,11 @@ module app.library {
 	import Folder = app.models.Folder;
 	import FolderType = app.models.FolderType;
 	import MessageBoxController = app.dialogs.MessageBoxController;
+	import FolderItem = app.models.FolderItem;
+	import ItemType = app.models.ItemType;
+	import LibraryItem = app.models.LibraryItem;
+	import CodeSetValue = app.models.CodeSetValue;
+	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
 	'use strict';
 
 	export class LibraryController {
@@ -24,13 +29,14 @@ module app.library {
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope', '$uibModal'];
+		static $inject = ['LibraryService', 'LoggerService', '$scope', '$uibModal', '$state'];
 
 		constructor(
 			protected libraryService:app.core.ILibraryService,
 			protected logger:ILoggerService,
 			protected $scope : IScope,
-			protected $modal : IModalService) {
+			protected $modal : IModalService,
+			protected $state : IStateService) {
 			this.getLibraryRootFolders();
 		}
 
@@ -83,32 +89,32 @@ module app.library {
 		}
 
 		showCodePicker() {
-			var selection : TermlexCodeSelection[] = [
+			var selection : CodeSetValueWithTerm[] = [
 				{
-					id: '195967001',
-					label: 'asthma',
+					code: '195967001',
+					term: 'asthma',
 					includeChildren: true,
-					exclusions: []
+					exclusion: []
 				},
 				{
-					id: '194828000',
-					label: 'angina',
+					code: '194828000',
+					term: 'angina',
 					includeChildren: true,
-					exclusions: [
-						{id:'315025001', label:'refractory angina' },
-						{id:'4557003', label:'preinfarcation syndrome' }
+					exclusion: [
+						{code:'315025001', term:'refractory angina', includeChildren : null, exclusion : null },
+						{code:'4557003', term:'preinfarcation syndrome', includeChildren : null, exclusion : null }
 					]
 				},
 				{
-					id: '73211009',
-					label: 'diabetes',
+					code: '73211009',
+					term: 'diabetes',
 					includeChildren: false,
-					exclusions: []
+					exclusion: []
 				}
 			];
 
 			CodePickerController.open(this.$modal, selection)
-				.result.then(function(resultData : TermlexCodeSelection[]){
+				.result.then(function(resultData : CodeSetValueWithTerm[]){
 					console.log('Dialog closed');
 					console.log(resultData);
 				});
@@ -148,6 +154,23 @@ module app.library {
 						vm.logger.error('Error deleting folder', error, 'Delete folder');
 					});
 			});
+		}
+
+		actionItem(item : FolderItem, action : string) {
+			switch (item.type) {
+				case ItemType.Query:
+					this.$state.go('app.queryAction', {itemUuid: item.uuid, itemAction: action});
+					break;
+				case ItemType.ListOutput:
+					this.$state.go('app.listOutputAction', {itemUuid: item.uuid, itemAction: action});
+					break;
+				case ItemType.CodeSet:
+					this.actionCodeSet(item.uuid, action);
+					break;
+			}
+		}
+
+		actionCodeSet(codeSetUuid : string, action : string) {
 		}
 	}
 

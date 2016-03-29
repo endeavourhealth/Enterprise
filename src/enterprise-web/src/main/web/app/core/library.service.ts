@@ -9,6 +9,7 @@ module app.core {
 	import UuidNameKVP = app.models.UuidNameKVP;
 	import ListReport = app.models.ListReport;
 	import LibraryItem = app.models.LibraryItem;
+	import EntityMap = app.models.EntityMap;
 	'use strict';
 
 	export interface ILibraryService {
@@ -27,6 +28,7 @@ module app.core {
 		getLibraryItem(uuid : string):ng.IPromise<LibraryItem>;
 		saveLibraryItem(libraryItem : LibraryItem):ng.IPromise<LibraryItem>;
 		deleteLibraryItem(libraryItem : LibraryItem):ng.IPromise<any>;
+		getEntityMap():ng.IPromise<EntityMap>;
 	}
 
 	export class LibraryService extends BaseHttpService implements ILibraryService {
@@ -156,6 +158,10 @@ module app.core {
 
 		deleteLibraryItem(libraryItem : LibraryItem):ng.IPromise<any> {
 			return this.httpPost('api/library/deleteLibraryItem', libraryItem);
+		}
+
+		getEntityMap():ng.IPromise<EntityMap> {
+			return this.httpGet('api/entity/getEntityMap');
 		}
 	}
 

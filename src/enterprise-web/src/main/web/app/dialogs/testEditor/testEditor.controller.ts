@@ -8,12 +8,14 @@ module app.dialogs {
 	import CodePickerController = app.dialogs.CodePickerController;
 	import TermlexCode = app.models.Code;
 	import TermlexCodeSelection = app.models.CodeSelection;
+	import ICodingService = app.core.ICodingService;
 	import Code = app.models.Code;
 	import Test = app.models.Test;
 	import DataSource = app.models.DataSource;
 	import FieldTest = app.models.FieldTest;
 	import CodeSet = app.models.CodeSet;
 	import CodeSetValue = app.models.CodeSetValue;
+	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
 	import ValueFrom = app.models.ValueFrom;
 	import ValueTo = app.models.ValueTo;
 	import Value = app.models.Value;
@@ -21,6 +23,7 @@ module app.dialogs {
 	import ValueFromOperator = app.models.ValueFromOperator;
 	import ValueToOperator = app.models.ValueToOperator;
 	import IsAny = app.models.IsAny;
+	import Concept = app.models.Concept;
 
 	'use strict';
 
@@ -58,7 +61,8 @@ module app.dialogs {
 
 		editMode : boolean = false;
 
-		codeSelection : TermlexCodeSelection[] = [];
+		codeSelection : CodeSetValueWithTerm[] = [];
+		termLookup : Concept[] = [];
 
 		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE','CALCULATION'];
 		sortorders = ['','LATEST','EARLIEST','HIGHEST','LOWEST'];
@@ -84,38 +88,41 @@ module app.dialogs {
 			return dialog;
 		}
 
-		static $inject = ['$uibModalInstance', 'LoggerService', '$uibModal', 'test'];
+		static $inject = ['$uibModalInstance', 'LoggerService', '$uibModal', 'test', 'CodingService'];
 
 		constructor(protected $uibModalInstance : IModalServiceInstance,
-					private logger:app.blocks.ILoggerService,
+					private logger : app.blocks.ILoggerService,
 					private $modal : IModalService,
-					private test: Test) {
+					private test: Test,
+					private codingService : ICodingService) {
 
 			super($uibModalInstance);
 
 			this.resultData = test;
 
-			 var ds : DataSource = {
-				 entity: "",
-				 dataSourceUuid: null,
-				 calculation: null,
-				 filter: [],
-				 restriction: null
-			 };
+			var ds : DataSource = {
+				entity: "",
+				dataSourceUuid: null,
+				calculation: null,
+				filter: [],
+				restriction: null
+			};
 
 			var isAny : IsAny = {}
 
-			 var newTest : Test = {
-				 dataSource: ds,
-				 dataSourceUuid: null,
-				 isAny: isAny,
-				 fieldTest: null
-			 };
+			var newTest : Test = {
+				dataSource: ds,
+				dataSourceUuid: null,
+				isAny: isAny,
+				fieldTest: null
+			};
 
 			if (!this.resultData)
 				this.resultData = newTest;
 			else
 				this.initialiseEditMode(this.resultData);
+
+
 		}
 
 		initialiseEditMode(resultData : Test) {
@@ -129,6 +136,7 @@ module app.dialogs {
 			for (var i = 0; i < resultData.dataSource.filter.length; ++i) {
 				var filter = resultData.dataSource.filter[i];
 				var field = filter.field;
+
 				this.showFilter(field);
 				vm.ruleFilter = field;
 
@@ -139,36 +147,46 @@ module app.dialogs {
 						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
 							var codes = filter.codeSet[0].codeSetValue[c];
 
-							var term = codes.term;
-							terms+=", "+term;
+							vm.codingService.getPreferredTerm(codes.code)
+								.then(function (result) {
 
-							var excludedCodes : Code[] = [];
+									var concept : Concept = {
+										id: result.id,
+										preferredTerm: result.preferredTerm,
+										exclusion: false
+									}
 
-							for (var e = 0; e < codes.exclusion.length; ++e) {
-								var exclusion = codes.exclusion[e];
+									vm.termLookup.push(concept);
 
-								var term = exclusion.term;
-								terms+=", "+term+" (exclusion)";
+									terms += ", "+vm.termShorten(result.preferredTerm);
 
-								var excl : Code = {
-									id: exclusion.code,
-									label: exclusion.term
-								}
-
-								excludedCodes.push(excl)
-							}
-
-							var selectedCodes : TermlexCodeSelection = {
-								id: codes.code,
-								label: codes.term,
-								includeChildren: codes.includeChildren,
-								exclusions: excludedCodes
-							}
-
-							this.codeSelection.push(selectedCodes);
+									vm.filterCodes = terms.substring(2);
+								});
 						}
 
-						vm.filterCodes = terms.substring(2);
+						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
+							var codes = filter.codeSet[0].codeSetValue[c];
+
+							if (codes.exclusion==null)
+								continue;
+							for (var e = 0; e < codes.exclusion.length; ++e) {
+								var exclusion = codes.exclusion[e];
+								vm.codingService.getPreferredTerm(exclusion.code)
+									.then(function (result:any) {
+
+										var concept : Concept = {
+											id: result.id,
+											preferredTerm: result.preferredTerm,
+											exclusion: true
+										}
+
+										vm.termLookup.push(concept);
+
+										terms += ", "+vm.termShorten(result.preferredTerm)+" (exclusion)";
+										vm.filterCodes = terms.substring(2);
+									});
+							}
+						}
 
 						break;
 					case "DOB":
@@ -198,6 +216,7 @@ module app.dialogs {
 					default:
 				}
 			}
+
 		}
 
 		formatDate(inputDate : Date) {
@@ -207,8 +226,46 @@ module app.dialogs {
 		showCodePicker() {
 			var vm = this;
 
+			if (vm.editMode) {
+				this.codeSelection = [];
+				for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
+					var filter = vm.resultData.dataSource.filter[i];
+					if (filter.field=="CODE") {
+						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
+							var codes = filter.codeSet[0].codeSetValue[c];
+
+							var excludedCodes : CodeSetValueWithTerm[] = [];
+
+							if (codes.exclusion!=null) {
+								for (var e = 0; e < codes.exclusion.length; ++e) {
+									var exclusion = codes.exclusion[e];
+
+									var excl : CodeSetValueWithTerm = {
+										code: exclusion.code,
+										term: this.lookupTerm(exclusion.code)
+
+									} as CodeSetValueWithTerm;
+
+									excludedCodes.push(excl)
+								}
+							}
+
+							var selectedCodes : CodeSetValueWithTerm = {
+								code: codes.code,
+								term: this.lookupTerm(codes.code),
+								includeChildren: codes.includeChildren,
+								exclusion: excludedCodes
+							}
+
+							this.codeSelection.push(selectedCodes);
+						}
+						break;
+					}
+				}
+			}
+
 			CodePickerController.open(this.$modal, this.codeSelection)
-				.result.then(function(resultData : TermlexCodeSelection[]){
+				.result.then(function(resultData : CodeSetValueWithTerm[]){
 
 				var codeSet : CodeSet = {
 					codingSystem : "SNOMED_CT",
@@ -222,33 +279,29 @@ module app.dialogs {
 
 					var codeSetVal : CodeSetValue = {
 						code : "",
-						term : "",
 						includeChildren : true,
 						exclusion : []
 					}
 
-					codeSetVal.code = code.id;
-					codeSetVal.term = code.label;
+					codeSetVal.code = code.code;
 					codeSetVal.includeChildren = code.includeChildren;
 
-					var term = code.label;
+					var term = code.term;
 					terms+=", "+term;
 
-					for (var e = 0; e < code.exclusions.length; ++e) {
-						var exclusion = code.exclusions[e];
+					for (var e = 0; e < code.exclusion.length; ++e) {
+						var exclusion = code.exclusion[e];
 
 						var codeSetValExcl : CodeSetValue = {
 							code : "",
-							term : "",
 							includeChildren : true,
 							exclusion : null
 						}
 
-						codeSetValExcl.code = exclusion.id;
-						codeSetValExcl.term = exclusion.label;
+						codeSetValExcl.code = exclusion.code;
 						codeSetVal.exclusion.push(codeSetValExcl);
 
-						var term = exclusion.label;
+						var term = exclusion.term;
 						terms+=", "+term+" (exclusion)";
 
 					}
@@ -328,8 +381,6 @@ module app.dialogs {
 		showFilter(value : any) {
 			var vm = this;
 
-			vm.editMode = true;
-
 			switch(value) {
 				case "CODE":
 					vm.codeEditor = true;
@@ -358,6 +409,9 @@ module app.dialogs {
 
 		filterDateFromChange(value : any, dateField : any) {
 			var vm = this;
+
+			if (!value)
+				return;
 
 			var datestring : string = "";
 
@@ -403,6 +457,9 @@ module app.dialogs {
 
 		filterDateToChange(value : any, dateField : any) {
 			var vm = this;
+
+			if (!value)
+				return;
 
 			var datestring : string = "";
 
@@ -458,6 +515,9 @@ module app.dialogs {
 		filterValueChange(value : any, valueField : any) {
 			var vm = this;
 
+			if (!value)
+				return;
+
 			var valueEqualTo : Value = {
 				constant: value,
 				parameter: null,
@@ -496,6 +556,9 @@ module app.dialogs {
 
 		filterValueFromChange(value : any) {
 			var vm = this;
+
+			if (!value)
+				return;
 
 			var valueFrom : ValueFrom = {
 				constant: value,
@@ -536,6 +599,9 @@ module app.dialogs {
 
 		filterValueToChange(value : any) {
 			var vm = this;
+
+			if (!value)
+				return;
 
 			var valueTo : ValueTo = {
 				constant: value,
@@ -610,6 +676,27 @@ module app.dialogs {
 
 		save() {
 			this.ok();
+		}
+
+		lookupTerm(codeId : string) {
+			var vm = this;
+			var term = "";
+			for (var i = 0; i < vm.termLookup.length; ++i) {
+				if (vm.termLookup[i].id==codeId) {
+					term = vm.termLookup[i].preferredTerm;
+					break;
+				}
+			}
+			term = vm.termShorten(term);
+
+			return term;
+		}
+
+		termShorten(term : string) {
+			term = term.replace(' (disorder)','');
+			term = term.replace(' (observable entity)','');
+			term = term.replace(' (finding)','');
+			return term;
 		}
 
 	}

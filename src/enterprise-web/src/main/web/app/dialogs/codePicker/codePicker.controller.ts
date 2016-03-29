@@ -2,30 +2,29 @@
 /// <reference path="../../blocks/logger.service.ts" />
 
 module app.dialogs {
-	import TermlexSearchResult = app.models.TermlexSearchResult;
-	import TermlexSearchResultResult = app.models.TermlexSearchResultResult;
 	import IModalServiceInstance = angular.ui.bootstrap.IModalServiceInstance;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import IModalService = angular.ui.bootstrap.IModalService;
-	import Code = app.models.Code;
-	import CodeSelection = app.models.CodeSelection;
 	import ExclusionTreeNode = app.models.ExclusionTreeNode;
 	import ICodingService = app.core.ICodingService;
+	import CodeSetValue = app.models.CodeSetValue;
+	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
+
 	'use strict';
 
 	export class CodePickerController extends BaseDialogController {
-		selectedMatch : Code;
-		previousSelection : Code;
-		selectedExclusion : CodeSelection;
+		selectedMatch : CodeSetValueWithTerm;
+		previousSelection : CodeSetValueWithTerm;
+		selectedExclusion : CodeSetValueWithTerm;
 
 		searchData : string;
-		searchResults : Code[];
-		parents : Code[];
-		children : Code[];
+		searchResults : CodeSetValueWithTerm[];
+		parents : CodeSetValueWithTerm[];
+		children : CodeSetValueWithTerm[];
 
 		exclusionTreeData : ExclusionTreeNode[];
 
-		public static open($modal : IModalService, selection : CodeSelection[]) : IModalServiceInstance {
+		public static open($modal : IModalService, selection : CodeSetValueWithTerm[]) : IModalServiceInstance {
 			var options : IModalSettings = {
 				templateUrl:'app/dialogs/codePicker/codePicker.html',
 				controller:'CodePickerController',
@@ -46,7 +45,7 @@ module app.dialogs {
 		constructor(protected $uibModalInstance : IModalServiceInstance,
 								private logger:app.blocks.ILoggerService,
 								private codingService : ICodingService,
-								private selection : CodeSelection[]) {
+								private selection : CodeSetValueWithTerm[]) {
 			super($uibModalInstance);
 			this.searchData = 'Asthma';
 			this.resultData = selection;
@@ -56,12 +55,12 @@ module app.dialogs {
 			var vm = this;
 			//vm.searchResults = vm.termlexSearch.getFindings(vm.searchData, vm.searchOptions);
 			vm.codingService.searchCodes(vm.searchData)
-				.then(function(result:TermlexSearchResult) {
-					vm.searchResults = result.results;
+				.then(function(result:CodeSetValueWithTerm[]) {
+					vm.searchResults = result;
 				});
 		}
 
-		displayCode(itemToDisplay : Code, replace : boolean) {
+		displayCode(itemToDisplay : CodeSetValueWithTerm, replace : boolean) {
 			var vm = this;
 
 			if (vm.selectedMatch) {
@@ -72,54 +71,54 @@ module app.dialogs {
 				vm.searchResults = [itemToDisplay];
 			}
 
-			vm.codingService.getCodeChildren(itemToDisplay.id)
-				.then(function(result:Code[]) {
+			vm.codingService.getCodeChildren(itemToDisplay.code)
+				.then(function(result:CodeSetValueWithTerm[]) {
 					vm.children = result;
 				});
 
-			vm.codingService.getCodeParents(itemToDisplay.id)
-				.then(function(result:Code[]) {
+			vm.codingService.getCodeParents(itemToDisplay.code)
+				.then(function(result:CodeSetValueWithTerm[]) {
 					vm.parents = result;
 				});
 
 			vm.selectedMatch = itemToDisplay;
 		}
 
-		select(match : Code) {
-			var item : CodeSelection = {
-				id : match.id,
-				label : match.label,
+		select(match : CodeSetValueWithTerm) {
+			var item : CodeSetValueWithTerm = {
+				code : match.code,
+				term : match.term,
 				includeChildren : true,
-				exclusions : []
+				exclusion : []
 			};
 			this.resultData.push(item);
 		}
 
-		unselect(item : CodeSelection) {
+		unselect(item : CodeSetValueWithTerm) {
 			var i = this.resultData.indexOf(item);
 			if (i !== -1) {
 				this.resultData.splice(i, 1);
 			}
 		}
 
-		displayExclusionTree(selection : CodeSelection) {
+		displayExclusionTree(selection : CodeSetValueWithTerm) {
 			var vm = this;
 			vm.selectedExclusion = selection;
 
-			vm.codingService.getCodeChildren(selection.id)
-				.then(function(result:Code[]) {
+			vm.codingService.getCodeChildren(selection.code)
+				.then(function(result:CodeSetValueWithTerm[]) {
 					var exclusionTreeNode : ExclusionTreeNode = selection as ExclusionTreeNode;
 					exclusionTreeNode.children = result as ExclusionTreeNode[];
 					exclusionTreeNode.children.forEach((item) => {
 						// If "Top-level include"
 						if (exclusionTreeNode.includeChildren) {
 							// and no "excludes" then tick
-							if (exclusionTreeNode.exclusions.length && exclusionTreeNode.exclusions.length === 0) {
+							if (exclusionTreeNode.exclusion.length && exclusionTreeNode.exclusion.length === 0) {
 								item.includeChildren = true;
 							} else {
 								// else if this is not excluded then tick
-								item.includeChildren = exclusionTreeNode.exclusions.every((exclusion) => {
-									return exclusion.id !== item.id;
+								item.includeChildren = exclusionTreeNode.exclusion.every((exclusion) => {
+									return exclusion.code !== item.code;
 								});
 							}
 						}
@@ -129,35 +128,35 @@ module app.dialogs {
 		}
 
 		includeNode(node : ExclusionTreeNode) {
-			if (node.id === this.selectedExclusion.id) {
-				this.selectedExclusion.exclusions = [];
+			if (node.code === this.selectedExclusion.code) {
+				this.selectedExclusion.exclusion = [];
 				this.selectedExclusion.includeChildren = true;
 				node.children.forEach((item) => { item.includeChildren = true; });
 			} else {
 				if (this.selectedExclusion.includeChildren) {
-					var index = this.findWithAttr(this.selectedExclusion.exclusions, 'id', node.id);
+					var index = this.findWithAttr(this.selectedExclusion.exclusion, 'code', node.code);
 					if (index > -1) {
-						this.selectedExclusion.exclusions.splice(index, 1);
+						this.selectedExclusion.exclusion.splice(index, 1);
 						node.includeChildren = true;
-						if (this.selectedExclusion.exclusions.length === 0) {
+						if (this.selectedExclusion.exclusion.length === 0) {
 							this.selectedExclusion.includeChildren = true;
 						}
 					}
 				} else {
 					this.selectedExclusion.includeChildren = true;
-					this.selectedExclusion.exclusions = this.exclusionTreeData[0].children.slice(0);
+					this.selectedExclusion.exclusion = this.exclusionTreeData[0].children.slice(0);
 					this.includeNode(node);
 				}
 			}
 		}
 
 		excludeNode(node : ExclusionTreeNode) {
-			if (node.id === this.selectedExclusion.id) {
-				this.selectedExclusion.exclusions = [];
+			if (node.code === this.selectedExclusion.code) {
+				this.selectedExclusion.exclusion = [];
 				this.selectedExclusion.includeChildren = false;
 				node.children.forEach((item) => { item.includeChildren = false; });
 			} else {
-				this.selectedExclusion.exclusions.push(node);
+				this.selectedExclusion.exclusion.push(node);
 				node.includeChildren = false;
 			}
 		}

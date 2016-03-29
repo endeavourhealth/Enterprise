@@ -13,13 +13,13 @@
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="name">Name</label>
-						<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.libraryItem.name">
+						<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.libraryItem.name" ng-readonly="listOutputCtrl.readOnly">
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col-md-12">
 						<label for="description">Description</label>
-						<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.libraryItem.description">
+						<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.libraryItem.description" ng-readonly="listOutputCtrl.readOnly">
 					</div>
 				</div>
 				<div class="row">
@@ -62,7 +62,7 @@
 						<div class="row">
 							<div class="form-group col-md-12">
 								<label for="group-heading">Heading</label>
-								<input type="text" class="form-control" id="group-heading" ng-model="listOutputCtrl.selectedListReportGroup.heading">
+								<input type="text" class="form-control" id="group-heading" ng-model="listOutputCtrl.selectedListReportGroup.heading" ng-readonly="listOutputCtrl.readOnly">
 							</div>
 						</div>
 						<div class="row" ng-show="listOutputCtrl.selectedListReportGroup.fieldBased">
@@ -97,12 +97,12 @@
 													ng-repeat="item in listOutputCtrl.selectedListReportGroup.fieldBased.fieldOutput">
 												<td>
 													<span class="child-to-hide">{{ item.heading }}</span>
-													<input type="text" class="form-control input-sm child-to-show" ng-model="item.heading">
+													<input type="text" class="form-control input-sm child-to-show" ng-model="item.heading" ng-readonly="listOutputCtrl.readOnly">
 												</td>
 												<td>
 													<span class="child-to-hide">{{ listOutputCtrl.getFieldDisplayName(item.field) }}</span>
 													<div class="btn-group child-to-show" role="group" uib-dropdown>
-														<button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle aria-haspopup="true" aria-expanded="false">
+														<button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle aria-haspopup="true" aria-expanded="false" ng-disabled="listOutputCtrl.readOnly">
 															{{ listOutputCtrl.getFieldDisplayName(item.field) }}
 															<span class="caret"></span>
 														</button>

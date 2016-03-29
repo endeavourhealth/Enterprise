@@ -132,6 +132,10 @@ module app.dialogs {
 
 			vm.editMode = true;
 
+			if (resultData.dataSource.filter === null) {
+				resultData.dataSource.filter = [];
+			}
+
 			for (var i = 0; i < resultData.dataSource.filter.length; ++i) {
 				var filter = resultData.dataSource.filter[i];
 				var field = filter.field;

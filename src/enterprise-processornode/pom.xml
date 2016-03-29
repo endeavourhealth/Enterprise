@@ -8,6 +8,24 @@
     <artifactId>enterprise-processornode</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.endeavourhealth</groupId>
+            <artifactId>enterprise-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.endeavourhealth</groupId>
+            <artifactId>enterprise-enginecore</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.endeavourhealth</groupId>
+            <artifactId>enterprise-engine</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

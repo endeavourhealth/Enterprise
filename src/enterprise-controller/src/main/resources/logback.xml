@@ -37,11 +37,12 @@
         </connectionSource>
     </appender>
 
-    <logger name="org.endeavourhealth">
-        <appender-ref ref="DB" />
+    <logger name="org.endeavourhealth" level="trace">
+        <appender-ref ref="STDOUT" />
+        <!--<appender-ref ref="DB" />-->
     </logger>
 
-    <root level="debug">
+    <root level="debug" >
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

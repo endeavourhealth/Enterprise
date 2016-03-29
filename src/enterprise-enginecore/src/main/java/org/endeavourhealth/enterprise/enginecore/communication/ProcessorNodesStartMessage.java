@@ -25,6 +25,7 @@ public class ProcessorNodesStartMessage {
         private UUID jobUuid;
         private String workerQueueName;
         private DatabaseConnectionDetails coreDatabaseConnectionDetails;
+        private DatabaseConnectionDetails careRecordDatabaseConnectionDetails;
         private String controllerQueueName;
 
         public UUID getJobUuid() {
@@ -49,6 +50,14 @@ public class ProcessorNodesStartMessage {
 
         public void setCoreDatabaseConnectionDetails(DatabaseConnectionDetails coreDatabaseConnectionDetails) {
             this.coreDatabaseConnectionDetails = coreDatabaseConnectionDetails;
+        }
+
+        public DatabaseConnectionDetails getCareRecordDatabaseConnectionDetails() {
+            return careRecordDatabaseConnectionDetails;
+        }
+
+        public void setCareRecordDatabaseConnectionDetails(DatabaseConnectionDetails careRecordDatabaseConnectionDetails) {
+            this.careRecordDatabaseConnectionDetails = careRecordDatabaseConnectionDetails;
         }
 
         public String getControllerQueueName() {

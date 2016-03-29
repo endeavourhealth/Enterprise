@@ -66,7 +66,7 @@ class ExecutionJob {
     }
 
     private void setPatientStatistics() throws Exception {
-        DatabaseConnectionDetails connectionDetails = ConfigurationAPI.convertConnection(configuration.getPatientDatabase());
+        DatabaseConnectionDetails connectionDetails = ConfigurationAPI.convertConnection(configuration.getCareRecordDatabase());
         primaryTableStats = CareRecordDal.calculateTableStatistics(connectionDetails);
     }
 
@@ -211,11 +211,13 @@ class ExecutionJob {
         QueueConnectionProperties queueConnectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
         String workerQueueName = WorkerQueue.calculateWorkerQueueName(configuration.getMessageQueuing().getWorkerQueuePrefix(), executionUuid);
         DatabaseConnectionDetails coreDatabaseConnectionDetails = ConfigurationAPI.convertConnection(configuration.getCoreDatabase());
+        DatabaseConnectionDetails careRecordDatabaseConnectionDetails = ConfigurationAPI.convertConnection(configuration.getCareRecordDatabase());
 
         ProcessorNodesStartMessage.StartMessagePayload payload = new ProcessorNodesStartMessage.StartMessagePayload();
         payload.setJobUuid(executionUuid);
         payload.setWorkerQueueName(workerQueueName);
         payload.setCoreDatabaseConnectionDetails(coreDatabaseConnectionDetails);
+        payload.setCareRecordDatabaseConnectionDetails(careRecordDatabaseConnectionDetails);
         payload.setControllerQueueName(configuration.getMessageQueuing().getControllerQueueName());
 
         ProcessorNodesStartMessage message = ProcessorNodesStartMessage.CreateAsNew(payload);

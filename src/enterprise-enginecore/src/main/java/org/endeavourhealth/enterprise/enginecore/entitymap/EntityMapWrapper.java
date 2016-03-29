@@ -5,12 +5,6 @@ import java.util.List;
 
 public class EntityMapWrapper {
 
-    public static class EntityMapException extends Exception {
-        public EntityMapException(String message) { super(message); }
-        public EntityMapException(String message, Throwable cause) { super(message, cause); }
-        public EntityMapException(Throwable cause) { super(cause); }
-    }
-
     public static class EntityMap {
 
         private org.endeavourhealth.enterprise.core.entitymap.models.EntityMap entityMap;

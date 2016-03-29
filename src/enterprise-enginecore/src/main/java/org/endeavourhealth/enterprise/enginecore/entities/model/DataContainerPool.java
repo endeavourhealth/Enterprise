@@ -44,7 +44,7 @@ public class DataContainerPool {
 
             DataEntity dataEntity = new DataEntity();
 
-            for (Field field : entity.getSource().getField()) {
+            for (int i = 0; i < entity.getSource().getField().size(); i++) {
                 dataEntity.getFields().add(new DataField());
             }
 

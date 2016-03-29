@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CareRecordDal {
@@ -72,13 +73,14 @@ public class CareRecordDal {
             ps.setLong(1, minimumId);
             ps.setLong(2, maximumId);
 
-            boolean hasResults = ps.execute();
+            ps.execute();
+            boolean hasResults = ps.getMoreResults();
 
             while (hasResults) {
                 resultSetIndex++;
 
                 try (JtdsResultSet rs = (JtdsResultSet) ps.getResultSet()) {
-                    processResultSet(rs, resultSetIndex, entityMapWrapper, dataContainerPool, dataContainerDictionary);
+                    processResultSet(rs, resultSetIndex, dataContainerDictionary);
                 }
 
                 hasResults = ps.getMoreResults();
@@ -90,16 +92,16 @@ public class CareRecordDal {
         return dataContainerDictionary;
     }
 
-    private static void processResultSet(
+    private void processResultSet(
             JtdsResultSet rs,
             int resultSetIndex,
-            EntityMapWrapper.EntityMap entityMapWrapper,
-            DataContainerPool dataContainerPool,
             Map<Long, DataContainer> dataContainerDictionary) throws Exception {
 
         int entityIndex = entityMapWrapper.getEntityIndexByResultSetIndex(resultSetIndex);
         EntityMapWrapper.Entity entity = entityMapWrapper.getEntity(entityIndex);
         int populationFieldIndex = entity.getSource().getPopulationFieldIndex();
+        List<Field> entityMapFields = entity.getSource().getField();
+        int entityMapFieldCount = entityMapFields.size();
 
         DataContainer dataContainer = null;
 
@@ -112,14 +114,15 @@ public class CareRecordDal {
                     dataContainer = dataContainerDictionary.get(populationId);
                 else {
                     dataContainer = dataContainerPool.acquire(populationId);
+                    dataContainer.setId(populationId);
                     dataContainerDictionary.put(populationId, dataContainer);
                 }
             }
 
             DataEntity dataEntity = dataContainer.getDataEntities().get(entityIndex);
 
-            for (Field field : entity.getSource().getField()) {
-                dataEntity.getFields().get(field.getIndex()).add(rs.getObject(field.getIndex()));
+            for (int i = 0; i < entityMapFieldCount; i++) {
+                dataEntity.getFields().get(i).add(rs.getObject(entityMapFields.get(i).getIndex()));
             }
         }
     }

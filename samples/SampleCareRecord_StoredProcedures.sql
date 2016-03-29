@@ -37,66 +37,47 @@ go
 create procedure EndeavourEnterprise.GetRecords
 (
 	@MinimumId int,
-	@MaximumId int,
-	@RegisteredOnly bit,
-	@OrganisationUuidFilter uniqueidentifier  --optional
+	@MaximumId int
 )
 as
 begin
 
 	set transaction isolation level read committed;
-
-	declare @OrganisationId int = null;
-	declare @RegisteredPatientStatus tinyint = 1;
-
-	if (@OrganisationUuidFilter is not null)
-	begin
-		select @OrganisationId = o.OrganisationId
-		from dbo.Organisation as o
-		where o.GUID = @OrganisationUuidFilter;
-	end
-
-	declare @patients table 
+		
+	declare @Patients table 
 	(
 		PatientId int not null primary key
 	);
 
-	insert into @patients
-	select p.PatientId
-	from dbo.Patient as p
-	inner join dbo.PatientStatus as s on s.PatientStatusId = p.PatientStatusId
-	where p.PatientId >= @MinimumId and p.PatientId <= @MaximumId
-	and (@OrganisationId is null or p.RegistrationOrganisationId = @OrganisationId)
-	and (@RegisteredOnly = 0 or s.CaseloadPatientStatusId = @RegisteredPatientStatus);
-
-	
+	insert into @Patients
+	select p.SK_PatientID
+	from [07T].[Patients] as p
+	where p.SK_PatientID >= @MinimumId and p.SK_PatientID <= @MaximumId;
+		
 	select
-		p.PatientId,
+		p.SK_PatientID,
 		p.DateOfBirth,
-		p.Sex,
-		p.CallingName,
-		p.DateOfRegistration
-	from dbo.Patient as p
-	inner join @Patients as j on j.PatientId = p.PatientId;
+		p.Gender,
+		p.DateRegistered
+	from [07T].Patients as p
+	inner join @Patients as j on j.PatientId = p.SK_PatientID;
 
 	select
-		o.PatientId,
-		o.LegacyCode,
-		o.OriginalTerm,
-		o.AvailabilityTimeStamp,
-		o.EffectiveDate,
-		o.NumericValue
-	from CareRecord.Observation as o
-	inner join @patients as p on p.PatientId = o.PatientId;
+		o.SK_PatientID,
+		--o.LegacyCode,
+		--o.OriginalTerm,
+		o.EventDate,
+		o.Value
+	from [07T].[GPEncounter] as o  --Observation
+	inner join @Patients as p on p.PatientId = o.SK_PatientID;
 	
 	select
-		i.PatientId,
-		i.LegacyCode,
-		i.OriginalTerm,
-		i.AvailabilityTimeStamp,
-		i.EffectiveDate
-	from Prescribing.IssueRecord as i
-	inner join @patients as p on p.PatientId = i.PatientId;
+		i.SK_PatientID,
+		i.DMDCode,
+		i.MedicationTerm,
+		i.IssueDate
+	from [07T].[GPMedication] as i
+	inner join @Patients as p on p.PatientId = i.SK_PatientID;
 
 	
 end;

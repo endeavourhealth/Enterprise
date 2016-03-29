@@ -1,4 +1,4 @@
-<entityMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\src\enterprise-core\src\main\resources\EntityMap.xsd">
+<entityMap xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EntityMap.xsd">
 	<entity>
 		<logicalName>PATIENT</logicalName>
 		<displayName>Patient</displayName>

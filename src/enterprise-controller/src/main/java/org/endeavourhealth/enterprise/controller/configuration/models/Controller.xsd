@@ -8,7 +8,7 @@
 			<xs:element name="patientBatchSize" type="xs:int"/>
 			<xs:element name="coreDatabase" type="databaseConnection"/>
 			<xs:element name="messageQueuing" type="messageQueuing"/>
-			<xs:element name="patientDatabase" type="databaseConnection"/>
+			<xs:element name="careRecordDatabase" type="databaseConnection"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="executionSchedule">

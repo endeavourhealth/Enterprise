@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="patientBatchSize" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="coreDatabase" type="{}databaseConnection"/>
  *         &lt;element name="messageQueuing" type="{}messageQueuing"/>
- *         &lt;element name="patientDatabase" type="{}databaseConnection"/>
+ *         &lt;element name="careRecordDatabase" type="{}databaseConnection"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
     "patientBatchSize",
     "coreDatabase",
     "messageQueuing",
-    "patientDatabase"
+    "careRecordDatabase"
 })
 public class Configuration {
 
@@ -51,7 +51,7 @@ public class Configuration {
     @XmlElement(required = true)
     protected MessageQueuing messageQueuing;
     @XmlElement(required = true)
-    protected DatabaseConnection patientDatabase;
+    protected DatabaseConnection careRecordDatabase;
 
     /**
      * Gets the value of the debugging property.
@@ -166,27 +166,27 @@ public class Configuration {
     }
 
     /**
-     * Gets the value of the patientDatabase property.
+     * Gets the value of the careRecordDatabase property.
      * 
      * @return
      *     possible object is
      *     {@link DatabaseConnection }
      *     
      */
-    public DatabaseConnection getPatientDatabase() {
-        return patientDatabase;
+    public DatabaseConnection getCareRecordDatabase() {
+        return careRecordDatabase;
     }
 
     /**
-     * Sets the value of the patientDatabase property.
+     * Sets the value of the careRecordDatabase property.
      * 
      * @param value
      *     allowed object is
      *     {@link DatabaseConnection }
      *     
      */
-    public void setPatientDatabase(DatabaseConnection value) {
-        this.patientDatabase = value;
+    public void setCareRecordDatabase(DatabaseConnection value) {
+        this.careRecordDatabase = value;
     }
 
 }

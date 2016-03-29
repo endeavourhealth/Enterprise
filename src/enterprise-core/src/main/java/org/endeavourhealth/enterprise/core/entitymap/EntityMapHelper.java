@@ -13,7 +13,7 @@ public class EntityMapHelper {
         String xml = Resources.getResourceAsString("EntityMap.xml");
         //"src/discovery-controller/src/main/resources/controller.config";
 
-        return XmlSerializer.deserializeFromString(EntityMap.class, xml, XSD);
+        return XmlSerializer.deserializeFromString(EntityMap.class, xml, "EntityMap.xsd");
     }
 //
 //    public static Entity getPrimaryEntity(EntityMap map) {

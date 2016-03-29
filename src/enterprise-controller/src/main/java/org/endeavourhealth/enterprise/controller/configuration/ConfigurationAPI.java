@@ -39,7 +39,6 @@ public class ConfigurationAPI {
 
     private static Configuration getConfiguration() throws Exception {
 
-        String xml = Resources.getResourceAsString("controller.config");
         //"src/discovery-controller/src/main/resources/controller.config";
 
         Configuration configuration = XmlSerializer.deserializeFromResource(Configuration.class, "controller.config", "Controller.xsd");

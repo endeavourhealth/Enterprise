@@ -167,7 +167,7 @@
 					<div class="col-xs-12">
 						<div class="form-group">
 							<label>Filter by Clinical Codes</label>
-							<div class="form-control" style="height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showCodePicker()">
+							<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showCodePicker()">
 								<span ng-repeat="code in testEditor.codeSelection">
 									<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
 								</span>

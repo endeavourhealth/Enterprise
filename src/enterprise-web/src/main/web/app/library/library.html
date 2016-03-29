@@ -41,7 +41,7 @@
 									</thead>
 									<tbody>
 										<tr class="hover-box show-child-on-hover" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
-											<td><a ng-click="ctrl.actionItem(item,'view')">{{item.name}}</a></td>
+											<td><a style="cursor: pointer" ng-click="ctrl.actionItem(item,'view')">{{item.name}}</a></td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 											<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>

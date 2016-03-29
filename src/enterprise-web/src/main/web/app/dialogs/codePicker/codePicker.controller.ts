@@ -50,7 +50,22 @@ module app.dialogs {
 								private selection : CodeSetValue[]) {
 			super($uibModalInstance);
 			this.termCache = {};
-			this.resultData = selection;
+			this.resultData = this.cloneCodeSetValueList(selection);
+		}
+
+		cloneCodeSetValueList(source : CodeSetValue[]) {
+			if (source == null) { return null; }
+
+			var target : CodeSetValue[] = [];
+			for (var i = 0; i < source.length; i++) {
+				var clone : CodeSetValue = {
+					code : source[i].code,
+					includeChildren : source[i].includeChildren,
+					exclusion : this.cloneCodeSetValueList(source[i].exclusion)
+				};
+				target.push(clone);
+			}
+			return target;
 		}
 
 		search() {
@@ -116,7 +131,7 @@ module app.dialogs {
 						// If "Top-level include"
 						if (exclusionTreeNode.includeChildren) {
 							// and no "excludes" then tick
-							if (exclusionTreeNode.exclusion.length && exclusionTreeNode.exclusion.length === 0) {
+							if ((!exclusionTreeNode.exclusion) || exclusionTreeNode.exclusion.length === 0) {
 								item.includeChildren = true;
 							} else {
 								// else if this is not excluded then tick

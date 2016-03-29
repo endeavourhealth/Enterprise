@@ -68,8 +68,8 @@
 							 class="hover-box show-child-on-hover striped"
 							 ng-class="{'selection': selection == codePicker.selectedExclusion}">
 						{{ codePicker.getTerm(selection.code) }}
-						<span class="label label-success" ng-show="selection.includeChildren && (selection.exclusion.length == 0)">All children</span>
-						<span class="label label-warning" ng-show="selection.includeChildren && (selection.exclusion.length > 0)">Some children</span>
+						<span class="label label-success" ng-show="selection.includeChildren && (!selection.exclusion || selection.exclusion.length == 0)">All children</span>
+						<span class="label label-warning" ng-show="selection.includeChildren && (selection.exclusion && selection.exclusion.length > 0)">Some children</span>
 						<span class="label label-danger" ng-show="!selection.includeChildren">No children</span>
 						<button type="button" class="btn btn-xs btn-danger pull-right child-to-show" ng-click="codePicker.unselect(selection)">
 							<span class="glyphicon glyphicon-sm glyphicon-minus"></span>

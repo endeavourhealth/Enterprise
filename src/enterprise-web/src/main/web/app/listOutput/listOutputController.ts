@@ -17,44 +17,28 @@ module app.listOutput {
 	import EntityMap = app.models.EntityMap;
 	import Entity = app.models.Entity;
 	import Field = app.models.Field;
+	import LibraryItemModuleBase = app.library.LibraryItemModuleBase;
 	'use strict';
 
-	export class ListOutputController {
-		libraryItem : LibraryItem;
+	export class ListOutputController extends LibraryItemModuleBase {
 		selectedListReportGroup : ListReportGroup;
 		selectedFieldOutput : FieldOutput;
 		dataSourceAvailableFields : Field[];
 		entityMap : EntityMap;
-		readOnly : boolean;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope',
+		static $inject = ['LibraryService', 'LoggerService',
 			'$uibModal', 'AdminService', '$window', '$stateParams'];
 
 		constructor(
-			protected libraryService:ILibraryService,
+			protected libraryService : ILibraryService,
 			protected logger : ILoggerService,
-			protected $scope : IScope,
 			protected $modal : IModalService,
 			protected adminService : IAdminService,
 			protected $window : IWindowService,
 			protected $stateParams : {itemAction : string, itemUuid : string}) {
 
+			super(libraryService, adminService, logger, $window, $stateParams);
 			this.loadEntityMap();
-			this.performAction($stateParams.itemAction, $stateParams.itemUuid);
-		}
-
-		// General report methods
-		performAction(action:string, itemUuid:string) {
-			this.readOnly = (action === 'view');
-			switch (action) {
-				case 'add':
-					this.create(itemUuid);
-					break;
-				case 'edit':
-				case 'view':
-					this.load(itemUuid);
-					break;
-			}
 		}
 
 		loadEntityMap() {
@@ -68,6 +52,7 @@ module app.listOutput {
 		}
 
 		selectDataSource(datasourceContainer : { dataSource : DataSource }) {
+			if (this.readOnly) { return; }
 			var vm = this;
 			var test : Test = null;
 
@@ -149,75 +134,11 @@ module app.listOutput {
 		}
 
 		create(folderUuid : string) {
-			this.libraryItem = {
-				uuid : null,
-				name : 'New item',
-				description : '',
-				folderUuid : folderUuid,
-				listReport : {
-					group: [
-						{
-							heading: 'Patient',
-							fieldBased: {
-								dataSource: {
-									entity : 'PATIENT',
-									filter : []
-								},
-								fieldOutput: [
-									{heading: 'Birth Date', field: 'DOB'},
-									{heading: 'Gender', field: 'SEX'},
-									{heading: 'Surname', field: 'SURNAME'}
-								]
-							}
-						},
-						{
-							heading: 'Issues',
-							fieldBased: {
-								dataSource: {
-									entity : 'MEDICATION_ISSUE',
-									filter : []
-								},
-								fieldOutput: [
-									{heading: 'Medication', field: 'TERM'},
-									{heading: 'Date', field: 'EFFECTIVEDATE'}
-								]
-							}
-						}
-					]
-				}
-			} as LibraryItem;
+			super.create(folderUuid);
+			this.libraryItem.listReport = {
+					group: []
+				} as ListReport;
 		}
-
-		load(uuid : string) {
-			var vm = this;
-			vm.libraryService.getLibraryItem(uuid)
-				.then(function(libraryItem : LibraryItem) {
-					vm.libraryItem = libraryItem;
-				})
-				.catch(function(data) {
-					vm.logger.error('Error loading list output', data, 'Error');
-				});
-		}
-
-		save(close : boolean) {
-			var vm = this;
-			vm.libraryService.saveLibraryItem(vm.libraryItem)
-				.then(function(libraryItem : LibraryItem) {
-					vm.libraryItem.uuid = libraryItem.uuid;
-					vm.adminService.clearPendingChanges();
-					vm.logger.success('List output saved', vm.libraryItem, 'Saved');
-					if (close) { vm.$window.history.back(); }
-				})
-				.catch(function(data) {
-					vm.logger.error('Error saving list output', data, 'Error');
-				});
-		}
-
-		close() {
-			this.adminService.clearPendingChanges();
-			this.$window.history.back();
-		}
-
 	}
 
 	angular

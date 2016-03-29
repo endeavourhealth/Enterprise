@@ -10,85 +10,36 @@ module app.codeSet {
 	import ICodingService = app.core.ICodingService;
 	import Concept = app.models.Concept;
 	import CodePickerController = app.dialogs.CodePickerController;
+	import LibraryItemModuleBase = app.library.LibraryItemModuleBase;
 	'use strict';
 
-	export class CodeSetController {
+	export class CodeSetController extends LibraryItemModuleBase {
 		libraryItem : LibraryItem;
 		termCache : any;
 		readOnly : boolean;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope',
+		static $inject = ['LibraryService', 'LoggerService',
 			'$uibModal', 'AdminService', '$window', '$stateParams', 'CodingService'];
 
 		constructor(
-			protected libraryService:ILibraryService,
+			protected libraryService : ILibraryService,
 			protected logger : ILoggerService,
-			protected $scope : IModalScope,
 			protected $modal : IModalService,
 			protected adminService : IAdminService,
 			protected $window : IWindowService,
 			protected $stateParams : {itemAction : string, itemUuid : string},
 			protected codingService : ICodingService) {
 
+			super(libraryService, adminService, logger, $window, $stateParams);
 			this.termCache = {};
-			this.performAction($stateParams.itemAction, $stateParams.itemUuid);
-		}
-
-		// General report methods
-		performAction(action:string, itemUuid:string) {
-			this.readOnly = (action === 'view');
-			switch (action) {
-				case 'add':
-					this.create(itemUuid);
-					break;
-				case 'view':
-				case 'edit':
-					this.load(itemUuid);
-					break;
-			}
 		}
 
 		create(folderUuid : string) {
-			this.libraryItem = {
-				uuid : null,
-				name : 'New item',
-				description : '',
-				folderUuid : folderUuid,
-				codeSet : {
+			super.create(folderUuid);
+			this.libraryItem.codeSet =  {
 					codingSystem: 'SNOMED_CT',
 					codeSetValue: []
-				}
-			} as LibraryItem;
-		}
-
-		load(uuid : string) {
-			var vm = this;
-			vm.libraryService.getLibraryItem(uuid)
-				.then(function(libraryItem : LibraryItem) {
-					vm.libraryItem = libraryItem;
-				})
-				.catch(function(data) {
-					vm.logger.error('Error loading library item', data, 'Error');
-				});
-		}
-
-		save(close : boolean) {
-			var vm = this;
-			vm.libraryService.saveLibraryItem(vm.libraryItem)
-				.then(function(libraryItem : LibraryItem) {
-					vm.libraryItem.uuid = libraryItem.uuid;
-					vm.adminService.clearPendingChanges();
-					vm.logger.success('Library item saved', vm.libraryItem, 'Saved');
-					if (close) { vm.$window.history.back(); }
-				})
-				.catch(function(data) {
-					vm.logger.error('Error saving library item', data, 'Error');
-				});
-		}
-
-		close() {
-			this.adminService.clearPendingChanges();
-			this.$window.history.back();
+				};
 		}
 
 		getTerm(code : string) : string {

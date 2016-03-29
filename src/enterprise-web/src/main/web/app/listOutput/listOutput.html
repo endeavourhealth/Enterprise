@@ -25,7 +25,7 @@
 				<div class="row">
 					<div class="form-group col-md-8">
 						<label>List groups</label>
-						<button type="button" class="btn btn-xs btn-success" data-ng-click="listOutputCtrl.addListGroup()">
+						<button type="button" class="btn btn-xs btn-success" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.addListGroup()">
 							<span class="glyphicon glyphicon-plus"></span>
 						</button>
 						<div class="table scroll-box-450 form-control">
@@ -48,7 +48,7 @@
 										<td>{{ item | listReportGroupToDescription }}</td>
 										<td>
 											<div class="child-to-show">
-												<button type="button" class="btn btn-danger btn-xs pull-right" ng-click="listOutputCtrl.removeListGroup(this)">
+												<button type="button" class="btn btn-danger btn-xs pull-right" ng-hide="listOutputCtrl.readOnly" ng-click="listOutputCtrl.removeListGroup(this)">
 													<span class="glyphicon glyphicon-remove"></span>
 												</button>
 											</div>
@@ -82,7 +82,7 @@
 						<div class="row" ng-show="listOutputCtrl.selectedListReportGroup.fieldBased.dataSource">
 							<div class="form-group col-md-12">
 								<label for="fieldBased-dataSource">Field output</label>
-								<button type="button" class="btn btn-xs btn-success" data-ng-click="listOutputCtrl.addFieldOutput()">
+								<button type="button" class="btn btn-xs btn-success" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.addFieldOutput()">
 									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 								<div class="table scroll-box-300 form-control">
@@ -112,7 +112,7 @@
 													</div>
 												</td>
 												<td>
-													<div class="pull-right">
+													<div class="pull-right" ng-hide="listOutputCtrl.readOnly">
 														<button type="button" class="btn btn-danger btn-xs child-to-show" ng-click="listOutputCtrl.removeFieldOutput(this)">
 															<span class="glyphicon glyphicon-remove"></span>
 														</button>

@@ -120,6 +120,32 @@ module app.library {
 				});
 		}
 
+		addChildFolder(node : FolderNode) {
+			var vm = this;
+			InputBoxController.open(vm.$modal, 'New Folder', 'Enter new folder name', 'New folder')
+				.result.then(function(result : string) {
+				var folder : Folder = {
+					uuid : null,
+					folderName : result,
+					folderType : FolderType.Library,
+					parentFolderUuid : node.uuid,
+					contentCount : 0,
+					hasChildren : false
+				};
+				vm.libraryService.saveFolder(folder)
+					.then(function(response) {
+						vm.logger.success('Folder created', response, 'New folder');
+						node.isExpanded = false;
+						node.hasChildren = true;
+						node.nodes = null;
+						vm.toggleExpansion(node);
+					})
+					.catch(function(error){
+						vm.logger.error('Error creating folder', error, 'New folder');
+					});
+			});
+		}
+
 		renameFolder(scope : any) {
 			var vm = this;
 			var folderNode : FolderNode = scope.$modelValue;
@@ -165,12 +191,9 @@ module app.library {
 					this.$state.go('app.listOutputAction', {itemUuid: item.uuid, itemAction: action});
 					break;
 				case ItemType.CodeSet:
-					this.actionCodeSet(item.uuid, action);
+					this.$state.go('app.codeSetAction', {itemUuid: item.uuid, itemAction: action});
 					break;
 			}
-		}
-
-		actionCodeSet(codeSetUuid : string, action : string) {
 		}
 	}
 

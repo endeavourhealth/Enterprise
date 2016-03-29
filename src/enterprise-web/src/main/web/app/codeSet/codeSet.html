@@ -1,0 +1,56 @@
+<div class="module">
+	<div class="container-fluid">
+		<div class="module-heading">
+			Code Set
+			<div class="pull-right">
+				<button type="button" class="btn btn-sm btn-success" ng-hide="codeSetCtrl.readOnly" data-ng-click="codeSetCtrl.save(false)">Save</button>
+				<button type="button" class="btn btn-sm btn-warning" ng-hide="codeSetCtrl.readOnly" data-ng-click="codeSetCtrl.save(true)">Save & Close</button>
+				<button type="button" class="btn btn-sm btn-danger" data-ng-click="codeSetCtrl.close()">Cancel</button>
+			</div>
+		</div>
+		<div class="module-body">
+			<form>
+				<div class="row">
+					<div class="form-group col-md-6">
+						<label for="name">Name</label>
+						<input type="text" class="form-control" id="name" ng-model="codeSetCtrl.libraryItem.name">
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-12">
+						<label for="description">Description</label>
+						<input type="text" class="form-control" id="description" ng-model="codeSetCtrl.libraryItem.description">
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-8">
+						<label>Codes</label>
+						<div class="table scroll-box-450 form-control">
+							<table class="table table-striped table-condensed">
+								<thead>
+									<tr>
+										<th class="col-md-4">Code</th>
+										<th class="col-md-2">Include Children</th>
+										<th class="col-md-4">Exclusions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="hover-box show-child-on-hover"
+											ng-repeat="item in codeSetCtrl.libraryItem.codeSet.codeSetValue">
+										<td>{{codeSetCtrl.getTerm(item.code)}}</td>
+										<td>
+											<span class="label label-success" ng-show="item.includeChildren && (item.exclusion == null || item.exclusion.length == 0)">All children</span>
+											<span class="label label-warning" ng-show="item.includeChildren && (item.exclusion && item.exclusion.length > 0)">Some children</span>
+											<span class="label label-danger" ng-show="!item.includeChildren">No children</span>
+										</td>
+										<td><span ng-show="item.exclusion && item.exclusion.length > 0">{{ item.exclusion.length }} exclusions</span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

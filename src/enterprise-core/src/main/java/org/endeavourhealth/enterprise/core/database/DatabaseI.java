@@ -91,7 +91,7 @@ public interface DatabaseI {
 
     public List<DbAudit> retrieveAuditsForUuids(List<UUID> uuids) throws Exception;
 
-    public int retrieveMaxAuditVersion() throws Exception;
+    public DbAudit retrieveLatestAudit() throws Exception;
 
     public List<DbJobContent> retrieveJobContentsForJob(UUID jobUuid) throws Exception;
 

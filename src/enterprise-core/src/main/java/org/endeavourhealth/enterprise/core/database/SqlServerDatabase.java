@@ -731,10 +731,12 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
-    public int retrieveMaxAuditVersion() throws Exception {
-        String sql = "SELECT MAX(AuditVersion)"
-                + " FROM Definition.Audit";
-        return executeScalarQuery(sql);
+    public DbAudit retrieveLatestAudit() throws Exception {
+
+        String sql = "WHERE AuditVersion = "
+                + "(SELECT MAX(AuditVersion)"
+                + " FROM Definition.Audit)";
+        return (DbAudit)retrieveSingleForWhere(new DbAudit().getAdapter(), sql);
     }
 
     @Override

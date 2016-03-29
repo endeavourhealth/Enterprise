@@ -9,6 +9,7 @@ import org.endeavour.enterprise.json.JsonOrganisation;
 import org.endeavour.enterprise.json.JsonOrganisationList;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.administration.*;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

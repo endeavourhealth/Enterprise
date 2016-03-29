@@ -204,6 +204,12 @@ module app.dialogs {
 
 			return vm.termCache[code];
 		}
+
+		ok() {
+			var cleanedResults = this.cloneCodeSetValueList(this.resultData);
+			this.resultData = cleanedResults;
+			super.ok();
+		}
 	}
 
 	angular

@@ -226,18 +226,26 @@
 			<a class="queryLink" ng-click="testEditor.toggleRestriction()"><img src="/content/img/add.png" style="width: 20px; height: 20px; margin-right: 10px"/>Add Restriction</a>
 		</div>
 		<div class='row' ng-show="testEditor.showRestriction">
-			<div class="col-xs-6">
+			<div class="col-xs-3">
 				<div class="form-group">
-					<label>Apply Restriction</label>
-					<select class="form-control" ng-model="testEditor.restriction">
+					<label>Field Name</label>
+					<select class="form-control" ng-model="testEditor.restrictionFieldName" ng-change="testEditor.restrictionChange(testEditor.restrictionFieldName)">
+						<option ng-repeat="restrictionfield in testEditor.fields" value="{{restrictionfield}}">{{restrictionfield}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-xs-3">
+				<div class="form-group">
+					<label>Order Direction</label>
+					<select class="form-control" ng-model="testEditor.restrictionOrderDirection" ng-change="testEditor.restrictionChange(testEditor.restrictionOrderDirection)">
 						<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
 					</select>
 				</div>
 			</div>
-			<div class="col-xs-6">
+			<div class="col-xs-3">
 				<div class="form-group">
-					<label>Restricted Entry matches these Codes</label>
-					<input type="text" class="form-control" ng-model="testEditor.fieldTestCodes" placeholder="Select codes">
+					<label>Count</label>
+					<input type="text" class="form-control" ng-model="testEditor.restrictionCount" placeholder="Select count" ng-blur="testEditor.restrictionChange(testEditor.restrictionCount)">
 					</input>
 				</div>
 			</div>

@@ -32,11 +32,11 @@
         <!--<appender-ref ref="TIME_BASED_FILE" />-->
     <!--</logger>-->
 
-    <logger name="org.endeavourhealth.discovery" level="trace">
+    <logger name="org.endeavourhealth" level="trace">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <root level="debug">
-        <appender-ref ref="STDOUT" />
-    </root>
+    <!--<root level="debug">-->
+        <!--<appender-ref ref="STDOUT" />-->
+    <!--</root>-->
 </configuration>

@@ -113,7 +113,7 @@ public class CareRecordDal {
                 if (dataContainerDictionary.containsKey(populationId))
                     dataContainer = dataContainerDictionary.get(populationId);
                 else {
-                    dataContainer = dataContainerPool.acquire(populationId);
+                    dataContainer = dataContainerPool.acquire();
                     dataContainer.setId(populationId);
                     dataContainerDictionary.put(populationId, dataContainer);
                 }

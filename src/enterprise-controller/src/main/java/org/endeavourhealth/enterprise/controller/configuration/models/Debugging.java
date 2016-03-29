@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="startImmediately" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
+ *         &lt;element name="maximumPatientId" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -27,11 +28,13 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "debugging", propOrder = {
-    "startImmediately"
+    "startImmediately",
+    "maximumPatientId"
 })
 public class Debugging {
 
     protected Boolean startImmediately;
+    protected Integer maximumPatientId;
 
     /**
      * Gets the value of the startImmediately property.
@@ -55,6 +58,30 @@ public class Debugging {
      */
     public void setStartImmediately(Boolean value) {
         this.startImmediately = value;
+    }
+
+    /**
+     * Gets the value of the maximumPatientId property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getMaximumPatientId() {
+        return maximumPatientId;
+    }
+
+    /**
+     * Sets the value of the maximumPatientId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setMaximumPatientId(Integer value) {
+        this.maximumPatientId = value;
     }
 
 }

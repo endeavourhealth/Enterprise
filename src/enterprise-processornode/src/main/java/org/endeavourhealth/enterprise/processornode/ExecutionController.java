@@ -2,40 +2,32 @@ package org.endeavourhealth.enterprise.processornode;
 
 import org.endeavourhealth.enterprise.core.entitymap.EntityMapHelper;
 import org.endeavourhealth.enterprise.engine.EngineApi;
-import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
-import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueue;
-import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueueWorkItemCompleteMessage;
-import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodesStartMessage;
-import org.endeavourhealth.enterprise.enginecore.communication.WorkerQueueBatchMessage;
+import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
+import org.endeavourhealth.enterprise.enginecore.communication.*;
 import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
-import org.endeavourhealth.enterprise.engine.ExecutionException;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
-import org.endeavourhealth.enterprise.engine.Processor;
+import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainerPool;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 import org.endeavourhealth.enterprise.processornode.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.processornode.configuration.ConfigurationAPI;
-import org.endeavourhealth.enterprise.processornode.datasource.DataSourceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-class ExecutionController implements DataSourceController.DataSourceControllerNotification, AutoCloseable {
+class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete, AutoCloseable {
 
     private final static Logger logger = LoggerFactory.getLogger(ExecutionController.class);
 
     private final ProcessorNodesStartMessage.StartMessagePayload startMessage;
     private final Configuration configuration;
-    private final List<ThreadProcessorPair> threadProcessors = new ArrayList<>();
-    private final DataSourceController dataSourceController;
     private final ControllerQueue controllerQueue;
-    private final EntityMapWrapper.EntityMap entityMap;
+    private final WorkerQueue workerQueue;
 
-    private EngineApi engineApi;
+    private ProcessorThreadPoolExecutor executor;
+    private WorkerQueueBatchMessage currentWorkerQueueBatch;
+
 
     public ExecutionController(Configuration configuration, ProcessorNodesStartMessage.StartMessagePayload startMessage) throws Exception {
 
@@ -44,19 +36,43 @@ class ExecutionController implements DataSourceController.DataSourceControllerNo
 
         this.startMessage = startMessage;
         this.configuration = configuration;
-        this.entityMap = getEntityMap();
+        this.controllerQueue = createControllerQueue();
+        this.workerQueue = createWorkerQueue();
+    }
 
+    private WorkerQueue createWorkerQueue() throws IOException, TimeoutException {
         QueueConnectionProperties queueConnectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
-        controllerQueue = new ControllerQueue(queueConnectionProperties, startMessage.getControllerQueueName());
+        return new WorkerQueue(queueConnectionProperties, startMessage.getWorkerQueueName());
+    }
 
-        dataSourceController = new DataSourceController(
-                this,
-                configuration.getMessageQueuing(),
-                configuration.getDataItemBufferSize(),
+    private ControllerQueue createControllerQueue() throws IOException, TimeoutException {
+        QueueConnectionProperties queueConnectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
+        return new ControllerQueue(queueConnectionProperties, startMessage.getControllerQueueName());
+    }
+
+    public void shutDown() throws InterruptedException {
+        executor.shutdownNow();
+    }
+
+    public void start() throws Exception {
+        EntityMapWrapper.EntityMap entityMap = getEntityMap();
+
+        EngineApi engineApi = new EngineApi(entityMap);
+
+        EngineProcessorPool engineProcessorPool = new EngineProcessorPool(engineApi, configuration.getExecutionThreads());
+        DataContainerPool dataContainerPool = new DataContainerPool(configuration.getDataItemBufferSize(), entityMap);
+        CareRecordDal careRecordDal = new CareRecordDal(startMessage.getCareRecordDatabaseConnectionDetails(), dataContainerPool, entityMap);
+        DataSourceRetriever dataSourceRetriever = new DataSourceRetriever(configuration.getDataItemBufferSize(), careRecordDal);
+        ExecutionContext executionContext = new ExecutionContext(engineProcessorPool, dataContainerPool);
+
+        executor = new ProcessorThreadPoolExecutor(
+                configuration.getExecutionThreads(),
                 configuration.getDataItemBufferTriggerSize(),
-                startMessage.getWorkerQueueName(),
-                entityMap,
-                startMessage.getCareRecordDatabaseConnectionDetails());
+                dataSourceRetriever,
+                this,
+                executionContext);
+
+        requestNextWorkerQueueMessage();
     }
 
     private EntityMapWrapper.EntityMap getEntityMap() throws Exception {
@@ -64,61 +80,57 @@ class ExecutionController implements DataSourceController.DataSourceControllerNo
         return new EntityMapWrapper.EntityMap(realEntityMap);
     }
 
-    public void shutDown() throws InterruptedException {
-        dataSourceController.shutdown();
+    private void requestNextWorkerQueueMessage() throws Exception {
 
-        for (ThreadProcessorPair pair : threadProcessors) {
-            pair.getThread().join();
-        }
-    }
+        currentWorkerQueueBatch = workerQueue.getNextMessage();
 
-    public void start() throws ExecutionException, SQLException, ClassNotFoundException, UnableToCompileExpection {
-
-        engineApi = new EngineApi(
-                entityMap);
-
-        for (int i = 0; i < configuration.getExecutionThreads(); i++) {
-
-            Processor engineProcessor = engineApi.createProcessor();
-            EngineProcessorWrapper engineProcessorWrapper = new EngineProcessorWrapper(engineProcessor, dataSourceController);
-
-            Thread thread = new Thread(engineProcessorWrapper);
-            //thread.setUncaughtExceptionHandler();
-
-            ThreadProcessorPair pair = new ThreadProcessorPair(thread, engineProcessorWrapper);
-            threadProcessors.add(pair);
-
-            pair.getThread().start();
+        if (currentWorkerQueueBatch != null) {
+            executor.setNextBatch(currentWorkerQueueBatch.getPayload().getMinimumId(), currentWorkerQueueBatch.getPayload().getMaximumId());
+        } else {
+            noWorkerQueueItemsLeft();
         }
     }
 
     @Override
-    public void workerQueueItemProcessed(WorkerQueueBatchMessage.BatchMessagePayload payload) throws IOException {
+    public void batchComplete() {
 
-        ControllerQueueWorkItemCompleteMessage message = ControllerQueueWorkItemCompleteMessage.CreateAsNew(
-                startMessage.getJobUuid(),
-                payload.getMinimumId()
-        );
+        try {
 
-        controllerQueue.sendMessage(message);
+            WorkerQueueBatchMessage.BatchMessagePayload batchMessagePayload = currentWorkerQueueBatch.getPayload();
 
-        logger.debug("Worker queue item processed.  MinimumId: " + payload.getMinimumId() + "  MaximumId: " + payload.getMaximumId());
+            ControllerQueueWorkItemCompleteMessage message = ControllerQueueWorkItemCompleteMessage.CreateAsNew(
+                    startMessage.getJobUuid(),
+                    batchMessagePayload.getMinimumId()
+            );
+
+            controllerQueue.sendMessage(message);
+            workerQueue.acknowledgePreviousMessage();
+
+            logger.debug("Worker queue item processed.  MinimumId: " + batchMessagePayload.getMinimumId() + "  MaximumId: " + batchMessagePayload.getMaximumId());
+
+            requestNextWorkerQueueMessage();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Override
     public void noWorkerQueueItemsLeft() {
 
         logger.debug("No worker queue items remaining");
 
-        //shutDown();
     }
 
     @Override
     public void close() throws Exception {
-        if (dataSourceController != null)
-            dataSourceController.close();
 
         if (controllerQueue != null)
             controllerQueue.close();
+
+        if (workerQueue != null)
+            workerQueue.close();
+
+        if (executor != null && !executor.isTerminating())
+            executor.shutdownNow();
     }
 }

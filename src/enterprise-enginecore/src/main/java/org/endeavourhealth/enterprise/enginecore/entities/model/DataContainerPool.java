@@ -22,15 +22,15 @@ public class DataContainerPool {
         maximumItemsToCreate = 3 * dataItemBufferSize;
     }
 
-    public synchronized DataContainer acquire(long populationId) throws Exception {
+    public synchronized DataContainer acquire() throws Exception {
 
         if (queue.isEmpty())
-            queue.add(createDataContainer(populationId));
+            queue.add(createDataContainer());
 
         return queue.pop();
     }
 
-    private DataContainer createDataContainer(long populationId) throws Exception {
+    private DataContainer createDataContainer() throws Exception {
 
         itemsCreated++;
 
@@ -38,7 +38,6 @@ public class DataContainerPool {
             throw new Exception("Maximum created items exceeded");  //If it hits this then the items are not being recycled
 
         DataContainer dataContainer = new DataContainer();
-        dataContainer.setId(populationId);
 
         for (EntityMapWrapper.Entity entity : entityMapWrapper.getEntities()) {
 

@@ -19,6 +19,7 @@
 	<xs:complexType name="debugging">
 		<xs:sequence>
 			<xs:element name="startImmediately" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="maximumPatientId" type="xs:int" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="messageQueuing">

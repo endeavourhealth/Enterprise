@@ -67,7 +67,13 @@ class ExecutionJob {
 
     private void setPatientStatistics() throws Exception {
         DatabaseConnectionDetails connectionDetails = ConfigurationAPI.convertConnection(configuration.getCareRecordDatabase());
-        primaryTableStats = CareRecordDal.calculateTableStatistics(connectionDetails);
+
+        SourceStatistics primaryTableStats = CareRecordDal.calculateTableStatistics(connectionDetails);
+
+        if (configuration.getDebugging().getMaximumPatientId() != null && configuration.getDebugging().getMaximumPatientId() > 0)
+            primaryTableStats = new SourceStatistics(primaryTableStats.getRecordCount(), primaryTableStats.getMinimumId(), configuration.getDebugging().getMaximumPatientId());
+
+        this.primaryTableStats = primaryTableStats;
     }
 
     private void createJobAsFinished(ExecutionStatus executionStatus) throws Exception {
@@ -186,6 +192,9 @@ class ExecutionJob {
             while (true) {
 
                 maximumId = minimumId + configuration.getPatientBatchSize() - 1;
+
+                if (maximumId > primaryTableStats.getMaximumId())
+                    maximumId = primaryTableStats.getMaximumId();
 
                 WorkerQueueBatchMessage message = WorkerQueueBatchMessage.CreateAsNew(
                         executionUuid,

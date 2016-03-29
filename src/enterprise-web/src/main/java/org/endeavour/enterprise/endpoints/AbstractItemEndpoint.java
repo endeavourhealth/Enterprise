@@ -65,7 +65,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         //now do the deleting, building up a list of all entities to update, which is then done atomically
         List<DbAbstractTable> toSave = new ArrayList<>();
 
-        DbAudit audit = DbAudit.factoryNow(userUuid);
+        DbAudit audit = DbAudit.factoryNow(userUuid, orgUuid);
         toSave.add(audit);
         UUID auditUuid = audit.getAuditUuid();
 
@@ -202,7 +202,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         item.setSaveMode(TableSaveMode.INSERT); //force the insert every time, since we allow duplicate rows in the Item table for the same UUID
 
         //update the AuditUuid on both objects
-        DbAudit audit = DbAudit.factoryNow(userUuid);
+        DbAudit audit = DbAudit.factoryNow(userUuid, orgUuid);
         UUID previousAuditUuid = item.getAuditUuid();
         activeItem.setAuditUuid(audit.getAuditUuid());
         item.setAuditUuid(audit.getAuditUuid());

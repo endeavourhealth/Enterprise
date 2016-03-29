@@ -221,7 +221,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         List<DbAbstractTable> toSave = new ArrayList<>();
 
-        DbAudit audit = DbAudit.factoryNow(userUuid);
+        DbAudit audit = DbAudit.factoryNow(userUuid, organisationUuid);
         toSave.add(audit);
 
         DbItem item = DbItem.factoryNew(title, audit);

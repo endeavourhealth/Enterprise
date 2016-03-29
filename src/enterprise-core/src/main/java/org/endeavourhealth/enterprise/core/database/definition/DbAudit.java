@@ -23,15 +23,18 @@ public final class DbAudit extends DbAbstractTable {
     @DatabaseColumn
     @IdentityColumn
     private Integer auditVersion = null;
+    @DatabaseColumn
+    private UUID organisationUuid = null;
 
     public DbAudit() {}
 
-    public static DbAudit factoryNow(UUID endUserUuid) {
+    public static DbAudit factoryNow(UUID endUserUuid, UUID organisationUuid) {
         DbAudit ret = new DbAudit();
         ret.setAuditUuid(UUID.randomUUID()); //always explicitly set a new UUID as we'll always want to use it
         ret.setSaveMode(TableSaveMode.INSERT);
         ret.setEndUserUuid(endUserUuid);
         ret.setTimeStamp(Instant.now());
+        ret.setOrganisationUuid(organisationUuid);
         return ret;
     }
 
@@ -92,5 +95,13 @@ public final class DbAudit extends DbAbstractTable {
 
     public void setAuditVersion(Integer auditVersion) {
         this.auditVersion = auditVersion;
+    }
+
+    public UUID getOrganisationUuid() {
+        return organisationUuid;
+    }
+
+    public void setOrganisationUuid(UUID organisationUuid) {
+        this.organisationUuid = organisationUuid;
     }
 }

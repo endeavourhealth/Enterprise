@@ -329,11 +329,11 @@ final class SqlServerDatabase implements DatabaseI {
         }
     }
 
-    private void retrieveForWhere(TableAdapter a, String conditions, List ret) throws Exception {
-        retrieveForWhere(a, Integer.MAX_VALUE, conditions, ret);
+    private void retrieveForWhere(TableAdapter a, String conditions, List results) throws Exception {
+        retrieveForWhere(a, Integer.MAX_VALUE, conditions, results);
     }
 
-    private void retrieveForWhere(TableAdapter a, int count, String conditions, List ret) throws Exception {
+    private void retrieveForWhere(TableAdapter a, int count, String conditions, List results, Object... parameters) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("SELECT ");
@@ -379,7 +379,7 @@ final class SqlServerDatabase implements DatabaseI {
             while (rr.nextResult()) {
                 DbAbstractTable entity = a.newEntity();
                 a.readFromDb(entity, rr);
-                ret.add(entity);
+                results.add(entity);
             }
 
             rs.close();

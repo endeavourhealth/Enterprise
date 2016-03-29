@@ -4,6 +4,7 @@ import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.json.JsonEndUser;
 import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
+import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUserEmailInvite;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
@@ -17,6 +18,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -384,11 +389,47 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
+        //testSql();
+
         return Response
                 .ok()
                 .entity(ret)
                 .build();
     }
+
+    /*private static void testSql() throws Exception {
+
+        int times = 100;
+        String uuid = "C8E02710-C380-454C-8776-45E4DD180825";
+
+        LOG.trace("Starting SQL literal test");
+        for (int i=0; i<times; i++) {
+            String sql = "SELECT * FROM Administration.EndUser WHERE EndUserUuid = '" + uuid + "'";
+
+            Connection conn = DatabaseManager.getConnection();
+            Statement s = conn.createStatement();
+            s.execute(sql);
+            ResultSet rs = s.getResultSet();
+            rs.close();
+            conn.close();
+        }
+        LOG.trace("Completed literal test");
+
+
+        LOG.trace("Starting SQL prepared statement test");
+        for (int i=0; i<times; i++) {
+            String sql = "SELECT * FROM Administration.EndUser WHERE EndUserUuid = ?";
+
+            Connection conn = DatabaseManager.getConnection();
+            PreparedStatement s = conn.prepareStatement(sql);
+            s.setString(1, uuid);
+            s.execute();
+            ResultSet rs = s.getResultSet();
+            rs.close();
+            conn.close();
+        }
+        LOG.trace("Completed prepared statement test");
+    }*/
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

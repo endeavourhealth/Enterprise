@@ -49,7 +49,7 @@ public interface DatabaseI {
 
     public DbItem retrieveItemForUuid(UUID itemUuid) throws Exception;
 
-    public List<DbItem> retrieveDependentItems(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception;
+    public List<DbItem> retrieveDependentItems(UUID itemUuid, DependencyType dependencyType) throws Exception;
 
     public List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception;
 

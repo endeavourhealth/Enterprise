@@ -62,12 +62,6 @@
         </dependency>
         <!-- End Java servlet -->
 
-        <dependency>
-            <groupId>org.endeavour</groupId>
-            <artifactId>enterprise-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
     </dependencies>
 
     <build>

@@ -178,10 +178,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         //if we have a parent, then we want the child folders under it
         else {
             UUID parentUuid = parseUuidFromStr(parentUuidStr);
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(parentUuid);
-            UUID auditUuid = activeItem.getAuditUuid();
-
-            items = DbItem.retrieveDependentItems(parentUuid, auditUuid, DependencyType.IsChildOf);
+            items = DbItem.retrieveDependentItems(parentUuid, DependencyType.IsChildOf);
         }
 
         LOG.trace("Found {} child folders", items.size());

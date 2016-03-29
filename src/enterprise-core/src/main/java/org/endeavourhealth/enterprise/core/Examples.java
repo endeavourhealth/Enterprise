@@ -199,10 +199,7 @@ public abstract class Examples {
     }
     private static void recursivelyGetDependentLibraryItems(UUID itemUuid, QueryDocument queryDocument) throws Exception {
 
-        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
-        UUID auditUuid = activeItem.getAuditUuid();
-
-        List<DbItem> dependentItems = DbItem.retrieveDependentItems(itemUuid, auditUuid, DependencyType.Uses);
+        List<DbItem> dependentItems = DbItem.retrieveDependentItems(itemUuid, DependencyType.Uses);
         for (DbItem dependentItem: dependentItems) {
 
             LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromItem(dependentItem);

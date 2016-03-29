@@ -483,18 +483,18 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
-    public List<DbItem> retrieveDependentItems(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception {
+    public List<DbItem> retrieveDependentItems(UUID itemUuid, DependencyType dependencyType) throws Exception {
         List<DbItem> ret = new ArrayList<>();
 
-        String where = "INNER JOIN Definition.ItemDependency d"
-                + " ON d.ItemUuid = " + convertToString(itemUuid)
-                + " AND d.AuditUuid = " + convertToString(auditUuid)
-                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
-                + "INNER JOIN Definition.ActiveItem a"
+        String where = "INNER JOIN Definition.ActiveItem a"
                 + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
                 + " AND a.AuditUuid = " + ALIAS + ".AuditUuid"
-                + " AND a.ItemUuid = d.DependentItemUuid"
-                + " AND a.IsDeleted = 0";
+                + " AND a.IsDeleted = 0"
+                + " INNER JOIN Definition.ItemDependency d"
+                + " ON d.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND a.AuditUuid = " + ALIAS + ".AuditUuid"
+                + " AND d.DependentItemUuid = " + convertToString(itemUuid)
+                + " AND d.DependencyTypeId = " + convertToString(dependencyType);
 
         retrieveForWhere(new DbItem().getAdapter(), where, ret);
         return ret;
@@ -511,12 +511,10 @@ final class SqlServerDatabase implements DatabaseI {
                 + " AND a.OrganisationUuid = " + convertToString(organisationUuid)
                 + " AND a.IsDeleted = 0"
                 + " WHERE NOT EXISTS ("
-                + "SELECT 1 FROM Definition.ItemDependency d, Definition.ActiveItem da"
-                + " WHERE d.DependentItemUuid = " + ALIAS + ".ItemUuid"
+                + "SELECT 1 FROM Definition.ItemDependency d"
+                + " WHERE d.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND d.AuditUuid = " + ALIAS + ".AuditUuid"
                 + " AND d.DependencyTypeId = " + convertToString(dependencyType)
-                + " AND da.IsDeleted = 0"
-                + " AND da.ItemUuid = d.ItemUuid"
-                + " AND da.AuditUuid = d.AuditUuid"
                 + ")";
 
         retrieveForWhere(new DbItem().getAdapter(), where, ret);
@@ -557,10 +555,11 @@ final class SqlServerDatabase implements DatabaseI {
     @Override
     public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception {
         String sql = "SELECT COUNT(1)"
-                + " FROM Definition.ItemDependency"
-                + " WHERE ItemUuid = " + convertToString(itemUuid)
-                + " AND DependencyTypeId = " + convertToString(dependencyType);
-
+                + " FROM Definition.ItemDependency d, Definition.ActiveItem a"
+                + " WHERE d.DependentItemUuid = " + convertToString(itemUuid)
+                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
+                + " AND a.ItemUuid = d.ItemUuid"
+                + " AND a.AuditUuid = d.AuditUuid";
         return executeScalarQuery(sql);
     }
 
@@ -752,12 +751,10 @@ final class SqlServerDatabase implements DatabaseI {
         List<DbActiveItem> ret = new ArrayList<>();
 
         String where = "INNER JOIN Definition.ItemDependency d"
-                + " ON d.ItemUuid = " + convertToString(itemUuid)
+                + " ON d.DependentItemUuid = " + convertToString(itemUuid)
                 + " AND d.DependencyTypeId = " + convertToString(dependencyType)
-                + " AND d.DependentItemUuid = " + ALIAS + ".ItemUuid"
-                + " INNER JOIN Definition.ActiveItem a"
-                + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
-                + " AND a.AuditUuid = d.AuditUuid"
+                + " AND d.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND d.AuditUuid = " + ALIAS + ".AuditUuid"
                 + " WHERE " + ALIAS + ".OrganisationUuid = " + convertToString(organisationUuid);
 
         retrieveForWhere(new DbActiveItem().getAdapter(), where, ret);

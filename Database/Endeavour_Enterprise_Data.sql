@@ -139,7 +139,7 @@ CREATE TABLE [07T].[GPEncounter](
 	[ConsultationType] [varchar](100) NULL,
 	[ConsultationDuration] [smallint] NULL,
 	[SK_ProblemID] [tinyint] NULL,
-	[SnomedConceptCode] bigint NOT NULL
+	[SnomedConceptCode] bigint NULL
 ) ON [PRIMARY]
 
 GO

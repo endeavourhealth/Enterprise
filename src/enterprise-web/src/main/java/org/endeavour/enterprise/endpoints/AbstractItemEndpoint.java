@@ -137,6 +137,13 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     }
 
     private static void validateItemTypeMatchesContainingFolder(DefinitionItemType itemType, UUID containingFolderUuid) throws Exception {
+
+        if (containingFolderUuid == null
+                && itemType != DefinitionItemType.ReportFolder
+                && itemType != DefinitionItemType.LibraryFolder) {
+            throw new BadRequestException("LibraryItems and Reports must have a containing folder UUID");
+        }
+
         if (containingFolderUuid == null) {
             return;
         }
@@ -233,7 +240,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
 
         //work out the child/contains dependency
-        updateFolderDependency(itemType, itemUuid, containingFolderUuid, toSave);
+        updateFolderDependency(itemType, item, containingFolderUuid, toSave);
 
         //we can now commit to the DB
         DatabaseManager.db().writeEntities(toSave);
@@ -288,7 +295,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     /**
      * when a libraryItem, report or folder is saved, link it to the containing folder
      */
-    private static void updateFolderDependency(DefinitionItemType itemType, UUID itemUuid, UUID containingFolderUuid, List<DbAbstractTable> toSave) throws Exception {
+    private static void updateFolderDependency(DefinitionItemType itemType, DbItem item, UUID containingFolderUuid, List<DbAbstractTable> toSave) throws Exception {
 
         //if we're saving a folder, we're working with "child of" dependencies
         //if we're saving anything else, we're working with "contained within" dependencies
@@ -300,40 +307,18 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             dependencyType = DependencyType.IsContainedWithin;
         }
 
-        DbItemDependency linkToParent = null;
-        List<DbItemDependency> parents = DbItemDependency.retrieveForDependentItemType(itemUuid, dependencyType);
-        if (parents.size() == 1) {
-            linkToParent = parents.get(0);
-        } else if (parents.size() > 1) {
-            throw new BadRequestException("Multiple dependencies that folder is child in");
-        }
-
+        //some items are allows to be top-level and not contained within a folder
         if (containingFolderUuid == null) {
-            //if we want it to be a top-level folder, then we must DELETE any existing dependency that makes us a child of another folder
-            //but only do this when saving FOLDERS. When saving reports etc., treat a null folder UUID to mean don't change anything
-            if (linkToParent != null
-                    && (itemType == DefinitionItemType.ReportFolder
-                    || itemType == DefinitionItemType.LibraryFolder)) {
-
-                linkToParent.setSaveMode(TableSaveMode.DELETE);
-                toSave.add(linkToParent);
-            }
-        } else {
-            //if we want to be a child folder, we need to ensure we have a dependency entity
-            if (linkToParent == null) {
-                linkToParent = new DbItemDependency();
-                linkToParent.setDependentItemUuid(itemUuid);
-                linkToParent.setDependencyTypeId(dependencyType);
-                linkToParent.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
-            }
-
-            DbActiveItem containingFolderActiveItem = DbActiveItem.retrieveForItemUuid(containingFolderUuid);
-
-            linkToParent.setItemUuid(containingFolderUuid);
-            linkToParent.setAuditUuid(containingFolderActiveItem.getAuditUuid());
-            toSave.add(linkToParent);
+            return;
         }
 
+        DbItemDependency linkToParent = new DbItemDependency();
+        linkToParent.setItemUuid(item.getItemUuid());
+        linkToParent.setAuditUuid(item.getAuditUuid());
+        linkToParent.setDependentItemUuid(containingFolderUuid);
+        linkToParent.setDependencyTypeId(dependencyType);
+        linkToParent.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
+        toSave.add(linkToParent);
     }
 
     protected UUID parseUuidFromStr(String uuidStr) {

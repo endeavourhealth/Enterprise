@@ -223,8 +223,10 @@ module app.dialogs {
 				}
 			}
 
-			CodePickerController.open(this.$modal, this.codeSelection)
+			CodePickerController.open(this.$modal, vm.codeSelection)
 				.result.then(function(resultData : CodeSetValue[]){
+
+				vm.codeSelection = resultData;
 
 				var codeSet : CodeSet = {
 					codingSystem : "SNOMED_CT",

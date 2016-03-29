@@ -25,6 +25,7 @@ module app.listOutput {
 		selectedFieldOutput : FieldOutput;
 		dataSourceAvailableFields : Field[];
 		entityMap : EntityMap;
+		readOnly : boolean;
 
 		static $inject = ['LibraryService', 'LoggerService', '$scope',
 			'$uibModal', 'AdminService', '$window', '$stateParams'];
@@ -44,10 +45,12 @@ module app.listOutput {
 
 		// General report methods
 		performAction(action:string, itemUuid:string) {
+			this.readOnly = (action === 'view');
 			switch (action) {
 				case 'add':
 					this.create(itemUuid);
 					break;
+				case 'edit':
 				case 'view':
 					this.load(itemUuid);
 					break;

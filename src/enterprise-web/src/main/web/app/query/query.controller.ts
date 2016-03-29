@@ -121,7 +121,6 @@ module app.query {
 
 				$scope.clearQueryYes = function () {
 					$scope.chartViewModel.clearQuery();
-					$scope.nextRuleID = 0;
 					$scope.ruleDescription = "";
 					$scope.rulePassAction = "";
 					$scope.ruleFailAction = "";
@@ -291,7 +290,6 @@ module app.query {
 				switch($stateParams.itemAction) {
 					case "view":
 					case "edit":
-						$stateParams.itemUuid = "A87A233D-293E-4220-AAA3-25AC1D201257";
 						libraryService.getLibraryItem($stateParams.itemUuid)
 							.then(function(libraryItem : LibraryItem) {
 								$scope.chartViewModel = new flowchart.ChartViewModel(libraryItem);

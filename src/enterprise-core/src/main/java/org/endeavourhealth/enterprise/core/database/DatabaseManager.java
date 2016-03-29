@@ -81,6 +81,12 @@ public final class DatabaseManager {
         //return DriverManager.getConnection(getInstance().url, getInstance().username, getInstance().password);
 
         Connection conn = getInstance().cpds.getConnection();
+
+        //occasional problems getting a connection that's already closed, so try this quick check
+        if (conn.isClosed()) {
+            return getConnection();
+        }
+
         conn.setAutoCommit(false); //never want auto-commit
         return conn;
     }

@@ -1,14 +1,13 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
+import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.json.JsonEndUser;
 import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUserEmailInvite;
-import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
-import org.endeavourhealth.enterprise.core.database.administration.DbOrganisationEndUserLink;
+import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
+import org.endeavourhealth.enterprise.core.database.administration.*;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -110,11 +110,6 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Path("/saveUser")
     public Response saveUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
 
-        //first, verify the user is an admin
-        if (!super.isAdminFromSession(sc)) {
-            throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
-        }
-
         //userParameters
         UUID uuid = userParameters.getUuid();
         String email = userParameters.getUsername();
@@ -124,20 +119,20 @@ public final class AdminEndpoint extends AbstractEndpoint {
         Integer permissions = userParameters.getPermissions();
         Boolean isAdmin = userParameters.getAdmin();
         Boolean isSuperUser = userParameters.getSuperUser();
-
-        LOG.trace("SavingUser UserUUID {}, Email {} Title {} Forename {} Surname {} IsAdmin {} IsSuperUser {}", uuid, email, title, forename, surname, isAdmin, isSuperUser);
+        String password = userParameters.getPassword();
 
         //until the web client is changed, we need to use the permissions value
-        if (isAdmin == null && permissions != null) {
-            isAdmin = permissions.intValue() == 2;
+        if (isAdmin == null) {
+            if (permissions != null) {
+                isAdmin = new Boolean(permissions.intValue() == 2);
+            }
         }
-
-        DbOrganisation org = getOrganisationFromSession(sc);
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         if (isSuperUser == null) {
             isSuperUser = new Boolean(false);
         }
+
+        LOG.trace("SavingUser UserUUID {}, Email {} Title {} Forename {} Surname {} IsAdmin {} IsSuperUser {}", uuid, email, title, forename, surname, isAdmin, isSuperUser);
 
         //if doing anything to a super user, verify the current user is a super-user
         if (isSuperUser.booleanValue()) {
@@ -147,20 +142,19 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        //currently support the "permissions" and "isAdmin" concept together. Ideally will just use isAdmin eventually.
-        if (isAdmin == null) {
-            if (permissions != null) {
-                if (permissions.intValue() == 1) {
-                    isAdmin = new Boolean(false);
-                } else if (permissions.intValue() == 2) {
-                    isAdmin = new Boolean(true);
-                } else {
-                    throw new BadRequestException("Unexpected Permissions value " + permissions);
-                }
-            } else {
-                isAdmin = new Boolean(false);
+        //validate that the user is amending themselves or is an admin
+        DbEndUser userLoggedOn = getEndUserFromSession(sc);
+        if (uuid == null
+                || !userLoggedOn.getEndUserUuid().equals(uuid)) {
+            if (!isAdminFromSession(sc)) {
+                throw new NotAuthorizedException("Must be an admin to create new users or amend others");
             }
         }
+
+        DbOrganisation org = getOrganisationFromSession(sc);
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+
+        List<DbAbstractTable> toSave = new ArrayList<>();
 
         DbEndUser user = null;
         DbOrganisationEndUserLink link = null;
@@ -170,9 +164,14 @@ public final class AdminEndpoint extends AbstractEndpoint {
         if (uuid == null) {
             //see if we have a person for this email address, that the admin user couldn't see, which we can just use
             user = DbEndUser.retrieveForEmail(email);
+
+            if (isAdmin == null) {
+                isAdmin = Boolean.FALSE;
+            }
+
             if (user == null) {
                 //if the user doesn't already exist, create it and save to the DB
-                createdNewPerson = new Boolean(true);
+                createdNewPerson = Boolean.TRUE;
 
                 if (email == null || email.length() == 0) {
                     throw new BadRequestException("Cannot set blank username");
@@ -189,20 +188,18 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 }
 
                 user = new DbEndUser();
+                user.assignPrimaryUUid();
                 user.setEmail(email);
                 user.setTitle(title);
                 user.setForename(forename);
                 user.setSurname(surname);
                 user.setSuperUser(isSuperUser);
-
-                //we need the UUID of this person, so save right now to generate it
-                user.writeToDb();
                 uuid = user.getEndUserUuid();
             }
             //if we're trying to create a new user, but they already exist at another org,
             //then we can just use that same user record and link it to the new organisation
             else {
-                createdNewPerson = new Boolean(false);
+                createdNewPerson = Boolean.FALSE;
 
                 //validate the name matches what's already on the DB
                 if (!user.getForename().equalsIgnoreCase(forename)
@@ -259,20 +256,26 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
 
             user.setSuperUser(isSuperUser);
-            user.writeToDb();
 
             //retrieve the link entity, as we may want to change the permissions on there
             link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
 
             //the link will be null if we're a super-user, so that's fine
-            if (link != null) {
+            if (link != null && isAdmin != null) {
                 link.setAdmin(isAdmin);
             }
         }
 
+        toSave.add(user);
+
         //if we created or changed a link, save it
         if (link != null) {
-            link.writeToDb();
+            toSave.add(link);
+        }
+
+        //if a password was supplied, then set or change the password
+        if (password != null) {
+            changePassword(user, userLoggedOn, password, toSave);
         }
 
         //if we just updated a person, then we don't want to generate any invite email
@@ -281,13 +284,15 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
         //if we created a new person, generate the invite email
         else if (createdNewPerson.booleanValue()) {
-            createAndSendInvite(user, org);
+            createAndSendInvite(user, org, toSave);
         }
         //if we didn't create a new person, then we don't need them to verify and create
         //a password, but we still want to tell the person that they were given new access
         else {
-            DbEndUserEmailInvite.sendNewAccessGrantedEmail(user, org);
+            DbEndUserEmailInvite.sendNewAccessGrantedEmail(user, org, toSave);
         }
+
+        DatabaseManager.db().writeEntities(toSave);
 
         //return the UUID of the person back to the client
         JsonEndUser ret = new JsonEndUser();
@@ -299,7 +304,36 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .build();
     }
 
-    private static void createAndSendInvite(DbEndUser user, DbOrganisation org) throws Exception {
+    private static void changePassword(DbEndUser user, DbEndUser loggedOnUser, String newPwd, List<DbAbstractTable> toSave) throws Exception {
+
+        //validate the user is changing their own password or is an admin
+        Boolean oneTimeUse = Boolean.FALSE;
+        if (!loggedOnUser.equals(user)) {
+            oneTimeUse = Boolean.TRUE; //if an admin resets a password, then it is one-time use
+        }
+
+        String hash = PasswordHash.createHash(newPwd);
+
+        //retrieve the most recent password for the person
+        UUID uuid = user.getEndUserUuid();
+        DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
+
+        //create the new password entity
+        DbEndUserPwd p = new DbEndUserPwd();
+        p.setEndUserUuid(uuid);
+        p.setPwdHash(hash);
+        p.setOneTimeUse(oneTimeUse);
+        p.setFailedAttempts(new Integer(0));
+        toSave.add(p);
+
+        //expire the old password, if there was one
+        if (oldPwd != null) {
+            oldPwd.setDtExpired(Instant.now());
+            toSave.add(oldPwd);
+        }
+    }
+
+    private static void createAndSendInvite(DbEndUser user, DbOrganisation org, List<DbAbstractTable> toSave) throws Exception {
         UUID userUuid = user.getEndUserUuid();
 
         DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
@@ -310,7 +344,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         invite.sendInviteEmail(user, org);
 
         //only save AFTER we've successfully send the invite email
-        invite.writeToDb();
+        toSave.add(invite);
     }
 
     @POST
@@ -450,16 +484,20 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         //retrieve any existing invite for this person and mark it as completed,
         //so clicking the link in the old email will no longer work
+        List<DbAbstractTable> toSave = new ArrayList<>();
+
         List<DbEndUserEmailInvite> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
         for (int i = 0; i < invites.size(); i++) {
             DbEndUserEmailInvite invite = invites.get(i);
             invite.setDtCompleted(Instant.now());
-            invite.writeToDb();
+            toSave.add(invite);
         }
 
         //now generate a new invite and send it
         DbOrganisation org = getOrganisationFromSession(sc);
-        createAndSendInvite(user, org);
+        createAndSendInvite(user, org, toSave);
+
+        DatabaseManager.db().writeEntities(toSave);
 
         return Response
                 .ok()

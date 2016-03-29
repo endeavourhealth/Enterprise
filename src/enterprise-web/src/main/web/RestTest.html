@@ -37,12 +37,6 @@
 				var statusText = xmlhttp.statusText;
 				appendResult(para, "response status", status + " " + statusText);
 
-				/*var headers = xmlhttp.getAllResponseHeaders();
-				appendResult(para, "headers", headers);*/
-
-				/*var cookie = xmlhttp.getResponseHeader('Set-Cookie');
-				appendResult(para, "cookie", cookie);*/
-
 				var response = xmlhttp.responseText;
 				appendResult(para, "response", response);
 
@@ -126,21 +120,39 @@
 
 	function appendResult(para, name, value)
 	{
-		//var para = document.createElement("p");
+		var brElement = document.createElement("br");
+		para.appendChild(brElement);
+
+		var nameTextNode = document.createTextNode(name + ": ");
+		para.appendChild(nameTextNode);
+
+		var codeElement = document.createElement("code");
+		para.appendChild(codeElement);
+
+		var valueArr = value.split("{");
+		for (i = 1; i < valueArr.length; i++) {
+			if (i>1) {
+				brElement = document.createElement("br");
+				codeElement.appendChild(brElement);
+			}
+
+			var valueTextNode = document.createTextNode("{" + valueArr[i]);
+			codeElement.appendChild(valueTextNode);
+		}
+	}
+	/*function appendResult(para, name, value)
+	{
 		var brElement = document.createElement("br");
 		var codeElement = document.createElement("code");
 		var nameTextNode = document.createTextNode(name + ": ");
 		var valueTextNode = document.createTextNode(value);
-		var resultsElement = document.getElementById("results");
-
 
 		codeElement.appendChild(valueTextNode);
 
 		para.appendChild(brElement);
 		para.appendChild(nameTextNode);
 		para.appendChild(codeElement);
-		//resultsElement.appendChild(para);
-	}
+	}*/
 
 	function scrollToEnd()
 	{
@@ -192,24 +204,6 @@
 			var params = {uuid:orgUuid};
 
 			post('/api/security/selectOrganisation/', params);
-	
-		}
-	</script>
-
-<hr/>
-<h3>/api/security/changePassword</h3>
-
-	New password: <input type="text" id="changePasswordNewPassword">
-	<br/>
-	<button type="button" onclick="changePassword()">Submit</button>
-
-	<script>
-		function changePassword() {
-
-			var newPassword = document.getElementById('changePasswordNewPassword').value;
-			var params = {password:newPassword};
-
-			post('/api/security/changePassword/', params);
 	
 		}
 	</script>
@@ -269,6 +263,8 @@
 	<br/>
 	Email: <input type="text" id="saveUserEmail">
 	<br/>
+	New password: <input type="text" id="saveUserPassword">
+	<br/>
 	Title: <input type="text" id="saveUserTitle">
 	<br/>
 	Forename: <input type="text" id="saveUserForename">
@@ -302,6 +298,12 @@
 				if (s.length > 0)
 				{
 					params["username"] = s;
+				}
+
+				s = document.getElementById('saveUserPassword').value;
+				if (s.length > 0)
+				{
+					params["password"] = s;
 				}
 
 				s = document.getElementById('saveUserTitle').value;

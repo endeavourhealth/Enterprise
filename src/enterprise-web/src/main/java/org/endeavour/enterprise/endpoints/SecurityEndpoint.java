@@ -36,18 +36,6 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         LOG.trace("Login for {}", email);
 
-        /*ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("EntityMap.xsd").getFile());
-        LOG.trace("{}", file);
-
-        file = new File(classLoader.getResource("logback.xml").getFile());
-        LOG.trace("{}", file);
-
-        String s = Resources.getResourceAsString("EntityMap.xsd");
-        LOG.trace(s);
-        s = Resources.getResourceAsString("logback.xml");
-        LOG.trace(s);*/
-
         if (email == null
                 || email.length() == 0
                 || password == null
@@ -224,65 +212,6 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 .build();
     }
 
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/changePassword")
-    public Response changePassword(@Context SecurityContext sc, JsonEndUser parameters) throws Exception {
-        //validate token
-        DbEndUser user = getEndUserFromSession(sc);
-
-        String newPwd = parameters.getPassword();
-
-        LOG.trace("Changing password");
-
-        //validate we have a new password
-        if (newPwd == null
-                || newPwd.length() == 0) {
-            throw new BadRequestException("No new password provided");
-        }
-
-        String hash = PasswordHash.createHash(newPwd);
-
-        //retrieve the most recent password for the person
-        UUID uuid = user.getEndUserUuid();
-        DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
-
-        //create the new password entity
-        DbEndUserPwd p = new DbEndUserPwd();
-        p.setEndUserUuid(uuid);
-        p.setPwdHash(hash);
-
-        //save both old and new passwords atomically
-        List<DbAbstractTable> toSave = new ArrayList<>();
-        toSave.add(p);
-        if (oldPwd != null) {
-            oldPwd.setDtExpired(Instant.now());
-            toSave.add(oldPwd);
-        }
-
-        DatabaseManager.db().writeEntities(toSave);
-
-        return Response
-                .ok()
-                .build();
-    }
-
-    /**
-     * @Path("customer") public class CustomerResource {
-     * @GET
-     * @Path("id/{id}")
-     * @Produces(MediaType.APPLICATION_JSON) public Customer getCustomer(@PathParam("id") String id) {
-     * Customer customer = new Customer();
-     * customer.setId(id);
-     * customer.setCity("Austin");
-     * customer.setState("TX");
-     * customer.setName("Mighty Pulpo");
-     * return customer;
-     * }
-     * }
-     */
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

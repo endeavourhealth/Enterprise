@@ -95,8 +95,10 @@ public final class TableAdapter {
         List<Object> ret = new ArrayList<>();
 
         List<Field> primaryKeyFields = getPrimaryKeyFields();
+        HashMap<Field, Method> hmGetMethods = getGetMethods();
         for (Field field: primaryKeyFields) {
-            ret.add(field.get(entity));
+            Method m = hmGetMethods.get(field);
+            ret.add(m.invoke(entity));
         }
 
         return ret;

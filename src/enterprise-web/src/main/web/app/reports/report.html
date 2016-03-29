@@ -2,8 +2,8 @@
 	<div class="container-fluid">
 		<div class="module-heading">Report
 			<div class="pull-right">
-				<button type="button" class="btn btn-sm btn-success" data-ng-click="reportCtrl.save(false)">Save</button>
-				<button type="button" class="btn btn-sm btn-warning" data-ng-click="reportCtrl.save(true)">Save & Close</button>
+				<button type="button" class="btn btn-sm btn-success" ng-hide="reportCtrl.readOnly" data-ng-click="reportCtrl.save(false)">Save</button>
+				<button type="button" class="btn btn-sm btn-warning" ng-hide="reportCtrl.readOnly" data-ng-click="reportCtrl.save(true)">Save & Close</button>
 				<button type="button" class="btn btn-sm btn-danger" data-ng-click="reportCtrl.close()">Cancel</button>
 			</div>
 		</div>

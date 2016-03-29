@@ -3,8 +3,8 @@
 		<div class="module-heading">
 			List output
 			<div class="pull-right">
-				<button type="button" class="btn btn-sm btn-success" data-ng-click="listOutputCtrl.save(false)">Save</button>
-				<button type="button" class="btn btn-sm btn-warning" data-ng-click="listOutputCtrl.save(true)">Save & Close</button>
+				<button type="button" class="btn btn-sm btn-success" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.save(false)">Save</button>
+				<button type="button" class="btn btn-sm btn-warning" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.save(true)">Save & Close</button>
 				<button type="button" class="btn btn-sm btn-danger" data-ng-click="listOutputCtrl.close()">Cancel</button>
 			</div>
 		</div>

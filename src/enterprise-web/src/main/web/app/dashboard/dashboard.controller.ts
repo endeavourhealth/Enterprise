@@ -3,6 +3,8 @@
 /// <reference path="../blocks/logger.service.ts" />
 
 module app.dashboard {
+	import FolderItem = app.models.FolderItem;
+	import ItemType = app.models.ItemType;
 	'use strict';
 
 	class DashboardController {
@@ -11,9 +13,11 @@ module app.dashboard {
 		engineState:app.models.EngineState;
 		reportActivityData:app.models.ReportActivityItem[];
 
-		static $inject = ['LibraryService', 'LoggerService'];
+		static $inject = ['LibraryService', 'LoggerService', '$state'];
 
-		constructor(private libraryService:app.core.ILibraryService, private logger:app.blocks.ILoggerService) {
+		constructor(private libraryService:app.core.ILibraryService,
+								private logger:app.blocks.ILoggerService,
+								private $state : IStateService) {
 			this.getEngineHistory();
 			this.getRecentDocumentsData();
 			this.getEngineState();
@@ -50,6 +54,23 @@ module app.dashboard {
 				.then(function (data:app.models.ReportActivityItem[]) {
 					vm.reportActivityData = data;
 				});
+		}
+
+		actionItem(item : FolderItem, action : string) {
+			switch (item.type) {
+				case ItemType.Query:
+					this.$state.go('app.queryAction', {itemUuid: item.uuid, itemAction: action});
+					break;
+				case ItemType.ListOutput:
+					this.$state.go('app.listOutputAction', {itemUuid: item.uuid, itemAction: action});
+					break;
+				case ItemType.CodeSet:
+					this.$state.go('app.codeSetAction', {itemUuid: item.uuid, itemAction: action});
+					break;
+				case ItemType.Report:
+					this.$state.go('app.reportAction', {itemUuid: item.uuid, itemAction: action});
+					break;
+			}
 		}
 	}
 

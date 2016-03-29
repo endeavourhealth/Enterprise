@@ -41,9 +41,9 @@
 							</thead>
 							<tbody>
 								<tr ng-repeat="item in dashboard.recentDocumentsData">
-									<td>{{item.name}}</td>
+									<td><a ng-click="dashboard.actionItem(item,'view')">{{item.name}}</a></td>
 									<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
-									<td>{{item.type | itemTypeIdToString }}</td>
+									<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString }}</td>
 								</tr>
 							</tbody>
 						</table>

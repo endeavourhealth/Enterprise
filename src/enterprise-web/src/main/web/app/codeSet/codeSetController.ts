@@ -105,7 +105,8 @@ module app.codeSet {
 			return vm.termCache[code];
 		}
 
-		editCodeSetValueList() {
+		showCodePicker() {
+			if (this.readOnly) { return; }
 			var vm = this;
 			CodePickerController.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
 				.result.then(function(result) {

@@ -98,7 +98,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             //only recurse for containing or child folder-type dependencies
             if (dependency.getDependencyTypeId() == DependencyType.IsChildOf
                     || dependency.getDependencyTypeId() == DependencyType.IsContainedWithin) {
-                DbActiveItem childActiveItem = DbActiveItem.retrieveForItemUuid(dependency.getDependentItemUuid());
+                DbActiveItem childActiveItem = DbActiveItem.retrieveForItemUuid(dependency.getItemUuid());
                 DbItem childItem = DbItem.retrieveForActiveItem(childActiveItem);
                 findItemsToDelete(childItem, childActiveItem, itemsToDelete, activeItemsToDelete);
             }

@@ -187,42 +187,6 @@ module app.dialogs {
 		showCodePicker() {
 			var vm = this;
 
-			if (vm.editMode) {
-				this.codeSelection = [];
-				for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-					var filter = vm.resultData.dataSource.filter[i];
-					if (filter.field=="CODE") {
-						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
-							var codes = filter.codeSet[0].codeSetValue[c];
-
-							var excludedCodes : CodeSetValue[] = [];
-
-							if (codes.exclusion!=null) {
-								for (var e = 0; e < codes.exclusion.length; ++e) {
-									var exclusion = codes.exclusion[e];
-
-									var excl : CodeSetValue = {
-										code: exclusion.code
-
-									} as CodeSetValue;
-
-									excludedCodes.push(excl)
-								}
-							}
-
-							var selectedCodes : CodeSetValue = {
-								code: codes.code,
-								includeChildren: codes.includeChildren,
-								exclusion: excludedCodes
-							}
-
-							this.codeSelection.push(selectedCodes);
-						}
-						break;
-					}
-				}
-			}
-
 			CodePickerController.open(this.$modal, vm.codeSelection)
 				.result.then(function(resultData : CodeSetValue[]){
 
@@ -230,37 +194,7 @@ module app.dialogs {
 
 				var codeSet : CodeSet = {
 					codingSystem : "SNOMED_CT",
-					codeSetValue : []
-				}
-
-				for (var i = 0; i < resultData.length; ++i) {
-					var code = resultData[i];
-
-					var codeSetVal : CodeSetValue = {
-						code : "",
-						includeChildren : true,
-						exclusion : []
-					}
-
-					codeSetVal.code = code.code;
-					codeSetVal.includeChildren = code.includeChildren;
-
-					for (var e = 0; e < code.exclusion.length; ++e) {
-						var exclusion = code.exclusion[e];
-
-						var codeSetValExcl : CodeSetValue = {
-							code : "",
-							includeChildren : true,
-							exclusion : null
-						}
-
-						codeSetValExcl.code = exclusion.code;
-						codeSetVal.exclusion.push(codeSetValExcl);
-
-					}
-
-					codeSet.codeSetValue.push(codeSetVal);
-
+					codeSetValue : resultData
 				}
 
 				var fieldTest : FieldTest = {
@@ -670,5 +604,16 @@ module app.dialogs {
 
 	angular
 		.module('app.dialogs')
+		.directive('showTab',
+			function () {
+				return {
+					link: function (scope, element, attrs) {
+						element.click(function(e) {
+							e.preventDefault();
+							//$(element).tab('show');
+						});
+					}
+				};
+			})
 		.controller('TestEditorController', TestEditorController);
 }

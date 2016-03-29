@@ -232,10 +232,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         toSave.add(activeItem);
 
         //work out any UUIDs our new item is dependent on
-        if (itemType == DefinitionItemType.LibraryFolder
-                || itemType == DefinitionItemType.ReportFolder) {
-            carryOverChildDependencies(previousAuditUuid, activeItem, toSave);
-        } else {
+        if (queryDocument != null) {
             createUsingDependencies(queryDocument, activeItem, toSave);
         }
 
@@ -244,28 +241,6 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
 
         //we can now commit to the DB
         DatabaseManager.db().writeEntities(toSave);
-    }
-
-    /**
-     * when a folder is renamed or moved, we need to carry over all the child dependencies that link us to our child folders and contents
-     */
-    private static void carryOverChildDependencies(UUID previousAuditUuid, DbActiveItem activeItem, List<DbAbstractTable> toSave) throws Exception {
-
-        UUID itemUuid = activeItem.getItemUuid();
-        UUID newAuditUuid = activeItem.getAuditUuid();
-        List<DbItemDependency> oldDependencies = DbItemDependency.retrieveForItem(itemUuid, previousAuditUuid);
-
-        for (DbItemDependency itemDependency: oldDependencies) {
-
-            DbItemDependency newDependency = new DbItemDependency();
-            newDependency.setItemUuid(itemUuid);
-            newDependency.setAuditUuid(newAuditUuid);
-            newDependency.setDependentItemUuid(itemDependency.getDependentItemUuid());
-            newDependency.setDependencyTypeId(itemDependency.getDependencyTypeId());
-            newDependency.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
-
-            toSave.add(newDependency);
-        }
     }
 
     /**

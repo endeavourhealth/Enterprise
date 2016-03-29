@@ -494,7 +494,11 @@ final class SqlServerDatabase implements DatabaseI {
                 + " ON d.ItemUuid = " + ALIAS + ".ItemUuid"
                 + " AND a.AuditUuid = " + ALIAS + ".AuditUuid"
                 + " AND d.DependentItemUuid = " + convertToString(itemUuid)
-                + " AND d.DependencyTypeId = " + convertToString(dependencyType);
+                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
+                + " INNER JOIN Definition.ActiveItem ad"
+                + " ON ad.ItemUuid = d.ItemUuid"
+                + " AND ad.AuditUuid = d.AuditUuid"
+                + " AND ad.IsDeleted = 0";
 
         retrieveForWhere(new DbItem().getAdapter(), where, ret);
         return ret;

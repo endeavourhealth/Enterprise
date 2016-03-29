@@ -83,12 +83,13 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
                     throw new BadRequestException("Cannot move a folder to be a child of itself");
                 }
 
-                List<DbItemDependency> parents = DbItemDependency.retrieveForDependentItemType(currentParentUuid, DependencyType.IsChildOf);
+                DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(currentParentUuid);
+                List<DbItemDependency> parents = DbItemDependency.retrieveForActiveItemType(activeItem, DependencyType.IsChildOf);
                 if (parents.isEmpty()) {
                     currentParentUuid = null;
                 } else {
                     DbItemDependency parent = parents.get(0);
-                    currentParentUuid = parent.getItemUuid();
+                    currentParentUuid = parent.getDependentItemUuid();
                 }
             }
         }

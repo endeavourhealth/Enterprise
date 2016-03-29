@@ -1,7 +1,7 @@
 module app.models {
 	'use strict';
 
-	export class ExclusionTreeNode extends CodeSetValueWithTerm {
+	export class ExclusionTreeNode extends CodeSetValue {
 		children : ExclusionTreeNode[];
 	}
 }

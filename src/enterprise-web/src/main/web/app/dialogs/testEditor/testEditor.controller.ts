@@ -41,7 +41,6 @@ module app.dialogs {
 		addFilter : boolean = false;
 		ruleDatasource : string;
 		ruleFilter : string;
-		filterCodes : string;
 		filterDateFrom : Date;
 		filterDateTo : Date;
 		filterDOBFrom : Date;
@@ -63,7 +62,7 @@ module app.dialogs {
 		editMode : boolean = false;
 
 		codeSelection : CodeSetValue[] = [];
-		termLookup : Concept[] = [];
+		termCache : any;
 
 		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE','CALCULATION'];
 		sortorders = ['','ASCENDING','DESCENDING'];
@@ -99,6 +98,7 @@ module app.dialogs {
 
 			super($uibModalInstance);
 
+			this.termCache = {};
 			this.resultData = test;
 
 			var ds : DataSource = {
@@ -141,52 +141,7 @@ module app.dialogs {
 
 				switch(field) {
 					case "CODE":
-						var terms = "";
-
-						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
-							var codes = filter.codeSet[0].codeSetValue[c];
-
-							vm.codingService.getPreferredTerm(codes.code)
-								.then(function (result) {
-
-									var concept : Concept = {
-										id: result.id,
-										preferredTerm: result.preferredTerm,
-										exclusion: false
-									}
-
-									vm.termLookup.push(concept);
-
-									terms += ", "+vm.termShorten(result.preferredTerm);
-
-									vm.filterCodes = terms.substring(2);
-								});
-						}
-
-						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
-							var codes = filter.codeSet[0].codeSetValue[c];
-
-							if (codes.exclusion==null)
-								continue;
-							for (var e = 0; e < codes.exclusion.length; ++e) {
-								var exclusion = codes.exclusion[e];
-								vm.codingService.getPreferredTerm(exclusion.code)
-									.then(function (result:any) {
-
-										var concept : Concept = {
-											id: result.id,
-											preferredTerm: result.preferredTerm,
-											exclusion: true
-										}
-
-										vm.termLookup.push(concept);
-
-										terms += ", "+vm.termShorten(result.preferredTerm)+" (exclusion)";
-										vm.filterCodes = terms.substring(2);
-									});
-							}
-						}
-
+						vm.codeSelection = filter.codeSet[0].codeSetValue;
 						break;
 					case "DOB":
 						if (filter.valueFrom)
@@ -276,8 +231,6 @@ module app.dialogs {
 					codeSetValue : []
 				}
 
-				var terms = "";
-
 				for (var i = 0; i < resultData.length; ++i) {
 					var code = resultData[i];
 
@@ -289,9 +242,6 @@ module app.dialogs {
 
 					codeSetVal.code = code.code;
 					codeSetVal.includeChildren = code.includeChildren;
-
-					var term = "TODO";
-					terms+=", "+term;
 
 					for (var e = 0; e < code.exclusion.length; ++e) {
 						var exclusion = code.exclusion[e];
@@ -305,16 +255,11 @@ module app.dialogs {
 						codeSetValExcl.code = exclusion.code;
 						codeSetVal.exclusion.push(codeSetValExcl);
 
-						var term = "TODO";
-						terms+=", "+term+" (exclusion)";
-
 					}
 
 					codeSet.codeSetValue.push(codeSetVal);
 
 				}
-
-				vm.filterCodes = terms.substring(2);
 
 				var fieldTest : FieldTest = {
 					field: "CODE",
@@ -699,20 +644,6 @@ module app.dialogs {
 			this.ok();
 		}
 
-		lookupTerm(codeId : string) {
-			var vm = this;
-			var term = "";
-			for (var i = 0; i < vm.termLookup.length; ++i) {
-				if (vm.termLookup[i].id==codeId) {
-					term = vm.termLookup[i].preferredTerm;
-					break;
-				}
-			}
-			term = vm.termShorten(term);
-
-			return term;
-		}
-
 		termShorten(term : string) {
 			term = term.replace(' (disorder)','');
 			term = term.replace(' (observable entity)','');
@@ -720,6 +651,19 @@ module app.dialogs {
 			return term;
 		}
 
+		getTerm(code : string) : string {
+			var vm = this;
+			var term = vm.termCache[code];
+			if (term) { return term; }
+			vm.termCache[code] = 'Loading...';
+
+			vm.codingService.getPreferredTerm(code)
+				.then(function(concept : Concept) {
+					vm.termCache[code] = vm.termShorten(concept.preferredTerm);
+				});
+
+			return vm.termCache[code];
+		}
 	}
 
 	angular

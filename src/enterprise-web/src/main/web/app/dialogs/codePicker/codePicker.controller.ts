@@ -8,23 +8,25 @@ module app.dialogs {
 	import ExclusionTreeNode = app.models.ExclusionTreeNode;
 	import ICodingService = app.core.ICodingService;
 	import CodeSetValue = app.models.CodeSetValue;
-	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
+	import Concept = app.models.Concept;
 
 	'use strict';
 
 	export class CodePickerController extends BaseDialogController {
-		selectedMatch : CodeSetValueWithTerm;
-		previousSelection : CodeSetValueWithTerm;
-		selectedExclusion : CodeSetValueWithTerm;
+		selectedMatch : CodeSetValue;
+		previousSelection : CodeSetValue;
+		selectedExclusion : CodeSetValue;
 
 		searchData : string;
-		searchResults : CodeSetValueWithTerm[];
-		parents : CodeSetValueWithTerm[];
-		children : CodeSetValueWithTerm[];
+		searchResults : CodeSetValue[];
+		parents : CodeSetValue[];
+		children : CodeSetValue[];
+
+		termCache : any;
 
 		exclusionTreeData : ExclusionTreeNode[];
 
-		public static open($modal : IModalService, selection : CodeSetValueWithTerm[]) : IModalServiceInstance {
+		public static open($modal : IModalService, selection : CodeSetValue[]) : IModalServiceInstance {
 			var options : IModalSettings = {
 				templateUrl:'app/dialogs/codePicker/codePicker.html',
 				controller:'CodePickerController',
@@ -45,9 +47,9 @@ module app.dialogs {
 		constructor(protected $uibModalInstance : IModalServiceInstance,
 								private logger:app.blocks.ILoggerService,
 								private codingService : ICodingService,
-								private selection : CodeSetValueWithTerm[]) {
+								private selection : CodeSetValue[]) {
 			super($uibModalInstance);
-			this.searchData = 'Asthma';
+			this.termCache = {};
 			this.resultData = selection;
 		}
 
@@ -55,12 +57,14 @@ module app.dialogs {
 			var vm = this;
 			//vm.searchResults = vm.termlexSearch.getFindings(vm.searchData, vm.searchOptions);
 			vm.codingService.searchCodes(vm.searchData)
-				.then(function(result:CodeSetValueWithTerm[]) {
+				.then(function(result:CodeSetValue[]) {
 					vm.searchResults = result;
+					vm.parents = [];
+					vm.children = [];
 				});
 		}
 
-		displayCode(itemToDisplay : CodeSetValueWithTerm, replace : boolean) {
+		displayCode(itemToDisplay : CodeSetValue, replace : boolean) {
 			var vm = this;
 
 			if (vm.selectedMatch) {
@@ -72,41 +76,40 @@ module app.dialogs {
 			}
 
 			vm.codingService.getCodeChildren(itemToDisplay.code)
-				.then(function(result:CodeSetValueWithTerm[]) {
+				.then(function(result:CodeSetValue[]) {
 					vm.children = result;
 				});
 
 			vm.codingService.getCodeParents(itemToDisplay.code)
-				.then(function(result:CodeSetValueWithTerm[]) {
+				.then(function(result:CodeSetValue[]) {
 					vm.parents = result;
 				});
 
 			vm.selectedMatch = itemToDisplay;
 		}
 
-		select(match : CodeSetValueWithTerm) {
-			var item : CodeSetValueWithTerm = {
+		select(match : CodeSetValue) {
+			var item : CodeSetValue = {
 				code : match.code,
-				term : match.term,
 				includeChildren : true,
 				exclusion : []
 			};
 			this.resultData.push(item);
 		}
 
-		unselect(item : CodeSetValueWithTerm) {
+		unselect(item : CodeSetValue) {
 			var i = this.resultData.indexOf(item);
 			if (i !== -1) {
 				this.resultData.splice(i, 1);
 			}
 		}
 
-		displayExclusionTree(selection : CodeSetValueWithTerm) {
+		displayExclusionTree(selection : CodeSetValue) {
 			var vm = this;
 			vm.selectedExclusion = selection;
 
 			vm.codingService.getCodeChildren(selection.code)
-				.then(function(result:CodeSetValueWithTerm[]) {
+				.then(function(result:CodeSetValue[]) {
 					var exclusionTreeNode : ExclusionTreeNode = selection as ExclusionTreeNode;
 					exclusionTreeNode.children = result as ExclusionTreeNode[];
 					exclusionTreeNode.children.forEach((item) => {
@@ -168,6 +171,20 @@ module app.dialogs {
 				}
 			}
 			return -1;
+		}
+
+		getTerm(code : string) : string {
+			var vm = this;
+			var term = vm.termCache[code];
+			if (term) { return term; }
+			vm.termCache[code] = 'Loading...';
+
+			vm.codingService.getPreferredTerm(code)
+				.then(function(concept : Concept) {
+					vm.termCache[code] = concept.preferredTerm;
+				});
+
+			return vm.termCache[code];
 		}
 	}
 

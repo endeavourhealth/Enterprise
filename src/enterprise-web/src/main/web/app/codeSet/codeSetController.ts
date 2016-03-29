@@ -9,6 +9,7 @@ module app.codeSet {
 	import CodeSetValue = app.models.CodeSetValue;
 	import ICodingService = app.core.ICodingService;
 	import Concept = app.models.Concept;
+	import CodePickerController = app.dialogs.CodePickerController;
 	'use strict';
 
 	export class CodeSetController {
@@ -55,26 +56,7 @@ module app.codeSet {
 				folderUuid : folderUuid,
 				codeSet : {
 					codingSystem: 'SNOMED_CT',
-					codeSetValue: [
-						{
-							code: '195967001',
-							includeChildren: true,
-							exclusion: []
-						},
-						{
-							code: '194828000',
-							includeChildren: true,
-							exclusion: [
-								{code:'315025001', includeChildren : null, exclusion : null },
-								{code:'4557003', includeChildren : null, exclusion : null }
-							]
-						},
-						{
-							code: '73211009',
-							includeChildren: false,
-							exclusion: []
-						}
-					]
+					codeSetValue: []
 				}
 			} as LibraryItem;
 		}
@@ -123,6 +105,13 @@ module app.codeSet {
 			return vm.termCache[code];
 		}
 
+		editCodeSetValueList() {
+			var vm = this;
+			CodePickerController.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
+				.result.then(function(result) {
+					vm.libraryItem.codeSet.codeSetValue = result;
+			});
+		}
 	}
 
 	angular

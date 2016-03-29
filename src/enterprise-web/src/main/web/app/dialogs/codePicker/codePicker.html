@@ -27,7 +27,7 @@
 							 ng-dblclick="codePicker.displayCode(parent, true)"
 							 class="hover-box striped"
 							 ng-class="{'previous-selection': parent.code == codePicker.previousSelection.code}">
-						{{ parent.term }}
+						{{ codePicker.getTerm(parent.code) }}
 					</div>
 				</div>
 			</div>
@@ -38,7 +38,7 @@
 							 ng-click="codePicker.displayCode(match, false)"
 							 class="hover-box show-child-on-hover striped"
 							 ng-class="{'selection': match.code == codePicker.selectedMatch.code}">
-						 {{ match.term }}
+						 {{ codePicker.getTerm(match.code) }}
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" ng-click="codePicker.select(match)">
 							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
 						</button>
@@ -52,7 +52,7 @@
 							 ng-dblclick="codePicker.displayCode(child, true)"
 							 class="hover-box striped"
 							 ng-class="{'previous-selection': child.code == codePicker.previousSelection.code}">
-						{{ child.term }}
+						{{ codePicker.getTerm(child.code) }}
 					</div>
 				</div>
 			</div>
@@ -67,7 +67,7 @@
 							 ng-click="codePicker.displayExclusionTree(selection)"
 							 class="hover-box show-child-on-hover striped"
 							 ng-class="{'selection': selection == codePicker.selectedExclusion}">
-						{{ selection.term }}
+						{{ codePicker.getTerm(selection.code) }}
 						<span class="label label-success" ng-show="selection.includeChildren && (selection.exclusion.length == 0)">All children</span>
 						<span class="label label-warning" ng-show="selection.includeChildren && (selection.exclusion.length > 0)">Some children</span>
 						<span class="label label-danger" ng-show="!selection.includeChildren">No children</span>
@@ -109,7 +109,7 @@
 			<span class="text-danger glyphicon glyphicon-ban-circle"
 						ng-click="codePicker.includeNode(node)"
 						ng-show="!node.includeChildren"> </span>
-			<span>{{node.term}}</span>
+			<span>{{codePicker.getTerm(node.code)}}</span>
 		</span>
 	</div>
 	<ol ui-tree-nodes ng-model="node.children">

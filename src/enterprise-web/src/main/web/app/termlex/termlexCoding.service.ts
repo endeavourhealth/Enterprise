@@ -3,13 +3,13 @@
 module app.core {
 	import TermlexCode = app.models.TermlexCode;
 	import TermlexSearchResult = app.models.TermlexSearchResult;
-	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
+	import CodeSetValue = app.models.CodeSetValue;
 	import Concept = app.models.Concept;
 	'use strict';
 
 	export class TermlexCodingService extends BaseHttpService implements ICodingService {
 
-		searchCodes(searchData : string):ng.IPromise<CodeSetValueWithTerm[]> {
+		searchCodes(searchData : string):ng.IPromise<CodeSetValue[]> {
 			var vm = this;
 			var request = {
 				params: {
@@ -23,7 +23,7 @@ module app.core {
 			vm.http.get('http://termlex.org/search/sct', request)
 				.then(function (response) {
 					var termlexResult : TermlexSearchResult = response.data as TermlexSearchResult;
-					var matches : CodeSetValueWithTerm[] = termlexResult.results.map((t) => vm.termlexCodeToCodeSetValue(t));
+					var matches : CodeSetValue[] = termlexResult.results.map((t) => vm.termlexCodeToCodeSetValue(t));
 					defer.resolve(matches);
 				})
 				.catch(function (exception) {
@@ -33,14 +33,14 @@ module app.core {
 			return defer.promise;
 		}
 
-		getCodeChildren(id : string):ng.IPromise<CodeSetValueWithTerm[]> {
+		getCodeChildren(id : string):ng.IPromise<CodeSetValue[]> {
 			var vm = this;
 			var request = { withCredentials: false };
 			var defer = vm.promise.defer();
 			vm.http.get('http://termlex.org/hierarchy/' + id + '/childHierarchy', request)
 				.then(function (response) {
 					var termlexResult : TermlexCode[] = response.data as TermlexCode[];
-					var matches : CodeSetValueWithTerm[] = termlexResult.map((t) => vm.termlexCodeToCodeSetValue(t));
+					var matches : CodeSetValue[] = termlexResult.map((t) => vm.termlexCodeToCodeSetValue(t));
 					defer.resolve(matches);
 				})
 				.catch(function (exception) {
@@ -50,14 +50,14 @@ module app.core {
 			return defer.promise;
 		}
 
-		getCodeParents(id : string):ng.IPromise<CodeSetValueWithTerm[]> {
+		getCodeParents(id : string):ng.IPromise<CodeSetValue[]> {
 			var vm = this;
 			var request = { withCredentials: false };
 			var defer = vm.promise.defer();
 			vm.http.get('http://termlex.org/hierarchy/' + id + '/parentHierarchy', request)
 				.then(function (response) {
 					var termlexResult : TermlexCode[] = response.data as TermlexCode[];
-					var matches : CodeSetValueWithTerm[] = termlexResult.map((t) => vm.termlexCodeToCodeSetValue(t));
+					var matches : CodeSetValue[] = termlexResult.map((t) => vm.termlexCodeToCodeSetValue(t));
 					defer.resolve(matches);
 				})
 				.catch(function (exception) {
@@ -67,10 +67,9 @@ module app.core {
 			return defer.promise;
 		}
 
-		termlexCodeToCodeSetValue(termlexCode : TermlexCode) : CodeSetValueWithTerm {
-			var codeSetValue : CodeSetValueWithTerm = {
+		termlexCodeToCodeSetValue(termlexCode : TermlexCode) : CodeSetValue {
+			var codeSetValue : CodeSetValue = {
 				code : termlexCode.id,
-				term: termlexCode.label,
 				includeChildren : null,
 				exclusion : null
 			};

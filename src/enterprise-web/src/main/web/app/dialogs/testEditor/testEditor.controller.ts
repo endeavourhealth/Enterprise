@@ -6,8 +6,6 @@ module app.dialogs {
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import CodePickerController = app.dialogs.CodePickerController;
-	import TermlexCode = app.models.Code;
-	import TermlexCodeSelection = app.models.CodeSelection;
 	import ICodingService = app.core.ICodingService;
 	import Code = app.models.Code;
 	import Test = app.models.Test;
@@ -15,7 +13,6 @@ module app.dialogs {
 	import FieldTest = app.models.FieldTest;
 	import CodeSet = app.models.CodeSet;
 	import CodeSetValue = app.models.CodeSetValue;
-	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
 	import ValueFrom = app.models.ValueFrom;
 	import ValueTo = app.models.ValueTo;
 	import Value = app.models.Value;
@@ -65,7 +62,7 @@ module app.dialogs {
 
 		editMode : boolean = false;
 
-		codeSelection : CodeSetValueWithTerm[] = [];
+		codeSelection : CodeSetValue[] = [];
 		termLookup : Concept[] = [];
 
 		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE','CALCULATION'];
@@ -243,25 +240,23 @@ module app.dialogs {
 						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
 							var codes = filter.codeSet[0].codeSetValue[c];
 
-							var excludedCodes : CodeSetValueWithTerm[] = [];
+							var excludedCodes : CodeSetValue[] = [];
 
 							if (codes.exclusion!=null) {
 								for (var e = 0; e < codes.exclusion.length; ++e) {
 									var exclusion = codes.exclusion[e];
 
-									var excl : CodeSetValueWithTerm = {
-										code: exclusion.code,
-										term: this.lookupTerm(exclusion.code)
+									var excl : CodeSetValue = {
+										code: exclusion.code
 
-									} as CodeSetValueWithTerm;
+									} as CodeSetValue;
 
 									excludedCodes.push(excl)
 								}
 							}
 
-							var selectedCodes : CodeSetValueWithTerm = {
+							var selectedCodes : CodeSetValue = {
 								code: codes.code,
-								term: this.lookupTerm(codes.code),
 								includeChildren: codes.includeChildren,
 								exclusion: excludedCodes
 							}
@@ -274,7 +269,7 @@ module app.dialogs {
 			}
 
 			CodePickerController.open(this.$modal, this.codeSelection)
-				.result.then(function(resultData : CodeSetValueWithTerm[]){
+				.result.then(function(resultData : CodeSetValue[]){
 
 				var codeSet : CodeSet = {
 					codingSystem : "SNOMED_CT",
@@ -295,7 +290,7 @@ module app.dialogs {
 					codeSetVal.code = code.code;
 					codeSetVal.includeChildren = code.includeChildren;
 
-					var term = code.term;
+					var term = "TODO";
 					terms+=", "+term;
 
 					for (var e = 0; e < code.exclusion.length; ++e) {
@@ -310,7 +305,7 @@ module app.dialogs {
 						codeSetValExcl.code = exclusion.code;
 						codeSetVal.exclusion.push(codeSetValExcl);
 
-						var term = exclusion.term;
+						var term = "TODO";
 						terms+=", "+term+" (exclusion)";
 
 					}

@@ -91,7 +91,7 @@
 					<ul uib-dropdown-menu>
 						<li><a ui-sref="app.reportAction({itemUuid: node.uuid, itemAction: 'add'})">Add report</a></li>
 						<li role="separator" class="divider"></li>
-						<li><a href="#">Add child folder</a></li>
+						<li><a  ng-click="reportListCtrl.addChildFolder(node)">Add child folder</a></li>
 						<li role="separator" class="divider"></li>
 						<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || reportListCtrl.renameFolder(this)">Rename</a></li>
 						<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || reportListCtrl.deleteFolder(this)">Delete</a></li>

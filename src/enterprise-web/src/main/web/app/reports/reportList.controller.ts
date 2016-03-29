@@ -13,6 +13,7 @@ module app.reports {
 	import InputBoxController = app.dialogs.InputBoxController;
 	import MessageBoxController = app.dialogs.MessageBoxController;
 	import IModalService = angular.ui.bootstrap.IModalService;
+	import Folder = app.models.Folder;
 	'use strict';
 
 	export class ReportListController {
@@ -76,6 +77,32 @@ module app.reports {
 						node.loading = false;
 					});
 			}
+		}
+
+		addChildFolder(node : FolderNode) {
+			var vm = this;
+			InputBoxController.open(vm.$modal, 'New Folder', 'Enter new folder name', 'New folder')
+				.result.then(function(result : string) {
+				var folder : Folder = {
+					uuid : null,
+					folderName : result,
+					folderType : FolderType.Report,
+					parentFolderUuid : node.uuid,
+					contentCount : 0,
+					hasChildren : false
+				};
+				vm.libraryService.saveFolder(folder)
+					.then(function(response) {
+						vm.logger.success('Folder created', response, 'New folder');
+						node.isExpanded = false;
+						node.hasChildren = true;
+						node.nodes = null;
+						vm.toggleExpansion(node);
+					})
+					.catch(function(error){
+						vm.logger.error('Error creating folder', error, 'New folder');
+					});
+			});
 		}
 
 		renameFolder(scope : any) {

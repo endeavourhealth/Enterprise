@@ -169,8 +169,11 @@ module app.dialogs {
 		}
 
 		excludeNode(node : ExclusionTreeNode) {
-			if (node.code === this.selectedExclusion.code) {
+			if (this.selectedExclusion.exclusion == null) {
 				this.selectedExclusion.exclusion = [];
+			}
+
+			if (node.code === this.selectedExclusion.code) {
 				this.selectedExclusion.includeChildren = false;
 				node.children.forEach((item) => { item.includeChildren = false; });
 			} else {

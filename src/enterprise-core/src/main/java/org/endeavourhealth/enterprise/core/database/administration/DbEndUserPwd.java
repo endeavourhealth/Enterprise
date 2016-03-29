@@ -20,8 +20,10 @@ public class DbEndUserPwd extends DbAbstractTable {
     private String pwdHash = null;
     @DatabaseColumn
     private Instant dtExpired = null;
-    //TODO: 2016-02-22 DL - should have number of lives and expiry date for passwords?
-
+    @DatabaseColumn
+    private Integer failedAttempts = null;
+    @DatabaseColumn
+    private boolean isOneTimeUse = false;
 
     public DbEndUserPwd() {
 
@@ -75,4 +77,19 @@ public class DbEndUserPwd extends DbAbstractTable {
         this.dtExpired = dtExpired;
     }
 
+    public Integer getFailedAttempts() {
+        return failedAttempts;
+    }
+
+    public void setFailedAttempts(Integer failedAttempts) {
+        this.failedAttempts = failedAttempts;
+    }
+
+    public boolean isOneTimeUse() {
+        return isOneTimeUse;
+    }
+
+    public void setOneTimeUse(boolean oneTimeUse) {
+        isOneTimeUse = oneTimeUse;
+    }
 }

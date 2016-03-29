@@ -31,7 +31,7 @@ public final class JsonEndUserList implements Serializable {
     }
 
     public void add(DbEndUser endUser, boolean isAdmin) {
-        JsonEndUser jsonEndUser = new JsonEndUser(endUser, isAdmin);
+        JsonEndUser jsonEndUser = new JsonEndUser(endUser, isAdmin, null);
         add(jsonEndUser);
     }
 

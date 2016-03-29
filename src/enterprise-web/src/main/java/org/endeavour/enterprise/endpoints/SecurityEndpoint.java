@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.security.PasswordHash;
+import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.json.JsonEmailInviteParameters;
@@ -70,8 +71,26 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //validate the password
         String hash = pwd.getPwdHash();
         if (!PasswordHash.validatePassword(password, hash)) {
+
+            int failedAttempts = pwd.getFailedAttempts();
+            failedAttempts ++;
+            pwd.setFailedAttempts(failedAttempts);
+            if (failedAttempts >= SecurityConfig.MAX_FAILED_PASSWORD_ATTEMPTS) {
+                pwd.setDtExpired(Instant.now());
+            }
+            pwd.writeToDb();
+
             throw new NotAuthorizedException("Invalid password");
         }
+
+        Boolean mustChangePassword = null;
+        if (pwd.isOneTimeUse()) {
+            pwd.setDtExpired(Instant.now());
+            mustChangePassword = Boolean.TRUE;
+        }
+
+        pwd.setFailedAttempts(0);
+        pwd.writeToDb();
 
         JsonOrganisationList ret = ret = new JsonOrganisationList();
         DbOrganisation orgToAutoSelect = null;
@@ -118,7 +137,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         }
 
         //set the user details in the return object as well
-        ret.setUser(new JsonEndUser(user, null));
+        ret.setUser(new JsonEndUser(user, null, mustChangePassword));
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
 

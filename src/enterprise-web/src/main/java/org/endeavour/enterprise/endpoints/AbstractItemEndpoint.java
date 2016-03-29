@@ -92,8 +92,8 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         itemsToDelete.add(item);
         activeItemsToDelete.add(activeItem);
 
-        List<DbItemDependency> dependecies = DbItemDependency.retrieveForActiveItem(activeItem);
-        for (DbItemDependency dependency: dependecies) {
+        List<DbItemDependency> dependencies = DbItemDependency.retrieveForDependentItem(item.getItemUuid());
+        for (DbItemDependency dependency: dependencies) {
 
             //only recurse for containing or child folder-type dependencies
             if (dependency.getDependencyTypeId() == DependencyType.IsChildOf

@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [Endeavour_Enterprise_Data]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Database [Endeavour_Enterprise_Data]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE DATABASE [Endeavour_Enterprise_Data]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -75,16 +75,16 @@ ALTER DATABASE [Endeavour_Enterprise_Data] SET DELAYED_DURABILITY = DISABLED
 GO
 USE [Endeavour_Enterprise_Data]
 GO
-/****** Object:  Schema [07T]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Schema [07T]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE SCHEMA [07T]
 GO
-/****** Object:  Schema [GP]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Schema [GP]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE SCHEMA [GP]
 GO
-/****** Object:  Schema [shared]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Schema [shared]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE SCHEMA [shared]
 GO
-/****** Object:  Table [07T].[GPAppointment]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [07T].[GPAppointment]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -111,13 +111,13 @@ CREATE TABLE [07T].[GPAppointment](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE CLUSTERED INDEX [SK_PatientID] ON [07T].[GPAppointment]
 (
 	[SK_PatientID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Table [07T].[GPEncounter]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [07T].[GPEncounter]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -139,19 +139,19 @@ CREATE TABLE [07T].[GPEncounter](
 	[ConsultationType] [varchar](100) NULL,
 	[ConsultationDuration] [smallint] NULL,
 	[SK_ProblemID] [tinyint] NULL,
-	[SnomedClinicalCode] [varchar](255) NOT NULL
+	[SnomedConceptCode] bigint NOT NULL
 ) ON [PRIMARY]
 
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE CLUSTERED INDEX [SK_PatientID] ON [07T].[GPEncounter]
 (
 	[SK_PatientID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Table [07T].[GPMedication]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [07T].[GPMedication]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -177,13 +177,13 @@ CREATE TABLE [07T].[GPMedication](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE CLUSTERED INDEX [SK_PatientID] ON [07T].[GPMedication]
 (
 	[SK_PatientID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Table [07T].[PatientDemographics]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [07T].[PatientDemographics]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -212,13 +212,13 @@ CREATE TABLE [07T].[PatientDemographics](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE CLUSTERED INDEX [SK_PatientID] ON [07T].[PatientDemographics]
 (
 	[SK_PatientID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Table [07T].[Patients]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [07T].[Patients]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -246,13 +246,13 @@ CREATE TABLE [07T].[Patients](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Index [SK_PatientID]    Script Date: 29/03/2016 09:55:04 ******/
 CREATE CLUSTERED INDEX [SK_PatientID] ON [07T].[Patients]
 (
 	[SK_PatientID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Table [GP].[ClinicalProblem]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [GP].[ClinicalProblem]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -273,7 +273,7 @@ CREATE TABLE [GP].[ClinicalProblem](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [GP].[MedicationIssue]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [GP].[MedicationIssue]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -293,7 +293,7 @@ CREATE TABLE [GP].[MedicationIssue](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [GP].[Staff]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [GP].[Staff]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -313,7 +313,7 @@ CREATE TABLE [GP].[Staff](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [shared].[Organisation]    Script Date: 29/03/2016 09:31:29 ******/
+/****** Object:  Table [shared].[Organisation]    Script Date: 29/03/2016 09:55:04 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

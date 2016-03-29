@@ -159,8 +159,11 @@
 			<div class="col-xs-12">
 				<div class="form-group">
 					<label>Filter by Clinical Codes</label>
-					<textarea class="form-control" style="height: 72px" ng-model="testEditor.filterCodes" placeholder="Select codes" ng-click="testEditor.showCodePicker()">
-					</textarea>
+					<div class="form-control" style="height:auto; overflow:visible" ng-click="testEditor.showCodePicker()">
+						<span ng-repeat="code in testEditor.codeSelection">
+							<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
+						</span>
+					</div>
 				</div>
 			</div>
 		</div>

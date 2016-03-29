@@ -21,7 +21,6 @@ module app.library {
 	import ItemType = app.models.ItemType;
 	import LibraryItem = app.models.LibraryItem;
 	import CodeSetValue = app.models.CodeSetValue;
-	import CodeSetValueWithTerm = app.models.CodeSetValueWithTerm;
 	'use strict';
 
 	export class LibraryController {
@@ -86,38 +85,6 @@ module app.library {
 						node.loading = false;
 					});
 			}
-		}
-
-		showCodePicker() {
-			var selection : CodeSetValueWithTerm[] = [
-				{
-					code: '195967001',
-					term: 'asthma',
-					includeChildren: true,
-					exclusion: []
-				},
-				{
-					code: '194828000',
-					term: 'angina',
-					includeChildren: true,
-					exclusion: [
-						{code:'315025001', term:'refractory angina', includeChildren : null, exclusion : null },
-						{code:'4557003', term:'preinfarcation syndrome', includeChildren : null, exclusion : null }
-					]
-				},
-				{
-					code: '73211009',
-					term: 'diabetes',
-					includeChildren: false,
-					exclusion: []
-				}
-			];
-
-			CodePickerController.open(this.$modal, selection)
-				.result.then(function(resultData : CodeSetValueWithTerm[]){
-					console.log('Dialog closed');
-					console.log(resultData);
-				});
 		}
 
 		addChildFolder(node : FolderNode) {

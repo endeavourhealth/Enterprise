@@ -50,6 +50,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Config.Email }
+     * 
+     */
+    public Config.Email createConfigEmail() {
+        return new Config.Email();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Config }{@code >}}
      * 
      */

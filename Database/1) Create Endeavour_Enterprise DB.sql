@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [Endeavour_Enterprise]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Database [Endeavour_Enterprise]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE DATABASE [Endeavour_Enterprise]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -75,32 +75,32 @@ ALTER DATABASE [Endeavour_Enterprise] SET DELAYED_DURABILITY = DISABLED
 GO
 USE [Endeavour_Enterprise]
 GO
-/****** Object:  User [test]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  User [test]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE USER [test] FOR LOGIN [test] WITH DEFAULT_SCHEMA=[dbo]
 GO
-/****** Object:  User [Endeavour_Enterprise_ApplicationUser]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  User [Endeavour_Enterprise_ApplicationUser]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE USER [Endeavour_Enterprise_ApplicationUser] FOR LOGIN [Endeavour_Enterprise_ApplicationUser] WITH DEFAULT_SCHEMA=[dbo]
 GO
 ALTER ROLE [db_datareader] ADD MEMBER [Endeavour_Enterprise_ApplicationUser]
 GO
 ALTER ROLE [db_datawriter] ADD MEMBER [Endeavour_Enterprise_ApplicationUser]
 GO
-/****** Object:  Schema [Administration]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Schema [Administration]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE SCHEMA [Administration]
 GO
-/****** Object:  Schema [Definition]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Schema [Definition]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE SCHEMA [Definition]
 GO
-/****** Object:  Schema [Execution]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Schema [Execution]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE SCHEMA [Execution]
 GO
-/****** Object:  Schema [Logging]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Schema [Logging]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE SCHEMA [Logging]
 GO
-/****** Object:  Schema [ReadV2]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Schema [ReadV2]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE SCHEMA [ReadV2]
 GO
-/****** Object:  UserDefinedFunction [Logging].[ConvertTimestamp]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  UserDefinedFunction [Logging].[ConvertTimestamp]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -120,8 +120,9 @@ END;
 
 
 
+
 GO
-/****** Object:  Table [Administration].[EndUser]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Administration].[EndUser]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -144,7 +145,7 @@ CREATE TABLE [Administration].[EndUser](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Administration].[EndUserEmailInvite]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Administration].[EndUserEmailInvite]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -165,7 +166,7 @@ CREATE TABLE [Administration].[EndUserEmailInvite](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Administration].[EndUserPwd]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Administration].[EndUserPwd]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -177,6 +178,8 @@ CREATE TABLE [Administration].[EndUserPwd](
 	[EndUserUuid] [uniqueidentifier] NOT NULL,
 	[PwdHash] [varchar](500) NOT NULL,
 	[DtExpired] [datetime2](7) NULL,
+	[FailedAttempts] [int] NOT NULL,
+	[IsOneTimeUse] [bit] NOT NULL,
  CONSTRAINT [PK_PersonPwd] PRIMARY KEY CLUSTERED 
 (
 	[EndUserPwdUuid] ASC
@@ -186,7 +189,7 @@ CREATE TABLE [Administration].[EndUserPwd](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Administration].[Organisation]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Administration].[Organisation]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -206,7 +209,7 @@ CREATE TABLE [Administration].[Organisation](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Administration].[OrganisationEndUserLink]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Administration].[OrganisationEndUserLink]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -224,7 +227,7 @@ CREATE TABLE [Administration].[OrganisationEndUserLink](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [Definition].[ActiveItem]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Definition].[ActiveItem]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -243,7 +246,7 @@ CREATE TABLE [Definition].[ActiveItem](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [Definition].[Audit]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Definition].[Audit]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -261,7 +264,7 @@ CREATE TABLE [Definition].[Audit](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [Definition].[DependencyType]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Definition].[DependencyType]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -284,7 +287,7 @@ CREATE TABLE [Definition].[DependencyType](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Definition].[Item]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Definition].[Item]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -308,7 +311,7 @@ CREATE TABLE [Definition].[Item](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Definition].[ItemDependency]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Definition].[ItemDependency]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -327,7 +330,7 @@ CREATE TABLE [Definition].[ItemDependency](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [Definition].[ItemType]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Definition].[ItemType]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -350,7 +353,7 @@ CREATE TABLE [Definition].[ItemType](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Execution].[Job]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Execution].[Job]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -369,7 +372,7 @@ CREATE TABLE [Execution].[Job](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [Execution].[JobContent]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Execution].[JobContent]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -386,7 +389,7 @@ CREATE TABLE [Execution].[JobContent](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [Execution].[JobReport]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Execution].[JobReport]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -411,7 +414,7 @@ CREATE TABLE [Execution].[JobReport](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Execution].[JobReportItem]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Execution].[JobReportItem]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -430,7 +433,7 @@ CREATE TABLE [Execution].[JobReportItem](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [Execution].[Request]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Execution].[Request]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -454,7 +457,7 @@ CREATE TABLE [Execution].[Request](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Execution].[Status]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Execution].[Status]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -477,7 +480,7 @@ CREATE TABLE [Execution].[Status](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Logging].[logging_event]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Logging].[logging_event]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -509,7 +512,7 @@ CREATE TABLE [Logging].[logging_event](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Logging].[logging_event_exception]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Logging].[logging_event_exception]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -530,7 +533,7 @@ CREATE TABLE [Logging].[logging_event_exception](
 GO
 SET ANSI_PADDING OFF
 GO
-/****** Object:  Table [Logging].[logging_event_property]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Table [Logging].[logging_event_property]    Script Date: 30/03/2016 16:03:35 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -554,93 +557,93 @@ GO
 SET ANSI_PADDING ON
 
 GO
-/****** Object:  Index [Email]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [Email]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [Email] ON [Administration].[EndUser]
 (
 	[Email] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [EndUserUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [EndUserUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [EndUserUuid] ON [Administration].[EndUser]
 (
 	[EndUserUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [EndUserEmailInviteUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [EndUserEmailInviteUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [EndUserEmailInviteUuid] ON [Administration].[EndUserEmailInvite]
 (
 	[EndUserEmailInviteUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [EndUserPwdUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [EndUserPwdUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [EndUserPwdUuid] ON [Administration].[EndUserPwd]
 (
 	[EndUserPwdUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [EndUserUuid_DtExpired]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [EndUserUuid_DtExpired]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE NONCLUSTERED INDEX [EndUserUuid_DtExpired] ON [Administration].[EndUserPwd]
 (
 	[EndUserUuid] ASC,
 	[DtExpired] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [OrganisationUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [OrganisationUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [OrganisationUuid] ON [Administration].[Organisation]
 (
 	[OrganisationUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [OrganisationEndUserLinkUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [OrganisationEndUserLinkUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [OrganisationEndUserLinkUuid] ON [Administration].[OrganisationEndUserLink]
 (
 	[OrganisationEndUserLinkUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [ActiveItemUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [ActiveItemUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [ActiveItemUuid] ON [Definition].[ActiveItem]
 (
 	[ActiveItemUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [ItemUuid_Version]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [ItemUuid_Version]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [ItemUuid_Version] ON [Definition].[ActiveItem]
 (
 	[ItemUuid] ASC,
 	[AuditUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [DependentItemUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [DependentItemUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE NONCLUSTERED INDEX [DependentItemUuid] ON [Definition].[ItemDependency]
 (
 	[DependentItemUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [ItemUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [ItemUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE NONCLUSTERED INDEX [ItemUuid] ON [Definition].[ItemDependency]
 (
 	[ItemUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [StatusId]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [StatusId]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE NONCLUSTERED INDEX [StatusId] ON [Execution].[Job]
 (
 	[StatusId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [JobUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [JobUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE NONCLUSTERED INDEX [JobUuid] ON [Execution].[JobReport]
 (
 	[JobUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [JobReportUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [JobReportUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE NONCLUSTERED INDEX [JobReportUuid] ON [Execution].[JobReportItem]
 (
 	[JobReportUuid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 80) ON [PRIMARY]
 GO
-/****** Object:  Index [ReportUuid]    Script Date: 29/03/2016 09:52:00 ******/
+/****** Object:  Index [ReportUuid]    Script Date: 30/03/2016 16:03:35 ******/
 CREATE NONCLUSTERED INDEX [ReportUuid] ON [Execution].[Request]
 (
 	[ReportUuid] ASC

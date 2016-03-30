@@ -1,21 +1,17 @@
 <div class="modal-header">
 	<button type="button" class="close" data-ng-click="testEditor.cancel()" aria-hidden="true">&times;</button>
-	<h4 class="modal-title">Test & Data Source Editor</h4>
+	<h4 class="modal-title">{{testEditor.title}}</h4>
 </div>
 <div class="modal-body">
-	<ul class="nav nav-tabs" id="testEditorTab">
-		<li class="active"><a show-tab="" href="#datasource">Data Source</a></li>
-		<li><a show-tab="" href="#fieldtest">Field Test</a></li>
-	</ul>
 
-	<div class="tab-content">
-		<div class="tab-pane active" id="datasource">
+	<uib-tabset active="active">
+		<uib-tab index="0" heading="Data Source">
 			<br/>
 			<form role="form">
 				<div class='row'>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Record Data Source</label>
+							<label>Data Source</label>
 							<select class="form-control" ng-model="testEditor.ruleDatasource" ng-change="testEditor.dataSourceChange(testEditor.ruleDatasource)" ng-disabled="testEditor.editMode">
 								<option ng-repeat="datasource in testEditor.datasources" value="{{datasource}}">{{datasource}}</option>
 							</select>
@@ -263,11 +259,107 @@
 				</div>
 				<br/>
 			</form>
-		</div>
-		<div class="tab-pane" id="fieldtest">
-			Field Test
-		</div>
-	</div>
+		</uib-tab>
+		<uib-tab index="1" heading="Field Test" ng-show="testEditor.viewFieldTest">
+			<br/>
+			<form role="form">
+				<div class='row'>
+					<div class="col-xs-6" ng-show="testEditor.addFilter">
+						<div class="form-group">
+							<label>Add a Field</label><br/>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('CODE')" ng-show="testEditor.codeFilter">Code</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('EFFECTIVE_DATE')" ng-show="testEditor.dateFilter">Date</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('VALUE')" ng-show="testEditor.valueFilter">Value</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('DOB')" ng-show="testEditor.dobFilter">DOB</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('SEX')" ng-show="testEditor.sexFilter">Sex</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('AGE')" ng-show="testEditor.ageFilter">Age</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('REGISTRATION_DATE')" ng-show="testEditor.regFilter">Reg Date</button>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestCodeEditor">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label>Field Test by Clinical Codes</label>
+							<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showFieldTestCodePicker()">
+								<span ng-repeat="code in testEditor.fieldTestCodeSelection">
+									<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestDobEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Field Test by {{testEditor.fieldTestDobLabel}} From</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDOBFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDOBFrom, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Field Test by {{testEditor.fieldTestDobLabel}} To</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDOBTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDOBTo, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} to">
+							</input>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestSexEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Field Test by {{testEditor.fieldTestSexLabel}}</label>
+							<select class="form-control" ng-model="testEditor.fieldTestSex" ng-change="testEditor.fieldTestValueChange(testEditor.fieldTestSex, testEditor.fieldTestSexLabel)">
+								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestDateEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Field Test by {{testEditor.fieldTestDateLabel}} From</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDateFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDateFrom, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Field Test by {{testEditor.fieldTestDateLabel}} To</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDateTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDateTo, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} to">
+							</input>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestValueEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Field Test by {{testEditor.fieldTestValueField}} From</label>
+							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueFrom" ng-blur="testEditor.fieldTestValueFromChange(testEditor.fieldTestValueFrom)" placeholder="Select {{testEditor.fieldTestValueField}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Field Test by {{testEditor.fieldTestValueField}} To</label>
+							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueTo" ng-blur="testEditor.fieldTestValueToChange(testEditor.fieldTestValueTo)" placeholder="Select {{testEditor.fieldTestValueField}} to">
+							</input>
+						</div>
+					</div>
+				</div>
+				<br/>
+			</form>
+
+		</uib-tab>
+	</uib-tabset>
+
 </div>
 <div class="modal-footer">
 	<button type="button" class="btn btn-danger"

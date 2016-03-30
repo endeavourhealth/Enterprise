@@ -89,7 +89,7 @@ module app.query {
 
 						var test : Test = selectedRule.data.test;
 
-						TestEditorController.open($modal, test)
+						TestEditorController.open($modal, test, false)
 							.result.then(function(resultData : Test){
 
 							selectedRule.data.test = resultData;

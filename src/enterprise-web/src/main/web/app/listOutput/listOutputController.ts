@@ -60,7 +60,7 @@ module app.listOutput {
 				test = {dataSource: datasourceContainer.dataSource} as Test;
 			}
 
-			TestEditorController.open(this.$modal, test)
+			TestEditorController.open(this.$modal, test, true)
 				.result.then(function(dataSourceContainer : { dataSource : DataSource }) {
 					datasourceContainer.dataSource = dataSourceContainer.dataSource;
 					vm.loadDataSourceAvailableFieldList();

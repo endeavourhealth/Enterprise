@@ -10,6 +10,7 @@ module app.core {
 	import ListReport = app.models.ListReport;
 	import LibraryItem = app.models.LibraryItem;
 	import EntityMap = app.models.EntityMap;
+	import RequestParameters = app.models.RequestParameters;
 	'use strict';
 
 	export interface ILibraryService {
@@ -22,6 +23,7 @@ module app.core {
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
 		deleteReport(report : Report):ng.IPromise<any>;
+		scheduleReport(requestParameters : RequestParameters):ng.IPromise<any>;
 		getContentNamesForReportLibraryItem(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}>;
 		saveFolder(folder : Folder):ng.IPromise<string>;
 		deleteFolder(folder : Folder):ng.IPromise<any>;
@@ -102,6 +104,10 @@ module app.core {
 				}
 			};
 			return this.httpGet('api/report/getReport', request);
+		}
+
+		scheduleReport(requestParameters : RequestParameters):ng.IPromise<any> {
+			return this.httpPost('api/report/scheduleReport', requestParameters);
 		}
 
 		getContentNamesForReportLibraryItem(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}> {

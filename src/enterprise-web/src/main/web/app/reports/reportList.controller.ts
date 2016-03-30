@@ -14,6 +14,9 @@ module app.reports {
 	import MessageBoxController = app.dialogs.MessageBoxController;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import Folder = app.models.Folder;
+	import QueueReportController = app.dialogs.QueueReportController;
+	import RequestParameters = app.models.RequestParameters;
+	import LoggerService = app.blocks.LoggerService;
 	'use strict';
 
 	export class ReportListController {
@@ -29,6 +32,25 @@ module app.reports {
 			protected $scope : IScope,
 			protected $modal : IModalService) {
 			this.getReportsRootFolders();
+		}
+
+		run(item : FolderItem) {
+			var vm = this;
+			QueueReportController.open(vm.$modal, item.uuid, item.name)
+				.result.then(function(result : RequestParameters) {
+					vm.scheduleReport(result);
+			});
+		}
+
+		scheduleReport(requestParameters : RequestParameters) {
+			var vm = this;
+			vm.libraryService.scheduleReport(requestParameters)
+				.then(function(result) {
+					vm.logger.success('Report queued', result, 'Run report');
+				})
+				.catch(function(error) {
+					vm.logger.error('Error queueing report', error, 'Run report');
+				});
 		}
 
 		getReportsRootFolders() {

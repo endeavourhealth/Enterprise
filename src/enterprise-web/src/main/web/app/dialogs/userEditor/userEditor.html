@@ -1,0 +1,26 @@
+<div class="modal-header">
+	<button type="button" class="close" data-ng-click="userEditor.cancel()" aria-hidden="true">&times;</button>
+	<h4 class="modal-title">User</h4>
+</div>
+<div class="modal-body">
+	<form endUserRole="form" class="container-fluid">
+		<div class="row">
+			<div class="form-group col-md-12">
+				<label class="control-label">Username/Email</label>
+				<div class="input-group">
+					<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
+								 ng-model="userEditor.searchData" ng-keyup="$event.keyCode == 13 && userEditor.search()">
+					<span class="input-group-addon" ng-click="userEditor.search()" style="cursor: pointer">
+						<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
+					</span>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn"
+					data-ng-click="userEditor.cancel()">Cancel</button>
+	<button type="button" class="btn btn-primary"
+					data-ng-click="userEditor.ok();">Ok</button>
+</div>

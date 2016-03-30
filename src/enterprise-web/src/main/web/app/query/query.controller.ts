@@ -79,7 +79,11 @@ module app.query {
 					}
 				};
 
-				$scope.results = ['','GOTO_RULES','INCLUDE','EXCLUDE'];
+				$scope.results = [
+					{value: 'GOTO_RULES', displayName: 'Go to rule'},
+					{value: 'INCLUDE', displayName: 'Include patient in final result'},
+					{value: 'EXCLUDE', displayName: 'No further action'}
+				];
 
 				$scope.$on('editTest', function(event : any, ruleId : any) {
 					if (ruleId!="0") {
@@ -89,7 +93,7 @@ module app.query {
 
 						var test : Test = selectedRule.data.test;
 
-						TestEditorController.open($modal, test)
+						TestEditorController.open($modal, test, false)
 							.result.then(function(resultData : Test){
 
 							selectedRule.data.test = resultData;

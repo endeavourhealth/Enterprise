@@ -51,12 +51,12 @@
 													<span uib-dropdown>
 														<button type="button" class="btn btn-xs btn-default" uib-dropdown-toggle>...</button>
 														<ul uib-dropdown-menu>
-															<li><a href="#">Rename</a></li>
-															<li><a href="#">Delete</a></li>
+															<li class="disabled"><a href="#">Rename</a></li>
+															<li class="disabled"><a href="#">Delete</a></li>
 															<li role="separator" class="divider"></li>
-															<li><a href="#">Cut</a></li>
-															<li><a href="#">Copy</a></li>
-															<li><a href="#">Paste</a></li>
+															<li class="disabled"><a href="#">Cut</a></li>
+															<li class="disabled"><a href="#">Copy</a></li>
+															<li class="disabled"><a href="#">Paste</a></li>
 														</ul>
 													</span>
 												</div>
@@ -96,9 +96,9 @@
 							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.renameFolder(this)">Rename</a></li>
 							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.deleteFolder(this)">Delete</a></li>
 							<li role="separator" class="divider"></li>
-							<li ng-class="{'disabled': !node.parentFolderUuid}"><a href="#">Cut</a></li>
-							<li ng-class="{'disabled': !node.parentFolderUuid}"><a href="#">Copy</a></li>
-							<li><a href="#">Paste</a></li>
+							<li class="disabled"><a href="#">Cut</a></li>
+							<li class="disabled"><a href="#">Copy</a></li>
+							<li class="disabled"><a href="#">Paste</a></li>
 						</ul>
 					</span>
 				</span>

@@ -1,11 +1,14 @@
 <div class="module">
-	<div class="module-heading">Dashboard</div>
+	<div class="module-heading">
+		Dashboard
+		<button class="btn btn-success btn-sm pull-right" ng-click="dashboard.refresh()">Refresh</button>
+	</div>
 	<div class="module-body">
 		<div class="container-fluid">
 	<div class="row">
 		<div class="col-md-4">
 			<div class="panel panel-primary">
-				<div class="panel-heading">Engine History</div>
+				<div class="panel-heading">Engine History <span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-hide="dashboard.engineHistoryData"></span></div>
 				<div class="panel-body">
 					<div class="table">
 						<table class="table table-striped table-condensed">
@@ -28,7 +31,7 @@
 		</div>
 		<div class="col-md-8">
 			<div class="panel panel-primary">
-				<div class="panel-heading">Recent Documents</div>
+				<div class="panel-heading">Recent Documents <span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-hide="dashboard.recentDocumentsData"></span></div>
 				<div class="panel-body">
 					<div class="table">
 						<table class="table table-striped table-condensed">
@@ -41,7 +44,7 @@
 							</thead>
 							<tbody>
 								<tr ng-repeat="item in dashboard.recentDocumentsData">
-									<td><a ng-click="dashboard.actionItem(item,'view')">{{item.name}}</a></td>
+									<td><a style="cursor:pointer" ng-click="dashboard.actionItem(item,'view')">{{item.name}}</a></td>
 									<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 									<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString }}</td>
 								</tr>
@@ -60,7 +63,7 @@
 	<div class="row">
 		<div class="col-md-4">
 			<div class="panel panel-primary">
-				<div class="panel-heading">Engine State</div>
+				<div class="panel-heading">Engine State <span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-hide="dashboard.engineState"></span></div>
 				<div class="panel-body">
 					<i>{{dashboard.engineState.EngineState.State}}</i>
 					<button type="button" class="btn btn-default pull-right">
@@ -71,7 +74,7 @@
 		</div>
 		<div class="col-md-8">
 			<div class="panel panel-primary">
-				<div class="panel-heading">Report Activity</div>
+				<div class="panel-heading">Report Activity <span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-hide="dashboard.reportActivityData"></span></div>
 				<div class="panel-body">
 					<div class="table">
 						<table class="table table-striped table-condensed">

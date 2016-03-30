@@ -21,6 +21,8 @@ module app.library {
 	import ItemType = app.models.ItemType;
 	import LibraryItem = app.models.LibraryItem;
 	import CodeSetValue = app.models.CodeSetValue;
+	import IFolderService = app.core.IFolderService;
+	import ILibraryService = app.core.ILibraryService;
 	'use strict';
 
 	export class LibraryController {
@@ -28,10 +30,11 @@ module app.library {
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
 
-		static $inject = ['LibraryService', 'LoggerService', '$scope', '$uibModal', '$state'];
+		static $inject = ['LibraryService', 'FolderService', 'LoggerService', '$scope', '$uibModal', '$state'];
 
 		constructor(
-			protected libraryService:app.core.ILibraryService,
+			protected libraryService:ILibraryService,
+			protected folderService:IFolderService,
 			protected logger:ILoggerService,
 			protected $scope : IScope,
 			protected $modal : IModalService,
@@ -41,7 +44,7 @@ module app.library {
 
 		getLibraryRootFolders() {
 			var vm = this;
-			vm.libraryService.getFolders(1, null)
+			vm.folderService.getFolders(1, null)
 				.then(function (data) {
 					vm.treeData = data.folders;
 
@@ -61,7 +64,7 @@ module app.library {
 			vm.selectedNode = node;
 			node.loading = true;
 
-			vm.libraryService.getFolderContents(node.uuid)
+			vm.folderService.getFolderContents(node.uuid)
 				.then(function(data) {
 					vm.itemSummaryList = data;
 					node.loading = false;
@@ -77,7 +80,7 @@ module app.library {
 				var vm = this;
 				var folderId = node.uuid;
 				node.loading = true;
-				this.libraryService.getFolders(1, folderId)
+				this.folderService.getFolders(1, folderId)
 					.then(function (data) {
 						node.nodes = data.folders;
 						// Set parent folder (not retrieved by API)
@@ -99,7 +102,7 @@ module app.library {
 					contentCount : 0,
 					hasChildren : false
 				};
-				vm.libraryService.saveFolder(folder)
+				vm.folderService.saveFolder(folder)
 					.then(function(response) {
 						vm.logger.success('Folder created', response, 'New folder');
 						node.isExpanded = false;
@@ -121,7 +124,7 @@ module app.library {
 				.result.then(function(newName : string) {
 				var oldName = folderNode.folderName;
 				folderNode.folderName = newName;
-					vm.libraryService.saveFolder(folderNode)
+					vm.folderService.saveFolder(folderNode)
 						.then(function (response) {
 							vm.logger.success('Folder renamed to ' + newName, response, 'Rename folder');
 						})
@@ -138,7 +141,7 @@ module app.library {
 			MessageBoxController.open(vm.$modal,
 				'Delete folder', 'Are you sure you want to delete folder ' + folderNode.folderName + '?', 'Yes', 'No')
 				.result.then(function() {
-					vm.libraryService.deleteFolder(folderNode)
+					vm.folderService.deleteFolder(folderNode)
 					.then(function (response) {
 						scope.remove();
 						vm.logger.success('Folder deleted', response, 'Delete folder');

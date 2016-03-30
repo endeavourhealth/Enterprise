@@ -5,18 +5,23 @@
 module app.dashboard {
 	import FolderItem = app.models.FolderItem;
 	import ItemType = app.models.ItemType;
+	import IDashboardService = app.core.IDashboardService;
+	import ILoggerService = app.blocks.ILoggerService;
+	import EngineHistoryItem = app.models.EngineHistoryItem;
+	import EngineState = app.models.EngineState;
+	import ReportActivityItem = app.models.ReportActivityItem;
 	'use strict';
 
 	class DashboardController {
-		engineHistoryData:app.models.EngineHistoryItem[];
-		recentDocumentsData:app.models.FolderItem[];
-		engineState:app.models.EngineState;
-		reportActivityData:app.models.ReportActivityItem[];
+		engineHistoryData:EngineHistoryItem[];
+		recentDocumentsData:FolderItem[];
+		engineState:EngineState;
+		reportActivityData:ReportActivityItem[];
 
-		static $inject = ['LibraryService', 'LoggerService', '$state'];
+		static $inject = ['DashboardService', 'LoggerService', '$state'];
 
-		constructor(private libraryService:app.core.ILibraryService,
-								private logger:app.blocks.ILoggerService,
+		constructor(private dashboardService:IDashboardService,
+								private logger:ILoggerService,
 								private $state : IStateService) {
 			this.refresh();
 		}
@@ -31,8 +36,8 @@ module app.dashboard {
 		getEngineHistory() {
 			var vm:DashboardController = this;
 			vm.engineHistoryData = null;
-			this.libraryService.getEngineHistory()
-				.then(function (data:app.models.EngineHistoryItem[]) {
+			vm.dashboardService.getEngineHistory()
+				.then(function (data:EngineHistoryItem[]) {
 					vm.engineHistoryData = data;
 				});
 		}
@@ -40,8 +45,8 @@ module app.dashboard {
 		getRecentDocumentsData() {
 			var vm:DashboardController = this;
 			vm.recentDocumentsData = null;
-			this.libraryService.getRecentDocumentsData()
-				.then(function (data:app.models.FolderItem[]) {
+			vm.dashboardService.getRecentDocumentsData()
+				.then(function (data:FolderItem[]) {
 					vm.recentDocumentsData = data;
 				});
 		}
@@ -49,8 +54,8 @@ module app.dashboard {
 		getEngineState() {
 			var vm:DashboardController = this;
 			vm.engineState = null;
-			this.libraryService.getEngineState()
-				.then(function (data:app.models.EngineState) {
+			vm.dashboardService.getEngineState()
+				.then(function (data:EngineState) {
 					vm.engineState = data;
 				});
 		}
@@ -58,8 +63,8 @@ module app.dashboard {
 		getReportActivityData() {
 			var vm:DashboardController = this;
 			vm.reportActivityData = null;
-			this.libraryService.getReportActivityData()
-				.then(function (data:app.models.ReportActivityItem[]) {
+			vm.dashboardService.getReportActivityData()
+				.then(function (data:ReportActivityItem[]) {
 					vm.reportActivityData = data;
 				});
 		}

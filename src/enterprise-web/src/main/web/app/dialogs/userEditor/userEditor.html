@@ -5,15 +5,23 @@
 <div class="modal-body">
 	<form endUserRole="form" class="container-fluid">
 		<div class="row">
-			<div class="form-group col-md-12">
+			<div class="form-group col-md-6">
 				<label class="control-label">Username/Email</label>
-				<div class="input-group">
-					<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
-								 ng-model="userEditor.searchData" ng-keyup="$event.keyCode == 13 && userEditor.search()">
-					<span class="input-group-addon" ng-click="userEditor.search()" style="cursor: pointer">
-						<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
-					</span>
-				</div>
+				<input type="text" class="form-control" placeholder="Username/Email" ng-model="userEditor.resultData.username" ng-readonly="userEditor.readOnly">
+			</div>
+			<div class="form-group col-md-6">
+				<label class="control-label">Title</label>
+				<input type="text" class="form-control" placeholder="Title" ng-model="userEditor.resultData.title" ng-readonly="userEditor.readOnly">
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-6">
+				<label class="control-label">Forename</label>
+				<input type="text" class="form-control" placeholder="Forename" ng-model="userEditor.resultData.forename" ng-readonly="userEditor.readOnly">
+			</div>
+			<div class="form-group col-md-6">
+				<label class="control-label">Surname</label>
+				<input type="text" class="form-control" placeholder="Surname" ng-model="userEditor.resultData.surname" ng-readonly="userEditor.readOnly">
 			</div>
 		</div>
 	</form>
@@ -21,6 +29,6 @@
 <div class="modal-footer">
 	<button type="button" class="btn"
 					data-ng-click="userEditor.cancel()">Cancel</button>
-	<button type="button" class="btn btn-primary"
+	<button type="button" class="btn btn-primary" ng-hide="userEditor.readOnly"
 					data-ng-click="userEditor.ok();">Ok</button>
 </div>

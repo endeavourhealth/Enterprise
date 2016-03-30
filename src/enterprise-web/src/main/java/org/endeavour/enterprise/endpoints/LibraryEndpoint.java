@@ -34,7 +34,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         LOG.trace("GettingLibraryItem for UUID {}", libraryItemUuid);
 
-        DbItem item = DbItem.retrieveForUUid(libraryItemUuid);
+        DbItem item = DbItem.retrieveLatestForUUid(libraryItemUuid);
         String xml = item.getXmlContent();
 
         LibraryItem ret = QueryDocumentSerializer.readLibraryItemFromXml(xml);
@@ -152,7 +152,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         for (DbItemDependency dependentItem: dependentItems) {
             UUID dependentItemUuid = dependentItem.getDependentItemUuid();
-            DbItem item = DbItem.retrieveForUUid(dependentItemUuid);
+            DbItem item = DbItem.retrieveLatestForUUid(dependentItemUuid);
 
             JsonFolderContent content = new JsonFolderContent(item, null);
             ret.addContent(content);

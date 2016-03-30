@@ -41,7 +41,7 @@ public final class DbJob extends DbAbstractTable {
 
 
     public static DbJob retrieveForUuid(UUID jobUuid) throws Exception {
-        return (DbJob)DatabaseManager.db().retrieveForPrimaryKeys(adapter, jobUuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbJob.class, jobUuid);
     }
 
     public static List<DbJob> retrieveRecent(int count) throws Exception {

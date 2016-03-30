@@ -6,6 +6,7 @@ import ch.qos.logback.classic.db.names.DefaultDBNameResolver;
 import ch.qos.logback.core.db.ConnectionSource;
 import ch.qos.logback.core.db.dialect.SQLDialectCode;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.util.CollectionUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
@@ -22,6 +23,9 @@ import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,21 +40,13 @@ public final class DatabaseManager {
     }
 
     private DatabaseI databaseImplementation = null;
-    private String url = null;
-    private String username = null;
-    private String password = null;
     private ComboPooledDataSource cpds = null;
-
 
 
     public void setConnectionProperties(String url, String username, String password) {
 
         //this would be where we plug in support for different databases
         this.databaseImplementation = new SqlServerDatabase();
-
-        this.url = url;
-        this.username = username;
-        this.password = password;
 
         try {
 
@@ -138,84 +134,234 @@ public final class DatabaseManager {
 
     public void sqlTest() throws Exception {
 
-        List<DbOrganisation> orgs = db().retrieveAllOrganisations();
+        List<UUID> uuidList = new ArrayList<>();
+        uuidList.add(UUID.randomUUID());
+        uuidList.add(UUID.randomUUID());
+        uuidList.add(UUID.randomUUID());
 
-/*
-            //generic read/write functions
-            public void writeEntity(DbAbstractTable entity) throws Exception;
+        db().retrieveEndUserForEmail("Email");
+        db().retrieveEndUserForEmail("Ema'il");
 
-            public void writeEntities(List<DbAbstractTable> entities) throws Exception;
+        db().retrieveSuperUsers();
 
-            public DbAbstractTable retrieveForPrimaryKeys(TableAdapter a, Object... keys) throws Exception;
+        db().retrieveEndUserPwdForUserNotExpired(UUID.randomUUID());
 
-            //specific functions
-            public DbEndUser retrieveEndUserForEmail(String email) throws Exception;
+        db().retrieveAllOrganisations();
 
-            public List<DbEndUser> retrieveSuperUsers() throws Exception;
+        db().retrieveOrganisationForNameNationalId("Name", "NationalId");
 
-            public DbEndUserPwd retrieveEndUserPwdForUserNotExpired(UUID endUserUuid) throws Exception;
+        db().retrieveEndUserEmailInviteForUserNotCompleted(UUID.randomUUID());
 
-            public List<DbOrganisation> retrieveAllOrganisations() throws Exception;
+        db().retrieveEndUserEmailInviteForToken("Token");
 
-            public DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception;
+        db().retrieveOrganisationEndUserLinksForOrganisationNotExpired(UUID.randomUUID());
 
-            public List<DbEndUserEmailInvite> retrieveEndUserEmailInviteForUserNotCompleted(UUID userUuid) throws Exception;
+        db().retrieveOrganisationEndUserLinksForUserNotExpired(UUID.randomUUID());
 
-            public DbEndUserEmailInvite retrieveEndUserEmailInviteForToken(String token) throws Exception;
+        db().retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(UUID.randomUUID(), UUID.randomUUID());
 
-            public List<DbOrganisationEndUserLink> retrieveOrganisationEndUserLinksForOrganisationNotExpired(UUID organisationUuid) throws Exception;
+        db().retrieveLatestItemForUuid(UUID.randomUUID());
 
-            public List<DbOrganisationEndUserLink> retrieveOrganisationEndUserLinksForUserNotExpired(UUID endUserUuid) throws Exception;
+        db().retrieveDependentItems(UUID.randomUUID(), DependencyType.IsContainedWithin);
 
-            public DbOrganisationEndUserLink retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception;
+        db().retrieveNonDependentItems(UUID.randomUUID(), DependencyType.IsChildOf, DefinitionItemType.ReportFolder);
 
-            public DbItem retrieveItemForUuid(UUID itemUuid) throws Exception;
+        List<DbActiveItem> activeItems = new ArrayList<>();
+        DbActiveItem a = new DbActiveItem();
+        a.setItemUuid(UUID.randomUUID());
+        a.setAuditUuid(UUID.randomUUID());
+        activeItems.add(a);
+        a = new DbActiveItem();
+        a.setItemUuid(UUID.randomUUID());
+        a.setAuditUuid(UUID.randomUUID());
+        activeItems.add(a);
+        db().retrieveItemsForActiveItems(activeItems);
 
-            public List<DbItem> retrieveDependentItems(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception;
+        db().retrieveActiveItemForItemUuid(UUID.randomUUID());
 
-            public List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception;
+        db().retrieveActiveItemDependentItems(UUID.randomUUID(), UUID.randomUUID(), DependencyType.Uses);
 
-            public List<DbItem> retrieveItemsForActiveItems(List<DbActiveItem> activeItems) throws Exception;
+        db().retrieveActiveItemRecentItems(UUID.randomUUID(), 5);
 
-            public DbActiveItem retrieveActiveItemForItemUuid(UUID itemUuid) throws Exception;
+        db().retrieveCountDependencies(UUID.randomUUID(), DependencyType.IsChildOf);
 
-            public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception;
+        db().retrieveItemDependenciesForItem(UUID.randomUUID(), UUID.randomUUID());
 
-            public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, int count) throws Exception;
+        db().retrieveItemDependenciesForItemType(UUID.randomUUID(), UUID.randomUUID(), DependencyType.Uses);
 
-            public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception;
+        db().retrieveItemDependenciesForDependentItem(UUID.randomUUID());
 
-            public List<DbItemDependency> retrieveItemDependenciesForItem(UUID itemUuid, UUID auditUuid) throws Exception;
+        db().retrieveItemDependenciesForDependentItemType(UUID.randomUUID(), DependencyType.Uses);
 
-            public List<DbItemDependency> retrieveItemDependenciesForItemType(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception;
+        db().retrievePendingRequestsForItems(UUID.randomUUID(), uuidList);
 
-            public List<DbItemDependency> retrieveItemDependenciesForDependentItem(UUID dependentItemUuid) throws Exception;
+        db().retrievePendingRequests();
 
-            public List<DbItemDependency> retrieveItemDependenciesForDependentItemType(UUID dependentItemUuid, DependencyType dependencyType) throws Exception;
+        db().retrieveRecentJobs(5);
 
-            public List<DbRequest> retrievePendingRequestsForItems(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
+        db().retrieveJobsForStatus(ExecutionStatus.Executing);
 
-            public List<DbRequest> retrievePendingRequests() throws Exception;
+        db().retrieveJobsForUuids(uuidList);
 
-            public List<DbJob> retrieveRecentJobs(int count) throws Exception;
+        db().retrieveJobReports(UUID.randomUUID(), 5);
 
-            public List<DbJob> retrieveJobsForStatus(ExecutionStatus status) throws Exception;
+        db().retrieveJobReportsForJob(UUID.randomUUID());
 
-            public List<DbJob> retrieveJobsForUuids(List<UUID> uuids) throws Exception;
+        db().retrieveLatestJobReportsForItemUuids(UUID.randomUUID(), uuidList);
 
-            public List<DbJobReport> retrieveJobReports(UUID organisationUuid, int count) throws Exception;
+        db().retrieveJobReportItemsForJobReport(UUID.randomUUID());
 
-            public List<DbJobReport> retrieveJobReportsForJob(UUID jobUuid) throws Exception;
+        db().retrieveAuditsForUuids(uuidList);
 
-            public List<DbJobReport> retrieveLatestJobReportsForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
+        db().retrieveLatestAudit();
 
-            public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception;
+        db().retrieveJobContentsForJob(UUID.randomUUID());
 
-            public List<DbAudit> retrieveAuditsForUuids(List<UUID> uuids) throws Exception;
+        List<DbAbstractTable> entities = new ArrayList<>();
 
-            public DbAudit retrieveLatestAudit() throws Exception;
+        DbOrganisation organisation = new DbOrganisation();
+        organisation.assignPrimaryUUid();
+        organisation.setName("OrgName");
+        organisation.setNationalId("OrgId");
+        UUID orgUuid = organisation.getOrganisationUuid();
+        entities.add(organisation);
 
-            public List<DbJobContent> retrieveJobContentsForJob(UUID jobUuid) throws Exception;*/
+        DbEndUser user = new DbEndUser();
+        user.assignPrimaryUUid();
+        user.setEmail("Email");
+        user.setForename("Forename");
+        user.setSuperUser(false);
+        user.setSurname("Surname");
+        user.setTitle("Title");
+        UUID userUuid = user.getEndUserUuid();
+        entities.add(user);
+
+        DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
+        invite.assignPrimaryUUid();
+        invite.setDtCompleted(null);
+        invite.setEndUserUuid(userUuid);
+        invite.setUniqueToken("Token");
+        entities.add(invite);
+
+        DbEndUserPwd pwd = new DbEndUserPwd();
+        pwd.assignPrimaryUUid();
+        pwd.setDtExpired(null);
+        pwd.setFailedAttempts(0);
+        pwd.setOneTimeUse(false);
+        pwd.setEndUserUuid(userUuid);
+        pwd.setPwdHash("PwdHash");
+        entities.add(pwd);
+
+        DbOrganisationEndUserLink organisationEndUserLink = new DbOrganisationEndUserLink();
+        organisationEndUserLink.assignPrimaryUUid();
+        organisationEndUserLink.setAdmin(false);
+        organisationEndUserLink.setEndUserUuid(userUuid);
+        organisationEndUserLink.setDtExpired(null);
+        organisationEndUserLink.setOrganisationUuid(orgUuid);
+        entities.add(organisationEndUserLink);
+
+        DbAudit audit = new DbAudit();
+        audit.assignPrimaryUUid();
+        audit.setOrganisationUuid(orgUuid);
+        audit.setTimeStamp(Instant.now());
+        audit.setEndUserUuid(userUuid);
+        UUID auditUuid = audit.getAuditUuid();
+        entities.add(audit);
+
+        DbItem item = new DbItem();
+        item.assignPrimaryUUid();
+        item.setAuditUuid(auditUuid);
+        item.setTitle("Title");
+        item.setDescription("Description");
+        item.setXmlContent("XmlContent");
+        UUID itemUuid = item.getItemUuid();
+        entities.add(item);
+
+        DbActiveItem activeItem = new DbActiveItem();
+        activeItem.assignPrimaryUUid();
+        activeItem.setAuditUuid(auditUuid);
+        activeItem.setItemUuid(itemUuid);
+        activeItem.setDeleted(false);
+        activeItem.setItemTypeId(DefinitionItemType.ReportFolder);
+        activeItem.setOrganisationUuid(orgUuid);
+        entities.add(activeItem);
+
+        DbItemDependency itemDependency = new DbItemDependency();
+        itemDependency.assignPrimaryUUid();
+        itemDependency.setAuditUuid(auditUuid);
+        itemDependency.setDependencyTypeId(DependencyType.Uses);
+        itemDependency.setDependentItemUuid(itemUuid);
+        itemDependency.setItemUuid(itemUuid);
+        entities.add(itemDependency);
+
+        DbJob job = new DbJob();
+        job.assignPrimaryUUid();
+        job.setBaselineAuditUuid(auditUuid);
+        job.setStartDateTime(Instant.now());
+        job.setStatusId(ExecutionStatus.Executing);
+        job.setEndDateTime(null);
+        job.setPatientsInDatabase(null);
+        UUID jobUuid = job.getJobUuid();
+        entities.add(job);
+
+        DbJobContent jobContent = new DbJobContent();
+        jobContent.assignPrimaryUUid();
+        jobContent.setAuditUuid(auditUuid);
+        jobContent.setItemUuid(itemUuid);
+        jobContent.setJobUuid(jobUuid);
+        entities.add(jobContent);
+
+        DbJobReport jobReport = new DbJobReport();
+        jobReport.assignPrimaryUUid();
+        jobReport.setAuditUuid(auditUuid);
+        jobReport.setJobUuid(jobUuid);
+        jobReport.setEndUserUuid(userUuid);
+        jobReport.setOrganisationUuid(orgUuid);
+        jobReport.setParameters("Parameters");
+        jobReport.setReportUuid(itemUuid);
+        jobReport.setStatusId(ExecutionStatus.Executing);
+        UUID jobReportUuid = jobReport.getJobReportUuid();
+        entities.add(jobReport);
+
+        DbJobReportItem jobReportItem = new DbJobReportItem();
+        jobReportItem.assignPrimaryUUid();
+        jobReportItem.setAuditUuid(auditUuid);
+        jobReportItem.setParentJobReportItemUuid(null);
+        jobReportItem.setItemUuid(itemUuid);
+        jobReportItem.setJobReportUuid(jobReportUuid);
+        jobReportItem.setResultCount(null);
+        entities.add(jobReportItem);
+
+        DbRequest request = new DbRequest();
+        request.assignPrimaryUUid();
+        request.setReportUuid(itemUuid);
+        request.setEndUserUuid(userUuid);
+        request.setJobUuid(null);
+        request.setOrganisationUuid(orgUuid);
+        request.setParameters("Parameters");
+        request.setTimeStamp(Instant.now());
+        entities.add(request);
+
+        //now insert the new entities
+        for (DbAbstractTable entity: entities) {
+            entity.setSaveMode(TableSaveMode.INSERT);
+            entity.writeToDb();
+        }
+
+        //now we've tested inserting, test an update to each item
+        for (DbAbstractTable entity: entities) {
+            entity.setSaveMode(TableSaveMode.UPDATE);
+            entity.writeToDb();
+        }
+
+        //now we've tested inserting and updating, we should test a delete
+        Collections.reverse(entities); //reverse, so the FK dependencies don't cause problems
+
+        for (DbAbstractTable entity: entities) {
+            entity.setSaveMode(TableSaveMode.DELETE);
+            entity.writeToDb();
+        }
+
 
     }
 

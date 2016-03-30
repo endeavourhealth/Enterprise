@@ -130,14 +130,19 @@
 		para.appendChild(codeElement);
 
 		var valueArr = value.split("{");
-		for (i = 1; i < valueArr.length; i++) {
-			if (i>1) {
-				brElement = document.createElement("br");
-				codeElement.appendChild(brElement);
-			}
-
-			var valueTextNode = document.createTextNode("{" + valueArr[i]);
+		if (valueArr.length == 1) {
+			var valueTextNode = document.createTextNode(value);
 			codeElement.appendChild(valueTextNode);
+		} else {
+			for (i = 1; i < valueArr.length; i++) {
+				if (i>1) {
+					brElement = document.createElement("br");
+					codeElement.appendChild(brElement);
+				}
+
+				var valueTextNode = document.createTextNode("{" + valueArr[i]);
+				codeElement.appendChild(valueTextNode);
+			}
 		}
 	}
 	/*function appendResult(para, name, value)
@@ -844,11 +849,11 @@
 <hr/>
 <h3>/api/library/getLibraryItemNamesForReport</h3>
 
-UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
-<br/>
-<button type="button" onclick="getLibraryItemNamesForReport()">Submit</button>
+	UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
+	<br/>
+	<button type="button" onclick="getLibraryItemNamesForReport()">Submit</button>
 
-<script>
+	<script>
 		function getLibraryItemNamesForReport() {
 
 			var s = document.getElementById('getLibraryItemNamesForReportUuid').value;
@@ -860,11 +865,10 @@ UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
 <hr/>
 <h3>/api/dashboard/getRecentDocuments</h3>
 
-<button type="button" onclick="getRecentDocuments()">Submit</button>
+	<button type="button" onclick="getRecentDocuments()">Submit</button>
 
-<script>
+	<script>
 		function getRecentDocuments() {
-
 			get('/api/dashboard/getRecentDocuments', 'count=5');
 		}
 	</script>
@@ -872,11 +876,10 @@ UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
 <hr/>
 <h3>/api/dashboard/getReportActivity</h3>
 
-<button type="button" onclick="getReportActivity()">Submit</button>
+	<button type="button" onclick="getReportActivity()">Submit</button>
 
-<script>
+	<script>
 		function getReportActivity() {
-
 			get('/api/dashboard/getReportActivity', 'count=5');
 		}
 	</script>
@@ -884,23 +887,32 @@ UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
 <hr/>
 <h3>/api/dashboard/getEngineHistory</h3>
 
-<button type="button" onclick="getEngineHistory()">Submit</button>
+	<button type="button" onclick="getEngineHistory()">Submit</button>
 
-<script>
+	<script>
 		function getEngineHistory() {
-
 			get('/api/dashboard/getEngineHistory', 'count=5');
+		}
+	</script>
+
+<hr/>
+<h3>/api/dashboard/testDatabase</h3>
+
+	<button type="button" onclick="testDatabase()">Submit</button>
+
+	<script>
+		function testDatabase() {
+			get('/api/dashboard/testDatabase');
 		}
 	</script>
 
 <hr/>
 <h3>/api/entity/getEntityMap</h3>
 
-<button type="button" onclick="getEntityMap()">Submit</button>
+	<button type="button" onclick="getEntityMap()">Submit</button>
 
-<script>
+	<script>
 		function getEntityMap() {
-
 			get('/api/entity/getEntityMap');
 		}
 	</script>

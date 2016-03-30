@@ -33,7 +33,7 @@ public final class DbOrganisation extends DbAbstractTable {
     }
 
     public static DbOrganisation retrieveForUuid(UUID uuid) throws Exception {
-        return (DbOrganisation) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbOrganisation.class, uuid);
     }
 
     public static DbOrganisation retrieveOrganisationForNameNationalId(String name, String nationalId) throws Exception {

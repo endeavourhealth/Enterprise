@@ -31,11 +31,11 @@ public final class DbEndUser extends DbAbstractTable {
     }
 
     public static DbEndUser retrieveForEmail(String email) throws Exception {
-        return (DbEndUser) DatabaseManager.db().retrieveEndUserForEmail(email);
+        return DatabaseManager.db().retrieveEndUserForEmail(email);
     }
 
     public static DbEndUser retrieveForUuid(UUID uuid) throws Exception {
-        return (DbEndUser) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbEndUser.class, uuid);
     }
 
     public static List<DbEndUser> retrieveSuperUsers() throws Exception {

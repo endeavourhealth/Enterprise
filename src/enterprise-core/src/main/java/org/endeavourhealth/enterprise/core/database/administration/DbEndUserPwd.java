@@ -30,11 +30,11 @@ public class DbEndUserPwd extends DbAbstractTable {
     }
 
     public static DbEndUserPwd retrieveForEndUserNotExpired(UUID endUserUuid) throws Exception {
-        return (DbEndUserPwd) DatabaseManager.db().retrieveEndUserPwdForUserNotExpired(endUserUuid);
+        return DatabaseManager.db().retrieveEndUserPwdForUserNotExpired(endUserUuid);
     }
 
     public static DbEndUserPwd retrieveForUuid(UUID uuid) throws Exception {
-        return (DbEndUserPwd) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbEndUserPwd.class, uuid);
     }
 
     @Override

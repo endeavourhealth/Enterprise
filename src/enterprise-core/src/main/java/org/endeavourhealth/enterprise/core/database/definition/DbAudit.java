@@ -50,7 +50,7 @@ public final class DbAudit extends DbAbstractTable {
     }
 
     public static DbAudit retrieveForUuid(UUID auditUuid) throws Exception {
-        return (DbAudit) DatabaseManager.db().retrieveForPrimaryKeys(adapter, auditUuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbAudit.class, auditUuid);
     }
 
     public static DbAudit retrieveLatest() throws Exception {

@@ -122,7 +122,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
                 UUID parentItemUuid = dependency.getItemUuid();
                 if (!hsUuidsToDelete.contains(parentItemUuid)) {
 
-                    DbItem usingItem = DbItem.retrieveForUUid(parentItemUuid);
+                    DbItem usingItem = DbItem.retrieveLatestForUUid(parentItemUuid);
                     String err = "" + item.getTitle() + " is used by " + usingItem.getTitle();
                     response.addValidationFailure(err);
 

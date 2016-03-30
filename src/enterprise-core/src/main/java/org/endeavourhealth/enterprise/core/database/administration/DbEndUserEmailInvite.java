@@ -35,7 +35,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     }
 
     public static DbEndUserEmailInvite retrieveForUuid(UUID uuid) throws Exception {
-        return (DbEndUserEmailInvite) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbEndUserEmailInvite.class, uuid);
     }
 
     @Override

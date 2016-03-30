@@ -14,8 +14,12 @@ import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -200,8 +204,6 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Unsecured
     public Response logoff(@Context SecurityContext sc) throws Exception {
         LOG.trace("Logoff");
-
-        //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
 
         //replace the cookie on the client with an empty one
         NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);

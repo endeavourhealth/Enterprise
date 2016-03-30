@@ -36,7 +36,22 @@ public final class TableAdapter {
         sb.append(getTableName());
     }
 
-    public void writeForDb(DbAbstractTable entity, ArrayList<Object> builder, boolean insertMode) throws Exception {
+    public void writeForDb(DbAbstractTable entity, HashMap<Field, Object> values) throws Exception {
+        if (!entity.getClass().equals(cls)) {
+            throw new RuntimeException("Expected " + cls + " but got " + entity.getClass());
+        }
+
+        List<Field> fields = getColumnFields();
+        HashMap<Field, Method> hmMethods = getGetMethods();
+
+        for (Field field: fields) {
+
+            Method method = hmMethods.get(field);
+            Object obj = method.invoke(entity);
+            values.put(field, obj);
+        }
+    }
+    /*public void writeForDb(DbAbstractTable entity, ArrayList<Object> builder, boolean insertMode) throws Exception {
         if (!entity.getClass().equals(cls)) {
             throw new RuntimeException("Expected " + cls + " but got " + entity.getClass());
         }
@@ -55,7 +70,7 @@ public final class TableAdapter {
             Object obj = method.invoke(entity);
             builder.add(obj);
         }
-    }
+    }*/
 
     public void readFromDb(DbAbstractTable entity, ResultReader reader) throws Exception {
 
@@ -240,9 +255,9 @@ public final class TableAdapter {
     /**
      * creates a new instance of our database class
      */
-    public DbAbstractTable newEntity() throws Exception {
+    /*public DbAbstractTable newEntity() throws Exception {
         return (DbAbstractTable) getCls().newInstance();
-    }
+    }*/
 
     private String[] getFieldNamesWithAnnotation(Class annotationCls) {
         List<String> v = new ArrayList<>();
@@ -309,7 +324,7 @@ public final class TableAdapter {
         }
     }
 
-    private static String uppercaseFieldName(Field field) {
+    public static String uppercaseFieldName(Field field) {
         String name = field.getName();
         char[] chars = name.toCharArray();
         char first = chars[0];

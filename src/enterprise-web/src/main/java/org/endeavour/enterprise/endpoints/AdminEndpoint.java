@@ -381,8 +381,6 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        //TODO: 2016-02-22 DL - remove any active sessions from memory for user we just deleted
-
         //don't bother returning anything to the client
         return Response
                 .ok()

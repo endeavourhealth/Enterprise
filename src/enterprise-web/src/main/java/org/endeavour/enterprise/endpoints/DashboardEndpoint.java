@@ -69,7 +69,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
 
             DbJob job = DbJob.retrieveForUuid(jobReport.getJobUuid());
             UUID itemUuid = jobReport.getReportUuid();
-            DbItem item = DbItem.retrieveForUUid(itemUuid);
+            UUID auditUuid = jobReport.getAuditUuid();
+            DbItem item = DbItem.retrieveForUuidAndAudit(itemUuid, auditUuid);
             String name = item.getTitle();
 
             Date date = new Date(job.getStartDateTime().toEpochMilli());
@@ -101,6 +102,25 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         return Response
                 .ok()
                 .entity(ret)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/testDatabase")
+    public Response testDatabase(@Context SecurityContext sc) throws Exception {
+
+        if (!getEndUserFromSession(sc).isSuperUser()) {
+            throw new BadRequestException();
+        }
+
+        LOG.trace("testDatabase");
+
+        DatabaseManager.getInstance().sqlTest();
+
+        return Response
+                .ok()
                 .build();
     }
 }

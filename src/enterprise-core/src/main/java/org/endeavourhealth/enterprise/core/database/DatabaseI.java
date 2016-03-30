@@ -20,11 +20,11 @@ public interface DatabaseI {
     public SQLDialectCode getLogbackDbDialectCode();
 
     //generic read/write functions
-    public void writeEntity(DbAbstractTable entity) throws Exception;
+    public <T extends DbAbstractTable> void writeEntity(T entity) throws Exception;
 
-    public void writeEntities(List<DbAbstractTable> entities) throws Exception;
+    public <T extends DbAbstractTable> void writeEntities(List<T> entities) throws Exception;
 
-    public DbAbstractTable retrieveForPrimaryKeys(TableAdapter a, Object... keys) throws Exception;
+    public <T extends DbAbstractTable> T retrieveForPrimaryKeys(Class<T> type, Object... keys) throws Exception;
 
     //specific functions
     public DbEndUser retrieveEndUserForEmail(String email) throws Exception;
@@ -47,7 +47,7 @@ public interface DatabaseI {
 
     public DbOrganisationEndUserLink retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(UUID organisationUuid, UUID endUserUuid) throws Exception;
 
-    public DbItem retrieveItemForUuid(UUID itemUuid) throws Exception;
+    public DbItem retrieveLatestItemForUuid(UUID itemUuid) throws Exception;
 
     public List<DbItem> retrieveDependentItems(UUID itemUuid, DependencyType dependencyType) throws Exception;
 

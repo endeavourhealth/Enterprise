@@ -123,6 +123,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
             throw new BadRequestException("Missing report UUID");
         }
 
+        LOG.trace("ScheduilingReport UUID {}", reportUuid);
+
         DbRequest request = new DbRequest();
         request.setReportUuid(reportUuid);
         request.setOrganisationUuid(orgUuid);

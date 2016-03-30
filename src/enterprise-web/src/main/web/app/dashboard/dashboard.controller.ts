@@ -18,6 +18,10 @@ module app.dashboard {
 		constructor(private libraryService:app.core.ILibraryService,
 								private logger:app.blocks.ILoggerService,
 								private $state : IStateService) {
+			this.refresh();
+		}
+
+		refresh() {
 			this.getEngineHistory();
 			this.getRecentDocumentsData();
 			this.getEngineState();
@@ -26,6 +30,7 @@ module app.dashboard {
 
 		getEngineHistory() {
 			var vm:DashboardController = this;
+			vm.engineHistoryData = null;
 			this.libraryService.getEngineHistory()
 				.then(function (data:app.models.EngineHistoryItem[]) {
 					vm.engineHistoryData = data;
@@ -34,6 +39,7 @@ module app.dashboard {
 
 		getRecentDocumentsData() {
 			var vm:DashboardController = this;
+			vm.recentDocumentsData = null;
 			this.libraryService.getRecentDocumentsData()
 				.then(function (data:app.models.FolderItem[]) {
 					vm.recentDocumentsData = data;
@@ -42,6 +48,7 @@ module app.dashboard {
 
 		getEngineState() {
 			var vm:DashboardController = this;
+			vm.engineState = null;
 			this.libraryService.getEngineState()
 				.then(function (data:app.models.EngineState) {
 					vm.engineState = data;
@@ -50,6 +57,7 @@ module app.dashboard {
 
 		getReportActivityData() {
 			var vm:DashboardController = this;
+			vm.reportActivityData = null;
 			this.libraryService.getReportActivityData()
 				.then(function (data:app.models.ReportActivityItem[]) {
 					vm.reportActivityData = data;

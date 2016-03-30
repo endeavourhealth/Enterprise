@@ -22,8 +22,14 @@ module app.admin {
 		editUser(user:User) {
 			var vm = this;
 			UserEditorController.open(vm.$modal, user, false)
-				.result.then(function(result) {
-					// vm.adminService.saveUser(result);
+				.result.then(function(editedUser : User) {
+					vm.adminService.saveUser(editedUser)
+						.then(function(response : {uuid : string} ) {
+							editedUser.uuid = response.uuid;
+							var i = vm.userList.indexOf(user);
+							vm.userList[i] = editedUser;
+							vm.logger.success('User saved', editedUser, 'Edit user');
+						});
 			});
 		}
 

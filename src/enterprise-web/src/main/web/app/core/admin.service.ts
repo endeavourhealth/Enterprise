@@ -7,19 +7,33 @@
 module app.core {
 	import IPromise = angular.IPromise;
 	import LoginResponse = app.models.LoginResponse;
+	import UserList = app.models.UserList;
+	import User = app.models.User;
 	'use strict';
 
 	export interface IAdminService {
 		getMenuOptions() : app.models.MenuOption[];
-		getUserList() : IPromise<app.models.UserList>;
+
 		setPendingChanges() : void;
 		clearPendingChanges() : void;
 		getPendingChanges() : boolean;
+
+		getUserList() : IPromise<UserList>;
+		saveUser(user : User) : IPromise<{uuid : string}>;
 	}
 
 	export class AdminService extends BaseHttpService implements IAdminService {
 		pendingChanges : boolean;
-		currentUser:app.models.User;
+
+		getMenuOptions():app.models.MenuOption[] {
+			return [
+				{caption: 'Dashboard', state: 'app.dashboard', icon: 'glyphicon-dashboard'},
+				{caption: 'Library', state: 'app.library', icon: 'glyphicon-book'},
+				{caption: 'Reports', state: 'app.reportList', icon: 'glyphicon-file'},
+				{caption: 'Administration', state: 'app.admin', icon: 'glyphicon-cog'},
+				{caption: 'Audit', state: 'app.audit', icon: 'glyphicon-check'}
+			];
+		}
 
 		setPendingChanges() : void {
 			this.pendingChanges = true;
@@ -33,22 +47,12 @@ module app.core {
 			return this.pendingChanges;
 		}
 
-		getCurrentUser() : app.models.User {
-			return this.currentUser;
-		}
-
-		getMenuOptions():app.models.MenuOption[] {
-			return [
-				{caption: 'Dashboard', state: 'app.dashboard', icon: 'glyphicon-dashboard'},
-				{caption: 'Library', state: 'app.library', icon: 'glyphicon-book'},
-				{caption: 'Reports', state: 'app.reportList', icon: 'glyphicon-file'},
-				{caption: 'Administration', state: 'app.admin', icon: 'glyphicon-cog'},
-				{caption: 'Audit', state: 'app.audit', icon: 'glyphicon-check'}
-			];
-		}
-
-		getUserList() : IPromise<app.models.UserList> {
+		getUserList() : IPromise<UserList> {
 			return this.httpGet('/api/admin/getUsers');
+		}
+
+		saveUser(user : User) : IPromise<{uuid : string}> {
+			return this.httpPost('/api/admin/saveUser', user);
 		}
 	}
 

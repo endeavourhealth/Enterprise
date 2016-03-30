@@ -260,13 +260,13 @@
 				<br/>
 			</form>
 		</uib-tab>
-		<uib-tab index="1" heading="Field Test" ng-show="testEditor.viewFieldTest">
+		<uib-tab index="1" heading="Additional Field Test" ng-show="testEditor.viewFieldTest">
 			<br/>
 			<form role="form">
 				<div class='row'>
 					<div class="col-xs-6" ng-show="testEditor.addFilter">
 						<div class="form-group">
-							<label>Add a Field</label><br/>
+							<label>Add a Field to Test against the Data Source Result</label><br/>
 							<button type="button" class="btn btn-primary"
 									data-ng-click="testEditor.showFieldTest('CODE')" ng-show="testEditor.codeFilter">Code</button>
 							<button type="button" class="btn btn-primary"
@@ -287,7 +287,7 @@
 				<div class='row' ng-show="testEditor.fieldTestCodeEditor">
 					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Field Test by Clinical Codes</label>
+							<label>Test by Clinical Codes</label>
 							<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showFieldTestCodePicker()">
 								<span ng-repeat="code in testEditor.fieldTestCodeSelection">
 									<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
@@ -299,14 +299,14 @@
 				<div class='row' ng-show="testEditor.fieldTestDobEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Field Test by {{testEditor.fieldTestDobLabel}} From</label>
+							<label>Test by {{testEditor.fieldTestDobLabel}} From</label>
 							<input type="date" class="form-control" ng-model="testEditor.fieldTestDOBFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDOBFrom, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} from">
 							</input>
 						</div>
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Field Test by {{testEditor.fieldTestDobLabel}} To</label>
+							<label>Test by {{testEditor.fieldTestDobLabel}} To</label>
 							<input type="date" class="form-control" ng-model="testEditor.fieldTestDOBTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDOBTo, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} to">
 							</input>
 						</div>
@@ -315,7 +315,7 @@
 				<div class='row' ng-show="testEditor.fieldTestSexEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Field Test by {{testEditor.fieldTestSexLabel}}</label>
+							<label>Test by {{testEditor.fieldTestSexLabel}}</label>
 							<select class="form-control" ng-model="testEditor.fieldTestSex" ng-change="testEditor.fieldTestValueChange(testEditor.fieldTestSex, testEditor.fieldTestSexLabel)">
 								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
 							</select>
@@ -325,14 +325,14 @@
 				<div class='row' ng-show="testEditor.fieldTestDateEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Field Test by {{testEditor.fieldTestDateLabel}} From</label>
+							<label>Test by {{testEditor.fieldTestDateLabel}} From</label>
 							<input type="date" class="form-control" ng-model="testEditor.fieldTestDateFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDateFrom, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} from">
 							</input>
 						</div>
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Field Test by {{testEditor.fieldTestDateLabel}} To</label>
+							<label>Test by {{testEditor.fieldTestDateLabel}} To</label>
 							<input type="date" class="form-control" ng-model="testEditor.fieldTestDateTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDateTo, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} to">
 							</input>
 						</div>
@@ -341,14 +341,14 @@
 				<div class='row' ng-show="testEditor.fieldTestValueEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Field Test by {{testEditor.fieldTestValueField}} From</label>
+							<label>Test by {{testEditor.fieldTestValueField}} From</label>
 							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueFrom" ng-blur="testEditor.fieldTestValueFromChange(testEditor.fieldTestValueFrom)" placeholder="Select {{testEditor.fieldTestValueField}} from">
 							</input>
 						</div>
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Field Test by {{testEditor.fieldTestValueField}} To</label>
+							<label>Test by {{testEditor.fieldTestValueField}} To</label>
 							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueTo" ng-blur="testEditor.fieldTestValueToChange(testEditor.fieldTestValueTo)" placeholder="Select {{testEditor.fieldTestValueField}} to">
 							</input>
 						</div>

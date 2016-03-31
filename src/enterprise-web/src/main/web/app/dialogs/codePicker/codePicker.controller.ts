@@ -13,9 +13,9 @@ module app.dialogs {
 	'use strict';
 
 	export class CodePickerController extends BaseDialogController {
-		selectedMatch : CodeSetValue;
+		highlightedMatch : CodeSetValue;
 		previousSelection : CodeSetValue;
-		selectedExclusion : CodeSetValue;
+		highlightedSelection : CodeSetValue;
 
 		searchData : string;
 		searchResults : CodeSetValue[];
@@ -50,22 +50,7 @@ module app.dialogs {
 								private selection : CodeSetValue[]) {
 			super($uibModalInstance);
 			this.termCache = {};
-			this.resultData = this.cloneCodeSetValueList(selection);
-		}
-
-		cloneCodeSetValueList(source : CodeSetValue[]) {
-			if (source == null) { return null; }
-
-			var target : CodeSetValue[] = [];
-			for (var i = 0; i < source.length; i++) {
-				var clone : CodeSetValue = {
-					code : source[i].code,
-					includeChildren : source[i].includeChildren,
-					exclusion : this.cloneCodeSetValueList(source[i].exclusion)
-				};
-				target.push(clone);
-			}
-			return target;
+			this.resultData = jQuery.extend(true, [], selection);
 		}
 
 		search() {
@@ -82,8 +67,8 @@ module app.dialogs {
 		displayCode(itemToDisplay : CodeSetValue, replace : boolean) {
 			var vm = this;
 
-			if (vm.selectedMatch) {
-				vm.previousSelection = vm.selectedMatch;
+			if (vm.highlightedMatch) {
+				vm.previousSelection = vm.highlightedMatch;
 			}
 
 			if (replace) {
@@ -100,10 +85,10 @@ module app.dialogs {
 					vm.parents = result;
 				});
 
-			vm.selectedMatch = itemToDisplay;
+			vm.highlightedMatch = itemToDisplay;
 		}
 
-		select(match : CodeSetValue) {
+		addToSelection(match : CodeSetValue) {
 			var item : CodeSetValue = {
 				code : match.code,
 				includeChildren : true,
@@ -112,7 +97,7 @@ module app.dialogs {
 			this.resultData.push(item);
 		}
 
-		unselect(item : CodeSetValue) {
+		removeFromSelection(item : CodeSetValue) {
 			var i = this.resultData.indexOf(item);
 			if (i !== -1) {
 				this.resultData.splice(i, 1);
@@ -121,65 +106,93 @@ module app.dialogs {
 
 		displayExclusionTree(selection : CodeSetValue) {
 			var vm = this;
-			vm.selectedExclusion = selection;
+			vm.highlightedSelection = selection;
 
 			vm.codingService.getCodeChildren(selection.code)
 				.then(function(result:CodeSetValue[]) {
-					var exclusionTreeNode : ExclusionTreeNode = selection as ExclusionTreeNode;
-					exclusionTreeNode.children = result as ExclusionTreeNode[];
-					exclusionTreeNode.children.forEach((item) => {
-						// If "Top-level include"
-						if (exclusionTreeNode.includeChildren) {
+					var rootNode : ExclusionTreeNode = {
+						codeSetValue : selection,
+						children : []
+					} as ExclusionTreeNode;
+
+					result.forEach((child) => {
+						// If "includeChildren" is ticked
+						if (selection.includeChildren) {
 							// and no "excludes" then tick
-							if ((!exclusionTreeNode.exclusion) || exclusionTreeNode.exclusion.length === 0) {
-								item.includeChildren = true;
+							if ((!selection.exclusion) || selection.exclusion.length === 0) {
+								child.includeChildren = true;
 							} else {
 								// else if this is not excluded then tick
-								item.includeChildren = exclusionTreeNode.exclusion.every((exclusion) => {
-									return exclusion.code !== item.code;
+								child.includeChildren = selection.exclusion.every((exclusion) => {
+									return exclusion.code !== child.code;
 								});
 							}
 						}
+
+						var childNode : ExclusionTreeNode = {
+							codeSetValue : child
+						} as ExclusionTreeNode;
+
+						rootNode.children.push(childNode);
 					});
-					vm.exclusionTreeData = [ exclusionTreeNode ];
+
+					vm.exclusionTreeData = [ rootNode ];
 				});
 		}
 
-		includeNode(node : ExclusionTreeNode) {
-			if (node.code === this.selectedExclusion.code) {
-				this.selectedExclusion.exclusion = [];
-				this.selectedExclusion.includeChildren = true;
-				node.children.forEach((item) => { item.includeChildren = true; });
+		tickNode(node : ExclusionTreeNode) {
+			if (node.codeSetValue.code === this.highlightedSelection.code) {
+				// Ticking root so empty exclusions and tick all children
+				this.highlightedSelection.exclusion = [];
+				this.highlightedSelection.includeChildren = true;
+				node.children.forEach((item) => { item.codeSetValue.includeChildren = true; });
 			} else {
-				if (this.selectedExclusion.includeChildren) {
-					var index = this.findWithAttr(this.selectedExclusion.exclusion, 'code', node.code);
+				if (this.highlightedSelection.includeChildren) {
+					// Ticking an excluded child so find the exclusion...
+					var index = this.findWithAttr(this.highlightedSelection.exclusion, 'code', node.codeSetValue.code);
 					if (index > -1) {
-						this.selectedExclusion.exclusion.splice(index, 1);
-						node.includeChildren = true;
-						if (this.selectedExclusion.exclusion.length === 0) {
-							this.selectedExclusion.includeChildren = true;
+						// ...remove it...
+						this.highlightedSelection.exclusion.splice(index, 1);
+						// ...tick it...
+						node.codeSetValue.includeChildren = true;
+						// ...and if no exclusions are left then set as "include all" at root
+						if (this.highlightedSelection.exclusion.length === 0) {
+							this.highlightedSelection.includeChildren = true;
 						}
 					}
 				} else {
-					this.selectedExclusion.includeChildren = true;
-					this.selectedExclusion.exclusion = this.exclusionTreeData[0].children.slice(0);
-					this.includeNode(node);
+					// Ticking a child on "DONT include children" so tick root...
+					this.highlightedSelection.includeChildren = true;
+					// ...tick the node...
+					node.codeSetValue.includeChildren = true;
+					// ...and add the rest as exclusions
+					this.highlightedSelection.exclusion = [];
+					this.exclusionTreeData[0].children.forEach((childNode) => {
+						if (childNode !== node) {
+							this.highlightedSelection.exclusion.push(childNode.codeSetValue);
+						}
+					});
 				}
 			}
 		}
 
-		excludeNode(node : ExclusionTreeNode) {
-			if (this.selectedExclusion.exclusion == null) {
-				this.selectedExclusion.exclusion = [];
-			}
-
-			if (node.code === this.selectedExclusion.code) {
-				this.selectedExclusion.includeChildren = false;
-				node.children.forEach((item) => { item.includeChildren = false; });
+		untickNode(node : ExclusionTreeNode) {
+			if (node.codeSetValue.code === this.highlightedSelection.code) {
+				// Unticking root so untick all children...
+				node.children.forEach((item) => { item.codeSetValue.includeChildren = false; });
+				// ... and clear exclusions list
+				this.highlightedSelection.exclusion = [];
 			} else {
-				this.selectedExclusion.exclusion.push(node);
-				node.includeChildren = false;
+				// Unticking a child so...
+				if (this.highlightedSelection.exclusion == null) {
+					// Initialize exclusion array if required
+					this.highlightedSelection.exclusion = [];
+				}
+				// ...add exclusion
+				this.highlightedSelection.exclusion.push(node.codeSetValue);
 			}
+			// Untick the node
+			node.codeSetValue.includeChildren = false;
 		}
 
 		findWithAttr(array : any[], attr : string, value : string) : number {
@@ -203,12 +216,6 @@ module app.dialogs {
 				});
 
 			return vm.termCache[code];
-		}
-
-		ok() {
-			var cleanedResults = this.cloneCodeSetValueList(this.resultData);
-			this.resultData = cleanedResults;
-			super.ok();
 		}
 	}
 

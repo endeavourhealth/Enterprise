@@ -1,7 +1,13 @@
 package org.endeavourhealth.enterprise.processornode;
 
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobContent;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
 import org.endeavourhealth.enterprise.core.entitymap.EntityMapHelper;
 import org.endeavourhealth.enterprise.engine.EngineApi;
+import org.endeavourhealth.enterprise.engine.LibraryItem;
 import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
 import org.endeavourhealth.enterprise.enginecore.communication.*;
 import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
@@ -14,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete, AutoCloseable {
@@ -57,8 +66,31 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     public void start() throws Exception {
         EntityMapWrapper.EntityMap entityMap = getEntityMap();
 
-        EngineApi engineApi = new EngineApi(entityMap);
+        EngineApi engineApi = createEngineApi(entityMap);
 
+        createProcessorThreadPoolExecutor(entityMap, engineApi);
+
+        requestNextWorkerQueueMessage();
+    }
+
+    private EngineApi createEngineApi(EntityMapWrapper.EntityMap entityMap) throws Exception {
+
+        List<DbJobContent> contentList = DbJobContent.retrieveForJob(startMessage.getJobUuid());
+        HashMap<UUID, LibraryItem> itemMap = new HashMap<>();
+
+        for (DbJobContent dbJobContent : contentList) {
+            DbItem item = DbItem.retrieveForUuidAndAudit(dbJobContent.getItemUuid(), dbJobContent.getAuditUuid());
+            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(item.getItemUuid());
+            LibraryItem libraryItem = new LibraryItem(item.getTitle(), item.getItemUuid(), activeItem.getItemTypeId(), item.getXmlContent());
+            itemMap.put(item.getItemUuid(), libraryItem);
+        }
+
+        List<DbJobReport> jobReports = DbJobReport.retrieveForJob(startMessage.getJobUuid());
+
+        return new EngineApi(entityMap, itemMap, jobReports);
+    }
+
+    private void createProcessorThreadPoolExecutor(EntityMapWrapper.EntityMap entityMap, EngineApi engineApi) {
         EngineProcessorPool engineProcessorPool = new EngineProcessorPool(engineApi, configuration.getExecutionThreads());
         DataContainerPool dataContainerPool = new DataContainerPool(configuration.getDataItemBufferSize(), entityMap);
         CareRecordDal careRecordDal = new CareRecordDal(startMessage.getCareRecordDatabaseConnectionDetails(), dataContainerPool, entityMap);
@@ -71,8 +103,6 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
                 dataSourceRetriever,
                 this,
                 executionContext);
-
-        requestNextWorkerQueueMessage();
     }
 
     private EntityMapWrapper.EntityMap getEntityMap() throws Exception {

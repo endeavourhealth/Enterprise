@@ -4,6 +4,7 @@ var flowchart : any;
 
 module app.query {
 	import TestEditorController = app.dialogs.TestEditorController;
+	import ExpressionEditorController = app.dialogs.ExpressionEditorController;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import Test = app.models.Test;
@@ -11,6 +12,7 @@ module app.query {
 	import LibraryItem = app.models.LibraryItem;
 	import Query = app.models.Query;
 	import StartingRules = app.models.StartingRules;
+	import ExpressionType = app.models.ExpressionType;
 
 	'use strict';
 
@@ -91,13 +93,24 @@ module app.query {
 
 						var selectedRule = $scope.chartViewModel.getSelectedRule();
 
-						var test : Test = selectedRule.data.test;
+						if (selectedRule.data.expression) {
+							var expression : ExpressionType = selectedRule.data.expression;
 
-						TestEditorController.open($modal, test, false)
-							.result.then(function(resultData : Test){
+							ExpressionEditorController.open($modal, expression)
+								.result.then(function(resultData : ExpressionType){
 
-							selectedRule.data.test = resultData;
-						});
+								selectedRule.data.expression = resultData;
+							});
+						}
+						else {
+							var test : Test = selectedRule.data.test;
+
+							TestEditorController.open($modal, test, false)
+								.result.then(function(resultData : Test){
+
+								selectedRule.data.test = resultData;
+							});
+						}
 					}
 				});
 
@@ -135,7 +148,7 @@ module app.query {
 				//
 				// Add a new rule to the chart.
 				//
-				$scope.addNewRule = function () {
+				$scope.addNewRule = function (expression : boolean) {
 					//
 					// Template for a new rule.
 					//
@@ -200,7 +213,31 @@ module app.query {
 							}
 						};
 
-						$scope.chartViewModel.addRule(newRuleDataModel);
+						var newExpressionRuleDataModel = {
+							description: "Expression Description",
+							id: $scope.nextRuleID++,
+							layout: {
+								x: 100,
+								y: 10
+							},
+							onPass: {
+								action: "",
+								ruleId: <any>[]
+							},
+							onFail: {
+								action: "",
+								ruleId: <any>[]
+							},
+							expression: {
+								expressionText: "",
+								variable: <any>[]
+							}
+						};
+
+						if (expression)
+							$scope.chartViewModel.addRule(newExpressionRuleDataModel);
+						else
+							$scope.chartViewModel.addRule(newRuleDataModel);
 					}
 				};
 

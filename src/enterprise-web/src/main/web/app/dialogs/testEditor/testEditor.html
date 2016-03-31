@@ -37,128 +37,6 @@
 						</div>
 					</div>
 				</div>
-				<div ng-show="testEditor.calculationEditor">
-					<a class="queryLink"><img src="/content/img/add.png" style="width: 20px; height: 20px; margin-right: 10px"/>Add Expression Variable</a>
-				</div>
-				<div class="editorSection" ng-show="testEditor.calculationEditor">A.</div>
-				<div class='row' ng-show="testEditor.calculationEditor">
-					<div class="col-xs-12">
-						<div class="form-group">
-							<label>Data Source</label>
-							<select class="form-control" ng-model="testEditor.expressionDataSource1">
-								<option ng-repeat="rule in testEditor.rule" value="{{rule}}">{{rule}}</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class='row' ng-show="testEditor.calculationEditor">
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Sort Field</label>
-							<select class="form-control" ng-model="testEditor.expressionSortField1">
-								<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-							</select>
-						</div>
-					</div>
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Sort Order</label>
-							<select class="form-control" ng-model="testEditor.expressionSortOrder1">
-								<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
-							</select>
-						</div>
-					</div>
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Restriction Count</label>
-							<input type="text" class="form-control" ng-model="testEditor.expressionRestrictionCount1" placeholder="Enter count">
-							</input>
-						</div>
-					</div>
-				</div>
-				<div class='row' ng-show="testEditor.calculationEditor">
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Test Field</label>
-							<select class="form-control" ng-model="testEditor.expressionTestField1">
-								<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-							</select>
-						</div>
-					</div>
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Function</label>
-							<select class="form-control" ng-model="testEditor.expressionFunction1">
-								<option ng-repeat="function in testEditor.functions" value="{{function}}">{{function}}</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="editorSection" ng-show="testEditor.calculationEditor">B.</div>
-				<div class='row' ng-show="testEditor.calculationEditor">
-					<div class="col-xs-12">
-						<div class="form-group">
-							<label>Data Source</label>
-							<select class="form-control" ng-model="testEditor.expressionDataSource2">
-								<option ng-repeat="rule in testEditor.rule" value="{{rule}}">{{rule}}</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class='row' ng-show="testEditor.calculationEditor">
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Sort Field</label>
-							<select class="form-control" ng-model="testEditor.expressionSortField2">
-								<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-							</select>
-						</div>
-					</div>
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Sort Order</label>
-							<select class="form-control" ng-model="testEditor.expressionSortOrder2">
-								<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
-							</select>
-						</div>
-					</div>
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Restriction Count</label>
-							<input type="text" class="form-control" ng-model="testEditor.expressionRestrictionCount2" placeholder="Enter count">
-							</input>
-						</div>
-					</div>
-				</div>
-				<div class='row' ng-show="testEditor.calculationEditor">
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Test Field</label>
-							<select class="form-control" ng-model="testEditor.expressionTestField2">
-								<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-							</select>
-						</div>
-					</div>
-					<div class="col-xs-4">
-						<div class="form-group">
-							<label>Function</label>
-							<select class="form-control" ng-model="testEditor.expressionFunction2">
-								<option ng-repeat="function in testEditor.functions" value="{{function}}">{{function}}</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="editorSection" ng-show="testEditor.calculationEditor">Expression Calculation</div>
-				<div class='row' ng-show="testEditor.calculationEditor">
-					<div class="col-xs-12">
-						<div class="form-group">
-							<label style="font-weight: normal">(example: A < B + 28 days)</label>
-							<input type="text" class="form-control" ng-model="testEditor.expression" placeholder="Enter expression">
-							</input>
-						</div>
-					</div>
-				</div>
-
 				<div class='row' ng-show="testEditor.codeEditor">
 					<div class="col-xs-12">
 						<div class="form-group">
@@ -235,7 +113,7 @@
 				<div class='row' ng-show="testEditor.showRestriction">
 					<div class="col-xs-3">
 						<div class="form-group">
-							<label>Field Name</label>
+							<label>Sort Field</label>
 							<select class="form-control" ng-model="testEditor.restrictionFieldName" ng-change="testEditor.restrictionChange(testEditor.restrictionFieldName)">
 								<option ng-repeat="restrictionfield in testEditor.fields" value="{{restrictionfield}}">{{restrictionfield}}</option>
 							</select>
@@ -243,7 +121,7 @@
 					</div>
 					<div class="col-xs-3">
 						<div class="form-group">
-							<label>Order Direction</label>
+							<label>Sort Order</label>
 							<select class="form-control" ng-model="testEditor.restrictionOrderDirection" ng-change="testEditor.restrictionChange(testEditor.restrictionOrderDirection)">
 								<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
 							</select>
@@ -251,7 +129,7 @@
 					</div>
 					<div class="col-xs-3">
 						<div class="form-group">
-							<label>Count</label>
+							<label>Restriction Count</label>
 							<input type="text" class="form-control" ng-model="testEditor.restrictionCount" placeholder="Select count" ng-blur="testEditor.restrictionChange(testEditor.restrictionCount)">
 							</input>
 						</div>

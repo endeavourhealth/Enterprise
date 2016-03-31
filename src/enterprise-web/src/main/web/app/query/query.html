@@ -3,9 +3,15 @@
         <div class="module-heading">Query editor
             <div class="pull-right">
                 <button class="btn btn-sm btn-primary"
-                        ng-click="addNewRule()"
+                        ng-click="addNewRule(false)"
                         title="Add a new rule to this query">
                     Add Rule
+                </button>
+
+                <button class="btn btn-sm btn-info"
+                        ng-click="addNewRule(true)"
+                        title="Add a new expression rule to this query">
+                    Add Expression
                 </button>
 
                 <button class="btn btn-sm btn-warning"

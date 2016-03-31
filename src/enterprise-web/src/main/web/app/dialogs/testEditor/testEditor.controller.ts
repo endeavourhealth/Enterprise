@@ -29,7 +29,6 @@ module app.dialogs {
 		title : string;
 		dataSourceOnly : boolean = false;
 		viewFieldTest : boolean = false;
-		calculationEditor : boolean = false;
 		codeEditor : boolean = false;
 		dateEditor : boolean = false;
 		dobEditor : boolean = false;
@@ -83,12 +82,9 @@ module app.dialogs {
 		fieldTestCodeSelection : CodeSetValue[] = [];
 		termCache : any;
 
-		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE','CALCULATION'];
+		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE'];
 		sortorders = ['','ASCENDING','DESCENDING'];
-		periods = ['','DAYS','WEEKS','MONTHS','YEARS'];
-		rule = [''];
 		fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
-		functions = ['','AVERAGE','COUNT','MIN','MAX'];
 		genders = ['','MALE','FEMALE','UNKNOWN'];
 
 		public static open($modal : IModalService, test : Test, dataSourceOnly : boolean) : IModalServiceInstance {
@@ -349,10 +345,29 @@ module app.dialogs {
 
 			this.resultData.dataSource.entity = value;
 
+			vm.codeEditor = false;
+			vm.dateEditor = false;
+			vm.dobEditor = false;
+			vm.valueEditor = false;
+			vm.sexEditor = false;
+			vm.fieldTestCodeEditor = false;
+			vm.fieldTestDateEditor = false;
+			vm.fieldTestDobEditor = false;
+			vm.fieldTestValueEditor = false;
+			vm.fieldTestSexEditor = false;
+			vm.addRestriction = true;
+			vm.showRestriction = false;
+			vm.addFilter = true;
+			vm.codeFilter = false;
+			vm.dateFilter = false;
+			vm.valueFilter = false;
+			vm.dobFilter = false;
+			vm.sexFilter = false;
+			vm.ageFilter = false;
+			vm.regFilter = false;
+			vm.viewFieldTest = true;
+
 			switch(value) {
-				case "CALCULATION":
-					this.showCalculationEditorFields();
-					break;
 				case "OBSERVATION":
 					vm.codeFilter = true;
 					vm.dateFilter = true;
@@ -370,9 +385,6 @@ module app.dialogs {
 					break;
 				default:
 			}
-
-			vm.addRestriction = true;
-			vm.addFilter = true;
 		};
 
 		showFilter(value : any) {
@@ -907,20 +919,6 @@ module app.dialogs {
 			};
 
 			vm.resultData.dataSource.restriction = restriction;
-		}
-
-		showCalculationEditorFields() {
-			var vm = this;
-
-			vm.calculationEditor = true;
-			vm.codeEditor = false;
-			vm.dateEditor = false;
-			vm.dobEditor = false;
-			vm.valueEditor = false;
-			vm.sexEditor = false;
-			vm.addRestriction = false;
-			vm.showRestriction = false;
-			vm.addFilter = false;
 		}
 
 		toggleRestriction() {

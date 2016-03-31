@@ -5,7 +5,10 @@ import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
+import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
 import org.endeavourhealth.enterprise.enginecore.carerecord.SourceStatistics;
 import org.endeavourhealth.enterprise.enginecore.communication.*;
@@ -15,6 +18,9 @@ import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.Instant;
 import java.util.*;
 
@@ -86,12 +92,17 @@ class ExecutionJob {
         job.setStatusId(executionStatus);
         job.setStartDateTime(currentDate);
         job.setEndDateTime(currentDate);
-        job.setBaselineAuditVersion(0);
+        job.setBaselineAuditUuid(getLatestAuditUuid());
 
         if (primaryTableStats != null)
             job.setPatientsInDatabase(primaryTableStats.getRecordCount());
 
         job.writeToDb();
+    }
+
+    private UUID getLatestAuditUuid() throws Exception {
+        DbAudit latestAudit = DbAudit.retrieveLatest();
+        return latestAudit.getAuditUuid();
     }
 
     private List<DbRequest> getItemRequests() throws Exception {
@@ -108,10 +119,11 @@ class ExecutionJob {
         JobContentRetriever jobContentRetriever = new JobContentRetriever(requests);
 
         prepareJobContentTable(jobContentRetriever.getLibraryItemToAuditMap(), toSave);
+        XMLGregorianCalendar defaultBaselineDate = getDefaultBaselineDate();
 
         for (DbRequest request: requests) {
 
-            DbJobReport jobReport = createJobReport(request, jobContentRetriever.getAuditUuid(request.getReportUuid()));
+            DbJobReport jobReport = createJobReport(request, jobContentRetriever.getAuditUuid(request.getReportUuid()), defaultBaselineDate);
             toSave.add(jobReport);
 
             prepareJobReportItemTable(jobReport.getJobReportUuid(), request.getReportUuid(), jobContentRetriever, toSave);
@@ -147,7 +159,14 @@ class ExecutionJob {
         }
     }
 
-    private DbJobReport createJobReport(DbRequest request, UUID auditUuid) throws Exception {
+    private DbJobReport createJobReport(DbRequest request, UUID auditUuid, XMLGregorianCalendar defaultBaselineDate) throws Exception {
+
+        RequestParameters requestParameters = RequestParametersSerializer.readFromXml(request.getParameters());
+
+        if (requestParameters.getBaselineDate() == null)
+            requestParameters.setBaselineDate(defaultBaselineDate);
+
+        String requestParameterString = RequestParametersSerializer.writeToXml(requestParameters);
 
         DbJobReport jobReport = new DbJobReport();
         jobReport.assignPrimaryUUid();
@@ -158,20 +177,20 @@ class ExecutionJob {
         jobReport.setAuditUuid(auditUuid);
         jobReport.setOrganisationUuid(request.getOrganisationUuid());
         jobReport.setEndUserUuid(request.getEndUserUuid());
-        jobReport.setParameters(request.getParameters());
+        jobReport.setParameters(requestParameterString);
         jobReport.setStatusId(ExecutionStatus.Executing);
 
         return jobReport;
     }
 
-    private DbJob createJobAsStarted() {
+    private DbJob createJobAsStarted() throws Exception {
         DbJob job = new DbJob();
         job.setSaveMode(TableSaveMode.INSERT);
 
         job.setJobUuid(executionUuid);
         job.setStatusId(ExecutionStatus.Executing);
         job.setStartDateTime(Instant.now());
-        job.setBaselineAuditVersion(0);
+        job.setBaselineAuditUuid(getLatestAuditUuid());
         job.setPatientsInDatabase(primaryTableStats.getRecordCount());
 
         return job;
@@ -257,5 +276,16 @@ class ExecutionJob {
         } catch (Exception e) {
             logger.error("Job Finished exception", e);
         }
+    }
+
+    public XMLGregorianCalendar getDefaultBaselineDate() throws DatatypeConfigurationException {
+        Instant now = Instant.now();
+
+        GregorianCalendar cal1 = new GregorianCalendar();
+        cal1.setTimeInMillis(now.toEpochMilli());
+
+        XMLGregorianCalendar cal2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal1);
+
+        return cal2;
     }
 }

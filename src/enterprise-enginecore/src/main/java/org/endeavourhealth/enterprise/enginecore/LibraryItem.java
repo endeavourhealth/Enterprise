@@ -1,4 +1,4 @@
-package org.endeavourhealth.enterprise.engine;
+package org.endeavourhealth.enterprise.enginecore;
 
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 

@@ -1,11 +1,13 @@
 package org.endeavourhealth.enterprise.controller;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
 import org.endeavourhealth.enterprise.core.querydocument.models.ReportItem;
+import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException;
 
 import java.util.*;
 
@@ -23,6 +25,9 @@ class RequestProcessor {
 
         String itemXml = dbItem.getXmlContent();
         Report report = QueryDocumentSerializer.readReportFromXml(itemXml);
+
+        if (CollectionUtils.isEmpty(report.getReportItem()))
+            throw new InvalidQueryDocumentException(reportUuid, "No ReportItems");
 
         processReportItems(report.getReportItem(), null);
     }

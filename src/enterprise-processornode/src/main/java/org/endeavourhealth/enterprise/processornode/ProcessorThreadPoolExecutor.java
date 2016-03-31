@@ -21,6 +21,7 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
     private final Semaphore getMoreDataLock = new Semaphore(1);
     private final Semaphore hasRaisedBatchCompleteLock = new Semaphore(1);
     private boolean hasRaisedBatchComplete;
+    private boolean addingItems;
 
     //This is a thread safe hashset.  I love Java :)
     private final Set<Runnable> jobsToRun = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -42,29 +43,29 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
     protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
 
-        jobsToRun.remove(r);
+        try {
+            jobsToRun.remove(r);
 
-        //ActiveCount == 1 is the current thread
-        if (dataSourceRetriever.isBatchComplete()) {
+            if (super.getQueue().size() < minimumBufferSize) {
+                tryGetMoreItemsToProcess();
 
-            if (jobsToRun.isEmpty()) {
+                if (dataSourceRetriever.isBatchComplete() && !addingItems) {
+                    if (jobsToRun.isEmpty()) {
 
-                if (hasRaisedBatchCompleteLock.tryAcquire()) {
-                    if (!hasRaisedBatchComplete) {
-                        hasRaisedBatchComplete = true;
-                        batchCompleteCallback.batchComplete();
+                        if (hasRaisedBatchCompleteLock.tryAcquire()) {
+                            if (!hasRaisedBatchComplete) {
+                                hasRaisedBatchComplete = true;
+                                batchCompleteCallback.batchComplete();
+                            }
+
+                            hasRaisedBatchCompleteLock.release();
+                        }
                     }
-
-                    hasRaisedBatchCompleteLock.release();
                 }
             }
 
-        } else if (super.getQueue().size() < minimumBufferSize) {
-            try {
-                tryGetMoreItemsToProcess();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -83,6 +84,8 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
         if (!acquired)
             return;
 
+        addingItems = true;
+
         Collection<DataContainer> dataContainers = dataSourceRetriever.getRecords();
 
         if (dataContainers != null) {
@@ -93,6 +96,8 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
                 this.execute(runnableItem);  //only adds it to the queue
             }
         }
+
+        addingItems = false;
 
         getMoreDataLock.release();
     }

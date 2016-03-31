@@ -18,9 +18,9 @@ where o.NationalId = '12345';
 
 
 insert into [Definition].[Audit]
-	(AuditUuid, EndUserUuid, [TimeStamp])
+	(AuditUuid, EndUserUuid, [TimeStamp], OrganisationUuid)
 values
-	('7E0108C9-2B28-48B8-B572-6FB821DD2017', @EndUserUuid, getdate());
+	('7E0108C9-2B28-48B8-B572-6FB821DD2017', @EndUserUuid, getdate(), @OrganisationUuid);
 
 declare @Query varchar(max) = '<?xml version="1.0" encoding="UTF-8"?>
 <libraryItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="H:\Code\Enterprise\src\enterprise-core\src\main\resources\QueryDocument.xsd">
@@ -91,9 +91,20 @@ values
 	('A42495AD-E047-4E9D-A7B1-E0CDD4BB907D', '7E0108C9-2B28-48B8-B572-6FB821DD2017', '7CFFD13B-9BA5-40F0-9A3D-8E6F0F33F9FF', 2)
 
 
+declare @Parameters varchar(max) = '
+<requestParameters xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<reportUuid>A42495AD-E047-4E9D-A7B1-E0CDD4BB907D</reportUuid>
+	<baselineDate>2016-03-01</baselineDate>
+	<patientType>regular</patientType>
+	<patientStatus>active</patientStatus>
+</requestParameters>';
+
+
 insert into Execution.Request
 	(RequestUuid, ReportUuid, OrganisationUuid, EndUserUuid, [TimeStamp], Parameters, JobUuid)
 values
-	('51EFDA87-A82A-4E5C-B90C-D05416A19010', 'A42495AD-E047-4E9D-A7B1-E0CDD4BB907D', @OrganisationUuid, @EndUserUuid, getdate(), '', null)
+	('51EFDA87-A82A-4E5C-B90C-D05416A19010', 'A42495AD-E047-4E9D-A7B1-E0CDD4BB907D', @OrganisationUuid, @EndUserUuid, getdate(), @Parameters, null)
+
+
 
 rollback transaction

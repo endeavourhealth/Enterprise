@@ -4,10 +4,10 @@ import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobContent;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
 import org.endeavourhealth.enterprise.core.entitymap.EntityMapHelper;
 import org.endeavourhealth.enterprise.engine.EngineApi;
-import org.endeavourhealth.enterprise.engine.LibraryItem;
+import org.endeavourhealth.enterprise.enginecore.LibraryItem;
+import org.endeavourhealth.enterprise.enginecore.Library;
 import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
 import org.endeavourhealth.enterprise.enginecore.communication.*;
 import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
@@ -36,7 +36,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     private ProcessorThreadPoolExecutor executor;
     private WorkerQueueBatchMessage currentWorkerQueueBatch;
-
+    private EngineApi engineApi;
 
     public ExecutionController(Configuration configuration, ProcessorNodesStartMessage.StartMessagePayload startMessage) throws Exception {
 
@@ -66,31 +66,34 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     public void start() throws Exception {
         EntityMapWrapper.EntityMap entityMap = getEntityMap();
 
-        EngineApi engineApi = createEngineApi(entityMap);
+        this.engineApi = createEngineApi(entityMap);
 
-        createProcessorThreadPoolExecutor(entityMap, engineApi);
+        createProcessorThreadPoolExecutor(entityMap);
 
-        requestNextWorkerQueueMessage();
+        if (!requestNextWorkerQueueMessage())
+            workComplete();
     }
 
     private EngineApi createEngineApi(EntityMapWrapper.EntityMap entityMap) throws Exception {
 
         List<DbJobContent> contentList = DbJobContent.retrieveForJob(startMessage.getJobUuid());
-        HashMap<UUID, LibraryItem> itemMap = new HashMap<>();
+        Library library = new Library();
 
         for (DbJobContent dbJobContent : contentList) {
             DbItem item = DbItem.retrieveForUuidAndAudit(dbJobContent.getItemUuid(), dbJobContent.getAuditUuid());
             DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(item.getItemUuid());
             LibraryItem libraryItem = new LibraryItem(item.getTitle(), item.getItemUuid(), activeItem.getItemTypeId(), item.getXmlContent());
-            itemMap.put(item.getItemUuid(), libraryItem);
+            library.put(libraryItem);
         }
 
         List<DbJobReport> jobReports = DbJobReport.retrieveForJob(startMessage.getJobUuid());
 
-        return new EngineApi(entityMap, itemMap, jobReports);
+        EngineApi engineApi = new EngineApi(entityMap, library, jobReports);
+        engineApi.initialise();
+        return engineApi;
     }
 
-    private void createProcessorThreadPoolExecutor(EntityMapWrapper.EntityMap entityMap, EngineApi engineApi) {
+    private void createProcessorThreadPoolExecutor(EntityMapWrapper.EntityMap entityMap) {
         EngineProcessorPool engineProcessorPool = new EngineProcessorPool(engineApi, configuration.getExecutionThreads());
         DataContainerPool dataContainerPool = new DataContainerPool(configuration.getDataItemBufferSize(), entityMap);
         CareRecordDal careRecordDal = new CareRecordDal(startMessage.getCareRecordDatabaseConnectionDetails(), dataContainerPool, entityMap);
@@ -110,14 +113,16 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         return new EntityMapWrapper.EntityMap(realEntityMap);
     }
 
-    private void requestNextWorkerQueueMessage() throws Exception {
+    private boolean requestNextWorkerQueueMessage() throws Exception {
 
         currentWorkerQueueBatch = workerQueue.getNextMessage();
 
         if (currentWorkerQueueBatch != null) {
             executor.setNextBatch(currentWorkerQueueBatch.getPayload().getMinimumId(), currentWorkerQueueBatch.getPayload().getMaximumId());
+            return true;
         } else {
-            noWorkerQueueItemsLeft();
+            logger.trace("No worker queue items remaining");
+            return false;
         }
     }
 
@@ -138,16 +143,19 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
             logger.debug("Worker queue item processed.  MinimumId: " + batchMessagePayload.getMinimumId() + "  MaximumId: " + batchMessagePayload.getMaximumId());
 
-            requestNextWorkerQueueMessage();
+            if (!requestNextWorkerQueueMessage())
+                workComplete();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void noWorkerQueueItemsLeft() {
+    public void workComplete() {
 
-        logger.debug("No worker queue items remaining");
+        Map<UUID, Integer> results = engineApi.getResults();
+
+        logger.debug("Work complete");
 
     }
 

@@ -64,7 +64,12 @@ module app.dialogs {
 		}
 
 		ok() {
-			this.resultData.baselineDate = this.baselineDate.valueOf();
+			if (this.baselineDate) {
+				this.resultData.baselineDate = this.baselineDate.valueOf();
+			} else {
+				this.resultData.baselineDate = null;
+			}
+
 			super.ok();
 		}
 	}

@@ -11,15 +11,15 @@ module app.layout {
 		currentUser:app.models.User;
 		selectedRole:app.models.UserInRole;
 
-		static $inject = ['AdminService'];
+		static $inject = ['SecurityService'];
 
-		constructor(private adminService:app.core.IAdminService) {
+		constructor(private securityService:ISecurityService) {
 			this.getCurrentUser();
 		}
 
 		getCurrentUser() {
 			var vm:TopnavController = this;
-			vm.currentUser = vm.adminService.getCurrentUser();
+			vm.currentUser = vm.securityService.getCurrentUser();
 			//vm.updateRole(vm.currentUser.currentUserInRoleUuid);
 		}
 
@@ -29,7 +29,7 @@ module app.layout {
 				return e.userInRoleUuid === userInRoleUuid;
 			});
 			if (matches.length === 1) {
-				vm.adminService.switchUserInRole(userInRoleUuid)
+				vm.securityService.switchUserInRole(userInRoleUuid)
 					.then(function(data) {
 						vm.currentUser.currentUserInRoleUuid = userInRoleUuid;
 						vm.selectedRole = matches[0];

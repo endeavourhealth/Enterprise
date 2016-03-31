@@ -12,13 +12,13 @@ module app.layout {
 		warning : IModalServiceInstance;
 		timedout : IModalServiceInstance;
 
-		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state', 'AdminService'];
+		static $inject = ['$scope', '$uibModal', '$uibModalStack', '$state', 'SecurityService'];
 
 		constructor($scope : IRootScopeService,
 								$modal : IModalService,
 								$modalStack : IModalStackService,
 								$state : IStateService,
-								adminService : IAdminService) {
+								securityService : ISecurityService) {
 			var vm = this;
 
 			function closeModals() {
@@ -49,7 +49,7 @@ module app.layout {
 			$scope.$on('IdleTimeout', function () {
 				closeModals();
 				$modalStack.dismissAll();
-				var userName = adminService.getCurrentUser().username;
+				var userName = securityService.getCurrentUser().username;
 				var options = {
 					templateUrl:'app/login/loginModal.html',
 					controller:'LoginController',

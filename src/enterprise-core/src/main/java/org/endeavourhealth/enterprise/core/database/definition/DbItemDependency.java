@@ -58,6 +58,10 @@ public final class DbItemDependency extends DbAbstractTable {
         return DatabaseManager.db().retrieveItemDependenciesForItem(itemUuid, auditUuid);
     }
 
+    public static List<DbItemDependency> retrieveForActiveItemType(DbActiveItem activeItem, DependencyType dependencyType) throws Exception {
+        return retrieveForItemType(activeItem.getItemUuid(), activeItem.getAuditUuid(), dependencyType);
+    }
+
     public static List<DbItemDependency> retrieveForItemType(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception {
         return DatabaseManager.db().retrieveItemDependenciesForItemType(itemUuid, auditUuid, dependencyType);
     }

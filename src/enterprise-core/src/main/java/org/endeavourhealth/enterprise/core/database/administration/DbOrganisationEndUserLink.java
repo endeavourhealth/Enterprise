@@ -44,7 +44,7 @@ public final class DbOrganisationEndUserLink extends DbAbstractTable {
     }
 
     public static DbOrganisationEndUserLink retrieveForUuid(UUID uuid) throws Exception {
-        return (DbOrganisationEndUserLink) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbOrganisationEndUserLink.class, uuid);
     }
 
     @Override

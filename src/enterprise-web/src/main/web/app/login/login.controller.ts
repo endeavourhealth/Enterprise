@@ -4,7 +4,6 @@
 module app.login {
 	import IIdleService = angular.idle.IIdleService;
 	import IAdminService = app.core.IAdminService;
-	import AdminService = app.core.AdminService;
 	import IStateService = angular.ui.IStateService;
 	'use strict';
 
@@ -12,21 +11,21 @@ module app.login {
 		username:string;
 		password:string;
 
-		static $inject = ['LoggerService', 'Idle', '$state', 'AdminService', 'userName'];
+		static $inject = ['LoggerService', 'Idle', '$state', 'SecurityService', 'userName'];
 
 		constructor(private logger:app.blocks.ILoggerService,
 								private Idle:IIdleService,
 								private $state : IStateService,
-								private AdminService:IAdminService,
+								private securityService:ISecurityService,
 								username : string) {
 			this.username = username;
 			Idle.unwatch();
-			AdminService.logout();
+			securityService.logout();
 		}
 
 		login(scope : any) {
 			var vm = this;
-			vm.AdminService.login(vm.username, vm.password)
+			vm.securityService.login(vm.username, vm.password)
 				.then(function (response) {
 					vm.logger.success('User logged in', vm.username, 'Logged In');
 					vm.Idle.watch();

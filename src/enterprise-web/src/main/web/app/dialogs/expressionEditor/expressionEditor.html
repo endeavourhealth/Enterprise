@@ -1,0 +1,153 @@
+<div class="modal-header">
+    <button type="button" class="close" data-ng-click="expressionEditor.cancel()" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">Expression Editor</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <div class='row' style="padding: 10px 0px 0px 10px;
+                margin: 0px 2px 10px 2px;
+                font-weight: bold;
+                border-top: 1px solid silver;
+                border-bottom: 1px solid silver;
+                color: midnightblue;
+                background-color: ghostwhite;">
+            <div class="col-xs-2">
+                <div class="form-group">
+                    <label>A.&nbsp;&nbsp;&nbsp;Data Source</label>
+                </div>
+            </div>
+            <div class="col-xs-9">
+                <div class="form-group">
+                    <select class="form-control" ng-model="expressionEditor.expressionDataSource1">
+                        <option ng-repeat="rule in expressionEditor.rule" value="{{rule}}">{{rule}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class='row' >
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Sort Field</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionRestrictionFieldName1">
+                        <option ng-repeat="field in expressionEditor.fields" value="{{field}}">{{field}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Sort Order</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionRestrictionOrderDirection1">
+                        <option ng-repeat="sortorder in expressionEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Restriction Count</label>
+                    <input type="text" class="form-control" ng-model="expressionEditor.expressionRestrictionCount1" placeholder="Enter count">
+                    </input>
+                </div>
+            </div>
+        </div>
+        <div class='row'>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Test Field</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionTestField1">
+                        <option ng-repeat="field in expressionEditor.fields" value="{{field}}">{{field}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Function</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionFunction1">
+                        <option ng-repeat="function in expressionEditor.functions" value="{{function}}">{{function}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class='row' style="padding: 10px 0px 0px 10px;
+                 margin: 0px 2px 10px 2px;
+                font-weight: bold;
+                border-top: 1px solid silver;
+                border-bottom: 1px solid silver;
+                color: midnightblue;
+                background-color: ghostwhite;">
+            <div class="col-xs-2">
+                <div class="form-group">
+                    <label>B.&nbsp;&nbsp;&nbsp;Data Source</label>
+                </div>
+            </div>
+            <div class="col-xs-9">
+                <div class="form-group">
+                    <select class="form-control" ng-model="expressionEditor.expressionDataSource2">
+                        <option ng-repeat="rule in expressionEditor.rule" value="{{rule}}">{{rule}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class='row' >
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Sort Field</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionRestrictionFieldName2">
+                        <option ng-repeat="field in expressionEditor.fields" value="{{field}}">{{field}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Sort Order</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionRestrictionOrderDirection2">
+                        <option ng-repeat="sortorder in expressionEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Restriction Count</label>
+                    <input type="text" class="form-control" ng-model="expressionEditor.expressionRestrictionCount2" placeholder="Enter count">
+                    </input>
+                </div>
+            </div>
+        </div>
+        <div class='row' >
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Test Field</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionTestField2">
+                        <option ng-repeat="field in expressionEditor.fields" value="{{field}}">{{field}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label>Function</label>
+                    <select class="form-control" ng-model="expressionEditor.expressionFunction2">
+                        <option ng-repeat="function in expressionEditor.functions" value="{{function}}">{{function}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="editorSection" >Expression Calculation&nbsp;&nbsp;&nbsp;
+            <span style="font-weight: normal; color: silver">(example: A < B + 28 days)</span></div>
+        <div class='row' >
+            <div class="col-xs-12">
+                <div class="form-group">
+
+                    <input type="text" class="form-control" ng-model="expressionEditor.expressionText" placeholder="Enter expression">
+                    </input>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-danger"
+            data-ng-click="expressionEditor.cancel()">Cancel</button>
+    <button type="button" class="btn btn-success"
+            data-ng-click="expressionEditor.save();">Ok</button>
+</div>

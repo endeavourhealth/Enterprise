@@ -37,9 +37,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("GettingReport for UUID {}", reportUuid);
 
-        //retrieve the activeItem, so we know the latest version
-        DbItem item = DbItem.retrieveForUUid(reportUuid);
-
+        DbItem item = DbItem.retrieveLatestForUUid(reportUuid);
         String xml = item.getXmlContent();
 
         Report ret = QueryDocumentSerializer.readReportFromXml(xml);
@@ -122,6 +120,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         if (reportUuid == null) {
             throw new BadRequestException("Missing report UUID");
         }
+
+        LOG.trace("ScheduilingReport UUID {}", reportUuid);
 
         DbRequest request = new DbRequest();
         request.setReportUuid(reportUuid);

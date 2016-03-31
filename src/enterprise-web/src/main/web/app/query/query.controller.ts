@@ -4,6 +4,7 @@ var flowchart : any;
 
 module app.query {
 	import TestEditorController = app.dialogs.TestEditorController;
+	import ExpressionEditorController = app.dialogs.ExpressionEditorController;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import Test = app.models.Test;
@@ -11,6 +12,7 @@ module app.query {
 	import LibraryItem = app.models.LibraryItem;
 	import Query = app.models.Query;
 	import StartingRules = app.models.StartingRules;
+	import ExpressionType = app.models.ExpressionType;
 
 	'use strict';
 
@@ -79,7 +81,11 @@ module app.query {
 					}
 				};
 
-				$scope.results = ['','GOTO_RULES','INCLUDE','EXCLUDE'];
+				$scope.results = [
+					{value: 'GOTO_RULES', displayName: 'Go to rule'},
+					{value: 'INCLUDE', displayName: 'Include patient in final result'},
+					{value: 'EXCLUDE', displayName: 'No further action'}
+				];
 
 				$scope.$on('editTest', function(event : any, ruleId : any) {
 					if (ruleId!="0") {
@@ -87,13 +93,24 @@ module app.query {
 
 						var selectedRule = $scope.chartViewModel.getSelectedRule();
 
-						var test : Test = selectedRule.data.test;
+						if (selectedRule.data.expression) {
+							var expression : ExpressionType = selectedRule.data.expression;
 
-						TestEditorController.open($modal, test)
-							.result.then(function(resultData : Test){
+							ExpressionEditorController.open($modal, expression)
+								.result.then(function(resultData : ExpressionType){
 
-							selectedRule.data.test = resultData;
-						});
+								selectedRule.data.expression = resultData;
+							});
+						}
+						else {
+							var test : Test = selectedRule.data.test;
+
+							TestEditorController.open($modal, test, false)
+								.result.then(function(resultData : Test){
+
+								selectedRule.data.test = resultData;
+							});
+						}
 					}
 				});
 
@@ -121,17 +138,17 @@ module app.query {
 
 				$scope.clearQueryYes = function () {
 					$scope.chartViewModel.clearQuery();
-					$scope.nextRuleID = 0;
 					$scope.ruleDescription = "";
 					$scope.rulePassAction = "";
 					$scope.ruleFailAction = "";
+					$scope.nextRuleID = 1;
 					this.toggleClearQuery();
 				};
 
 				//
 				// Add a new rule to the chart.
 				//
-				$scope.addNewRule = function () {
+				$scope.addNewRule = function (expression : boolean) {
 					//
 					// Template for a new rule.
 					//
@@ -196,7 +213,31 @@ module app.query {
 							}
 						};
 
-						$scope.chartViewModel.addRule(newRuleDataModel);
+						var newExpressionRuleDataModel = {
+							description: "Expression Description",
+							id: $scope.nextRuleID++,
+							layout: {
+								x: 100,
+								y: 10
+							},
+							onPass: {
+								action: "",
+								ruleId: <any>[]
+							},
+							onFail: {
+								action: "",
+								ruleId: <any>[]
+							},
+							expression: {
+								expressionText: "",
+								variable: <any>[]
+							}
+						};
+
+						if (expression)
+							$scope.chartViewModel.addRule(newExpressionRuleDataModel);
+						else
+							$scope.chartViewModel.addRule(newRuleDataModel);
 					}
 				};
 
@@ -290,7 +331,7 @@ module app.query {
 				switch($stateParams.itemAction) {
 					case "view":
 					case "edit":
-						libraryService.getLibraryItem("fee2a6b7-0708-42b1-9513-705c0ebd2a13")
+						libraryService.getLibraryItem($stateParams.itemUuid)
 							.then(function(libraryItem : LibraryItem) {
 								$scope.chartViewModel = new flowchart.ChartViewModel(libraryItem);
 

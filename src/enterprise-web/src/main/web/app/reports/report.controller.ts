@@ -18,6 +18,8 @@ module app.reports {
 	import UuidNameKVP = app.models.UuidNameKVP;
 	import IScope = angular.IScope;
 	import IWindowService = angular.IWindowService;
+	import IFolderService = app.core.IFolderService;
+	import IReportService = app.core.IReportService;
 	'use strict';
 
 	class ReportController {
@@ -28,11 +30,13 @@ module app.reports {
 		reportContent : ReportNode[];
 		contentTreeCallbackOptions : ICallbacks;
 		dataSourceMap : any;
+		readOnly : boolean;
 
-		static $inject = ['LibraryService', 'LoggerService', '$stateParams', 'AdminService', '$window'];
+		static $inject = ['ReportService', 'FolderService', 'LoggerService', '$stateParams', 'AdminService', '$window'];
 
 		constructor(
-			protected libraryService:app.core.ILibraryService,
+			protected reportService:IReportService,
+			protected folderService:IFolderService,
 			protected logger : ILoggerService,
 			protected $stateParams : {itemAction : string, itemUuid : string},
 			protected adminService : IAdminService,
@@ -45,10 +49,12 @@ module app.reports {
 
 		// General report methods
 		performAction(action:string, itemUuid:string) {
+			this.readOnly = (action === 'view');
 			switch (action) {
 				case 'add':
 					this.createReport(itemUuid);
 					break;
+				case 'edit':
 				case 'view':
 					this.getReport(itemUuid);
 					break;
@@ -69,11 +75,11 @@ module app.reports {
 
 		getReport(reportUuid:string) {
 			var vm = this;
-			vm.libraryService.getReport(reportUuid)
+			vm.reportService.getReport(reportUuid)
 				.then(function (data) {
 					vm.report = data;
 					vm.reportContent = [];
-					vm.libraryService.getContentNamesForReportLibraryItem(reportUuid)
+					vm.reportService.getContentNamesForReportLibraryItem(reportUuid)
 						.then(function(data) {
 							vm.dataSourceMap = UuidNameKVP.toAssociativeArray(data.contents);
 							vm.populateTreeFromReportLists(vm.report.reportItem, vm.reportContent);
@@ -126,7 +132,7 @@ module app.reports {
 			vm.report.reportItem = [];
 			vm.populateReportListsFromTree(vm.report.reportItem, vm.reportContent);
 
-			vm.libraryService.saveReport(vm.report)
+			vm.reportService.saveReport(vm.report)
 				.then(function (data:Report) {
 					vm.report.uuid = data.uuid;
 					vm.adminService.clearPendingChanges();
@@ -169,7 +175,7 @@ module app.reports {
 		// Library tree methods
 		getLibraryRootFolders() {
 			var vm = this;
-			vm.libraryService.getFolders(1, null)
+			vm.folderService.getFolders(1, null)
 				.then(function (data) {
 					vm.treeData = data.folders;
 				});
@@ -181,7 +187,7 @@ module app.reports {
 
 			vm.selectedNode = node;
 			node.loading = true;
-			vm.libraryService.getFolderContents(node.uuid)
+			vm.folderService.getFolderContents(node.uuid)
 				.then(function(data) {
 					vm.itemSummaryList = data;
 					// filter content by those allowed in reports
@@ -201,7 +207,7 @@ module app.reports {
 				var vm = this;
 				var folderId = node.uuid;
 				node.loading = true;
-				this.libraryService.getFolders(1, folderId)
+				this.folderService.getFolders(1, folderId)
 					.then(function (data) {
 						node.nodes = data.folders;
 						node.loading = false;

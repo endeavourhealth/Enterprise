@@ -35,7 +35,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     }
 
     public static DbEndUserEmailInvite retrieveForUuid(UUID uuid) throws Exception {
-        return (DbEndUserEmailInvite) DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbEndUserEmailInvite.class, uuid);
     }
 
     @Override
@@ -58,7 +58,7 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
      * sends an email to the person, telling them about the new access that
      * has been added to their account
      */
-    public static void sendNewAccessGrantedEmail(DbEndUser user, DbOrganisation org) {
+    public static void sendNewAccessGrantedEmail(DbEndUser user, DbOrganisation org, List<DbAbstractTable> toSave) {
 
         //TODO: 2016-02-22 DL - send email to the user about new acess granted
     }

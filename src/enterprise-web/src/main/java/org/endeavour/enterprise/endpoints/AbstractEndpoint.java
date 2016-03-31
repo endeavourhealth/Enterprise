@@ -21,7 +21,6 @@ public abstract class AbstractEndpoint {
 
     /*
     * gets session data from the Token passed up
-    * TODO: change to use server-side stored session data, rather than use the token
     * */
     protected DbEndUser getEndUserFromSession(SecurityContext sc) throws Exception {
         UUID uuid = getEndUserUuidFromToken(sc);

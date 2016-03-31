@@ -1,3 +1,5 @@
+USE Endeavour_Enterprise
+
 INSERT INTO Definition.DependencyType VALUES (0, 'IsChildOf')
 INSERT INTO Definition.DependencyType VALUES (1, 'IsContainedWithin')
 INSERT INTO Definition.DependencyType VALUES (2, 'Uses')
@@ -31,9 +33,9 @@ INSERT INTO Administration.OrganisationEndUserLink VALUES (NEWID(), @OrgId, @Reg
 INSERT INTO Administration.OrganisationEndUserLink VALUES (NEWID(), @OrgId, @AdminUser, 1, null)
 --no org/user link required for super user
 
-INSERT INTO Administration.EndUserPwd VALUES (NEWID(), @RegularUser, '1000:1d049ba2ce1cbc28d76fed47e9699b21885252496d58b58b:c4d1df46d3ba5867349bec73fafba63468803ba5fe0d8edd', null)
-INSERT INTO Administration.EndUserPwd VALUES (NEWID(), @AdminUser, '1000:1d049ba2ce1cbc28d76fed47e9699b21885252496d58b58b:c4d1df46d3ba5867349bec73fafba63468803ba5fe0d8edd', null)
-INSERT INTO Administration.EndUserPwd VALUES (NEWID(), @SuperUser, '1000:1d049ba2ce1cbc28d76fed47e9699b21885252496d58b58b:c4d1df46d3ba5867349bec73fafba63468803ba5fe0d8edd', null)
+INSERT INTO Administration.EndUserPwd VALUES (NEWID(), @RegularUser, '1000:1d049ba2ce1cbc28d76fed47e9699b21885252496d58b58b:c4d1df46d3ba5867349bec73fafba63468803ba5fe0d8edd', null, 0, 0)
+INSERT INTO Administration.EndUserPwd VALUES (NEWID(), @AdminUser, '1000:1d049ba2ce1cbc28d76fed47e9699b21885252496d58b58b:c4d1df46d3ba5867349bec73fafba63468803ba5fe0d8edd', null, 0, 0)
+INSERT INTO Administration.EndUserPwd VALUES (NEWID(), @SuperUser, '1000:1d049ba2ce1cbc28d76fed47e9699b21885252496d58b58b:c4d1df46d3ba5867349bec73fafba63468803ba5fe0d8edd', null, 0, 0)
 
 --the above creates three users all with password "test"
 --regular@email    non-admin user

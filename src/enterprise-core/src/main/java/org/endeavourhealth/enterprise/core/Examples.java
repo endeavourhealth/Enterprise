@@ -29,14 +29,15 @@ public abstract class Examples {
         List<DbAbstractTable> toSave = new ArrayList<>();
 
         int patientsInDb = 0; //get count of patients
-        int maxAuditVersion = DbAudit.retrieveMaxAuditVersion();
+        DbAudit latestAudit = DbAudit.retrieveLatest();
+        UUID latestAuditUuid = latestAudit.getAuditUuid();
 
         //create the job
         DbJob job = new DbJob();
         job.assignPrimaryUUid();
         job.setStartDateTime(Instant.now());
         job.setPatientsInDatabase(patientsInDb);
-        job.setBaselineAuditVersion(maxAuditVersion);
+        job.setBaselineAuditUuid(latestAuditUuid);
         toSave.add(job);
 
         UUID jobUuid = job.getJobUuid();
@@ -198,10 +199,7 @@ public abstract class Examples {
     }
     private static void recursivelyGetDependentLibraryItems(UUID itemUuid, QueryDocument queryDocument) throws Exception {
 
-        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
-        UUID auditUuid = activeItem.getAuditUuid();
-
-        List<DbItem> dependentItems = DbItem.retrieveDependentItems(itemUuid, auditUuid, DependencyType.Uses);
+        List<DbItem> dependentItems = DbItem.retrieveDependentItems(itemUuid, DependencyType.Uses);
         for (DbItem dependentItem: dependentItems) {
 
             LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromItem(dependentItem);

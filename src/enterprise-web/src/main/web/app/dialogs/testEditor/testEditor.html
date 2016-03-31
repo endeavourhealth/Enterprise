@@ -1,249 +1,243 @@
 <div class="modal-header">
 	<button type="button" class="close" data-ng-click="testEditor.cancel()" aria-hidden="true">&times;</button>
-	<h4 class="modal-title">Test & Data Source Editor</h4>
+	<h4 class="modal-title">{{testEditor.title}}</h4>
 </div>
 <div class="modal-body">
-	<form role="form">
-		<div class='row'>
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Record Data Source</label>
-					<select class="form-control" ng-model="testEditor.ruleDatasource" ng-change="testEditor.dataSourceChange(testEditor.ruleDatasource)" ng-disabled="testEditor.editMode">
-						<option ng-repeat="datasource in testEditor.datasources" value="{{datasource}}">{{datasource}}</option>
-					</select>
-				</div>
-			</div>
-			<div class="col-xs-6" ng-show="testEditor.addFilter">
-				<div class="form-group">
-					<label>Add a Filter</label><br/>
-					<button type="button" class="btn btn-primary"
-							data-ng-click="testEditor.showFilter('CODE')" ng-show="testEditor.codeFilter">Code</button>
-					<button type="button" class="btn btn-primary"
-							data-ng-click="testEditor.showFilter('EFFECTIVE_DATE')" ng-show="testEditor.dateFilter">Date</button>
-					<button type="button" class="btn btn-primary"
-							data-ng-click="testEditor.showFilter('VALUE')" ng-show="testEditor.valueFilter">Value</button>
-					<button type="button" class="btn btn-primary"
-							data-ng-click="testEditor.showFilter('DOB')" ng-show="testEditor.dobFilter">DOB</button>
-					<button type="button" class="btn btn-primary"
-							data-ng-click="testEditor.showFilter('SEX')" ng-show="testEditor.sexFilter">Sex</button>
-					<button type="button" class="btn btn-primary"
-							data-ng-click="testEditor.showFilter('AGE')" ng-show="testEditor.ageFilter">Age</button>
-					<button type="button" class="btn btn-primary"
-							data-ng-click="testEditor.showFilter('REGISTRATION_DATE')" ng-show="testEditor.regFilter">Reg Date</button>
-				</div>
-			</div>
-		</div>
-		<div ng-show="testEditor.calculationEditor">
-			<a class="queryLink"><img src="/content/img/add.png" style="width: 20px; height: 20px; margin-right: 10px"/>Add Expression Variable</a>
-		</div>
-		<div class="editorSection" ng-show="testEditor.calculationEditor">A.</div>
-		<div class='row' ng-show="testEditor.calculationEditor">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<label>Data Source</label>
-					<select class="form-control" ng-model="testEditor.expressionDataSource1">
-						<option ng-repeat="rule in testEditor.rule" value="{{rule}}">{{rule}}</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.calculationEditor">
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Sort Field</label>
-					<select class="form-control" ng-model="testEditor.expressionSortField1">
-						<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-					</select>
-				</div>
-			</div>
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Sort Order</label>
-					<select class="form-control" ng-model="testEditor.expressionSortOrder1">
-						<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
-					</select>
-				</div>
-			</div>
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Restriction Count</label>
-					<input type="text" class="form-control" ng-model="testEditor.expressionRestrictionCount1" placeholder="Enter count">
-					</input>
-				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.calculationEditor">
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Test Field</label>
-					<select class="form-control" ng-model="testEditor.expressionTestField1">
-						<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-					</select>
-				</div>
-			</div>
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Function</label>
-					<select class="form-control" ng-model="testEditor.expressionFunction1">
-						<option ng-repeat="function in testEditor.functions" value="{{function}}">{{function}}</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class="editorSection" ng-show="testEditor.calculationEditor">B.</div>
-		<div class='row' ng-show="testEditor.calculationEditor">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<label>Data Source</label>
-					<select class="form-control" ng-model="testEditor.expressionDataSource2">
-						<option ng-repeat="rule in testEditor.rule" value="{{rule}}">{{rule}}</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.calculationEditor">
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Sort Field</label>
-					<select class="form-control" ng-model="testEditor.expressionSortField2">
-						<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-					</select>
-				</div>
-			</div>
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Sort Order</label>
-					<select class="form-control" ng-model="testEditor.expressionSortOrder2">
-						<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
-					</select>
-				</div>
-			</div>
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Restriction Count</label>
-					<input type="text" class="form-control" ng-model="testEditor.expressionRestrictionCount2" placeholder="Enter count">
-					</input>
-				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.calculationEditor">
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Test Field</label>
-					<select class="form-control" ng-model="testEditor.expressionTestField2">
-						<option ng-repeat="field in testEditor.fields" value="{{field}}">{{field}}</option>
-					</select>
-				</div>
-			</div>
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Function</label>
-					<select class="form-control" ng-model="testEditor.expressionFunction2">
-						<option ng-repeat="function in testEditor.functions" value="{{function}}">{{function}}</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class="editorSection" ng-show="testEditor.calculationEditor">Expression Calculation</div>
-		<div class='row' ng-show="testEditor.calculationEditor">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<label style="font-weight: normal">(example: A < B + 28 days)</label>
-					<input type="text" class="form-control" ng-model="testEditor.expression" placeholder="Enter expression">
-					</input>
-				</div>
-			</div>
-		</div>
 
-		<div class='row' ng-show="testEditor.codeEditor">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<label>Filter by Clinical Codes</label>
-					<textarea class="form-control" style="height: 72px" ng-model="testEditor.filterCodes" placeholder="Select codes" ng-click="testEditor.showCodePicker()">
-					</textarea>
+	<uib-tabset active="active">
+		<uib-tab index="0" heading="Data Source">
+			<br/>
+			<form role="form">
+				<div class='row'>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Data Source</label>
+							<select class="form-control" ng-model="testEditor.ruleDatasource" ng-change="testEditor.dataSourceChange(testEditor.ruleDatasource)" ng-disabled="testEditor.editMode">
+								<option ng-repeat="datasource in testEditor.datasources" value="{{datasource}}">{{datasource}}</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-xs-6" ng-show="testEditor.addFilter">
+						<div class="form-group">
+							<label>Add a Filter</label><br/>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFilter('CODE')" ng-show="testEditor.codeFilter">Code</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFilter('EFFECTIVE_DATE')" ng-show="testEditor.dateFilter">Date</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFilter('VALUE')" ng-show="testEditor.valueFilter">Value</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFilter('DOB')" ng-show="testEditor.dobFilter">DOB</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFilter('SEX')" ng-show="testEditor.sexFilter">Sex</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFilter('AGE')" ng-show="testEditor.ageFilter">Age</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFilter('REGISTRATION_DATE')" ng-show="testEditor.regFilter">Reg Date</button>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.dobEditor">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Filter by {{testEditor.dobLabel}} From</label>
-					<input type="date" class="form-control" ng-model="testEditor.filterDOBFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDOBFrom, testEditor.dobLabel)" placeholder="Select {{testEditor.dobLabel}} from">
-					</input>
+				<div class='row' ng-show="testEditor.codeEditor">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label>Filter by Clinical Codes</label>
+							<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showCodePicker()">
+								<span ng-repeat="code in testEditor.codeSelection">
+									<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
+								</span>
+							</div>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Filter by {{testEditor.dobLabel}} To</label>
-					<input type="date" class="form-control" ng-model="testEditor.filterDOBTo" ng-blur="testEditor.filterDateToChange(testEditor.filterDOBTo, testEditor.dobLabel)" placeholder="Select {{testEditor.dobLabel}} to">
-					</input>
+				<div class='row' ng-show="testEditor.dobEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Filter by {{testEditor.dobLabel}} From</label>
+							<input type="date" class="form-control" ng-model="testEditor.filterDOBFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDOBFrom, testEditor.dobLabel)" placeholder="Select {{testEditor.dobLabel}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Filter by {{testEditor.dobLabel}} To</label>
+							<input type="date" class="form-control" ng-model="testEditor.filterDOBTo" ng-blur="testEditor.filterDateToChange(testEditor.filterDOBTo, testEditor.dobLabel)" placeholder="Select {{testEditor.dobLabel}} to">
+							</input>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.sexEditor">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Filter by {{testEditor.sexLabel}}</label>
-					<select class="form-control" ng-model="testEditor.filterSex" ng-change="testEditor.filterValueChange(testEditor.filterSex, testEditor.sexLabel)">
-						<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
-					</select>
+				<div class='row' ng-show="testEditor.sexEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Filter by {{testEditor.sexLabel}}</label>
+							<select class="form-control" ng-model="testEditor.filterSex" ng-change="testEditor.filterValueChange(testEditor.filterSex, testEditor.sexLabel)">
+								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
+							</select>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.dateEditor">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Filter by {{testEditor.dateLabel}} From</label>
-					<input type="date" class="form-control" ng-model="testEditor.filterDateFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDateFrom, testEditor.dateLabel)" placeholder="Select {{testEditor.dateLabel}} from">
-					</input>
+				<div class='row' ng-show="testEditor.dateEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Filter by {{testEditor.dateLabel}} From</label>
+							<input type="date" class="form-control" ng-model="testEditor.filterDateFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDateFrom, testEditor.dateLabel)" placeholder="Select {{testEditor.dateLabel}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Filter by {{testEditor.dateLabel}} To</label>
+							<input type="date" class="form-control" ng-model="testEditor.filterDateTo" ng-blur="testEditor.filterDateToChange(testEditor.filterDateTo, testEditor.dateLabel)" placeholder="Select {{testEditor.dateLabel}} to">
+							</input>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Filter by {{testEditor.dateLabel}} To</label>
-					<input type="date" class="form-control" ng-model="testEditor.filterDateTo" ng-blur="testEditor.filterDateToChange(testEditor.filterDateTo, testEditor.dateLabel)" placeholder="Select {{testEditor.dateLabel}} to">
-					</input>
+				<div class='row' ng-show="testEditor.valueEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Filter by {{testEditor.valueField}} From</label>
+							<input type="text" class="form-control" ng-model="testEditor.filterValueFrom" ng-blur="testEditor.filterValueFromChange(testEditor.filterValueFrom)" placeholder="Select {{testEditor.valueField}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Filter by {{testEditor.valueField}} To</label>
+							<input type="text" class="form-control" ng-model="testEditor.filterValueTo" ng-blur="testEditor.filterValueToChange(testEditor.filterValueTo)" placeholder="Select {{testEditor.valueField}} to">
+							</input>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div class='row' ng-show="testEditor.valueEditor">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Filter by {{testEditor.valueField}} From</label>
-					<input type="text" class="form-control" ng-model="testEditor.filterValueFrom" ng-blur="testEditor.filterValueFromChange(testEditor.filterValueFrom)" placeholder="Select {{testEditor.valueField}} from">
-					</input>
+				<div ng-show="testEditor.addRestriction">
+					<a class="queryLink" ng-click="testEditor.toggleRestriction()"><img src="/content/img/add.png" style="width: 20px; height: 20px; margin-right: 10px"/>Add Restriction</a>
 				</div>
-			</div>
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Filter by {{testEditor.valueField}} To</label>
-					<input type="text" class="form-control" ng-model="testEditor.filterValueTo" ng-blur="testEditor.filterValueToChange(testEditor.filterValueTo)" placeholder="Select {{testEditor.valueField}} to">
-					</input>
+				<div class='row' ng-show="testEditor.showRestriction">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label>Sort Field</label>
+							<select class="form-control" ng-model="testEditor.restrictionFieldName" ng-change="testEditor.restrictionChange(testEditor.restrictionFieldName)">
+								<option ng-repeat="restrictionfield in testEditor.fields" value="{{restrictionfield}}">{{restrictionfield}}</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label>Sort Order</label>
+							<select class="form-control" ng-model="testEditor.restrictionOrderDirection" ng-change="testEditor.restrictionChange(testEditor.restrictionOrderDirection)">
+								<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label>Restriction Count</label>
+							<input type="text" class="form-control" ng-model="testEditor.restrictionCount" placeholder="Select count" ng-blur="testEditor.restrictionChange(testEditor.restrictionCount)">
+							</input>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div ng-show="testEditor.addRestriction">
-			<a class="queryLink" ng-click="testEditor.toggleRestriction()"><img src="/content/img/add.png" style="width: 20px; height: 20px; margin-right: 10px"/>Add Restriction</a>
-		</div>
-		<div class='row' ng-show="testEditor.showRestriction">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Apply Restriction</label>
-					<select class="form-control" ng-model="testEditor.restriction">
-						<option ng-repeat="sortorder in testEditor.sortorders" value="{{sortorder}}">{{sortorder}}</option>
-					</select>
+				<br/>
+			</form>
+		</uib-tab>
+		<uib-tab index="1" heading="Additional Field Test" ng-show="testEditor.viewFieldTest">
+			<br/>
+			<form role="form">
+				<div class='row'>
+					<div class="col-xs-6" ng-show="testEditor.addFilter">
+						<div class="form-group">
+							<label>Add a Field to Test against the Data Source Result</label><br/>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('CODE')" ng-show="testEditor.codeFilter">Code</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('EFFECTIVE_DATE')" ng-show="testEditor.dateFilter">Date</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('VALUE')" ng-show="testEditor.valueFilter">Value</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('DOB')" ng-show="testEditor.dobFilter">DOB</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('SEX')" ng-show="testEditor.sexFilter">Sex</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('AGE')" ng-show="testEditor.ageFilter">Age</button>
+							<button type="button" class="btn btn-primary"
+									data-ng-click="testEditor.showFieldTest('REGISTRATION_DATE')" ng-show="testEditor.regFilter">Reg Date</button>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div class="col-xs-6">
-				<div class="form-group">
-					<label>Restricted Entry matches these Codes</label>
-					<input type="text" class="form-control" ng-model="testEditor.fieldTestCodes" placeholder="Select codes">
-					</input>
+				<div class='row' ng-show="testEditor.fieldTestCodeEditor">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label>Test by Clinical Codes</label>
+							<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showFieldTestCodePicker()">
+								<span ng-repeat="code in testEditor.fieldTestCodeSelection">
+									<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
+								</span>
+							</div>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
-		<br/>
-	</form>
+				<div class='row' ng-show="testEditor.fieldTestDobEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Test by {{testEditor.fieldTestDobLabel}} From</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDOBFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDOBFrom, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Test by {{testEditor.fieldTestDobLabel}} To</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDOBTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDOBTo, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} to">
+							</input>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestSexEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Test by {{testEditor.fieldTestSexLabel}}</label>
+							<select class="form-control" ng-model="testEditor.fieldTestSex" ng-change="testEditor.fieldTestValueChange(testEditor.fieldTestSex, testEditor.fieldTestSexLabel)">
+								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestDateEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Test by {{testEditor.fieldTestDateLabel}} From</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDateFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDateFrom, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Test by {{testEditor.fieldTestDateLabel}} To</label>
+							<input type="date" class="form-control" ng-model="testEditor.fieldTestDateTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDateTo, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} to">
+							</input>
+						</div>
+					</div>
+				</div>
+				<div class='row' ng-show="testEditor.fieldTestValueEditor">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Test by {{testEditor.fieldTestValueField}} From</label>
+							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueFrom" ng-blur="testEditor.fieldTestValueFromChange(testEditor.fieldTestValueFrom)" placeholder="Select {{testEditor.fieldTestValueField}} from">
+							</input>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label>Test by {{testEditor.fieldTestValueField}} To</label>
+							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueTo" ng-blur="testEditor.fieldTestValueToChange(testEditor.fieldTestValueTo)" placeholder="Select {{testEditor.fieldTestValueField}} to">
+							</input>
+						</div>
+					</div>
+				</div>
+				<br/>
+			</form>
+
+		</uib-tab>
+	</uib-tabset>
+
 </div>
 <div class="modal-footer">
 	<button type="button" class="btn btn-danger"

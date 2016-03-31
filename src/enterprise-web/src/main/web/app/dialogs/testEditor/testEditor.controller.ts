@@ -6,8 +6,7 @@ module app.dialogs {
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import CodePickerController = app.dialogs.CodePickerController;
-	import TermlexCode = app.models.Code;
-	import TermlexCodeSelection = app.models.CodeSelection;
+	import ICodingService = app.core.ICodingService;
 	import Code = app.models.Code;
 	import Test = app.models.Test;
 	import DataSource = app.models.DataSource;
@@ -21,11 +20,15 @@ module app.dialogs {
 	import ValueFromOperator = app.models.ValueFromOperator;
 	import ValueToOperator = app.models.ValueToOperator;
 	import IsAny = app.models.IsAny;
+	import Concept = app.models.Concept;
+	import Restriction = app.models.Restriction;
 
 	'use strict';
 
 	export class TestEditorController extends BaseDialogController {
-		calculationEditor : boolean = false;
+		title : string;
+		dataSourceOnly : boolean = false;
+		viewFieldTest : boolean = false;
 		codeEditor : boolean = false;
 		dateEditor : boolean = false;
 		dobEditor : boolean = false;
@@ -35,12 +38,19 @@ module app.dialogs {
 		dateLabel : string;
 		dobLabel : string;
 		sexLabel : string;
+		fieldTestCodeEditor : boolean = false;
+		fieldTestDateEditor : boolean = false;
+		fieldTestDobEditor : boolean = false;
+		fieldTestValueEditor : boolean = false;
+		fieldTestSexEditor : boolean = false;
+		fieldTestValueField : string;
+		fieldTestDateLabel : string;
+		fieldTestDobLabel : string;
+		fieldTestSexLabel : string;
 		addRestriction : boolean = false;
 		showRestriction : boolean = false;
 		addFilter : boolean = false;
 		ruleDatasource : string;
-		ruleFilter : string;
-		filterCodes : string;
 		filterDateFrom : Date;
 		filterDateTo : Date;
 		filterDOBFrom : Date;
@@ -48,6 +58,16 @@ module app.dialogs {
 		filterValueFrom : string;
 		filterValueTo : string;
 		filterSex : string;
+		fieldTestDateFrom : Date;
+		fieldTestDateTo : Date;
+		fieldTestDOBFrom : Date;
+		fieldTestDOBTo : Date;
+		fieldTestValueFrom : string;
+		fieldTestValueTo : string;
+		fieldTestSex : string;
+		restrictionFieldName: string;
+		restrictionOrderDirection: string;
+		restrictionCount: string;
 		codeFilter : boolean = false;
 		dateFilter : boolean = false;
 		valueFilter : boolean = false;
@@ -58,17 +78,16 @@ module app.dialogs {
 
 		editMode : boolean = false;
 
-		codeSelection : TermlexCodeSelection[] = [];
+		codeSelection : CodeSetValue[] = [];
+		fieldTestCodeSelection : CodeSetValue[] = [];
+		termCache : any;
 
-		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE','CALCULATION'];
-		sortorders = ['','LATEST','EARLIEST','HIGHEST','LOWEST'];
-		periods = ['','DAYS','WEEKS','MONTHS','YEARS'];
-		rule = [''];
+		datasources = ['','PATIENT','OBSERVATION','MEDICATION_ISSUE'];
+		sortorders = ['','ASCENDING','DESCENDING'];
 		fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
-		functions = ['','AVERAGE','COUNT','MIN','MAX'];
 		genders = ['','MALE','FEMALE','UNKNOWN'];
 
-		public static open($modal : IModalService, test : Test) : IModalServiceInstance {
+		public static open($modal : IModalService, test : Test, dataSourceOnly : boolean) : IModalServiceInstance {
 			var options : IModalSettings = {
 				templateUrl:'app/dialogs/testEditor/testEditor.html',
 				controller:'TestEditorController',
@@ -76,7 +95,8 @@ module app.dialogs {
 				size:'lg',
 				backdrop: 'static',
 				resolve:{
-					test : () => test
+					test : () => test,
+					dataSourceOnly : () => dataSourceOnly
 				}
 			};
 
@@ -84,38 +104,52 @@ module app.dialogs {
 			return dialog;
 		}
 
-		static $inject = ['$uibModalInstance', 'LoggerService', '$uibModal', 'test'];
+		static $inject = ['$uibModalInstance', 'LoggerService', '$uibModal', 'test', 'CodingService', 'dataSourceOnly'];
 
 		constructor(protected $uibModalInstance : IModalServiceInstance,
-					private logger:app.blocks.ILoggerService,
+					private logger : app.blocks.ILoggerService,
 					private $modal : IModalService,
-					private test: Test) {
+					private test: Test,
+					private codingService : ICodingService,
+					dataSourceOnly : boolean) {
 
 			super($uibModalInstance);
 
-			this.resultData = test;
+			var vm = this;
 
-			 var ds : DataSource = {
-				 entity: "",
-				 dataSourceUuid: null,
-				 calculation: null,
-				 filter: [],
-				 restriction: null
-			 };
+			this.termCache = {};
+			this.resultData = test;
+			this.dataSourceOnly = dataSourceOnly;
+
+			var ds : DataSource = {
+				entity: "",
+				dataSourceUuid: null,
+				calculation: null,
+				filter: [],
+				restriction: null
+			};
 
 			var isAny : IsAny = {}
 
-			 var newTest : Test = {
-				 dataSource: ds,
-				 dataSourceUuid: null,
-				 isAny: isAny,
-				 fieldTest: null
-			 };
+			var newTest : Test = {
+				dataSource: ds,
+				dataSourceUuid: null,
+				isAny: isAny,
+				fieldTest: []
+			};
 
 			if (!this.resultData)
 				this.resultData = newTest;
 			else
 				this.initialiseEditMode(this.resultData);
+
+			if (!this.dataSourceOnly) {
+				vm.viewFieldTest = true;
+				vm.title = "Test Editor"
+			}
+			else {
+				vm.title = "Data Source Editor"
+			}
 		}
 
 		initialiseEditMode(resultData : Test) {
@@ -126,50 +160,25 @@ module app.dialogs {
 
 			vm.editMode = true;
 
+			if (resultData.dataSource.filter === null) {
+				resultData.dataSource.filter = [];
+			}
+
+			if (!vm.dataSourceOnly) {
+				if (resultData.fieldTest === null) {
+					resultData.fieldTest = [];
+				}
+			}
+
 			for (var i = 0; i < resultData.dataSource.filter.length; ++i) {
 				var filter = resultData.dataSource.filter[i];
 				var field = filter.field;
+
 				this.showFilter(field);
-				vm.ruleFilter = field;
 
 				switch(field) {
 					case "CODE":
-						var terms = "";
-
-						for (var c = 0; c < filter.codeSet[0].codeSetValue.length; ++c) {
-							var codes = filter.codeSet[0].codeSetValue[c];
-
-							var term = codes.term;
-							terms+=", "+term;
-
-							var excludedCodes : Code[] = [];
-
-							for (var e = 0; e < codes.exclusion.length; ++e) {
-								var exclusion = codes.exclusion[e];
-
-								var term = exclusion.term;
-								terms+=", "+term+" (exclusion)";
-
-								var excl : Code = {
-									id: exclusion.code,
-									label: exclusion.term
-								}
-
-								excludedCodes.push(excl)
-							}
-
-							var selectedCodes : TermlexCodeSelection = {
-								id: codes.code,
-								label: codes.term,
-								includeChildren: codes.includeChildren,
-								exclusions: excludedCodes
-							}
-
-							this.codeSelection.push(selectedCodes);
-						}
-
-						vm.filterCodes = terms.substring(2);
-
+						vm.codeSelection = filter.codeSet[0].codeSetValue;
 						break;
 					case "DOB":
 						if (filter.valueFrom)
@@ -198,6 +207,55 @@ module app.dialogs {
 					default:
 				}
 			}
+
+			if (!vm.dataSourceOnly) {
+				for (var i = 0; i < resultData.fieldTest.length; ++i) {
+					var fieldTest = resultData.fieldTest[i];
+					var field = fieldTest.field;
+
+					this.showFieldTest(field);
+
+					switch(field) {
+						case "CODE":
+							vm.fieldTestCodeSelection = fieldTest.codeSet[0].codeSetValue;
+							break;
+						case "DOB":
+							if (fieldTest.valueFrom)
+								vm.fieldTestDOBFrom = new Date(fieldTest.valueFrom.constant);
+							if (fieldTest.valueTo)
+								vm.fieldTestDOBTo = new Date(fieldTest.valueTo.constant);
+							break;
+						case "EFFECTIVE_DATE":
+						case "REGISTRATION_DATE":
+							if (fieldTest.valueFrom)
+								vm.fieldTestDateFrom = new Date(fieldTest.valueFrom.constant);
+							if (fieldTest.valueTo)
+								vm.fieldTestDateTo = new Date(fieldTest.valueTo.constant);
+							break;
+						case "VALUE":
+						case "AGE":
+							if (fieldTest.valueFrom)
+								vm.fieldTestValueFrom = fieldTest.valueFrom.constant;
+							if (fieldTest.valueTo)
+								vm.fieldTestValueTo = fieldTest.valueTo.constant;
+							break;
+						case "SEX":
+							if (fieldTest.valueEqualTo)
+								vm.fieldTestSex = fieldTest.valueEqualTo.constant;
+							break;
+						default:
+					}
+				}
+
+			}
+
+			if (resultData.dataSource.restriction) {
+				vm.showRestriction = true;
+				vm.restrictionFieldName = resultData.dataSource.restriction.fieldName;
+				vm.restrictionOrderDirection = resultData.dataSource.restriction.orderDirection;
+				vm.restrictionCount = resultData.dataSource.restriction.count.toString();
+			}
+
 		}
 
 		formatDate(inputDate : Date) {
@@ -207,57 +265,24 @@ module app.dialogs {
 		showCodePicker() {
 			var vm = this;
 
-			CodePickerController.open(this.$modal, this.codeSelection)
-				.result.then(function(resultData : TermlexCodeSelection[]){
+			CodePickerController.open(this.$modal, vm.codeSelection)
+				.result.then(function(resultData : CodeSetValue[]){
+
+				if (vm.codeSelection.length>0) {
+					for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
+						var filter = vm.resultData.dataSource.filter[i];
+
+						if (filter.field=="CODE")
+							vm.resultData.dataSource.filter.splice(i, 1);
+					}
+				}
+
+				vm.codeSelection = resultData;
 
 				var codeSet : CodeSet = {
 					codingSystem : "SNOMED_CT",
-					codeSetValue : []
+					codeSetValue : resultData
 				}
-
-				var terms = "";
-
-				for (var i = 0; i < resultData.length; ++i) {
-					var code = resultData[i];
-
-					var codeSetVal : CodeSetValue = {
-						code : "",
-						term : "",
-						includeChildren : true,
-						exclusion : []
-					}
-
-					codeSetVal.code = code.id;
-					codeSetVal.term = code.label;
-					codeSetVal.includeChildren = code.includeChildren;
-
-					var term = code.label;
-					terms+=", "+term;
-
-					for (var e = 0; e < code.exclusions.length; ++e) {
-						var exclusion = code.exclusions[e];
-
-						var codeSetValExcl : CodeSetValue = {
-							code : "",
-							term : "",
-							includeChildren : true,
-							exclusion : null
-						}
-
-						codeSetValExcl.code = exclusion.id;
-						codeSetValExcl.term = exclusion.label;
-						codeSetVal.exclusion.push(codeSetValExcl);
-
-						var term = exclusion.label;
-						terms+=", "+term+" (exclusion)";
-
-					}
-
-					codeSet.codeSetValue.push(codeSetVal);
-
-				}
-
-				vm.filterCodes = terms.substring(2);
 
 				var fieldTest : FieldTest = {
 					field: "CODE",
@@ -272,16 +297,46 @@ module app.dialogs {
 
 				fieldTest.codeSet.push(codeSet);
 
-				if (vm.codeSelection.length>0) {
-					for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-						var filter = vm.resultData.dataSource.filter[i];
+				vm.resultData.dataSource.filter.push(fieldTest);
+			});
+		}
 
-						if (filter.field=="CODE")
-							vm.resultData.dataSource.filter.splice(i, 1);
+		showFieldTestCodePicker() {
+			var vm = this;
+
+			CodePickerController.open(this.$modal, vm.fieldTestCodeSelection)
+				.result.then(function(resultData : CodeSetValue[]){
+
+				if (vm.fieldTestCodeSelection.length>0) {
+					for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+						var fTest = vm.resultData.fieldTest[i];
+
+						if (fTest.field=="CODE")
+							vm.resultData.fieldTest.splice(i, 1);
 					}
 				}
 
-				vm.resultData.dataSource.filter.push(fieldTest);
+				vm.fieldTestCodeSelection = resultData;
+
+				var codeSet : CodeSet = {
+					codingSystem : "SNOMED_CT",
+					codeSetValue : resultData
+				}
+
+				var fieldTest : FieldTest = {
+					field: "CODE",
+					valueFrom: null,
+					valueTo: null,
+					valueRange: null,
+					valueEqualTo: null,
+					codeSet: [],
+					codeSetLibraryItemUuid: null,
+					negate: false
+				};
+
+				fieldTest.codeSet.push(codeSet);
+
+				vm.resultData.fieldTest.push(fieldTest);
 			});
 		}
 
@@ -290,6 +345,19 @@ module app.dialogs {
 
 			this.resultData.dataSource.entity = value;
 
+			vm.codeEditor = false;
+			vm.dateEditor = false;
+			vm.dobEditor = false;
+			vm.valueEditor = false;
+			vm.sexEditor = false;
+			vm.fieldTestCodeEditor = false;
+			vm.fieldTestDateEditor = false;
+			vm.fieldTestDobEditor = false;
+			vm.fieldTestValueEditor = false;
+			vm.fieldTestSexEditor = false;
+			vm.addRestriction = true;
+			vm.showRestriction = false;
+			vm.addFilter = true;
 			vm.codeFilter = false;
 			vm.dateFilter = false;
 			vm.valueFilter = false;
@@ -297,38 +365,30 @@ module app.dialogs {
 			vm.sexFilter = false;
 			vm.ageFilter = false;
 			vm.regFilter = false;
+			vm.viewFieldTest = true;
 
 			switch(value) {
-				case "CALCULATION":
-					this.showCalculationEditorFields();
-					break;
 				case "OBSERVATION":
 					vm.codeFilter = true;
 					vm.dateFilter = true;
 					vm.valueFilter = true;
-					this.showFilters();
 					break;
 				case "MEDICATION_ISSUE":
 					vm.codeFilter = true;
 					vm.dateFilter = true;
-					this.showFilters();
 					break;
 				case "PATIENT":
 					vm.dobFilter = true;
 					vm.sexFilter = true;
 					vm.ageFilter = true;
 					vm.regFilter = true;
-					this.showFilters();
 					break;
 				default:
-					this.showFilters();
 			}
 		};
 
 		showFilter(value : any) {
 			var vm = this;
-
-			vm.editMode = true;
 
 			switch(value) {
 				case "CODE":
@@ -356,8 +416,40 @@ module app.dialogs {
 			}
 		}
 
+		showFieldTest(value : any) {
+			var vm = this;
+
+			switch(value) {
+				case "CODE":
+					vm.fieldTestCodeEditor = true;
+					break;
+				case "DOB":
+					vm.fieldTestDobEditor = true;
+					vm.fieldTestDobLabel = value;
+					break;
+				case "EFFECTIVE_DATE":
+				case "REGISTRATION_DATE":
+					vm.fieldTestDateEditor = true;
+					vm.fieldTestDateLabel = value;
+					break;
+				case "VALUE":
+				case "AGE":
+					vm.fieldTestValueEditor = true;
+					vm.fieldTestValueField = value;
+					break;
+				case "SEX":
+					vm.fieldTestSexEditor = true;
+					vm.fieldTestSexLabel = value;
+					break;
+				default:
+			}
+		}
+
 		filterDateFromChange(value : any, dateField : any) {
 			var vm = this;
+
+			if (!value)
+				value="";
 
 			var datestring : string = "";
 
@@ -403,6 +495,9 @@ module app.dialogs {
 
 		filterDateToChange(value : any, dateField : any) {
 			var vm = this;
+
+			if (!value)
+				value="";
 
 			var datestring : string = "";
 
@@ -458,6 +553,9 @@ module app.dialogs {
 		filterValueChange(value : any, valueField : any) {
 			var vm = this;
 
+			if (!value)
+				value="";
+
 			var valueEqualTo : Value = {
 				constant: value,
 				parameter: null,
@@ -496,6 +594,9 @@ module app.dialogs {
 
 		filterValueFromChange(value : any) {
 			var vm = this;
+
+			if (!value)
+				value="";
 
 			var valueFrom : ValueFrom = {
 				constant: value,
@@ -537,6 +638,9 @@ module app.dialogs {
 		filterValueToChange(value : any) {
 			var vm = this;
 
+			if (!value)
+				value="";
+
 			var valueTo : ValueTo = {
 				constant: value,
 				parameter: null,
@@ -575,31 +679,246 @@ module app.dialogs {
 
 		}
 
-		showCalculationEditorFields() {
+		fieldTestDateFromChange(value : any, dateField : any) {
 			var vm = this;
 
-			vm.calculationEditor = true;
-			vm.codeEditor = false;
-			vm.dateEditor = false;
-			vm.dobEditor = false;
-			vm.valueEditor = false;
-			vm.sexEditor = false;
-			vm.addRestriction = false;
-			vm.showRestriction = false;
-			vm.addFilter = false;
+			if (!value)
+				value="";
+
+			var datestring : string = "";
+
+			if (value!="" && value!=null)
+				datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
+
+			var valueFrom : ValueFrom = {
+				constant: datestring,
+				parameter: null,
+				absoluteUnit: "DATE",
+				relativeUnit: null,
+				operator: "GREATER_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: dateField,
+				valueFrom: valueFrom,
+				valueTo: null,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+				var ftest = vm.resultData.fieldTest[i];
+
+				if (ftest.field==dateField && ftest.valueFrom && value!="" && value!=null) {
+					foundEntry = true;
+					fieldTest.valueFrom = valueFrom;
+					break;
+				}
+				else if (ftest.field==dateField && ftest.valueFrom && (value=="" || value==null))
+					vm.resultData.fieldTest.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="" && value!=null)
+				vm.resultData.fieldTest.push(fieldTest);
 		}
 
-		showFilters() {
+		fieldTestDateToChange(value : any, dateField : any) {
 			var vm = this;
 
-			vm.calculationEditor = false;
-			vm.codeEditor = false;
-			vm.dateEditor = false;
-			vm.dobEditor = false;
-			vm.valueEditor = false;
-			vm.sexEditor = false;
-			vm.addRestriction = true;
-			vm.addFilter = true;
+			if (!value)
+				value="";
+
+			var datestring : string = "";
+
+			if (value!="" && value!=null)
+				datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
+
+			var valueTo : ValueTo = {
+				constant: datestring,
+				parameter: null,
+				absoluteUnit: "DATE",
+				relativeUnit: null,
+				operator: "LESS_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: dateField,
+				valueFrom: null,
+				valueTo: valueTo,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+				var ftest = vm.resultData.fieldTest[i];
+
+				if (ftest.field==dateField && ftest.valueTo && value!="" && value!=null) {
+					foundEntry = true;
+					fieldTest.valueTo = valueTo;
+					break;
+				}
+				else if (ftest.field==dateField && ftest.valueTo && (value=="" || value==null))
+					vm.resultData.fieldTest.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="" && value!=null)
+				vm.resultData.fieldTest.push(fieldTest);
+		}
+
+		fieldTestValueChange(value : any, valueField : any) {
+			var vm = this;
+
+			if (!value)
+				value="";
+
+			var valueEqualTo : Value = {
+				constant: value,
+				parameter: null,
+				absoluteUnit: "NUMERIC",
+				relativeUnit: null
+			}
+
+			var fieldTest : FieldTest = {
+				field: valueField,
+				valueFrom: null,
+				valueTo: null,
+				valueRange: null,
+				valueEqualTo: valueEqualTo,
+				codeSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+				var ftest = vm.resultData.fieldTest[i];
+
+				if (ftest.field==valueField && ftest.valueEqualTo && value!="") {
+					foundEntry = true;
+					fieldTest.valueEqualTo = valueEqualTo;
+					break;
+				}
+				else if (ftest.field==valueField && ftest.valueEqualTo && value=="")
+					vm.resultData.fieldTest.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="")
+				vm.resultData.fieldTest.push(fieldTest);
+		}
+
+		fieldTestValueFromChange(value : any) {
+			var vm = this;
+
+			if (!value)
+				value="";
+
+			var valueFrom : ValueFrom = {
+				constant: value,
+				parameter: null,
+				absoluteUnit: "NUMERIC",
+				relativeUnit: null,
+				operator: "GREATER_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: vm.fieldTestValueField,
+				valueFrom: valueFrom,
+				valueTo: null,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+				var ftest = vm.resultData.fieldTest[i];
+
+				if (ftest.field==vm.fieldTestValueField && ftest.valueFrom && value!="") {
+					foundEntry = true;
+					fieldTest.valueFrom = valueFrom;
+					break;
+				}
+				else if (ftest.field==vm.fieldTestValueField && ftest.valueFrom && value=="")
+					vm.resultData.fieldTest.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="")
+				vm.resultData.fieldTest.push(fieldTest);
+		}
+
+		fieldTestValueToChange(value : any) {
+			var vm = this;
+
+			if (!value)
+				value="";
+
+			var valueTo : ValueTo = {
+				constant: value,
+				parameter: null,
+				absoluteUnit: "NUMERIC",
+				relativeUnit: null,
+				operator: "LESS_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: vm.fieldTestValueField,
+				valueFrom: null,
+				valueTo: valueTo,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+				var ftest = vm.resultData.fieldTest[i];
+
+				if (ftest.field==vm.fieldTestValueField && ftest.valueTo && value!="") {
+					foundEntry = true;
+					fieldTest.valueTo = valueTo;
+					break;
+				}
+				else if (ftest.field==vm.fieldTestValueField && ftest.valueTo && value=="")
+					vm.resultData.fieldTest.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="")
+				vm.resultData.fieldTest.push(fieldTest);
+
+		}
+
+		restrictionChange(value : any) {
+			var vm = this;
+
+			if (!value || vm.restrictionFieldName=="" || vm.restrictionOrderDirection=="" || vm.restrictionCount=="") {
+				vm.resultData.dataSource.restriction = null;
+				return;
+			}
+
+			var restriction : Restriction = {
+				fieldName: vm.restrictionFieldName,
+				orderDirection: vm.restrictionOrderDirection,
+				count: Number(vm.restrictionCount)
+			};
+
+			vm.resultData.dataSource.restriction = restriction;
 		}
 
 		toggleRestriction() {
@@ -609,9 +928,47 @@ module app.dialogs {
 		};
 
 		save() {
+			var vm = this;
+
+			if (!vm.dataSourceOnly) {
+				for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+					var ft = vm.resultData.fieldTest[i];
+					if (ft.field=="CODE") {
+						if (ft.codeSet[0].codeSetValue.length==0) {
+							vm.resultData.fieldTest.splice(i, 1);
+						}
+					}
+				}
+
+				if (vm.resultData.fieldTest.length>0)
+					vm.resultData.isAny = null;
+				else
+					vm.resultData.isAny = {};
+			}
+
 			this.ok();
 		}
 
+		termShorten(term : string) {
+			term = term.replace(' (disorder)','');
+			term = term.replace(' (observable entity)','');
+			term = term.replace(' (finding)','');
+			return term;
+		}
+
+		getTerm(code : string) : string {
+			var vm = this;
+			var term = vm.termCache[code];
+			if (term) { return term; }
+			vm.termCache[code] = 'Loading...';
+
+			vm.codingService.getPreferredTerm(code)
+				.then(function(concept : Concept) {
+					vm.termCache[code] = vm.termShorten(concept.preferredTerm);
+				});
+
+			return vm.termCache[code];
+		}
 	}
 
 	angular

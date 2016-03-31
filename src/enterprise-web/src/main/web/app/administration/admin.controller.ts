@@ -3,25 +3,39 @@
 
 module app.admin {
 	import User = app.models.User;
+	import UserEditorController = app.dialogs.UserEditorController;
 	'use strict';
 
 	class AdminController {
 		userType : string;
 		userList : app.models.User[];
 
-		static $inject = ['LoggerService', 'AdminService'];
+		static $inject = ['LoggerService', 'AdminService', '$uibModal'];
 
-		constructor(private logger:app.blocks.ILoggerService, private adminService : app.core.IAdminService) {
+		constructor(private logger:app.blocks.ILoggerService,
+								private adminService : app.core.IAdminService,
+								private $modal : IModalService) {
 			this.userType = 'all';
 			this.loadUsers();
 		}
 
 		editUser(user:User) {
-			this.logger.success('Edit ' + user.username);
+			var vm = this;
+			UserEditorController.open(vm.$modal, user, false)
+				.result.then(function(editedUser : User) {
+					vm.adminService.saveUser(editedUser)
+						.then(function(response : {uuid : string} ) {
+							editedUser.uuid = response.uuid;
+							var i = vm.userList.indexOf(user);
+							vm.userList[i] = editedUser;
+							vm.logger.success('User saved', editedUser, 'Edit user');
+						});
+			});
 		}
 
 		viewUser(user:User) {
-			this.logger.info('View ' + user.username);
+			var vm = this;
+			UserEditorController.open(vm.$modal, user, true);
 		}
 
 		deleteUser(user:User) {

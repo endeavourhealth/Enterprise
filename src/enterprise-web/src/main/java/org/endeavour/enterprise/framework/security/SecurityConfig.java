@@ -10,4 +10,6 @@ public abstract class SecurityConfig {
 
     public static final String AUTH_COOKIE_VALID_PATH = "/";
     public static final boolean AUTH_COOKIE_REQUIRES_HTTPS = false;
+
+    public static final int MAX_FAILED_PASSWORD_ATTEMPTS = 5;
 }

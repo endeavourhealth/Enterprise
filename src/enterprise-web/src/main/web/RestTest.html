@@ -37,12 +37,6 @@
 				var statusText = xmlhttp.statusText;
 				appendResult(para, "response status", status + " " + statusText);
 
-				/*var headers = xmlhttp.getAllResponseHeaders();
-				appendResult(para, "headers", headers);*/
-
-				/*var cookie = xmlhttp.getResponseHeader('Set-Cookie');
-				appendResult(para, "cookie", cookie);*/
-
 				var response = xmlhttp.responseText;
 				appendResult(para, "response", response);
 
@@ -126,21 +120,44 @@
 
 	function appendResult(para, name, value)
 	{
-		//var para = document.createElement("p");
+		var brElement = document.createElement("br");
+		para.appendChild(brElement);
+
+		var nameTextNode = document.createTextNode(name + ": ");
+		para.appendChild(nameTextNode);
+
+		var codeElement = document.createElement("code");
+		para.appendChild(codeElement);
+
+		var valueArr = value.split("{");
+		if (valueArr.length == 1) {
+			var valueTextNode = document.createTextNode(value);
+			codeElement.appendChild(valueTextNode);
+		} else {
+			for (i = 1; i < valueArr.length; i++) {
+				if (i>1) {
+					brElement = document.createElement("br");
+					codeElement.appendChild(brElement);
+				}
+
+				var valueTextNode = document.createTextNode("{" + valueArr[i]);
+				codeElement.appendChild(valueTextNode);
+			}
+		}
+	}
+	/*function appendResult(para, name, value)
+	{
 		var brElement = document.createElement("br");
 		var codeElement = document.createElement("code");
 		var nameTextNode = document.createTextNode(name + ": ");
 		var valueTextNode = document.createTextNode(value);
-		var resultsElement = document.getElementById("results");
-
 
 		codeElement.appendChild(valueTextNode);
 
 		para.appendChild(brElement);
 		para.appendChild(nameTextNode);
 		para.appendChild(codeElement);
-		//resultsElement.appendChild(para);
-	}
+	}*/
 
 	function scrollToEnd()
 	{
@@ -192,24 +209,6 @@
 			var params = {uuid:orgUuid};
 
 			post('/api/security/selectOrganisation/', params);
-	
-		}
-	</script>
-
-<hr/>
-<h3>/api/security/changePassword</h3>
-
-	New password: <input type="text" id="changePasswordNewPassword">
-	<br/>
-	<button type="button" onclick="changePassword()">Submit</button>
-
-	<script>
-		function changePassword() {
-
-			var newPassword = document.getElementById('changePasswordNewPassword').value;
-			var params = {password:newPassword};
-
-			post('/api/security/changePassword/', params);
 	
 		}
 	</script>
@@ -269,6 +268,8 @@
 	<br/>
 	Email: <input type="text" id="saveUserEmail">
 	<br/>
+	New password: <input type="text" id="saveUserPassword">
+	<br/>
 	Title: <input type="text" id="saveUserTitle">
 	<br/>
 	Forename: <input type="text" id="saveUserForename">
@@ -302,6 +303,12 @@
 				if (s.length > 0)
 				{
 					params["username"] = s;
+				}
+
+				s = document.getElementById('saveUserPassword').value;
+				if (s.length > 0)
+				{
+					params["password"] = s;
 				}
 
 				s = document.getElementById('saveUserTitle').value;
@@ -842,11 +849,11 @@
 <hr/>
 <h3>/api/library/getLibraryItemNamesForReport</h3>
 
-UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
-<br/>
-<button type="button" onclick="getLibraryItemNamesForReport()">Submit</button>
+	UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
+	<br/>
+	<button type="button" onclick="getLibraryItemNamesForReport()">Submit</button>
 
-<script>
+	<script>
 		function getLibraryItemNamesForReport() {
 
 			var s = document.getElementById('getLibraryItemNamesForReportUuid').value;
@@ -858,11 +865,10 @@ UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
 <hr/>
 <h3>/api/dashboard/getRecentDocuments</h3>
 
-<button type="button" onclick="getRecentDocuments()">Submit</button>
+	<button type="button" onclick="getRecentDocuments()">Submit</button>
 
-<script>
+	<script>
 		function getRecentDocuments() {
-
 			get('/api/dashboard/getRecentDocuments', 'count=5');
 		}
 	</script>
@@ -870,11 +876,10 @@ UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
 <hr/>
 <h3>/api/dashboard/getReportActivity</h3>
 
-<button type="button" onclick="getReportActivity()">Submit</button>
+	<button type="button" onclick="getReportActivity()">Submit</button>
 
-<script>
+	<script>
 		function getReportActivity() {
-
 			get('/api/dashboard/getReportActivity', 'count=5');
 		}
 	</script>
@@ -882,23 +887,32 @@ UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
 <hr/>
 <h3>/api/dashboard/getEngineHistory</h3>
 
-<button type="button" onclick="getEngineHistory()">Submit</button>
+	<button type="button" onclick="getEngineHistory()">Submit</button>
 
-<script>
+	<script>
 		function getEngineHistory() {
-
 			get('/api/dashboard/getEngineHistory', 'count=5');
+		}
+	</script>
+
+<hr/>
+<h3>/api/dashboard/testDatabase</h3>
+
+	<button type="button" onclick="testDatabase()">Submit</button>
+
+	<script>
+		function testDatabase() {
+			get('/api/dashboard/testDatabase');
 		}
 	</script>
 
 <hr/>
 <h3>/api/entity/getEntityMap</h3>
 
-<button type="button" onclick="getEntityMap()">Submit</button>
+	<button type="button" onclick="getEntityMap()">Submit</button>
 
-<script>
+	<script>
 		function getEntityMap() {
-
 			get('/api/entity/getEntityMap');
 		}
 	</script>

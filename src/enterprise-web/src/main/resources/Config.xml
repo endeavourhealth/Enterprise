@@ -15,4 +15,11 @@
 		<password>TheQuickBrownFox1234%^&amp;*</password>
 	</database>-->
 
+	<!--GMail settings-->
+	<!--<email>
+		<url>smtp.gmail.com</url>
+		<username>XXX</username>
+		<password>XXX</password>
+	</email>-->
+
 </config>

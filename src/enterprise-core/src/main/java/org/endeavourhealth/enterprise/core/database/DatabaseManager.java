@@ -6,6 +6,16 @@ import ch.qos.logback.classic.db.names.DefaultDBNameResolver;
 import ch.qos.logback.core.db.ConnectionSource;
 import ch.qos.logback.core.db.dialect.SQLDialectCode;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.util.CollectionUtils;
+import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.DependencyType;
+import org.endeavourhealth.enterprise.core.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.database.administration.*;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
+import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
+import org.endeavourhealth.enterprise.core.database.execution.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +23,11 @@ import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public final class DatabaseManager {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);
@@ -25,21 +40,13 @@ public final class DatabaseManager {
     }
 
     private DatabaseI databaseImplementation = null;
-    private String url = null;
-    private String username = null;
-    private String password = null;
     private ComboPooledDataSource cpds = null;
-
 
 
     public void setConnectionProperties(String url, String username, String password) {
 
         //this would be where we plug in support for different databases
         this.databaseImplementation = new SqlServerDatabase();
-
-        this.url = url;
-        this.username = username;
-        this.password = password;
 
         try {
 
@@ -70,6 +77,12 @@ public final class DatabaseManager {
         //return DriverManager.getConnection(getInstance().url, getInstance().username, getInstance().password);
 
         Connection conn = getInstance().cpds.getConnection();
+
+        //occasional problems getting a connection that's already closed, so try this quick check
+        if (conn.isClosed()) {
+            return getConnection();
+        }
+
         conn.setAutoCommit(false); //never want auto-commit
         return conn;
     }
@@ -117,6 +130,239 @@ public final class DatabaseManager {
         asyncAppender.start();
 
         rootLogger.addAppender(asyncAppender);
+    }
+
+    public void sqlTest() throws Exception {
+
+        List<UUID> uuidList = new ArrayList<>();
+        uuidList.add(UUID.randomUUID());
+        uuidList.add(UUID.randomUUID());
+        uuidList.add(UUID.randomUUID());
+
+        db().retrieveEndUserForEmail("Email");
+        db().retrieveEndUserForEmail("Ema'il");
+
+        db().retrieveSuperUsers();
+
+        db().retrieveEndUserPwdForUserNotExpired(UUID.randomUUID());
+
+        db().retrieveAllOrganisations();
+
+        db().retrieveOrganisationForNameNationalId("Name", "NationalId");
+
+        db().retrieveEndUserEmailInviteForUserNotCompleted(UUID.randomUUID());
+
+        db().retrieveEndUserEmailInviteForToken("Token");
+
+        db().retrieveOrganisationEndUserLinksForOrganisationNotExpired(UUID.randomUUID());
+
+        db().retrieveOrganisationEndUserLinksForUserNotExpired(UUID.randomUUID());
+
+        db().retrieveOrganisationEndUserLinksForOrganisationEndUserNotExpired(UUID.randomUUID(), UUID.randomUUID());
+
+        db().retrieveLatestItemForUuid(UUID.randomUUID());
+
+        db().retrieveDependentItems(UUID.randomUUID(), DependencyType.IsContainedWithin);
+
+        db().retrieveNonDependentItems(UUID.randomUUID(), DependencyType.IsChildOf, DefinitionItemType.ReportFolder);
+
+        List<DbActiveItem> activeItems = new ArrayList<>();
+        DbActiveItem a = new DbActiveItem();
+        a.setItemUuid(UUID.randomUUID());
+        a.setAuditUuid(UUID.randomUUID());
+        activeItems.add(a);
+        a = new DbActiveItem();
+        a.setItemUuid(UUID.randomUUID());
+        a.setAuditUuid(UUID.randomUUID());
+        activeItems.add(a);
+        db().retrieveItemsForActiveItems(activeItems);
+
+        db().retrieveActiveItemForItemUuid(UUID.randomUUID());
+
+        db().retrieveActiveItemDependentItems(UUID.randomUUID(), UUID.randomUUID(), DependencyType.Uses);
+
+        db().retrieveActiveItemRecentItems(UUID.randomUUID(), 5);
+
+        db().retrieveCountDependencies(UUID.randomUUID(), DependencyType.IsChildOf);
+
+        db().retrieveItemDependenciesForItem(UUID.randomUUID(), UUID.randomUUID());
+
+        db().retrieveItemDependenciesForItemType(UUID.randomUUID(), UUID.randomUUID(), DependencyType.Uses);
+
+        db().retrieveItemDependenciesForDependentItem(UUID.randomUUID());
+
+        db().retrieveItemDependenciesForDependentItemType(UUID.randomUUID(), DependencyType.Uses);
+
+        db().retrievePendingRequestsForItems(UUID.randomUUID(), uuidList);
+
+        db().retrievePendingRequests();
+
+        db().retrieveRecentJobs(5);
+
+        db().retrieveJobsForStatus(ExecutionStatus.Executing);
+
+        db().retrieveJobsForUuids(uuidList);
+
+        db().retrieveJobReports(UUID.randomUUID(), 5);
+
+        db().retrieveJobReportsForJob(UUID.randomUUID());
+
+        db().retrieveLatestJobReportsForItemUuids(UUID.randomUUID(), uuidList);
+
+        db().retrieveJobReportItemsForJobReport(UUID.randomUUID());
+
+        db().retrieveAuditsForUuids(uuidList);
+
+        db().retrieveLatestAudit();
+
+        db().retrieveJobContentsForJob(UUID.randomUUID());
+
+        List<DbAbstractTable> entities = new ArrayList<>();
+
+        DbOrganisation organisation = new DbOrganisation();
+        organisation.assignPrimaryUUid();
+        organisation.setName("OrgName");
+        organisation.setNationalId("OrgId");
+        UUID orgUuid = organisation.getOrganisationUuid();
+        entities.add(organisation);
+
+        DbEndUser user = new DbEndUser();
+        user.assignPrimaryUUid();
+        user.setEmail("Email");
+        user.setForename("Forename");
+        user.setSuperUser(false);
+        user.setSurname("Surname");
+        user.setTitle("Title");
+        UUID userUuid = user.getEndUserUuid();
+        entities.add(user);
+
+        DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
+        invite.assignPrimaryUUid();
+        invite.setDtCompleted(null);
+        invite.setEndUserUuid(userUuid);
+        invite.setUniqueToken("Token");
+        entities.add(invite);
+
+        DbEndUserPwd pwd = new DbEndUserPwd();
+        pwd.assignPrimaryUUid();
+        pwd.setDtExpired(null);
+        pwd.setFailedAttempts(0);
+        pwd.setOneTimeUse(false);
+        pwd.setEndUserUuid(userUuid);
+        pwd.setPwdHash("PwdHash");
+        entities.add(pwd);
+
+        DbOrganisationEndUserLink organisationEndUserLink = new DbOrganisationEndUserLink();
+        organisationEndUserLink.assignPrimaryUUid();
+        organisationEndUserLink.setAdmin(false);
+        organisationEndUserLink.setEndUserUuid(userUuid);
+        organisationEndUserLink.setDtExpired(null);
+        organisationEndUserLink.setOrganisationUuid(orgUuid);
+        entities.add(organisationEndUserLink);
+
+        DbAudit audit = new DbAudit();
+        audit.assignPrimaryUUid();
+        audit.setOrganisationUuid(orgUuid);
+        audit.setTimeStamp(Instant.now());
+        audit.setEndUserUuid(userUuid);
+        UUID auditUuid = audit.getAuditUuid();
+        entities.add(audit);
+
+        DbItem item = new DbItem();
+        item.assignPrimaryUUid();
+        item.setAuditUuid(auditUuid);
+        item.setTitle("Title");
+        item.setDescription("Description");
+        item.setXmlContent("XmlContent");
+        UUID itemUuid = item.getItemUuid();
+        entities.add(item);
+
+        DbActiveItem activeItem = new DbActiveItem();
+        activeItem.assignPrimaryUUid();
+        activeItem.setAuditUuid(auditUuid);
+        activeItem.setItemUuid(itemUuid);
+        activeItem.setDeleted(false);
+        activeItem.setItemTypeId(DefinitionItemType.ReportFolder);
+        activeItem.setOrganisationUuid(orgUuid);
+        entities.add(activeItem);
+
+        DbItemDependency itemDependency = new DbItemDependency();
+        itemDependency.assignPrimaryUUid();
+        itemDependency.setAuditUuid(auditUuid);
+        itemDependency.setDependencyTypeId(DependencyType.Uses);
+        itemDependency.setDependentItemUuid(itemUuid);
+        itemDependency.setItemUuid(itemUuid);
+        entities.add(itemDependency);
+
+        DbJob job = new DbJob();
+        job.assignPrimaryUUid();
+        job.setBaselineAuditUuid(auditUuid);
+        job.setStartDateTime(Instant.now());
+        job.setStatusId(ExecutionStatus.Executing);
+        job.setEndDateTime(null);
+        job.setPatientsInDatabase(null);
+        UUID jobUuid = job.getJobUuid();
+        entities.add(job);
+
+        DbJobContent jobContent = new DbJobContent();
+        jobContent.assignPrimaryUUid();
+        jobContent.setAuditUuid(auditUuid);
+        jobContent.setItemUuid(itemUuid);
+        jobContent.setJobUuid(jobUuid);
+        entities.add(jobContent);
+
+        DbJobReport jobReport = new DbJobReport();
+        jobReport.assignPrimaryUUid();
+        jobReport.setAuditUuid(auditUuid);
+        jobReport.setJobUuid(jobUuid);
+        jobReport.setEndUserUuid(userUuid);
+        jobReport.setOrganisationUuid(orgUuid);
+        jobReport.setParameters("Parameters");
+        jobReport.setReportUuid(itemUuid);
+        jobReport.setStatusId(ExecutionStatus.Executing);
+        UUID jobReportUuid = jobReport.getJobReportUuid();
+        entities.add(jobReport);
+
+        DbJobReportItem jobReportItem = new DbJobReportItem();
+        jobReportItem.assignPrimaryUUid();
+        jobReportItem.setAuditUuid(auditUuid);
+        jobReportItem.setParentJobReportItemUuid(null);
+        jobReportItem.setItemUuid(itemUuid);
+        jobReportItem.setJobReportUuid(jobReportUuid);
+        jobReportItem.setResultCount(null);
+        entities.add(jobReportItem);
+
+        DbRequest request = new DbRequest();
+        request.assignPrimaryUUid();
+        request.setReportUuid(itemUuid);
+        request.setEndUserUuid(userUuid);
+        request.setJobUuid(null);
+        request.setOrganisationUuid(orgUuid);
+        request.setParameters("Parameters");
+        request.setTimeStamp(Instant.now());
+        entities.add(request);
+
+        //now insert the new entities
+        for (DbAbstractTable entity: entities) {
+            entity.setSaveMode(TableSaveMode.INSERT);
+            entity.writeToDb();
+        }
+
+        //now we've tested inserting, test an update to each item
+        for (DbAbstractTable entity: entities) {
+            entity.setSaveMode(TableSaveMode.UPDATE);
+            entity.writeToDb();
+        }
+
+        //now we've tested inserting and updating, we should test a delete
+        Collections.reverse(entities); //reverse, so the FK dependencies don't cause problems
+
+        for (DbAbstractTable entity: entities) {
+            entity.setSaveMode(TableSaveMode.DELETE);
+            entity.writeToDb();
+        }
+
+
     }
 
     /**

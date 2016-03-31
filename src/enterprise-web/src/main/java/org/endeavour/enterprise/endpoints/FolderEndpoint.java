@@ -83,12 +83,13 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
                     throw new BadRequestException("Cannot move a folder to be a child of itself");
                 }
 
-                List<DbItemDependency> parents = DbItemDependency.retrieveForDependentItemType(currentParentUuid, DependencyType.IsChildOf);
+                DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(currentParentUuid);
+                List<DbItemDependency> parents = DbItemDependency.retrieveForActiveItemType(activeItem, DependencyType.IsChildOf);
                 if (parents.isEmpty()) {
                     currentParentUuid = null;
                 } else {
                     DbItemDependency parent = parents.get(0);
-                    currentParentUuid = parent.getItemUuid();
+                    currentParentUuid = parent.getDependentItemUuid();
                 }
             }
         }
@@ -178,10 +179,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         //if we have a parent, then we want the child folders under it
         else {
             UUID parentUuid = parseUuidFromStr(parentUuidStr);
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(parentUuid);
-            UUID auditUuid = activeItem.getAuditUuid();
-
-            items = DbItem.retrieveDependentItems(parentUuid, auditUuid, DependencyType.IsChildOf);
+            items = DbItem.retrieveDependentItems(parentUuid, DependencyType.IsChildOf);
         }
 
         LOG.trace("Found {} child folders", items.size());
@@ -221,7 +219,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         List<DbAbstractTable> toSave = new ArrayList<>();
 
-        DbAudit audit = DbAudit.factoryNow(userUuid);
+        DbAudit audit = DbAudit.factoryNow(userUuid, organisationUuid);
         toSave.add(audit);
 
         DbItem item = DbItem.factoryNew(title, audit);

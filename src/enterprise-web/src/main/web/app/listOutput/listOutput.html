@@ -3,8 +3,8 @@
 		<div class="module-heading">
 			List output
 			<div class="pull-right">
-				<button type="button" class="btn btn-sm btn-success" data-ng-click="listOutputCtrl.save(false)">Save</button>
-				<button type="button" class="btn btn-sm btn-warning" data-ng-click="listOutputCtrl.save(true)">Save & Close</button>
+				<button type="button" class="btn btn-sm btn-success" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.save(false)">Save</button>
+				<button type="button" class="btn btn-sm btn-warning" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.save(true)">Save & Close</button>
 				<button type="button" class="btn btn-sm btn-danger" data-ng-click="listOutputCtrl.close()">Cancel</button>
 			</div>
 		</div>
@@ -13,19 +13,19 @@
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="name">Name</label>
-						<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.libraryItem.name">
+						<input type="text" class="form-control" id="name" ng-model="listOutputCtrl.libraryItem.name" ng-readonly="listOutputCtrl.readOnly">
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col-md-12">
 						<label for="description">Description</label>
-						<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.libraryItem.description">
+						<input type="text" class="form-control" id="description" ng-model="listOutputCtrl.libraryItem.description" ng-readonly="listOutputCtrl.readOnly">
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col-md-8">
 						<label>List groups</label>
-						<button type="button" class="btn btn-xs btn-success" data-ng-click="listOutputCtrl.addListGroup()">
+						<button type="button" class="btn btn-xs btn-success" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.addListGroup()">
 							<span class="glyphicon glyphicon-plus"></span>
 						</button>
 						<div class="table scroll-box-450 form-control">
@@ -48,7 +48,7 @@
 										<td>{{ item | listReportGroupToDescription }}</td>
 										<td>
 											<div class="child-to-show">
-												<button type="button" class="btn btn-danger btn-xs pull-right" ng-click="listOutputCtrl.removeListGroup(this)">
+												<button type="button" class="btn btn-danger btn-xs pull-right" ng-hide="listOutputCtrl.readOnly" ng-click="listOutputCtrl.removeListGroup(this)">
 													<span class="glyphicon glyphicon-remove"></span>
 												</button>
 											</div>
@@ -62,7 +62,7 @@
 						<div class="row">
 							<div class="form-group col-md-12">
 								<label for="group-heading">Heading</label>
-								<input type="text" class="form-control" id="group-heading" ng-model="listOutputCtrl.selectedListReportGroup.heading">
+								<input type="text" class="form-control" id="group-heading" ng-model="listOutputCtrl.selectedListReportGroup.heading" ng-readonly="listOutputCtrl.readOnly">
 							</div>
 						</div>
 						<div class="row" ng-show="listOutputCtrl.selectedListReportGroup.fieldBased">
@@ -72,17 +72,17 @@
 									<input type="text"
 												 class="form-control"
 												 id="fieldBased-dataSource"
-												 value="{{listOutputCtrl.selectedListReportGroup.fieldBased.dataSource.entity}}" disabled>
+												 value="{{listOutputCtrl.getDatasourceDisplayName()}}" disabled>
 									<span class="input-group-addon" ng-click="listOutputCtrl.selectDataSource(listOutputCtrl.selectedListReportGroup.fieldBased)" style="cursor: pointer">
 										<i class="glyphicon glyphicon-hdd" id="fieldBased-dataSource" aria-hidden="true"></i>
 									</span>
 								</div>
 							</div>
 						</div>
-						<div class="row">
+						<div class="row" ng-show="listOutputCtrl.selectedListReportGroup.fieldBased.dataSource">
 							<div class="form-group col-md-12">
 								<label for="fieldBased-dataSource">Field output</label>
-								<button type="button" class="btn btn-xs btn-success" data-ng-click="listOutputCtrl.addFieldOutput()">
+								<button type="button" class="btn btn-xs btn-success" ng-hide="listOutputCtrl.readOnly" data-ng-click="listOutputCtrl.addFieldOutput()">
 									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 								<div class="table scroll-box-300 form-control">
@@ -97,24 +97,26 @@
 													ng-repeat="item in listOutputCtrl.selectedListReportGroup.fieldBased.fieldOutput">
 												<td>
 													<span class="child-to-hide">{{ item.heading }}</span>
-													<input type="text" class="form-control input-sm child-to-show" ng-model="item.heading">
+													<input type="text" class="form-control input-sm child-to-show" ng-model="item.heading" ng-readonly="listOutputCtrl.readOnly">
 												</td>
 												<td>
-													<span class="child-to-hide">{{ item.field }}</span>
+													<span class="child-to-hide">{{ listOutputCtrl.getFieldDisplayName(item.field) }}</span>
 													<div class="btn-group child-to-show" role="group" uib-dropdown>
-														<button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle aria-haspopup="true" aria-expanded="false">
-															{{ item.field }}
+														<button type="button" class="btn btn-sm btn-default dropdown-toggle" uib-dropdown-toggle aria-haspopup="true" aria-expanded="false" ng-disabled="listOutputCtrl.readOnly">
+															{{ listOutputCtrl.getFieldDisplayName(item.field) }}
 															<span class="caret"></span>
 														</button>
 														<ul uib-dropdown-menu>
-															<li ng-repeat="field in listOutputCtrl.dataSourceAvailableFields"><a ng-click="item.field = field">{{ field }}</a></li>
+															<li ng-repeat="field in listOutputCtrl.dataSourceAvailableFields"><a ng-click="item.field = field.logicalName">{{ field.displayName }}</a></li>
 														</ul>
 													</div>
 												</td>
 												<td>
-													<button type="button" class="btn btn-danger btn-xs child-to-show" ng-click="listOutputCtrl.removeFieldOutput(this)">
-														<span class="glyphicon glyphicon-remove"></span>
-													</button>
+													<div class="pull-right" ng-hide="listOutputCtrl.readOnly">
+														<button type="button" class="btn btn-danger btn-xs child-to-show" ng-click="listOutputCtrl.removeFieldOutput(this)">
+															<span class="glyphicon glyphicon-remove"></span>
+														</button>
+													</div>
 												</td>
 											</tr>
 										</tbody>

@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.security.PasswordHash;
+import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.json.JsonEmailInviteParameters;
@@ -9,11 +10,16 @@ import org.endeavour.enterprise.json.JsonOrganisation;
 import org.endeavour.enterprise.json.JsonOrganisationList;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.administration.*;
+import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,18 +39,6 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         String password = personParameters.getPassword();
 
         LOG.trace("Login for {}", email);
-
-        /*ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("EntityMap.xsd").getFile());
-        LOG.trace("{}", file);
-
-        file = new File(classLoader.getResource("logback.xml").getFile());
-        LOG.trace("{}", file);
-
-        String s = Resources.getResourceAsString("EntityMap.xsd");
-        LOG.trace(s);
-        s = Resources.getResourceAsString("logback.xml");
-        LOG.trace(s);*/
 
         if (email == null
                 || email.length() == 0
@@ -69,8 +63,26 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //validate the password
         String hash = pwd.getPwdHash();
         if (!PasswordHash.validatePassword(password, hash)) {
+
+            int failedAttempts = pwd.getFailedAttempts();
+            failedAttempts ++;
+            pwd.setFailedAttempts(failedAttempts);
+            if (failedAttempts >= SecurityConfig.MAX_FAILED_PASSWORD_ATTEMPTS) {
+                pwd.setDtExpired(Instant.now());
+            }
+            pwd.writeToDb();
+
             throw new NotAuthorizedException("Invalid password");
         }
+
+        Boolean mustChangePassword = null;
+        if (pwd.isOneTimeUse()) {
+            pwd.setDtExpired(Instant.now());
+            mustChangePassword = Boolean.TRUE;
+        }
+
+        pwd.setFailedAttempts(0);
+        pwd.writeToDb();
 
         JsonOrganisationList ret = ret = new JsonOrganisationList();
         DbOrganisation orgToAutoSelect = null;
@@ -117,7 +129,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         }
 
         //set the user details in the return object as well
-        ret.setUser(new JsonEndUser(user, null));
+        ret.setUser(new JsonEndUser(user, null, mustChangePassword));
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
 
@@ -193,8 +205,6 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     public Response logoff(@Context SecurityContext sc) throws Exception {
         LOG.trace("Logoff");
 
-        //TODO: 2016-02-22 DL - once we have server-side sessions, should remove it here
-
         //replace the cookie on the client with an empty one
         NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);
 
@@ -204,65 +214,6 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 .build();
     }
 
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/changePassword")
-    public Response changePassword(@Context SecurityContext sc, JsonEndUser parameters) throws Exception {
-        //validate token
-        DbEndUser user = getEndUserFromSession(sc);
-
-        String newPwd = parameters.getPassword();
-
-        LOG.trace("Changing password");
-
-        //validate we have a new password
-        if (newPwd == null
-                || newPwd.length() == 0) {
-            throw new BadRequestException("No new password provided");
-        }
-
-        String hash = PasswordHash.createHash(newPwd);
-
-        //retrieve the most recent password for the person
-        UUID uuid = user.getEndUserUuid();
-        DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
-
-        //create the new password entity
-        DbEndUserPwd p = new DbEndUserPwd();
-        p.setEndUserUuid(uuid);
-        p.setPwdHash(hash);
-
-        //save both old and new passwords atomically
-        List<DbAbstractTable> toSave = new ArrayList<>();
-        toSave.add(p);
-        if (oldPwd != null) {
-            oldPwd.setDtExpired(Instant.now());
-            toSave.add(oldPwd);
-        }
-
-        DatabaseManager.db().writeEntities(toSave);
-
-        return Response
-                .ok()
-                .build();
-    }
-
-    /**
-     * @Path("customer") public class CustomerResource {
-     * @GET
-     * @Path("id/{id}")
-     * @Produces(MediaType.APPLICATION_JSON) public Customer getCustomer(@PathParam("id") String id) {
-     * Customer customer = new Customer();
-     * customer.setId(id);
-     * customer.setCity("Austin");
-     * customer.setState("TX");
-     * customer.setName("Mighty Pulpo");
-     * return customer;
-     * }
-     * }
-     */
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

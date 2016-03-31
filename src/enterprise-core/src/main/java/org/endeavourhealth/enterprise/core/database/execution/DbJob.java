@@ -26,7 +26,7 @@ public final class DbJob extends DbAbstractTable {
     @DatabaseColumn
     private Integer patientsInDatabase = null;
     @DatabaseColumn
-    private Integer baselineAuditVersion = null;
+    private UUID baselineAuditUuid = null;
 
     public static List<DbJob> retrieveForJobReports(List<DbJobReport> jobReports) throws Exception {
         List<UUID> uuids = new ArrayList<>();
@@ -41,7 +41,7 @@ public final class DbJob extends DbAbstractTable {
 
 
     public static DbJob retrieveForUuid(UUID jobUuid) throws Exception {
-        return (DbJob)DatabaseManager.db().retrieveForPrimaryKeys(adapter, jobUuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbJob.class, jobUuid);
     }
 
     public static List<DbJob> retrieveRecent(int count) throws Exception {
@@ -105,11 +105,11 @@ public final class DbJob extends DbAbstractTable {
         this.statusId = statusId;
     }
 
-    public Integer getBaselineAuditVersion() {
-        return baselineAuditVersion;
+    public UUID getBaselineAuditUuid() {
+        return baselineAuditUuid;
     }
 
-    public void setBaselineAuditVersion(Integer baselineAuditVersion) {
-        this.baselineAuditVersion = baselineAuditVersion;
+    public void setBaselineAuditUuid(UUID baselineAuditUuid) {
+        this.baselineAuditUuid = baselineAuditUuid;
     }
 }

@@ -3,7 +3,7 @@ module app.models {
 
 	export class Restriction {
 		fieldName : string;
-		orderDirection : OrderDirection;
+		orderDirection : string;
 		count : number;
 	}
 }

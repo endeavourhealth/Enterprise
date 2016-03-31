@@ -3,9 +3,15 @@
         <div class="module-heading">Query editor
             <div class="pull-right">
                 <button class="btn btn-sm btn-primary"
-                        ng-click="addNewRule()"
+                        ng-click="addNewRule(false)"
                         title="Add a new rule to this query">
                     Add Rule
+                </button>
+
+                <button class="btn btn-sm btn-info"
+                        ng-click="addNewRule(true)"
+                        title="Add a new expression rule to this query">
+                    Add Expression
                 </button>
 
                 <button class="btn btn-sm btn-warning"
@@ -79,11 +85,11 @@
                                         <input class="form-control" type="text" name="input" ng-model="ruleDescription" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleDescriptionChange()">
                                         <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule PASS Action:</label>
                                         <select class="form-control" ng-model="rulePassAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="rulePassActionChange()">
-                                            <option ng-repeat="result in results" value="{{result}}">{{result}}</option>
+                                            <option ng-repeat="result in results" value="{{result.value}}">{{result.displayName}}</option>
                                         </select>
                                         <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule FAIL Action:</label>
                                         <select class="form-control" ng-model="ruleFailAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleFailActionChange()">
-                                            <option ng-repeat="result in results" value="{{result}}">{{result}}</option>
+                                            <option ng-repeat="result in results" value="{{result.value}}">{{result.displayName}}</option>
                                         </select>
                                     </fieldset>
                                 </form>

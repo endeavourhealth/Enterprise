@@ -39,8 +39,8 @@ public final class DbItem extends DbAbstractTable {
         return ret;
     }
 
-    public static DbItem retrieveForUUid(UUID itemUuid) throws Exception {
-        return (DbItem)DatabaseManager.db().retrieveItemForUuid(itemUuid);
+    public static DbItem retrieveLatestForUUid(UUID itemUuid) throws Exception {
+        return DatabaseManager.db().retrieveLatestItemForUuid(itemUuid);
     }
 
     public static DbItem retrieveForActiveItem(DbActiveItem activeItem) throws Exception {
@@ -48,11 +48,11 @@ public final class DbItem extends DbAbstractTable {
     }
 
     public static DbItem retrieveForUuidAndAudit(UUID uuid, UUID auditUuid) throws Exception {
-        return (DbItem)DatabaseManager.db().retrieveForPrimaryKeys(adapter, uuid, auditUuid);
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbItem.class, uuid, auditUuid);
     }
 
-    public static List<DbItem> retrieveDependentItems(UUID itemUuid, UUID auditUuid, DependencyType dependencyType) throws Exception {
-        return DatabaseManager.db().retrieveDependentItems(itemUuid, auditUuid, dependencyType);
+    public static List<DbItem> retrieveDependentItems(UUID itemUuid, DependencyType dependencyType) throws Exception {
+        return DatabaseManager.db().retrieveDependentItems(itemUuid, dependencyType);
     }
 
     public static List<DbItem> retrieveNonDependentItems(UUID organisationUuid, DependencyType dependencyType, DefinitionItemType itemType) throws Exception {

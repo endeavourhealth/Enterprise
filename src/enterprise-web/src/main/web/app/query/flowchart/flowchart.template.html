@@ -9,6 +9,11 @@
                     offset="0" stop-opacity="0.99609" stop-color="#80bdff"/>
             <stop offset="0.63934" stop-opacity="0.99219" stop-color="#cce5ff"/>
         </linearGradient>
+        <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="expressionRuleBackgroundGradient">
+            <stop
+                    offset="0" stop-opacity="0.99609" stop-color="#56BFE0"/>
+            <stop offset="0.63934" stop-opacity="0.99219" stop-color="#B2EAFF"/>
+        </linearGradient>
         <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="startRuleBackgroundGradient">
             <stop offset="0" stop-opacity="0.99609" stop-color="green"/>
             <stop offset="0.63934" stop-opacity="0.99219" stop-color="lightgreen"/>
@@ -29,13 +34,22 @@
                 r="40" cx="212" cy="30"
                 fill="url(#startRuleBackgroundGradient)"/>
 
-        <rect ng-if="rule.description()!='START'"
+        <rect ng-if="rule.description()!='START' && !rule.expression()"
               ng-attr-class="{{rule.selected() && 'selected-rule-rect'
                       || (rule == mouseOverRule && 'mouseover-rule-rect' || 'rule-rect')}}"
               ry="10" rx="10" x="0" y="0"
               ng-attr-width="{{rule.width()}}"
               ng-attr-height="{{110}}"
               fill="url(#ruleBackgroundGradient)">
+        </rect>
+
+        <rect ng-if="rule.description()!='START' && rule.expression()"
+              ng-attr-class="{{rule.selected() && 'selected-rule-rect'
+                      || (rule == mouseOverRule && 'mouseover-rule-rect' || 'rule-rect')}}"
+              ry="10" rx="10" x="0" y="0"
+              ng-attr-width="{{rule.width()}}"
+              ng-attr-height="{{110}}"
+              fill="url(#expressionRuleBackgroundGradient)">
         </rect>
 
         <text ng-if="rule.description()=='START'"

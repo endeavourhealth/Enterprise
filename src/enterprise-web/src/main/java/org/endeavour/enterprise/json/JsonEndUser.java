@@ -18,23 +18,23 @@ public final class JsonEndUser implements Serializable {
     private Boolean superUser = null; //using non-primative types because serialisation to JSON can skip nulls, if we want
     private Boolean admin = null;
     private Integer permissions = null; //to be removed after isAdmin is adopted
-
+    private Boolean mustChangePassword = null;
 
     public JsonEndUser() {
     }
 
-    public JsonEndUser(DbEndUser endUser, Boolean isAdmin) {
+    public JsonEndUser(DbEndUser endUser, Boolean isAdmin, Boolean mustChangePassword) {
         this.uuid = endUser.getEndUserUuid();
         this.username = endUser.getEmail();
         this.title = endUser.getTitle();
         this.forename = endUser.getForename();
         this.surname = endUser.getSurname();
         this.superUser = new Boolean(endUser.isSuperUser());
+        this.admin = isAdmin;
+        this.mustChangePassword = mustChangePassword;
 
+        //to be removed once web client changed to use isAdmin
         if (isAdmin != null) {
-            this.admin = new Boolean(isAdmin);
-
-            //to be removed once web client changed to use isAdmin
             if (isAdmin) {
                 this.permissions = new Integer(2);
             } else {
@@ -116,5 +116,13 @@ public final class JsonEndUser implements Serializable {
 
     public void setPermissions(Integer permissions) {
         this.permissions = permissions;
+    }
+
+    public Boolean getMustChangePassword() {
+        return mustChangePassword;
+    }
+
+    public void setMustChangePassword(Boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
     }
 }

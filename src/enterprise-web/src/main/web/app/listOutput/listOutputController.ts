@@ -52,7 +52,6 @@ module app.listOutput {
 		}
 
 		selectDataSource(datasourceContainer : { dataSource : DataSource }) {
-			if (this.readOnly) { return; }
 			var vm = this;
 			var test : Test = null;
 

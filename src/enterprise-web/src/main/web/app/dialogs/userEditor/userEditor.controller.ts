@@ -10,16 +10,14 @@ module app.dialogs {
 	'use strict';
 
 	export class UserEditorController extends BaseDialogController {
-		public static open($modal : IModalService, user : User, readOnly : boolean) : IModalServiceInstance {
+		public static open($modal : IModalService, user : User) : IModalServiceInstance {
 			var options : IModalSettings = {
 				templateUrl:'app/dialogs/userEditor/userEditor.html',
 				controller:'UserEditorController',
 				controllerAs:'userEditor',
 				backdrop: 'static',
 				resolve:{
-					user : () => user,
-					readOnly : () => readOnly
-
+					user : () => user
 				}
 			};
 
@@ -27,13 +25,12 @@ module app.dialogs {
 			return dialog;
 		}
 
-		static $inject = ['$uibModalInstance', 'LoggerService', 'AdminService', 'user', 'readOnly'];
+		static $inject = ['$uibModalInstance', 'LoggerService', 'AdminService', 'user'];
 
 		constructor(protected $uibModalInstance : IModalServiceInstance,
 								private logger:app.blocks.ILoggerService,
 								private adminService : IAdminService,
-								private user : User,
-								private readOnly : boolean) {
+								private user : User) {
 			super($uibModalInstance);
 			this.resultData = jQuery.extend(true, {}, user);
 		}

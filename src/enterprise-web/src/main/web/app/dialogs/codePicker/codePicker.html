@@ -25,9 +25,12 @@
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="parent in codePicker.parents"
 							 ng-dblclick="codePicker.displayCode(parent, true)"
-							 class="hover-box striped"
+							 class="hover-box show-child-on-hover striped"
 							 ng-class="{'previous-selection': parent.code == codePicker.previousSelection.code}">
 						{{ codePicker.getTerm(parent.code) }}
+						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" ng-click="codePicker.addToSelection(parent)">
+							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -50,9 +53,12 @@
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="child in codePicker.children"
 							 ng-dblclick="codePicker.displayCode(child, true)"
-							 class="hover-box striped"
+							 class="hover-box show-child-on-hover striped"
 							 ng-class="{'previous-selection': child.code == codePicker.previousSelection.code}">
 						{{ codePicker.getTerm(child.code) }}
+						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" ng-click="codePicker.addToSelection(child)">
+							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
+						</button>
 					</div>
 				</div>
 			</div>

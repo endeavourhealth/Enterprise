@@ -24,10 +24,14 @@
 				</div>
 				<div class="row">
 					<div class="form-group col-md-12">
-						<label>Codes</label>
-						<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="codeSetCtrl.showCodePicker()">
-							<span ng-repeat="code in codeSetCtrl.libraryItem.codeSet.codeSetValue">
-								<span ng-hide="this.$first">, </span>{{ codeSetCtrl.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ codeSetCtrl.getTerm(exclusion.code) }} (exclusion)</span>
+						<label>Codes</label> <small class="text-muted">(Click box to edit)</small>
+						<div class="scroll-box-150 form-control" style="cursor: pointer;" ng-click="codeSetCtrl.showCodePicker()">
+							<span ng-repeat="selection in codeSetCtrl.libraryItem.codeSet.codeSetValue">
+								{{ codeSetCtrl.getTerm(selection.code) }}
+								<span class="label label-success" ng-show="selection.includeChildren && (!selection.exclusion || selection.exclusion.length == 0)">All children</span>
+								<span class="label label-warning" ng-show="selection.includeChildren && (selection.exclusion && selection.exclusion.length > 0)">Some children</span>
+								<span class="label label-danger" ng-show="!selection.includeChildren">No children</span>
+								<span ng-hide="this.$last">  |  </span>
 							</span>
 						</div>
 					</div>

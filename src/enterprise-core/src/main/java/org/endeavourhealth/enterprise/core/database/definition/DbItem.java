@@ -3,12 +3,14 @@ package org.endeavourhealth.enterprise.core.database.definition;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.database.*;
+import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobContent;
+import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
+import org.endeavourhealth.enterprise.core.querydocument.models.*;
 
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class DbItem extends DbAbstractTable {
 
@@ -61,6 +63,33 @@ public final class DbItem extends DbAbstractTable {
 
     public static List<DbItem> retrieveForActiveItems(List<DbActiveItem> activeItems) throws Exception {
         return DatabaseManager.db().retrieveItemsForActiveItems(activeItems);
+    }
+
+    public static Map<UUID, Object> retrieveLibraryItemsForJob(UUID jobUuid) throws Exception {
+        Map<UUID, Object> ret = new HashMap<>();
+
+        List<DbItem> items = DatabaseManager.db().retrieveItemsForJob(jobUuid);
+        for (DbItem item: items) {
+
+            UUID itemUuid = item.getItemUuid();
+            String xml = item.getXmlContent();
+            LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
+            if (libraryItem.getQuery() != null) {
+                ret.put(itemUuid, libraryItem.getQuery());
+            } else if (libraryItem.getDataSource() != null) {
+                ret.put(itemUuid, libraryItem.getDataSource());
+            } else if (libraryItem.getTest() != null) {
+                ret.put(itemUuid, libraryItem.getTest());
+            } else if (libraryItem.getCodeSet() != null) {
+                ret.put(itemUuid, libraryItem.getCodeSet());
+            } else if (libraryItem.getListReport() != null) {
+                ret.put(itemUuid, libraryItem.getListReport());
+            } else {
+                throw new RuntimeException("Library item " + itemUuid + " contains no content");
+            }
+        }
+
+        return ret;
     }
 
     @Override
@@ -118,4 +147,5 @@ public final class DbItem extends DbAbstractTable {
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
+
 }

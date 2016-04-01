@@ -1119,6 +1119,15 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public List<DbItem> retrieveItemsForJob(UUID jobUuid) throws Exception {
+        String where = "INNER JOIN Execution.JobContent c"
+                + " ON c.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND c.AuditUuid = " + ALIAS + ".AuditUuid"
+                + " AND c.JobUuid = ?";
+        return retrieveForWherePreparedStatement(DbItem.class, where, jobUuid);
+    }
+
+    @Override
     public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception {
         String sql = "SELECT COUNT(1)"
                 + " FROM Definition.ItemDependency d, Definition.ActiveItem a"

@@ -55,6 +55,8 @@ public interface DatabaseI {
 
     public List<DbItem> retrieveItemsForActiveItems(List<DbActiveItem> activeItems) throws Exception;
 
+    public List<DbItem> retrieveItemsForJob(UUID jobUuid) throws Exception;
+
     public DbActiveItem retrieveActiveItemForItemUuid(UUID itemUuid) throws Exception;
 
     public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception;

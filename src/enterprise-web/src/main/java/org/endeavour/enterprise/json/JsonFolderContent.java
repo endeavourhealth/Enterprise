@@ -17,6 +17,7 @@ public final class JsonFolderContent implements Serializable {
     private Integer type = null;
     private String typeDesc = null;
     private String name = null;
+    private String description = null;
     private Date lastModified = null;
     private Date lastRun = null; //only applicable when showing reports
     private Boolean isScheduled = null; //only applicable when showing reports
@@ -32,6 +33,7 @@ public final class JsonFolderContent implements Serializable {
     public JsonFolderContent(DbItem item, DbAudit audit) {
         this.uuid = item.getItemUuid();
         this.name = item.getTitle();
+        this.description = item.getDescription();
 
         if (audit != null) {
             this.lastModified = new Date(audit.getTimeStamp().toEpochMilli());
@@ -77,6 +79,14 @@ public final class JsonFolderContent implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Date getLastModified() {

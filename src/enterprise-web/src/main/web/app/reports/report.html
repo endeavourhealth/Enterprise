@@ -2,8 +2,8 @@
 	<div class="container-fluid">
 		<div class="module-heading">Report
 			<div class="pull-right">
-				<button type="button" class="btn btn-sm btn-success" ng-hide="reportCtrl.readOnly" data-ng-click="reportCtrl.save(false)">Save</button>
-				<button type="button" class="btn btn-sm btn-warning" ng-hide="reportCtrl.readOnly" data-ng-click="reportCtrl.save(true)">Save & Close</button>
+				<button type="button" class="btn btn-sm btn-success" data-ng-click="reportCtrl.save(false)">Save</button>
+				<button type="button" class="btn btn-sm btn-warning" data-ng-click="reportCtrl.save(true)">Save & Close</button>
 				<button type="button" class="btn btn-sm btn-danger" data-ng-click="reportCtrl.close()">Cancel</button>
 			</div>
 		</div>
@@ -12,13 +12,13 @@
 				<div class="row">
 					<div class="form-group col-md-6">
 						<label for="report-name">Name</label>
-						<input type="text" class="form-control" id="report-name" ng-model="reportCtrl.report.name" ng-readonly="reportCtrl.readOnly">
+						<input type="text" class="form-control" id="report-name" ng-model="reportCtrl.report.name">
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col-md-12">
 						<label for="report-description">Description</label>
-						<input type="text" class="form-control" id="report-description" ng-model="reportCtrl.report.description" ng-readonly="reportCtrl.readOnly">
+						<textarea class="form-control" id="report-description" ng-model="reportCtrl.report.description"></textarea>
 					</div>
 				</div>
 				<div class="row">
@@ -30,7 +30,7 @@
 									<div class="form-group">
 										<div class="row">
 											<div class="col-md-12">
-												<div ui-tree id="report-tree" data-drag-enabled="!reportCtrl.readOnly">
+												<div ui-tree id="report-tree">
 													<ol ui-tree-nodes ng-model="reportCtrl.reportContent">
 														<li ng-repeat="node in reportCtrl.reportContent" ui-tree-node ng-include="'report_template.html'">
 														</li>
@@ -44,7 +44,7 @@
 						</div>
 					</div>
 
-					<div class="form-group col-md-7" ng-hide="reportCtrl.readOnly">
+					<div class="form-group col-md-7">
 						<div class="panel panel-default">
 							<div class="panel-heading">Components</div>
 							<div class="panel-body">
@@ -117,7 +117,7 @@
 				<span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
 				{{node.name}}
 			</span>
-			<button type="button" class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)" ng-hide="reportCtrl.readOnly">
+			<button type="button" class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)">
 				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 			</button>
 		</div>

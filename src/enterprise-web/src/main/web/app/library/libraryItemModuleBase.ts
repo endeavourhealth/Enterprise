@@ -4,7 +4,6 @@ module app.library {
 	import IWindowService = angular.IWindowService;
 	export class LibraryItemModuleBase {
 		protected libraryItem : LibraryItem;
-		protected readOnly:boolean;
 
 		static $inject = ['LibraryService', 'AdminService', 'LoggerService', '$window', '$stateParams'];
 
@@ -19,13 +18,11 @@ module app.library {
 		}
 
 		protected performAction(action:string, itemUuid:string) {
-			this.readOnly = (action === 'view');
 			switch (action) {
 				case 'add':
 					this.create(itemUuid);
 					break;
 				case 'edit':
-				case 'view':
 					this.load(itemUuid);
 					break;
 			}

@@ -16,7 +16,6 @@ module app.codeSet {
 	export class CodeSetController extends LibraryItemModuleBase {
 		libraryItem : LibraryItem;
 		termCache : any;
-		readOnly : boolean;
 
 		static $inject = ['LibraryService', 'LoggerService',
 			'$uibModal', 'AdminService', '$window', '$stateParams', 'CodingService'];
@@ -57,7 +56,6 @@ module app.codeSet {
 		}
 
 		showCodePicker() {
-			if (this.readOnly) { return; }
 			var vm = this;
 			CodePickerController.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
 				.result.then(function(result) {

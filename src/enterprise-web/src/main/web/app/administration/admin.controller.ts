@@ -21,7 +21,7 @@ module app.admin {
 
 		editUser(user:User) {
 			var vm = this;
-			UserEditorController.open(vm.$modal, user, false)
+			UserEditorController.open(vm.$modal, user)
 				.result.then(function(editedUser : User) {
 					vm.adminService.saveUser(editedUser)
 						.then(function(response : {uuid : string} ) {
@@ -35,7 +35,7 @@ module app.admin {
 
 		viewUser(user:User) {
 			var vm = this;
-			UserEditorController.open(vm.$modal, user, true);
+			UserEditorController.open(vm.$modal, user);
 		}
 
 		deleteUser(user:User) {

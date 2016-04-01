@@ -93,10 +93,14 @@ public abstract class Examples {
             }
             UUID itemUuid = UUID.fromString(uuidStr);
 
+            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
+            UUID auditUuid = activeItem.getAuditUuid();
+
             DbJobReportItem jobReportItem = new DbJobReportItem();
             jobReportItem.assignPrimaryUUid();
             jobReportItem.setJobReportUuid(jobReportUuid);
             jobReportItem.setItemUuid(itemUuid);
+            jobReportItem.setAuditUuid(auditUuid);
             jobReportItem.setParentJobReportItemUuid(parentJobReportItemUuid);
             toSave.add(jobReportItem);
 
@@ -133,8 +137,9 @@ public abstract class Examples {
         toSave.add(jobContent);
 
         //then recurse to find the dependent items on this item
-        List<DbItemDependency> itemDependencies = DbItemDependency.retrieveForActiveItem(activeItem);
+        List<DbItemDependency> itemDependencies = DbItemDependency.retrieveForActiveItemType(activeItem, DependencyType.Uses);
         for (DbItemDependency itemDependency: itemDependencies) {
+
             UUID childItemUuid = itemDependency.getDependentItemUuid();
             createReportContents(jobUuid, childItemUuid, toSave);
         }
@@ -215,4 +220,8 @@ public abstract class Examples {
         return codes;
     }
 
+    public static void retrieveLibraryItemsForJob(DbJob job) throws Exception {
+        UUID jobUuid = job.getJobUuid();
+        Map<UUID, Object> hm = DbItem.retrieveLibraryItemsForJob(jobUuid);
+    }
 }

@@ -44,26 +44,6 @@ public final class DbEndUserEmailInvite extends DbAbstractTable {
     }
 
     /**
-     * sends the invite email for this person
-     */
-    public void sendInviteEmail(DbEndUser user, DbOrganisation org) {
-        String emailTo = user.getEmail();
-
-        String forename = user.getForename();
-
-        //TODO: 2016-02-22 DL - send invite email to the new user
-    }
-
-    /**
-     * sends an email to the person, telling them about the new access that
-     * has been added to their account
-     */
-    public static void sendNewAccessGrantedEmail(DbEndUser user, DbOrganisation org, List<DbAbstractTable> toSave) {
-
-        //TODO: 2016-02-22 DL - send email to the user about new acess granted
-    }
-
-    /**
      * gets/sets
      */
     public UUID getEndUserEmailInviteUuid() {

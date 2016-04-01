@@ -370,17 +370,15 @@
 <hr/>
 <h3>/api/admin/resendInviteEmail</h3>
 
-	Email: <input type="text" id="resendInviteEmail">
+	User UUID: <input type="text" id="resendInviteUuid">
 	<br/>
 	<button type="button" onclick="resendInviteEmail()">Submit</button>
-
 
 	<script>
 		function resendInviteEmail() {
 
-			var s = document.getElementById('resendInviteEmail').value;
-			var params = {username:s};
-
+			var s = document.getElementById('resendInviteUuid').value;
+			var params = {uuid:s};
 			post('/api/admin/resendInviteEmail/', params);
 		}
 	</script>

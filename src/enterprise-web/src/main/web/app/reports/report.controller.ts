@@ -30,7 +30,6 @@ module app.reports {
 		reportContent : ReportNode[];
 		contentTreeCallbackOptions : ICallbacks;
 		dataSourceMap : any;
-		readOnly : boolean;
 
 		static $inject = ['ReportService', 'FolderService', 'LoggerService', '$stateParams', 'AdminService', '$window'];
 
@@ -49,13 +48,11 @@ module app.reports {
 
 		// General report methods
 		performAction(action:string, itemUuid:string) {
-			this.readOnly = (action === 'view');
 			switch (action) {
 				case 'add':
 					this.createReport(itemUuid);
 					break;
 				case 'edit':
-				case 'view':
 					this.getReport(itemUuid);
 					break;
 			}

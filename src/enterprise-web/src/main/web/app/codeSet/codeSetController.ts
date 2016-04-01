@@ -16,7 +16,6 @@ module app.codeSet {
 	export class CodeSetController extends LibraryItemModuleBase {
 		libraryItem : LibraryItem;
 		termCache : any;
-		readOnly : boolean;
 
 		static $inject = ['LibraryService', 'LoggerService',
 			'$uibModal', 'AdminService', '$window', '$stateParams', 'CodingService'];
@@ -42,6 +41,13 @@ module app.codeSet {
 				};
 		}
 
+		termShorten(term : string) {
+			term = term.replace(' (disorder)','');
+			term = term.replace(' (observable entity)','');
+			term = term.replace(' (finding)','');
+			return term;
+		}
+
 		getTerm(code : string) : string {
 			var vm = this;
 			var term = vm.termCache[code];
@@ -50,14 +56,13 @@ module app.codeSet {
 
 			vm.codingService.getPreferredTerm(code)
 				.then(function(concept:Concept) {
-					vm.termCache[code] = concept.preferredTerm;
+					vm.termCache[code] = vm.termShorten(concept.preferredTerm);
 				});
 
 			return vm.termCache[code];
 		}
 
 		showCodePicker() {
-			if (this.readOnly) { return; }
 			var vm = this;
 			CodePickerController.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
 				.result.then(function(result) {

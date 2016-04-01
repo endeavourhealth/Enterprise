@@ -20,7 +20,7 @@
 
 .angular-ui-tree-empty {
     border: 1px dashed #bbb;
-    min-height: 20px;
+    min-height: 60px;
     background-color: #e5e5e5;
     background-image: none;
     background-size: auto;

@@ -5,6 +5,7 @@ import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.json.JsonEndUser;
 import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
+import org.endeavour.enterprise.utility.EmailProvider;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.administration.*;
@@ -23,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -289,7 +291,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         //if we didn't create a new person, then we don't need them to verify and create
         //a password, but we still want to tell the person that they were given new access
         else {
-            DbEndUserEmailInvite.sendNewAccessGrantedEmail(user, org, toSave);
+            EmailProvider.getInstance().sendNewAccessGrantedEmail(user, org, toSave);
         }
 
         DatabaseManager.db().writeEntities(toSave);
@@ -338,10 +340,14 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
         invite.setEndUserUuid(userUuid);
-        invite.setUniqueToken("" + UUID.randomUUID());
+
+        //use a base64 encoded version of a random UUID
+        String tokenUuid = UUID.randomUUID().toString();
+        String token = Base64.getEncoder().encodeToString(tokenUuid.getBytes());
+        invite.setUniqueToken(token);
 
         //send the invite email before saving to the DB
-        invite.sendInviteEmail(user, org);
+        EmailProvider.getInstance().sendInviteEmail(user, org, token);
 
         //only save AFTER we've successfully send the invite email
         toSave.add(invite);

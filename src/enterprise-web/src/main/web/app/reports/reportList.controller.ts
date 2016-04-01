@@ -25,6 +25,8 @@ module app.reports {
 		treeData : FolderNode[];
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
+		selectedReport : FolderItem;
+		selectedReportDetails : any;
 
 		static $inject = ['ReportService', 'FolderService', 'LoggerService', '$scope', '$uibModal'];
 
@@ -102,6 +104,12 @@ module app.reports {
 						node.loading = false;
 					});
 			}
+		}
+
+		selectFolderItem(item : FolderItem) {
+			this.selectedReport = item;
+			// Load report details
+			this.selectedReportDetails = {};
 		}
 
 		addChildFolder(node : FolderNode) {

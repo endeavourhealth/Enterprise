@@ -3,6 +3,7 @@ module app.models {
 		uuid:string;
 		type:ItemType;
 		name:string;
+		description:string;
 		children:FolderItem[] = [];
 		lastModified:number;
 		lastRun:number; //only applicable when showing reports

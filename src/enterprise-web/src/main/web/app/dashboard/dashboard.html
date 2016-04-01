@@ -44,7 +44,10 @@
 							</thead>
 							<tbody>
 								<tr ng-repeat="item in dashboard.recentDocumentsData">
-									<td><a style="cursor:pointer" ng-click="dashboard.actionItem(item,'edit')">{{item.name}}</a></td>
+									<td>
+										<span class="glyphicon glyphicon-info-sign glyphicon-right-pad text-muted" uib-tooltip="{{item.description}}"></span>
+										<a style="cursor:pointer" ng-click="dashboard.actionItem(item,'edit')">{{item.name}}</a>
+									</td>
 									<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 									<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString }}</td>
 								</tr>

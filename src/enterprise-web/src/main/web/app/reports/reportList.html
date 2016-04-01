@@ -41,7 +41,10 @@
 									</thead>
 									<tbody>
 										<tr class="hover-box show-child-on-hover" ng-repeat="item in reportListCtrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
-											<td><a ui-sref="app.reportAction({itemUuid: item.uuid, itemAction: 'edit'})">{{item.name}}</a></td>
+											<td>
+												<span class="glyphicon glyphicon-info-sign glyphicon-right-pad text-muted" uib-tooltip="{{item.description}}"></span>
+												<a ui-sref="app.reportAction({itemUuid: item.uuid, itemAction: 'edit'})">{{item.name}}</a>
+											</td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 											<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>

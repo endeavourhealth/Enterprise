@@ -5,9 +5,9 @@ import org.endeavourhealth.enterprise.core.database.TableAdapter;
 
 import java.util.UUID;
 
-public final class JobProcessorResult extends DbAbstractTable {
+public final class DbJobProcessorResult extends DbAbstractTable {
 
-    private static final TableAdapter adapter = new TableAdapter(JobProcessorResult.class);
+    private static final TableAdapter adapter = new TableAdapter(DbJobProcessorResult.class);
 
     private UUID jobUuid = null;
     private UUID processorUuid = null;

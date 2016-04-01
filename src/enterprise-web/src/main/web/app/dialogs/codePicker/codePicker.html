@@ -23,7 +23,7 @@
 		<!-- Matches -->
 		<div class="row">
 			<div class="form-group col-md-4">
-				<label class="control-label">Parents</label>
+				<label class="control-label">Parents</label> <small class="text-muted">(Dbl click to navigate up)</small>
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="parent in codePicker.parents"
 							 ng-dblclick="codePicker.displayCode(parent, true)"
@@ -51,7 +51,7 @@
 				</div>
 			</div>
 			<div class="form-group col-md-4">
-				<label class="control-label">Children</label>
+				<label class="control-label">Children</label> <small class="text-muted">(Dbl click to navigate down)</small>
 				<div class="scroll-box-150 form-control">
 					<div ng-repeat="child in codePicker.children"
 							 ng-dblclick="codePicker.displayCode(child, true)"

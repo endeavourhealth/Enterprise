@@ -73,6 +73,7 @@ public final class DbItem extends DbAbstractTable {
 
             UUID itemUuid = item.getItemUuid();
             String xml = item.getXmlContent();
+
             LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
             if (libraryItem.getQuery() != null) {
                 ret.put(itemUuid, libraryItem.getQuery());

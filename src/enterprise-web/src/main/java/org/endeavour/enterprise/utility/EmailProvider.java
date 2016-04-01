@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.utility;
 
+import com.sun.mail.util.MailLogger;
 import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
@@ -41,6 +42,7 @@ public final class EmailProvider {
      */
     public void sendInviteEmail(DbEndUser user, DbOrganisation org, String token) {
         String emailTo = user.getEmail();
+        emailTo = "drewlittler@hotmail.com";
 
         String forename = user.getForename();
 

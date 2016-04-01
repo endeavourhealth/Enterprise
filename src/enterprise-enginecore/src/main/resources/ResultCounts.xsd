@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="resultCounts" type="resultCounts"/>
+	<xs:complexType name="resultCounts">
+		<xs:sequence>
+			<xs:element name="jobReportItemResult" type="jobReportItemResult" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="jobReportItemResult">
+		<xs:sequence>
+			<xs:element name="organisation" type="organisationResult" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="uuid" type="xs:string" use="required"/>
+		<xs:attribute name="resultCount" type="xs:int" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="organisationResult">
+		<xs:attribute name="odsCode" type="xs:string" use="required"/>
+		<xs:attribute name="resultCount" type="xs:string" use="required"/>
+	</xs:complexType>
+</xs:schema>

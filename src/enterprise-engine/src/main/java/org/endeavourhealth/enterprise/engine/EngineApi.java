@@ -10,6 +10,8 @@ import org.endeavourhealth.enterprise.engine.compiler.CompilerApi;
 import org.endeavourhealth.enterprise.engine.execution.Request;
 import org.endeavourhealth.enterprise.enginecore.Library;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
+import org.endeavourhealth.enterprise.enginecore.resultcounts.models.JobReportItemResult;
+import org.endeavourhealth.enterprise.enginecore.resultcounts.models.ResultCounts;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -56,8 +58,8 @@ public class EngineApi {
         }
     }
 
-    public Map<UUID, Integer> getResults() {
-        Map<UUID, Integer> results = new HashMap<>();
+    public ResultCounts getResults() {
+        ResultCounts resultCounts = new ResultCounts();
 
         for (Request request: executionRequests) {
             CompiledReport compiledReport = request.getCompiledReport();
@@ -65,11 +67,16 @@ public class EngineApi {
             Map<UUID, Integer> requestResults = compiledReport.getQueryResults();
 
             for (Map.Entry<UUID, Integer> entry: requestResults.entrySet()) {
-                results.put(entry.getKey(), entry.getValue());
+
+                JobReportItemResult result = new JobReportItemResult();
+                result.setUuid(entry.getKey().toString());
+                result.setResultCount(entry.getValue());
+
+                resultCounts.getJobReportItemResult().add(result);
             }
         }
 
-        return results;
+        return resultCounts;
     }
 
     public Processor createProcessor() {

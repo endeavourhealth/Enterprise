@@ -14,6 +14,7 @@ import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainerPool;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
+import org.endeavourhealth.enterprise.enginecore.resultcounts.models.ResultCounts;
 import org.endeavourhealth.enterprise.processornode.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.processornode.configuration.ConfigurationAPI;
 import org.slf4j.Logger;
@@ -153,7 +154,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     public void workComplete() {
 
-        Map<UUID, Integer> results = engineApi.getResults();
+        ResultCounts results = engineApi.getResults();
 
         logger.debug("Work complete");
 

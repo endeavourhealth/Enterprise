@@ -62,6 +62,15 @@
         </dependency>
         <!-- End Java servlet -->
 
+        <!-- JavaMail -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+        <!-- End JavaMail -->
+
+
     </dependencies>
 
     <build>

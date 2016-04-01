@@ -61,5 +61,6 @@
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.6.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.2" level="project" />
     <orderEntry type="library" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
+    <orderEntry type="library" name="Maven: javax.mail:javax.mail-api:1.5.5" level="project" />
   </component>
 </module>

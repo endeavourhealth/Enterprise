@@ -67,7 +67,7 @@ module app.dialogs {
 		fieldTestSex : string;
 		restrictionFieldName: string;
 		restrictionOrderDirection: string;
-		restrictionCount: string;
+		restrictionCount: string = "1";
 		codeFilter : boolean = false;
 		dateFilter : boolean = false;
 		valueFilter : boolean = false;
@@ -148,7 +148,8 @@ module app.dialogs {
 				vm.title = "Test Editor"
 			}
 			else {
-				vm.title = "Data Source Editor"
+				vm.title = "Data Source Editor";
+				vm.viewFieldTest = false;
 			}
 		}
 
@@ -253,7 +254,6 @@ module app.dialogs {
 				vm.showRestriction = true;
 				vm.restrictionFieldName = resultData.dataSource.restriction.fieldName;
 				vm.restrictionOrderDirection = resultData.dataSource.restriction.orderDirection;
-				vm.restrictionCount = resultData.dataSource.restriction.count.toString();
 			}
 
 		}
@@ -907,7 +907,7 @@ module app.dialogs {
 		restrictionChange(value : any) {
 			var vm = this;
 
-			if (!value || vm.restrictionFieldName=="" || vm.restrictionOrderDirection=="" || vm.restrictionCount=="") {
+			if (!value || vm.restrictionFieldName=="" || vm.restrictionOrderDirection=="") {
 				vm.resultData.dataSource.restriction = null;
 				return;
 			}

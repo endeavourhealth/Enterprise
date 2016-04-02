@@ -195,11 +195,11 @@ module app.query {
 								y: 5
 							},
 							onPass: {
-								action: "",
+								action: "INCLUDE",
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "",
+								action: "EXCLUDE",
 								ruleId: <any>[]
 							}
 						};
@@ -213,15 +213,15 @@ module app.query {
 							description: "Rule Description",
 							id: $scope.nextRuleID++,
 							layout: {
-								x: 100,
-								y: 10
+								x: 566,
+								y: 7
 							},
 							onPass: {
-								action: "",
+								action: "INCLUDE",
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "",
+								action: "EXCLUDE",
 								ruleId: <any>[]
 							}
 						};
@@ -230,15 +230,15 @@ module app.query {
 							description: "Expression Description",
 							id: $scope.nextRuleID++,
 							layout: {
-								x: 100,
-								y: 10
+								x: 566,
+								y: 7
 							},
 							onPass: {
-								action: "",
+								action: "INCLUDE",
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "",
+								action: "EXCLUDE",
 								ruleId: <any>[]
 							},
 							expression: {

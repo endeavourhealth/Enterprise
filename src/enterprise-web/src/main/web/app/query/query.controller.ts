@@ -94,9 +94,22 @@ module app.query {
 						var selectedRule = $scope.chartViewModel.getSelectedRule();
 
 						if (selectedRule.data.expression) {
+							var rules = <any>[];
+
+							for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+								if ($scope.chartViewModel.data.query.rule[i].description!="START" &&
+									!$scope.chartViewModel.data.query.rule[i].expression) {
+									var rule = {
+										value: $scope.chartViewModel.data.query.rule[i].id,
+										displayName: $scope.chartViewModel.data.query.rule[i].description
+									}
+									rules.push(rule);
+								}
+
+							}
 							var expression : ExpressionType = selectedRule.data.expression;
 
-							ExpressionEditorController.open($modal, expression)
+							ExpressionEditorController.open($modal, expression, rules)
 								.result.then(function(resultData : ExpressionType){
 
 								selectedRule.data.expression = resultData;

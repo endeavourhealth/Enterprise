@@ -16,7 +16,6 @@ module app.dialogs {
 
         expressionVariableName1: string;
         expressionRuleId1: string;
-        expressionDataSource1: string;
         expressionRestrictionFieldName1: string;
         expressionRestrictionOrderDirection1: string;
         expressionRestrictionCount1: string;
@@ -25,7 +24,6 @@ module app.dialogs {
 
         expressionVariableName2: string;
         expressionRuleId2: string;
-        expressionDataSource2: string;
         expressionRestrictionFieldName2: string;
         expressionRestrictionOrderDirection2: string;
         expressionRestrictionCount2: string;
@@ -38,11 +36,11 @@ module app.dialogs {
 
         sortorders = ['','ASCENDING','DESCENDING'];
         periods = ['','DAYS','WEEKS','MONTHS','YEARS'];
-        rule = ['1','2'];
+        rules = <any>[];
         fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
         functions = ['','AVERAGE','COUNT','MINIMUM','MAXIMUM'];
 
-        public static open($modal : IModalService, expression : ExpressionType) : IModalServiceInstance {
+        public static open($modal : IModalService, expression : ExpressionType, rules : any) : IModalServiceInstance {
             var options : IModalSettings = {
                 templateUrl:'app/dialogs/expressionEditor/expressionEditor.html',
                 controller:'ExpressionEditorController',
@@ -50,7 +48,8 @@ module app.dialogs {
                 size:'lg',
                 backdrop: 'static',
                 resolve:{
-                    expression : () => expression
+                    expression : () => expression,
+                    rules : () => rules
                 }
             };
 
@@ -58,12 +57,13 @@ module app.dialogs {
             return dialog;
         }
 
-        static $inject = ['$uibModalInstance', 'LoggerService', '$uibModal', 'expression'];
+        static $inject = ['$uibModalInstance', 'LoggerService', '$uibModal', 'expression', 'rules'];
 
         constructor(protected $uibModalInstance : IModalServiceInstance,
                     private logger : app.blocks.ILoggerService,
                     private $modal : IModalService,
-                    private expression: ExpressionType) {
+                    private expression: ExpressionType,
+                     rules: any) {
 
             super($uibModalInstance);
 
@@ -79,6 +79,8 @@ module app.dialogs {
             if (this.resultData.variable.length>0)
                 this.initialiseEditMode(this.resultData);
 
+            vm.rules = rules;
+
         }
 
         initialiseEditMode(resultData : ExpressionType) {
@@ -93,8 +95,7 @@ module app.dialogs {
             vm.expressionText = resultData.expressionText;
 
             vm.expressionVariableName1 = resultData.variable[0].variableName;
-            vm.expressionRuleId1 = resultData.variable[0].ruleId;
-            vm.expressionDataSource1 = resultData.variable[0].ruleId;
+            vm.expressionRuleId1 = resultData.variable[0].ruleId.toString();
             vm.expressionRestrictionFieldName1 = resultData.variable[0].restriction.fieldName;
             vm.expressionRestrictionOrderDirection1 = resultData.variable[0].restriction.orderDirection;
             vm.expressionRestrictionCount1 = resultData.variable[0].restriction.count.toString();
@@ -102,8 +103,7 @@ module app.dialogs {
             vm.expressionFunction1 = resultData.variable[0].function;
 
             vm.expressionVariableName2 = resultData.variable[1].variableName;
-            vm.expressionRuleId2 = resultData.variable[1].ruleId;
-            vm.expressionDataSource2 = resultData.variable[1].ruleId;
+            vm.expressionRuleId2 = resultData.variable[1].ruleId.toString();
             vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.fieldName;
             vm.expressionRestrictionOrderDirection2 = resultData.variable[1].restriction.orderDirection;
             vm.expressionRestrictionCount2 = resultData.variable[1].restriction.count.toString();
@@ -127,7 +127,7 @@ module app.dialogs {
 
             var variableType : VariableType = {
                 variableName: "A",
-                ruleId: vm.expressionDataSource1,
+                ruleId: Number(vm.expressionRuleId1),
                 restriction: restriction,
                 fieldName: vm.expressionTestField1,
                 function: vm.expressionFunction1
@@ -143,7 +143,7 @@ module app.dialogs {
 
             var variableType : VariableType = {
                 variableName: "B",
-                ruleId: vm.expressionDataSource2,
+                ruleId: Number(vm.expressionRuleId2),
                 restriction: restriction,
                 fieldName: vm.expressionTestField2,
                 function: vm.expressionFunction2

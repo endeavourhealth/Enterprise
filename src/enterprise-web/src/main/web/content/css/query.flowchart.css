@@ -4,16 +4,16 @@ Styles for rule and connectors.
 */
 
 .rule-text {
-	font-size: 12px;
+	font-size: 14px;
 	fill: black;
-	font-weight: bold;
+	font-weight: normal;
 	cursor: pointer;
 }
 
 .rule-text:hover {
-	font-size: 12px;
+	font-size: 14px;
 	fill: blue;
-	font-weight: bold;
+	font-weight: normal;
 	text-decoration: underline;
 	cursor: pointer;
 }
@@ -92,7 +92,7 @@ Styles for rule and connectors.
 
 .selected-rule-rect {
 	stroke: red;
-	stroke-width: 2;
+	stroke-width: 3;
 }
 
 .selected-rule-start {

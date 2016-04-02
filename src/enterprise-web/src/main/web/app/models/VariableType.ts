@@ -3,7 +3,7 @@ module app.models {
 
     export class VariableType {
         variableName: string;
-        ruleId: string;
+        ruleId: number;
         restriction: Restriction;
         fieldName: string;
         function: string;

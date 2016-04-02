@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="include"/>
  *     &lt;enumeration value="exclude"/>
+ *     &lt;enumeration value="noAction"/>
  *     &lt;enumeration value="gotoRules"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -30,6 +31,8 @@ public enum RuleActionOperator {
     INCLUDE("include"),
     @XmlEnumValue("exclude")
     EXCLUDE("exclude"),
+    @XmlEnumValue("noAction")
+    NO_ACTION("noAction"),
     @XmlEnumValue("gotoRules")
     GOTO_RULES("gotoRules");
     private final String value;

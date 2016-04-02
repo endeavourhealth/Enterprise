@@ -11,8 +11,8 @@
         </linearGradient>
         <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="expressionRuleBackgroundGradient">
             <stop
-                    offset="0" stop-opacity="0.99609" stop-color="#56BFE0"/>
-            <stop offset="0.63934" stop-opacity="0.99219" stop-color="#B2EAFF"/>
+                    offset="0" stop-opacity="0.99609" stop-color="#B1EAFF"/>
+            <stop offset="0.63934" stop-opacity="0.99219" stop-color="#D7F5FF"/>
         </linearGradient>
         <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="startRuleBackgroundGradient">
             <stop offset="0" stop-opacity="0.99609" stop-color="green"/>
@@ -62,13 +62,33 @@
 
 
         <text ng-click="editTest($event, rule)"
-              ng-if="rule.description()!='START'"
+              ng-if="rule.description()!='START' && rule.description().length<=30"
               class="rule-text"
               ng-attr-x="{{rule.width()/2}}"
               y="60"
               text-anchor="middle"
               alignment-baseline="middle">
             {{rule.description()}}
+        </text>
+
+        <text ng-click="editTest($event, rule)"
+              ng-if="rule.description()!='START' && rule.description().length>30"
+              class="rule-text"
+              ng-attr-x="{{rule.width()/2}}"
+              y="50"
+              text-anchor="middle"
+              alignment-baseline="middle">
+            {{firstString(rule.description(), 30)}}
+        </text>
+
+        <text ng-click="editTest($event, rule)"
+              ng-if="rule.description()!='START' && rule.description().length>30"
+              class="rule-text"
+              ng-attr-x="{{rule.width()/2}}"
+              y="70"
+              text-anchor="middle"
+              alignment-baseline="middle">
+            {{secondString(rule.description(), 30)}}
         </text>
 
         <g ng-if="rule.description()!='START'"

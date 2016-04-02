@@ -18,8 +18,8 @@
             </div>
             <div class="col-xs-9">
                 <div class="form-group">
-                    <select class="form-control" ng-model="expressionEditor.expressionDataSource1">
-                        <option ng-repeat="rule in expressionEditor.rule" value="{{rule}}">{{rule}}</option>
+                    <select class="form-control" ng-model="expressionEditor.expressionRuleId1">
+                        <option ng-repeat="rule in expressionEditor.rules" value="{{rule.value}}">{{rule.displayName}}</option>
                     </select>
                 </div>
             </div>
@@ -81,8 +81,8 @@
             </div>
             <div class="col-xs-9">
                 <div class="form-group">
-                    <select class="form-control" ng-model="expressionEditor.expressionDataSource2">
-                        <option ng-repeat="rule in expressionEditor.rule" value="{{rule}}">{{rule}}</option>
+                    <select class="form-control" ng-model="expressionEditor.expressionRuleId2">
+                        <option ng-repeat="rule in expressionEditor.rules" value="{{rule.value}}">{{rule.displayName}}</option>
                     </select>
                 </div>
             </div>

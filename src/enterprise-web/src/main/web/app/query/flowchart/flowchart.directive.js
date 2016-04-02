@@ -291,6 +291,30 @@ angular.module('flowChart', ['dragging'] )
 				return y;
 			}
 
+			$scope.stringSplitter = function (str, width) {
+				if (str.length>width) {
+					var p=width
+					for (;p>0 && str[p]!=' ';p--) {
+					}
+					if (p>0) {
+						var left = str.substring(0, p);
+						var right = str.substring(p+1);
+						return left + '~' + $scope.stringSplitter(right, width);
+					}
+				}
+				return str;
+			}
+
+			$scope.firstString = function (str, width) {
+				var s = $scope.stringSplitter(str, width);
+				return s.split('~')[0];
+			}
+
+			$scope.secondString = function (str, width) {
+				var s = $scope.stringSplitter(str, width);
+				return s.split('~')[1];
+			}
+
 			//
 			// Handle mousedown on an input connector.
 			//

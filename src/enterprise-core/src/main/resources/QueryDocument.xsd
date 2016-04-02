@@ -71,6 +71,7 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="include"/>
 			<xs:enumeration value="exclude"/>
+			<xs:enumeration value="noAction"/>
 			<xs:enumeration value="gotoRules"/>
 		</xs:restriction>
 	</xs:simpleType>

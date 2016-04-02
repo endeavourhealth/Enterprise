@@ -38,7 +38,7 @@ Styles for rule and connectors.
 	font-weight: bold;
 }
 
-.connector-text-out-exclude {
+.connector-text-out-noaction {
 	font-size: 10px;
 	fill: red;
 	font-weight: bold;
@@ -126,7 +126,7 @@ Style for connections.
 	fill: transparent;
 }
 
-.connection-line-exclusion {
+.connection-line-noaction {
 	stroke: black;
 	stroke-width: 4;
 	fill: transparent;

@@ -127,8 +127,8 @@
                     cx="250"
                     cy="30"/>
 
-            <path ng-if="rule.description()!='START' && rule.onPassAction() == 'EXCLUDE'"
-                  class="connection-line-exclusion"
+            <path ng-if="rule.description()!='START' && rule.onPassAction() == 'NO_ACTION'"
+                  class="connection-line-noaction"
                   d="M 260, 30
                      L 280, 30,
                      280, 15,
@@ -136,7 +136,7 @@
             </path>
 
             <path ng-if="rule.description()!='START' && rule.onPassAction() == 'INCLUDE'"
-                  class="connection-line-exclusion"
+                  class="connection-line-noaction"
                   d="M 260, 30
                  L 280, 30">
             </path>
@@ -167,8 +167,8 @@
                     cx="250"
                     cy="85"/>
 
-            <path ng-if="rule.description()!='START' && rule.onFailAction() == 'EXCLUDE'"
-                  class="connection-line-exclusion"
+            <path ng-if="rule.description()!='START' && rule.onFailAction() == 'NO_ACTION'"
+                  class="connection-line-noaction"
                   d="M 260, 85
                      L 280, 85,
                      280, 70,
@@ -176,7 +176,7 @@
             </path>
 
             <path ng-if="rule.description()!='START' && rule.onFailAction() == 'INCLUDE'"
-                  class="connection-line-exclusion"
+                  class="connection-line-noaction"
                   d="M 260, 85
                  L 280, 85">
             </path>

@@ -84,7 +84,7 @@ module app.query {
 				$scope.results = [
 					{value: 'GOTO_RULES', displayName: 'Go to rule'},
 					{value: 'INCLUDE', displayName: 'Include patient in final result'},
-					{value: 'EXCLUDE', displayName: 'No further action'}
+					{value: 'NO_ACTION', displayName: 'No further action'}
 				];
 
 				$scope.$on('editTest', function(event : any, ruleId : any) {
@@ -199,7 +199,7 @@ module app.query {
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "EXCLUDE",
+								action: "NO_ACTION",
 								ruleId: <any>[]
 							}
 						};
@@ -221,7 +221,7 @@ module app.query {
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "EXCLUDE",
+								action: "NO_ACTION",
 								ruleId: <any>[]
 							}
 						};
@@ -238,7 +238,7 @@ module app.query {
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "EXCLUDE",
+								action: "NO_ACTION",
 								ruleId: <any>[]
 							},
 							expression: {
@@ -275,6 +275,8 @@ module app.query {
 					libraryService.saveLibraryItem(libraryItem)
 						.then(function(libraryItem : LibraryItem) {
 							$scope.chartViewModel.data.uuid = libraryItem.uuid;
+
+							$scope.chartViewModel = new flowchart.ChartViewModel($scope.chartViewModel.data);
 
 							var newStartRuleDataModel = {
 								description: "START",

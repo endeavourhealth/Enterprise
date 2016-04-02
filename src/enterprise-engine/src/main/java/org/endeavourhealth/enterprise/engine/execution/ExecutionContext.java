@@ -24,7 +24,7 @@ public class ExecutionContext {
         this.queryMap = queryMap;
     }
 
-    public boolean getQueryResult(UUID queryUuid) throws ExecutionException {
+    public boolean getQueryResult(UUID queryUuid) throws Exception {
 
         if (queriesPatientIncluded.contains(queryUuid))
             return true;

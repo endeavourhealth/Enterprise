@@ -25,8 +25,12 @@ public class Processor {
         executionContext.setItem(dataContainer);
 
         for (Request request: requests) {
-            executionContext.setRequestParameters(request.getParameters());
-            request.getCompiledReport().execute(executionContext);
+            try {
+                executionContext.setRequestParameters(request.getParameters());
+                request.getCompiledReport().execute(executionContext);
+            } catch (Exception e) {
+                throw new ExecutionException("Request UUID: " + request.getJobReportUuid(), e);
+            }
         }
     }
 }

@@ -8,6 +8,8 @@ public class InvalidQueryDocumentException extends Exception {
     public InvalidQueryDocumentException(UUID itemUuid, String message, Throwable cause) { super(createMessage(itemUuid, message), cause); }
     public InvalidQueryDocumentException(UUID itemUuid, Throwable cause) { super(createMessage(itemUuid, null), cause); }
 
+    public InvalidQueryDocumentException(String message) { super(message); }
+
     private static String createMessage(UUID itemUuid, String message) {
         if (message == null)
             return "Item UUID: " + itemUuid;

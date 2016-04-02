@@ -15,7 +15,6 @@ class ReportCompiler {
     private final CompilerContext compilerContext;
 
     public ReportCompiler(CompilerContext compilerContext) {
-
         this.compilerContext = compilerContext;
     }
 

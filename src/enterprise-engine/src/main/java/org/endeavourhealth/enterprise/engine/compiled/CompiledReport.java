@@ -60,13 +60,13 @@ public class CompiledReport {
     public List<CompiledReportQuery> getChildQueries() { return rootQueries; }
     public List<CompiledReportListReport> getChildListReports() { return rootListReports; }
 
-    public void execute(ExecutionContext context) throws ExecutionException {
+    public void execute(ExecutionContext context) throws Exception {
 
         executeQueryList(rootQueries, context);
         executeReportList(rootListReports, context);
     }
 
-    private void executeQueryList(List<CompiledReportQuery> queries, ExecutionContext context) throws ExecutionException {
+    private void executeQueryList(List<CompiledReportQuery> queries, ExecutionContext context) throws Exception {
         if (queries == null)
             return;
 

@@ -53,7 +53,7 @@ public class EngineApi {
 
             CompiledReport compiledReport = compilerApi.compile(jobReport, parameters);
 
-            Request request = new Request(compiledReport, parameters);
+            Request request = new Request(jobReport.getJobReportUuid(), compiledReport, parameters);
             executionRequests.add(request);
         }
     }

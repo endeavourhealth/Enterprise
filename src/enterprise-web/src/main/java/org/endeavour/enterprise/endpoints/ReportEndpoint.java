@@ -71,14 +71,20 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("SavingReport UUID {}, Name {} FolderUuid", reportUuid, name, folderUuid);
 
+        QueryDocument doc = new QueryDocument();
+        doc.getReport().add(report);
+
+        //if we're just renaming or moving a report, the report won't containg report items,
+        //so null the query document, so we don't overwrite the one on the DB with an empty one
+        if (report.getReportItem().isEmpty()) {
+            doc = null;
+        }
+
         boolean inserting = reportUuid == null;
         if (inserting) {
             reportUuid = UUID.randomUUID();
             report.setUuid(reportUuid.toString());
         }
-
-        QueryDocument doc = new QueryDocument();
-        doc.getReport().add(report);
 
         super.saveItem(inserting, reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, doc, folderUuid);
 

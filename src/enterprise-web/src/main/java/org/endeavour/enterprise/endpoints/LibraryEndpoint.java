@@ -67,6 +67,9 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         LOG.trace("SavingLibraryItem UUID {}, Name {} FolderUuid", libraryItemUuid, name, folderUuid);
 
+        QueryDocument doc = new QueryDocument();
+        doc.getLibraryItem().add(libraryItem);
+
         //work out the item type (query, test etc.) from the content passed up
         DefinitionItemType type = null;
         if (query != null) {
@@ -80,7 +83,15 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         } else if (listOutput != null) {
             type = DefinitionItemType.ListOutput;
         } else {
-            throw new BadRequestException("Can't save LibraryItem without some content (e.g. query, test etc.)");
+            //if we've been passed no proper content, we might just be wanting to rename an existing item,
+            //so work out the type from what's on the DB already
+            if (libraryItemUuid == null) {
+                throw new BadRequestException("Can't save LibraryItem without some content (e.g. query, test etc.)");
+            }
+
+            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(libraryItemUuid);
+            type = activeItem.getItemTypeId();
+            doc = null; //clear this, because we don't want to overwrite what's on the DB with an empty query doc
         }
 
         boolean inserting = libraryItemUuid == null;
@@ -88,9 +99,6 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             libraryItemUuid = UUID.randomUUID();
             libraryItem.setUuid(libraryItemUuid.toString());
         }
-
-        QueryDocument doc = new QueryDocument();
-        doc.getLibraryItem().add(libraryItem);
 
         super.saveItem(inserting, libraryItemUuid, orgUuid, userUuid, type, name, description, doc, folderUuid);
 

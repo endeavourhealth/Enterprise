@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
-public final class JsonJob implements Serializable {
+public final class JsonJob {
     private Date date = null;
     private String status = null;
 

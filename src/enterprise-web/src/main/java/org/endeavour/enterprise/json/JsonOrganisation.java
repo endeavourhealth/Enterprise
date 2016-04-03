@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonOrganisation implements Serializable {
+public final class JsonOrganisation {
     private UUID uuid = null;
     private String name = null;
     private String nationalId = null;

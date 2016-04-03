@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonOrganisationList implements Serializable {
+public final class JsonOrganisationList {
     private JsonEndUser user = null;
     private List<JsonOrganisation> organisations = new ArrayList<>();
 

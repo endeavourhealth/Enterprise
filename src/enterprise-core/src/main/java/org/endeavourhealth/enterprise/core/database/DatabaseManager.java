@@ -330,6 +330,7 @@ public final class DatabaseManager {
         jobReportItem.setItemUuid(itemUuid);
         jobReportItem.setJobReportUuid(jobReportUuid);
         jobReportItem.setResultCount(null);
+        UUID jobReportItemUuid = jobReportItem.getJobReportItemUuid();
         entities.add(jobReportItem);
 
         DbRequest request = new DbRequest();
@@ -341,6 +342,24 @@ public final class DatabaseManager {
         request.setParameters("Parameters");
         request.setTimeStamp(Instant.now());
         entities.add(request);
+
+        DbJobProcessorResult result = new DbJobProcessorResult();
+        result.setJobUuid(jobUuid);
+        result.setProcessorUuid(UUID.randomUUID());
+        result.setResultXml("resultXml");
+        entities.add(result);
+
+        DbJobReportOrganisation orgResult = new DbJobReportOrganisation();
+        orgResult.setJobReportUuid(jobReportUuid);
+        orgResult.setOrganisationOdsCode("orgOdsCode");
+        orgResult.setPopulationCount(new Integer(100));
+        entities.add(orgResult);
+
+        DbJobReportItemOrganisation itemOrgResult = new DbJobReportItemOrganisation();
+        itemOrgResult.setJobReportItemUuid(jobReportItemUuid);
+        itemOrgResult.setOrganisationOdsCode("orgOdsCode");
+        itemOrgResult.setResultCount(new Integer(99));
+        entities.add(itemOrgResult);
 
         //now insert the new entities
         for (DbAbstractTable entity: entities) {

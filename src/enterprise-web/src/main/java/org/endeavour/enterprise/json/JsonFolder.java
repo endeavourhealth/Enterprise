@@ -10,7 +10,7 @@ import java.util.UUID;
  * JSON object used to manipulate folders, such as creating, moving and renaming
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonFolder implements Serializable {
+public final class JsonFolder {
 
     public static final int FOLDER_TYPE_LIBRARY = 1;
     public static final int FOLDER_TYPE_REPORTS = 2;

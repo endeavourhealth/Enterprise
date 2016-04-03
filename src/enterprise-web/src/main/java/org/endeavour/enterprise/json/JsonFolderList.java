@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonFolderList implements Serializable {
+public final class JsonFolderList {
 
-    private List<JsonFolder> folders = new ArrayList<JsonFolder>();
+    private List<JsonFolder> folders = new ArrayList<>();
 
     public JsonFolderList() {
     }

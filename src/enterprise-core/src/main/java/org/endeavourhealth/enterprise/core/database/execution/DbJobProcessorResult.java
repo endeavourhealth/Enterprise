@@ -1,18 +1,29 @@
 package org.endeavourhealth.enterprise.core.database.execution;
 
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
+import java.util.List;
 import java.util.UUID;
 
 public final class DbJobProcessorResult extends DbAbstractTable {
 
     private static final TableAdapter adapter = new TableAdapter(DbJobProcessorResult.class);
 
+    @DatabaseColumn
+    @PrimaryKeyColumn
     private UUID jobUuid = null;
+    @DatabaseColumn
+    @PrimaryKeyColumn
     private UUID processorUuid = null;
+    @DatabaseColumn
     private String resultXml = null;
 
+    public static List<DbJobProcessorResult> retrieveForJob(DbJob job) throws Exception {
+        return retrieveForJob(job.getJobUuid());
+    }
+    public static List<DbJobProcessorResult> retrieveForJob(UUID jobUuid) throws Exception {
+        return DatabaseManager.db().retrieveJobProcessorResultsForJob(jobUuid);
+    }
 
     @Override
     public TableAdapter getAdapter() {

@@ -556,17 +556,43 @@
 
 <hr/>
 <h3>/api/report/getReportSchedules</h3>
-	
+
 	Report UUID: <input type="text" id="getReportSchedulesUuid">
 	<br/>
+	Count: <input type="number" min="1" value="5" id="getReportSchedulesCount">
+	<br/>
 	<button type="button" onclick="getReportSchedules()">Submit</button>
-	
+
 	<script>
 		function getReportSchedules() {
 
 			var s = document.getElementById('getReportSchedulesUuid').value;
+			var s2 = document.getElementById('getReportSchedulesCount').value;
 
-			get('/api/report/getReportSchedules', 'uuid=' + s);
+			get('/api/report/getReportSchedules', 'uuid=' + s + '&count=' + s2);
+		}
+	</script>
+
+
+<hr/>
+<h3>/api/report/getScheduleResults</h3>
+
+	Schedule UUID: <input type="text" id="getScheduleResultsUuid">
+	<br/>
+	Filter by ODS code: <input type="text" id="getScheduleResultsOdsCode"> (leave blank to get all results)
+	<br/>
+	<button type="button" onclick="getScheduleResults()">Submit</button>
+
+	<script>
+		function getScheduleResults() {
+
+			var s = document.getElementById('getScheduleResultsUuid').value;
+			var ods = document.getElementById('getScheduleResultsOdsCode').value;
+			if (ods.length > 0) {
+				get('/api/report/getScheduleResults', 'uuid=' + s + '&organisation=' + ods);
+			} else {
+				get('/api/report/getScheduleResults', 'uuid=' + s);
+			}
 		}
 	</script>
 
@@ -863,33 +889,42 @@
 <hr/>
 <h3>/api/dashboard/getRecentDocuments</h3>
 
+	Count: <input type="number" min="1" value="5" id="getRecentDocumentsCount">
+	<br/>
 	<button type="button" onclick="getRecentDocuments()">Submit</button>
 
 	<script>
 		function getRecentDocuments() {
-			get('/api/dashboard/getRecentDocuments', 'count=5');
+			var s = document.getElementById('getRecentDocumentsCount').value;
+			get('/api/dashboard/getRecentDocuments', 'count=' + s);
 		}
 	</script>
 
 <hr/>
 <h3>/api/dashboard/getReportActivity</h3>
 
+	Count: <input type="number" min="1" value="5" id="getReportActivityCount">
+	<br/>
 	<button type="button" onclick="getReportActivity()">Submit</button>
 
 	<script>
 		function getReportActivity() {
-			get('/api/dashboard/getReportActivity', 'count=5');
+			var s = document.getElementById('getReportActivityCount').value;
+			get('/api/dashboard/getReportActivity', 'count=' + s);
 		}
 	</script>
 
 <hr/>
 <h3>/api/dashboard/getEngineHistory</h3>
 
+	Count: <input type="number" min="1" value="5" id="getEngineHistoryCount">
+	<br/>
 	<button type="button" onclick="getEngineHistory()">Submit</button>
 
 	<script>
 		function getEngineHistory() {
-			get('/api/dashboard/getEngineHistory', 'count=5');
+			var s = document.getElementById('getEngineHistoryCount').value;
+			get('/api/dashboard/getEngineHistory', 'count=' + s);
 		}
 	</script>
 

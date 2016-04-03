@@ -31,6 +31,8 @@ public interface DatabaseI {
 
     public List<DbEndUser> retrieveSuperUsers() throws Exception;
 
+    public List<DbEndUser> retrieveEndUsersForUuids(List<UUID> uuids) throws Exception;
+
     public DbEndUserPwd retrieveEndUserPwdForUserNotExpired(UUID endUserUuid) throws Exception;
 
     public List<DbOrganisation> retrieveAllOrganisations() throws Exception;
@@ -57,6 +59,8 @@ public interface DatabaseI {
 
     public List<DbItem> retrieveItemsForJob(UUID jobUuid) throws Exception;
 
+    public List<DbItem> retrieveLatestItemsForUuids(List<UUID> itemUuids) throws Exception;
+
     public DbActiveItem retrieveActiveItemForItemUuid(UUID itemUuid) throws Exception;
 
     public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception;
@@ -77,6 +81,8 @@ public interface DatabaseI {
 
     public List<DbRequest> retrievePendingRequests() throws Exception;
 
+    public List<DbRequest> retrieveRequestsForItem(UUID organisationUuid, UUID itemUuid, int count) throws Exception;
+
     public List<DbJob> retrieveRecentJobs(int count) throws Exception;
 
     public List<DbJob> retrieveJobsForStatus(ExecutionStatus status) throws Exception;
@@ -89,6 +95,8 @@ public interface DatabaseI {
 
     public List<DbJobReport> retrieveLatestJobReportsForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
 
+    public DbJobReport retrieveJobReportForJobAndReportAndParameters(UUID jobUuid, UUID reportUuid, String parameters) throws Exception;
+
     public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception;
 
     public List<DbAudit> retrieveAuditsForUuids(List<UUID> uuids) throws Exception;
@@ -96,5 +104,11 @@ public interface DatabaseI {
     public DbAudit retrieveLatestAudit() throws Exception;
 
     public List<DbJobContent> retrieveJobContentsForJob(UUID jobUuid) throws Exception;
+
+    public DbJobReportOrganisation retrieveJobReportOrganisationForJobReportAndOdsCode(UUID jobReportUuid, String odsCode) throws Exception;
+
+    public DbJobReportItemOrganisation retrieveJobReportItemOrganisationForJobReportItemAndOdsCode(UUID jobReportItemUUid, String odsCode) throws Exception;
+
+    public List<DbJobProcessorResult> retrieveJobProcessorResultsForJob(UUID jobUuid) throws Exception;
 
 }

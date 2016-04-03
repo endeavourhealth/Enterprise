@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonFolderContent implements Serializable {
+public final class JsonFolderContent {
     private UUID uuid = null;
     private Integer type = null;
     private String typeDesc = null;

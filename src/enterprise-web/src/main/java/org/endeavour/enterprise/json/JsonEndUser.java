@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonEndUser implements Serializable {
+public final class JsonEndUser {
 
     private UUID uuid = null;
     private String username = null;

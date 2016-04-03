@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.core.database.administration;
 
 import org.endeavourhealth.enterprise.core.database.*;
+import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,6 +43,16 @@ public final class DbEndUser extends DbAbstractTable {
         return DatabaseManager.db().retrieveSuperUsers();
     }
 
+    public static List<DbEndUser> retrieveForRequests(List<DbRequest> requests) throws Exception {
+        List<UUID> uuids = new ArrayList<>();
+        for (DbRequest request: requests) {
+            uuids.add(request.getEndUserUuid());
+        }
+        return retrieveForUuids(uuids);
+    }
+    public static List<DbEndUser> retrieveForUuids(List<UUID> uuids) throws Exception {
+        return DatabaseManager.db().retrieveEndUsersForUuids(uuids);
+    }
 
     @Override
     public TableAdapter getAdapter() {

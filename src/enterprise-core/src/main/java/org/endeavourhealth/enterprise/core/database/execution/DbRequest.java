@@ -29,6 +29,9 @@ public final class DbRequest extends DbAbstractTable {
     @DatabaseColumn
     private UUID jobUuid = null;
 
+    public static DbRequest retrieveForUuid(UUID requestUuid) throws Exception {
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbRequest.class, requestUuid);
+    }
     public static List<DbRequest> retrievePendingForActiveItems(UUID organisationUuid, List<DbActiveItem> activeItems) throws Exception {
 
         //filter activeItems to find UUIDs of just reports
@@ -45,6 +48,9 @@ public final class DbRequest extends DbAbstractTable {
     }
     public static List<DbRequest> retrieveAllPending() throws Exception {
         return DatabaseManager.db().retrievePendingRequests();
+    }
+    public static List<DbRequest> retrieveForItem(UUID organisationUuid, UUID itemUuid, int count) throws Exception {
+        return DatabaseManager.db().retrieveRequestsForItem(organisationUuid, itemUuid, count);
     }
 
     @Override

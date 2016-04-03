@@ -65,6 +65,10 @@ public final class DbItem extends DbAbstractTable {
         return DatabaseManager.db().retrieveItemsForActiveItems(activeItems);
     }
 
+    public static List<DbItem> retrieveLatestForUuids(List<UUID> itemUuids) throws Exception {
+        return DatabaseManager.db().retrieveLatestItemsForUuids(itemUuids);
+    }
+
     public static Map<UUID, Object> retrieveLibraryItemsForJob(UUID jobUuid) throws Exception {
         Map<UUID, Object> ret = new HashMap<>();
 
@@ -92,6 +96,7 @@ public final class DbItem extends DbAbstractTable {
 
         return ret;
     }
+
 
     @Override
     public TableAdapter getAdapter() {

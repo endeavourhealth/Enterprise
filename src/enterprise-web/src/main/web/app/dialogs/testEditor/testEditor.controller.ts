@@ -279,6 +279,10 @@ module app.dialogs {
 
 				vm.codeSelection = resultData;
 
+				if (resultData.length==0) {
+					return;
+				}
+
 				var codeSet : CodeSet = {
 					codingSystem : "SNOMED_CT",
 					codeSetValue : resultData

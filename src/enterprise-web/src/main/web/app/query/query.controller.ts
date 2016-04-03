@@ -262,6 +262,42 @@ module app.query {
 				};
 
 				$scope.save = function (close : boolean) {
+
+					if ($scope.queryName=="") {
+						logger.error('Please enter a name for the query');
+						return;
+					}
+
+					if ($scope.chartViewModel.data.query.rule.length==0) {
+						logger.error('Please create a rule in this query');
+						return;
+					}
+
+					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+						var rule = $scope.chartViewModel.data.query.rule[i];
+						if (!rule.test && rule.description!="START") {
+							logger.error('Rule "'+rule.description+'" does not have a test');
+							return;
+						}
+					}
+
+					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+						var rule = $scope.chartViewModel.data.query.rule[i];
+						if (rule.description!="START") {
+							for (var f = 0; f < rule.test.dataSource.filter.length; ++f) {
+								var filter = rule.test.dataSource.filter[f];
+								if (filter.field=="CODE") {
+									for (var c = 0; c < filter.codeSet.length; ++c) {
+										if (!filter.codeSet[c].codeSetValue || filter.codeSet[c].codeSetValue.length==0) {
+											logger.error('Rule "'+rule.description+'" does not have any clinical codes selected');
+											return;
+										}
+									}
+								}
+							}
+						}
+					}
+
 					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						if ($scope.chartViewModel.data.query.rule[i].description=="START") {
 							$scope.chartViewModel.data.query.rule.splice(i,1);

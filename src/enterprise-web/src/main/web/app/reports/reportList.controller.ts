@@ -19,6 +19,8 @@ module app.reports {
 	import LoggerService = app.blocks.LoggerService;
 	import IReportService = app.core.IReportService;
 	import IFolderService = app.core.IFolderService;
+	import ReportSchedule = app.models.ReportSchedule;
+	import ReportResult = app.models.ReportResult;
 	'use strict';
 
 	export class ReportListController {
@@ -26,7 +28,9 @@ module app.reports {
 		selectedNode : FolderNode = null;
 		itemSummaryList : ItemSummaryList;
 		selectedReport : FolderItem;
-		selectedReportDetails : any;
+		selectedReportSchedules : ReportSchedule[];
+		selectedSchedule : ReportSchedule;
+		selectedScheduleResults : ReportResult;
 
 		static $inject = ['ReportService', 'FolderService', 'LoggerService', '$scope', '$uibModal'];
 
@@ -107,9 +111,21 @@ module app.reports {
 		}
 
 		selectFolderItem(item : FolderItem) {
-			this.selectedReport = item;
-			// Load report details
-			this.selectedReportDetails = {};
+			var vm = this;
+			vm.selectedReport = item;
+			vm.reportService.getReportSchedules(item.uuid, 5)
+				.then(function(result) {
+					vm.selectedReportSchedules = result;
+				});
+		}
+
+		selectSchedule(schedule : ReportSchedule) {
+			var vm = this;
+			vm.selectedSchedule = schedule;
+			vm.reportService.getScheduleResults(schedule.uuid)
+				.then(function(results) {
+					vm.selectedScheduleResults = results;
+				});
 		}
 
 		addChildFolder(node : FolderNode) {

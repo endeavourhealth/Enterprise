@@ -10,10 +10,10 @@ module app.models {
 	export function listReportGroupToIcon() {
 		return function (listReportGroup:ListReportGroup) {
 			if (listReportGroup.summary != null) {
-				return 'glyphicon-summary';
+				return 'fa-summary';
 			}
 			if (listReportGroup.fieldBased != null) {
-				return 'glyphicon-fieldBased';
+				return 'fa-fieldBased';
 			}
 		};
 	}

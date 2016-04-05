@@ -19,18 +19,18 @@
 										<tr>
 											<th class="col-md-4" ng-click="sortField='name'; sortReverse=!sortReverse">Title
 												<span ng-show="sortField == 'name'"
-															class="glyphicon glyphicon-sm"
-															ng-class="{'glyphicon-chevron-down':!sortReverse, 'glyphicon-chevron-up':sortReverse}"></span>
+															class="fa fa-sm"
+															ng-class="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
 											<th class="col-md-4" ng-click="sortField='lastModified'; sortReverse=!sortReverse">Date modified
 												<span ng-show="sortField == 'lastModified'"
-															class="glyphicon glyphicon-sm"
-															ng-class="{'glyphicon-chevron-down':!sortReverse, 'glyphicon-chevron-up':sortReverse}"></span>
+															class="fa fa-sm"
+															ng-class="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
 											<th class="col-md-3" ng-click="sortField='type'; sortReverse=!sortReverse">Type
 												<span ng-show="sortField == 'type'"
-															class="glyphicon glyphicon-sm"
-															ng-class="{'glyphicon-chevron-down':!sortReverse, 'glyphicon-chevron-up':sortReverse}"></span>
+															class="fa fa-sm"
+															ng-class="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
 											<th class="col-md-1"></th>
 										</tr>
@@ -38,11 +38,11 @@
 									<tbody>
 										<tr class="hover-box show-child-on-hover" ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse">
 											<td>
-												<span class="glyphicon glyphicon-info-sign glyphicon-right-pad text-muted" uib-tooltip="{{item.description}}"></span>
+												<span class="fa fa-info-circle fa-right-pad text-muted" uib-tooltip="{{item.description}}"></span>
 												<a style="cursor: pointer" ng-click="ctrl.actionItem(item,'edit')">{{item.name}}</a>
 											</td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
-											<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
+											<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>
 												<div class="child-to-show">
 													<span uib-dropdown>

@@ -243,7 +243,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         }
 
         //retrieve the DbItem for the report, so we can work out the report query hierarchy
-        DbItem reportItemObj = DbItem.retrieveLatestForUUid(reportUuid);
+        UUID auditUuid = jobReport.getAuditUuid();
+        DbItem reportItemObj = DbItem.retrieveForUuidAndAudit(reportUuid, auditUuid);
         String xml = reportItemObj.getXmlContent();
         Report report = QueryDocumentSerializer.readReportFromXml(xml);
 

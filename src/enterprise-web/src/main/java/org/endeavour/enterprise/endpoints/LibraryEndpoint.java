@@ -132,17 +132,6 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 .build();
     }
 
-    /**
-     * to be removed once web client uses getContentNamesforReportLibraryItem
-     */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/getLibraryItemNamesForReport")
-    public Response getLibraryItemNamesForReport(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
-        return getContentNamesforReportLibraryItem(sc, uuidStr);
-    }
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

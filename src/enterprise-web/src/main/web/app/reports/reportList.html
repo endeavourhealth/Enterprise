@@ -7,13 +7,8 @@
 			<form>
 				<div class="row">
 					<div class="form-group col-md-3">
-							<div ui-tree data-nodrop-enabled="true" data-nodrag  id="tree-root">
-								<ol ui-tree-nodes ng-model="reportListCtrl.treeData">
-									<li ng-repeat="node in reportListCtrl.treeData" ui-tree-node ng-include="'node_template.html'"></li>
-								</ol>
-							</div>
-						</div>
-
+						<ng-include src="'/app/common/libraryItemFolder.html'"></ng-include>
+					</div>
 					<div class="form-group col-md-9">
 							<div class="table">
 								<table class="table table-striped table-condensed">
@@ -39,9 +34,9 @@
 									</thead>
 									<tbody>
 										<tr class="hover-box show-child-on-hover"
-												ng-repeat="item in reportListCtrl.itemSummaryList.contents | orderBy:sortField:sortReverse"
-												ng-class="{'selection': item.uuid == reportListCtrl.selectedReport.uuid}"
-												ng-click="reportListCtrl.selectFolderItem(item)">
+												ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse"
+												ng-class="{'selection': item.uuid == ctrl.selectedReport.uuid}"
+												ng-click="ctrl.selectFolderItem(item)">
 											<td>
 												<span class="glyphicon glyphicon-info-sign glyphicon-right-pad text-muted" uib-tooltip="{{item.description}}"></span>
 												<a ui-sref="app.reportAction({itemUuid: item.uuid, itemAction: 'edit'})">{{item.name}}</a>
@@ -50,12 +45,12 @@
 											<td><span class="glyphicon glyphicon-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>
 												<div class="child-to-show">
-													<button type="button" class="btn btn-primary btn-xs" ng-click="reportListCtrl.run(item)">Run</button>
+													<button type="button" class="btn btn-primary btn-xs" ng-click="ctrl.run(item)">Run</button>
 													<span uib-dropdown>
 														<button type="button" class="btn btn-xs btn-default" uib-dropdown-toggle>...</button>
 														<ul uib-dropdown-menu>
 															<li class="disabled"><a href="#">Rename</a></li>
-															<li><a ng-click="reportListCtrl.deleteItem(this)">Delete</a></li>
+															<li><a ng-click="ctrl.deleteItem(this)">Delete</a></li>
 															<li role="separator" class="divider"></li>
 															<li class="disabled"><a href="#">Cut</a></li>
 															<li class="disabled"><a href="#">Copy</a></li>
@@ -70,13 +65,77 @@
 							</div>
 						</div>
 				</div>
-				<div class="row" ng-show="reportListCtrl.selectedReportDetails">
-					<div class="form-group col-md-3"></div>
-					<div class="form-group col-md-9">
-						<div class="panel panel-primary">
-							<div class="panel-heading">Report details</div>
-							<div class="panel-body">
 
+				<div class="row" ng-show="ctrl.selectedReport">
+					<div class="form-group col-md-4">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								Report Schedules
+								<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-hide="ctrl.selectedReportSchedules"></span>
+							</div>
+							<div class="panel-body">
+								<div class="table">
+									<table class="table table-striped table-condensed">
+										<thead>
+											<tr>
+												<th class="col-md-7">Date</th>
+												<th class="col-md-5">Status</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="hover-box"
+													ng-repeat="schedule in ctrl.selectedReportSchedules"
+													ng-class="{'selection': schedule.uuid == ctrl.selectedSchedule.uuid}"
+													ng-click="ctrl.selectSchedule(schedule)">
+												<td>{{ schedule.date | date:'dd-MMM-yyyy HH:mm:ss' }}</td>
+												<td>{{ schedule.status }}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group col-md-8" ng-show="ctrl.selectedSchedule">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								Report details
+								<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-hide="ctrl.selectedScheduleResults"></span>
+							</div>
+							<div class="panel-body">
+								<uib-tabset>
+									<uib-tab index="0" heading="Parameters">
+										<div class="panel-body">
+											<div class="row">
+													<label class="col-md-3">Baseline date :</label>
+													<p class="col-md-9">{{ ctrl.selectedSchedule.parameters.baselineDate | date:'dd-MMM-yyyy' }}</p>
+											</div>
+											<div class="row">
+												<label class="col-md-3">Patient type : </label>
+												<p class="col-md-9">{{ ctrl.selectedSchedule.parameters.patientType }}</p>
+											</div>
+											<div class="row">
+												<label class="col-md-3">Patient status : </label>
+												<p class="col-md-9">{{ ctrl.selectedSchedule.parameters.patientStatus }}</p>
+											</div>
+										</div>
+									</uib-tab>
+									<uib-tab index="1" heading="Results">
+										<div class="panel-body">
+											<div class="row">
+												<label class="col-md-3">Population count :</label>
+												<p class="col-md-9">{{ ctrl.selectedScheduleResults.populationCount }}</p>
+											</div>
+
+											<div ui-tree data-nodrop-enabled="true" data-nodrag  id="tree-root">
+												<ol ui-tree-nodes ng-model="ctrl.selectedScheduleResults.queryResults">
+													<li ng-repeat="node in ctrl.selectedScheduleResults.queryResults" ui-tree-node ng-include="'result_template.html'"></li>
+												</ol>
+											</div>
+
+										</div>
+									</uib-tab>
+								</uib-tabset>
 							</div>
 						</div>
 					</div>
@@ -87,38 +146,27 @@
 	</div>
 </div>
 
-<script type="text/ng-template" id="node_template.html">
+<script type="text/ng-template" id="result_template.html">
 	<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
-		<span class="show-child-on-hover folder-item"
-					ng-class="{'selection': node.uuid == reportListCtrl.selectedNode.uuid}">
-			<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-sm glyphicon-blank text-muted"></span>
-			<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-						ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
-						ng-click="reportListCtrl.toggleExpansion(node)"></span>
-			<span ng-click="reportListCtrl.selectNode(node)" style="cursor:pointer">
-				<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
-				<span>{{node.folderName}}</span>
-				<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
-				<span uib-dropdown>
-					<button type="button" class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
-					<ul uib-dropdown-menu>
-						<li><a ui-sref="app.reportAction({itemUuid: node.uuid, itemAction: 'add'})">Add report</a></li>
-						<li role="separator" class="divider"></li>
-						<li><a  ng-click="reportListCtrl.addChildFolder(node)">Add child folder</a></li>
-						<li role="separator" class="divider"></li>
-						<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || reportListCtrl.renameFolder(this)">Rename</a></li>
-						<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || reportListCtrl.deleteFolder(this)">Delete</a></li>
-						<li role="separator" class="divider"></li>
-						<li class="disabled"><a href="#">Cut</a></li>
-						<li class="disabled"><a href="#">Copy</a></li>
-						<li class="disabled"><a href="#">Paste</a></li>
-					</ul>
-				</span>
-			</span>
-		</span>
+		<div class="row">
+			<div class="col-md-6">
+				<span	ng-if="!node.childQueries" data-nodrag class="glyphicon glyphicon-sm glyphicon-blank text-muted"></span>
+				<span ng-if="node.childQueries" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+							ng-click="node.isExpanded = !node.isExpanded"></span>
+				<span class="glyphicon glyphicon-info-sign glyphicon-right-pad text-muted" uib-tooltip="{{node.description}}"></span>
+				<span>{{node.name}}</span>
+			</div>
+			<div class="col-md-3">
+				<span>{{node.resultCount}}</span>
+			</div>
+			<div class="col-md-3">
+				<span>{{node.percentageOfParent | number:4 }}%</span>
+			</div>
+		</div>
 	</div>
-	<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">
-		<li ui-tree-node ng-repeat="node in node.nodes" ng-include="'node_template.html'">
+	<ol ui-tree-nodes ng-model="node.childQueries" ng-show="node.isExpanded">
+		<li ui-tree-node ng-repeat="node in node.childQueries" ng-include="'result_template.html'">
 		</li>
 	</ol>
 </script>

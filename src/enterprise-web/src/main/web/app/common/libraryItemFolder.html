@@ -1,0 +1,42 @@
+<div ui-tree data-nodrop-enabled="true" data-nodrag id="tree-root">
+	<ol ui-tree-nodes ng-model="ctrl.treeData">
+		<li ng-repeat="node in ctrl.treeData" ui-tree-node ng-include="'library_folder_template.html'"></li>
+	</ol>
+</div>
+<script type="text/ng-template" id="library_folder_template.html">
+	<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
+			<span class="show-child-on-hover folder-item"
+						ng-class="{'selection': node.uuid == ctrl.selectedNode.uuid}">
+				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-sm glyphicon-blank text-muted"></span>
+				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
+							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+							ng-click="ctrl.toggleExpansion(node)"></span>
+				<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
+					<span>{{node.folderName}}</span>
+					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+					<span uib-dropdown>
+						<button type="button" class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
+						<ul uib-dropdown-menu>
+							<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
+							<li><a ui-sref="app.listOutputAction({itemUuid: node.uuid, itemAction: 'add'})">Add list output</a></li>
+							<li><a ui-sref="app.codeSetAction({itemUuid: node.uuid, itemAction: 'add'})">Add code set</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a ng-click="ctrl.addChildFolder(node)">Add child folder</a></li>
+							<li role="separator" class="divider"></li>
+							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.renameFolder(this)">Rename</a></li>
+							<li ng-class="{'disabled': !node.parentFolderUuid}"><a ng-click="!node.parentFolderUuid || ctrl.deleteFolder(this)">Delete</a></li>
+							<li role="separator" class="divider"></li>
+							<li class="disabled"><a href="#">Cut</a></li>
+							<li class="disabled"><a href="#">Copy</a></li>
+							<li class="disabled"><a href="#">Paste</a></li>
+						</ul>
+					</span>
+				</span>
+			</span>
+	</div>
+	<ol ui-tree-nodes ng-model="node.nodes" ng-show="node.isExpanded">
+		<li ui-tree-node ng-repeat="node in node.nodes" ng-include="'library_folder_template.html'">
+		</li>
+	</ol>
+</script>

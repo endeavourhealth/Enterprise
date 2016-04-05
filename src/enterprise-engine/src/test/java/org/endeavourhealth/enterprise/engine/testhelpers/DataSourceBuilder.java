@@ -1,8 +1,6 @@
 package org.endeavourhealth.enterprise.engine.testhelpers;
 
-import org.endeavourhealth.enterprise.core.querydocument.models.DataSource;
-import org.endeavourhealth.enterprise.core.querydocument.models.FieldTest;
-import org.endeavourhealth.enterprise.core.querydocument.models.ValueFrom;
+import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
 
@@ -26,6 +24,18 @@ public class DataSourceBuilder {
     public DataSourceBuilder addFilter(int fieldId, ValueFrom valueFrom) {
         FieldTest fieldTest = addFieldTest(fieldId);
         fieldTest.setValueFrom(valueFrom);
+        return this;
+    }
+
+    public DataSourceBuilder setRestriction(int fieldId, OrderDirection direction, int count) {
+        String fieldName = entity.getField(fieldId).getLogicalName();
+
+        Restriction restriction = new Restriction();
+        restriction.setCount(count);
+        restriction.setFieldName(fieldName);
+        restriction.setOrderDirection(direction);
+
+        dataSource.setRestriction(restriction);
         return this;
     }
 

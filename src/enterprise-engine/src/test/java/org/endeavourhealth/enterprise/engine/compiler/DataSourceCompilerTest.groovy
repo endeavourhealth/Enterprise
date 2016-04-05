@@ -2,6 +2,7 @@ package org.endeavourhealth.enterprise.engine.compiler
 
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType
 import org.endeavourhealth.enterprise.core.querydocument.models.DataSource
+import org.endeavourhealth.enterprise.core.querydocument.models.OrderDirection
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueAbsoluteUnit
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueFrom
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueFromOperator
@@ -17,6 +18,8 @@ import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper
 import org.junit.Test
 
 import java.time.LocalDate
+
+import static org.junit.Assert.*;
 
 class DataSourceCompilerTest {
 
@@ -53,10 +56,23 @@ class DataSourceCompilerTest {
             assert actualSet.equals(expectedSet);
             return this;
         }
+
+        public DataSourceAssertion assertRowInOrder(List<Integer> rowIndexes) {
+
+            assert rowIndexes.equals(compiledDataSource.getRowIds());
+//
+//            assert rowIndexes.size() == compiledDataSource.getRowIds().size();
+//
+//            for (int i = 0; i < rowIndexes.size(); i++) {
+//                if (rowIndexes.get(i).)
+//            }
+
+            return this;
+        }
     }
 
     @Test
-    void testCompiler_filterFunctionality_success() {
+    void testDataSource_filterFunctionality_success() {
 
         EntityMapWrapper.EntityMap entityMap = new EntityMapBuilder()
                 .addEntity(LogicalDataType.UUID, LogicalDataType.DATE)
@@ -79,70 +95,54 @@ class DataSourceCompilerTest {
             .assertRows([2, 3])
     }
 
+    @Test
+    void testDataSource_restrictionDescending_success() {
+
+        EntityMapWrapper.EntityMap entityMap = new EntityMapBuilder()
+                .addEntity(LogicalDataType.UUID, LogicalDataType.DATE)
+                .build();
+
+        DataContainerBuilder dataContainerBuilder = new DataContainerBuilder(entityMap)
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 19))
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 20))
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 21))
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 22));
+
+        ValueFrom from = new ValueFrom(operator: ValueFromOperator.GREATER_THAN_OR_EQUAL_TO, constant: "2015-01-20", absoluteUnit: ValueAbsoluteUnit.DATE);
+
+        DataSourceBuilder dataSourceBuilder = new DataSourceBuilder(entityMap)
+                .setEntity(0)
+                .addFilter(1, from)
+                .setRestriction(1, OrderDirection.DESCENDING, 2);
+
+        new DataSourceAssertion(entityMap, dataSourceBuilder.build(), dataContainerBuilder.build())
+                .assertAnyResults()
+                .assertRowInOrder([3, 2])
+    }
 
 
-//
-//    void testCompiler_restrictionDescending_success() {
-//        EntityMapWrapper.EntityMap map = Helpers.buildStandardEntityMap();
-//        Library library = new Library();
-//        CompilerApi compilerAPI = new CompilerApi(map, library);
-//
-//        Restriction restriction = new Restriction(fieldName: "clinicalDate", orderDirection: OrderDirection.DESCENDING, count: 1);
-//
-//        UUID dataSourceId = UUID.randomUUID();
-//        DataSource dataSource = new DataSource(entity: map.entity.get(0).logicalName, uuid: dataSourceId);
-//        dataSource.restriction = restriction;
-//
-//        ICompiledDataSource compiledDataSource = compilerAPI.compile(dataSource);
-//
-//        DataContainer dataContainer = Helpers.buildStandardContainer();
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 19));
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 22));
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 20));
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 21));
-//
-//        Helpers.levelFields(dataContainer);
-//
-//        compiledDataSource.resolve(dataContainer);
-//
-//        assert compiledDataSource.anyResults();
-//        assert compiledDataSource.count() == 1;
-//
-//        List<Integer> rowIds = compiledDataSource.getRowIds();
-//        int[] expected = [1];
-//
-//        assert rowIds.equals(expected);
-//    }
-//
-//    void testCompiler_restrictionAscending_success() {
-//        EntityMapWrapper.EntityMap map = Helpers.buildStandardEntityMap();
-//        Library library = new Library();
-//        CompilerApi compilerAPI = new CompilerApi(map, library);
-//
-//        Restriction restriction = new Restriction(fieldName: "clinicalDate", orderDirection: OrderDirection.ASCENDING, count: 2);
-//
-//        UUID dataSourceId = UUID.randomUUID();
-//        DataSource dataSource = new DataSource(entity: map.entity.get(0).logicalName, uuid: dataSourceId);
-//        dataSource.restriction = restriction;
-//
-//        ICompiledDataSource compiledDataSource = compilerAPI.compile(dataSource);
-//
-//        DataContainer dataContainer = Helpers.buildStandardContainer();
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 19));
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 22));
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 20));
-//        Helpers.getClinicalDateDataField(dataContainer).add(new LocalDate(2015, 1, 21));
-//
-//        Helpers.levelFields(dataContainer);
-//
-//        compiledDataSource.resolve(dataContainer);
-//
-//        assert compiledDataSource.anyResults();
-//        assert compiledDataSource.count() == 2;
-//
-//        List<Integer> rowIds = compiledDataSource.getRowIds();
-//        int[] expected = [0, 2];
-//
-//        assert rowIds.equals(expected);
-//    }
+    @Test
+    void testDataSource_restrictionAscending_success() {
+
+        EntityMapWrapper.EntityMap entityMap = new EntityMapBuilder()
+                .addEntity(LogicalDataType.UUID, LogicalDataType.DATE)
+                .build();
+
+        DataContainerBuilder dataContainerBuilder = new DataContainerBuilder(entityMap)
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 19))
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 20))
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 21))
+                .addRow(UUID.randomUUID(), LocalDate.of(2015, 1, 22));
+
+        ValueFrom from = new ValueFrom(operator: ValueFromOperator.GREATER_THAN_OR_EQUAL_TO, constant: "2015-01-20", absoluteUnit: ValueAbsoluteUnit.DATE);
+
+        DataSourceBuilder dataSourceBuilder = new DataSourceBuilder(entityMap)
+                .setEntity(0)
+                .addFilter(1, from)
+                .setRestriction(1, OrderDirection.ASCENDING, 2);
+
+        new DataSourceAssertion(entityMap, dataSourceBuilder.build(), dataContainerBuilder.build())
+                .assertAnyResults()
+                .assertRowInOrder([1, 2])
+    }
 }

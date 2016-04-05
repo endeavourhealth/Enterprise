@@ -8,9 +8,7 @@ import org.endeavourhealth.enterprise.enginecore.entities.model.DataEntity;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapException;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CompiledEntityDataSource implements ICompiledDataSource {
 
@@ -18,6 +16,7 @@ public class CompiledEntityDataSource implements ICompiledDataSource {
     private final EntityMapWrapper.Entity entity;
     private final List<Integer> finalRows = new ArrayList<>();
     private List<FieldTestFromDataSource> filters;
+    private CompiledRestriction compiledRestriction;
 
     private DataEntity dataEntity;
 
@@ -48,14 +47,18 @@ public class CompiledEntityDataSource implements ICompiledDataSource {
     }
 
     @Override
+    public void setRestriction(CompiledRestriction restriction) {
+        this.compiledRestriction = restriction;
+    }
+
+    @Override
     public void resolve(ExecutionContext executionContext) {
 
         finalRows.clear();
         dataEntity = executionContext.getDataContainer().getDataEntities().get(entityId);
 
         processFilters();
-
-        //Process restriction
+        processRestriction();
 
         //finally have a list of row ids.
     }
@@ -89,9 +92,11 @@ public class CompiledEntityDataSource implements ICompiledDataSource {
     }
 
     private void processRestriction() {
+        if (compiledRestriction == null)
+            return;
 
-        Map<Object, Integer> indexMap;
-
-
+        List<Integer> orderedIds = compiledRestriction.process();
+        finalRows.clear();
+        finalRows.addAll(orderedIds);
     }
 }

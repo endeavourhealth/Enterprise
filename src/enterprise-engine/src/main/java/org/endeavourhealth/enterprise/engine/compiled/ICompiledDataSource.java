@@ -19,5 +19,6 @@ public interface ICompiledDataSource {
     void addFilter(FieldTestFromDataSource filter);
     int getFieldIndex(String logicalName) throws EntityMapException;
     Field getField(int fieldIndex);
+    void setRestriction(CompiledRestriction restriction);
 }
 

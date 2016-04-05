@@ -25,7 +25,6 @@ module app.reports {
 	'use strict';
 
 	export class ReportListController extends LibraryItemFolderModuleBase {
-		itemSummaryList : ItemSummaryList;
 		selectedReport : FolderItem;
 		selectedReportSchedules : ReportSchedule[];
 		selectedSchedule : ReportSchedule;

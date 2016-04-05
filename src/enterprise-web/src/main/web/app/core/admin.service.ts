@@ -30,7 +30,7 @@ module app.core {
 				{caption: 'Dashboard', state: 'app.dashboard', icon: 'fa fa-tachometer'},
 				{caption: 'Library', state: 'app.library', icon: 'fa fa-book'},
 				{caption: 'Reports', state: 'app.reportList', icon: 'fa fa-files-o'},
-				{caption: 'Organisations', state: 'app.orgSets', icon: 'fa fa-hospital-o'},
+				{caption: 'Organisations', state: 'app.organisationSet', icon: 'fa fa-hospital-o'},
 				{caption: 'Administration', state: 'app.admin', icon: 'fa fa-users'},
 				{caption: 'Audit', state: 'app.audit', icon: 'fa fa-archive'}
 			];

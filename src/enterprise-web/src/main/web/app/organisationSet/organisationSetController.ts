@@ -1,7 +1,7 @@
 /// <reference path="../../typings/tsd.d.ts" />
 /// <reference path="../core/library.service.ts" />
 
-module app.codeSet {
+module app.organisationSet {
 	import LibraryItem = app.models.LibraryItem;
 	import ILibraryService = app.core.ILibraryService;
 	import IModalScope = angular.ui.bootstrap.IModalScope;
@@ -13,7 +13,7 @@ module app.codeSet {
 	import LibraryItemModuleBase = app.library.LibraryItemModuleBase;
 	'use strict';
 
-	export class CodeSetController extends LibraryItemModuleBase {
+	export class OrganisationSetController extends LibraryItemModuleBase {
 		libraryItem : LibraryItem;
 		termCache : any;
 
@@ -72,6 +72,6 @@ module app.codeSet {
 	}
 
 	angular
-		.module('app.codeSet')
-		.controller('CodeSetController', CodeSetController);
+		.module('app.organisationSet')
+		.controller('OrganisationSetController', OrganisationSetController);
 }

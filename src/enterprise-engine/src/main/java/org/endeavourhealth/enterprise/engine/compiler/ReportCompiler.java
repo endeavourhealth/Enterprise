@@ -33,7 +33,7 @@ class ReportCompiler {
             return compiledReport;
 
         } catch (Exception e) {
-            throw new UnableToCompileExpection(jobReport.getReportUuid(), e);
+            throw new UnableToCompileExpection("JobReportUuid: " + jobReport.getReportUuid(), e);
         }
     }
 

@@ -1,5 +1,7 @@
 package org.endeavourhealth.enterprise.enginecore.entitymap;
 
+import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,10 @@ public class EntityMapWrapper {
                 Entity target = new Entity(s);
                 entities.add(target);
             }
+        }
+
+        public org.endeavourhealth.enterprise.core.entitymap.models.EntityMap getSource() {
+            return entityMap;
         }
 
         public List<Entity> getEntities() {

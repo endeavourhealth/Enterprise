@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.engine.compiler
 
 import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException
+import org.junit.Test
 
 import static org.mockito.Mockito.*;
 
@@ -11,10 +12,9 @@ import org.endeavourhealth.enterprise.core.querydocument.models.RuleActionOperat
 import org.endeavourhealth.enterprise.engine.compiled.INodeExecutor
 import org.endeavourhealth.enterprise.engine.compiled.NodeTraversal
 
+class NodeCompilerTest {
 
-
-class NodeCompilerTest extends GroovyTestCase {
-
+    @Test
     void testCompile_singleRuleTruePIFN_pass() {
 
         new NodeBuilder()
@@ -23,6 +23,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_singleRuleFalsePIFN_fail() {
 
         new NodeBuilder()
@@ -31,6 +32,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertFail();
     }
 
+    @Test
     void testCompile_singleRuleTruePNFI_fail() {
 
         new NodeBuilder()
@@ -39,6 +41,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertFail();
     }
 
+    @Test
     void testCompile_singleRuleFalsePNFI_pass() {
 
         new NodeBuilder()
@@ -47,6 +50,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_multiStartRuleFirstPassSecondFail_pass() {
 
         new NodeBuilder()
@@ -57,6 +61,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_multiStartRuleFirstFailSecondPass_pass() {
 
         new NodeBuilder()
@@ -67,6 +72,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_multiStartRuleBothFail_fail() {
 
         new NodeBuilder()
@@ -77,6 +83,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertFail();
     }
 
+    @Test
     void testCompile_simpleChain1_pass() {
 
         new NodeBuilder()
@@ -86,6 +93,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_simpleChain2_fail() {
 
         new NodeBuilder()
@@ -95,6 +103,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertFail();
     }
 
+    @Test
     void testCompile_orFirst_pass() {
 
         new NodeBuilder()
@@ -105,6 +114,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_orSecond_pass() {
 
         new NodeBuilder()
@@ -115,6 +125,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_orNeither_fail() {
 
         new NodeBuilder()
@@ -125,6 +136,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertFail();
     }
 
+    @Test
     void testCompile_negateOrFirst_pass() {
 
         new NodeBuilder()
@@ -135,6 +147,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_negateOrSecond_pass() {
 
         new NodeBuilder()
@@ -145,6 +158,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_negateOrNeither_fail() {
 
         new NodeBuilder()
@@ -155,6 +169,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertFail();
     }
 
+    @Test
     void testCompile_multiStartingNodesFirst_pass() {
 
         new NodeBuilder()
@@ -165,7 +180,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
-
+    @Test
     void testCompile_multiStartingNodesSecond_pass() {
 
         new NodeBuilder()
@@ -176,6 +191,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertPass();
     }
 
+    @Test
     void testCompile_multiStartingNodesNeither_fail() {
 
         new NodeBuilder()
@@ -186,6 +202,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .assertFail();
     }
 
+    @Test
     void testCompile_outcomeBothNoAction_exception() {
 
         new NodeBuilder()
@@ -194,6 +211,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
+    @Test
     void testCompile_outcomeBothInclude_exception() {
 
         new NodeBuilder()
@@ -202,6 +220,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
+    @Test
     void testCompile_outcomeBothGoToSameNode_exception() {
 
         new NodeBuilder()
@@ -212,6 +231,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
+    @Test
     void testCompile_noStartingNodes_exception() {
 
         new NodeBuilder()
@@ -219,6 +239,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
+    @Test
     void testCompile_nodeNotCalled_exception() {
 
         new NodeBuilder()
@@ -228,6 +249,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
+    @Test
     void testCompile_cycle1_exception() {
 
         new NodeBuilder()
@@ -236,6 +258,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
+    @Test
     void testCompile_cycle2_exception() {
 
         new NodeBuilder()
@@ -244,7 +267,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
-
+    @Test
     void testCompile_cycle3_exception() {
 
         new NodeBuilder()
@@ -254,6 +277,7 @@ class NodeCompilerTest extends GroovyTestCase {
                 .shouldFailDueToQueryDocument();
     }
 
+    @Test
     void testCompile_cycle4_exception() {
 
         new NodeBuilder()

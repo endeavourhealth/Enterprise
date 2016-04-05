@@ -1,12 +1,11 @@
 package org.endeavourhealth.enterprise.enginecore.carerecord;
 
 import net.sourceforge.jtds.jdbc.JtdsResultSet;
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseHelper;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainer;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainerPool;
-import org.endeavourhealth.enterprise.enginecore.entities.model.DataEntity;
+import org.endeavourhealth.enterprise.enginecore.entities.model.DataField;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 
@@ -119,10 +118,10 @@ public class CareRecordDal {
                 }
             }
 
-            DataEntity dataEntity = dataContainer.getDataEntities().get(entityIndex);
+            List<DataField> fields = dataContainer.getDataEntities().get(entityIndex).getFields();
 
             for (int i = 0; i < entityMapFieldCount; i++) {
-                dataEntity.getFields().get(i).add(rs.getObject(entityMapFields.get(i).getIndex()));
+                fields.get(i).add(rs.getObject(entityMapFields.get(i).getIndex()));
             }
         }
     }

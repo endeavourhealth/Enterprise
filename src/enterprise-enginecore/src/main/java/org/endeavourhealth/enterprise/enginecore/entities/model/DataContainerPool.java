@@ -1,9 +1,9 @@
 package org.endeavourhealth.enterprise.enginecore.entities.model;
 
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
-import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 
 import java.util.ArrayDeque;
+import java.util.List;
 
 /*
 The processor will load up many patients.  That means loading up many datacontainers.  Each container contains quite a few lists which are
@@ -37,9 +37,14 @@ public class DataContainerPool {
         if (itemsCreated > maximumItemsToCreate)
             throw new Exception("Maximum created items exceeded");  //If it hits this then the items are not being recycled
 
+        return createDataContainer(entityMapWrapper.getEntities());
+    }
+
+    public static DataContainer createDataContainer(List<EntityMapWrapper.Entity> entities) {
+
         DataContainer dataContainer = new DataContainer();
 
-        for (EntityMapWrapper.Entity entity : entityMapWrapper.getEntities()) {
+        for (EntityMapWrapper.Entity entity : entities) {
 
             DataEntity dataEntity = new DataEntity();
 

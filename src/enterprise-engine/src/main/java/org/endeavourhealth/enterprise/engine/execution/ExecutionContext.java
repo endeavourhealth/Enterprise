@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class ExecutionContext {
 
-    public DataContainer dataContainer;
+    private DataContainer dataContainer;
 
     private HashSet<UUID> queriesPatientExcluded = new HashSet<>();
     private HashSet<UUID> queriesPatientIncluded = new HashSet<>();
@@ -74,5 +74,9 @@ public class ExecutionContext {
             return false;
 
         return true;
+    }
+
+    public DataContainer getDataContainer() {
+        return dataContainer;
     }
 }

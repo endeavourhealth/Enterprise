@@ -2,18 +2,18 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<!--AZURE settings-->
-	<!--<database>
+	<database>
 		<url>jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise</url>
 		<username>devuser@mpydpvsu61</username>
 		<password>7oaG7FVsvK08sE9T5NEe</password>
-	</database>-->
+	</database>
 
 	<!--AIMES SQL Settings-->
-	<database>
+	<!--<database>
 		<url>jdbc:jtds:sqlserver://10.11.87.68/Endeavour_Enterprise</url>
 		<username>Endeavour_Enterprise_ApplicationUser</username>
 		<password>TheQuickBrownFox1234%^&amp;*</password>
-	</database>
+	</database>-->
 
 	<!--local SQL Express settings-->
 	<!--<database>
@@ -24,13 +24,13 @@
 
 	<webServer>
 		<!--local host cookie-->
-		<!--<cookieDomain>localHost</cookieDomain>-->
+		<cookieDomain>localHost</cookieDomain>
 
 		<!--AIMES cookie-->
-		<cookieDomain>10.11.87.69</cookieDomain>
-	</webServer>
+	<!--<cookieDomain>10.11.87.69</cookieDomain>-->
+</webServer>
 
-	<!--GMail settings-->
+<!--GMail settings-->
 	<email>
 		<url>smtp.gmail.com</url>
 		<username>endeavourhealthenterprise@gmail.com</username>

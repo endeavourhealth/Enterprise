@@ -275,13 +275,21 @@ module app.query {
 
 					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						var rule = $scope.chartViewModel.data.query.rule[i];
-						if (!rule.test && rule.description!="START") {
+						if (!rule.test && !rule.expression && rule.description!="START") {
 							logger.error('Rule "'+rule.description+'" does not have a test');
 							return;
 						}
 					}
 
 					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+						var rule = $scope.chartViewModel.data.query.rule[i];
+						if (!rule.test && (rule.expression && rule.expression.variable.length==0) && rule.description!="START") {
+							logger.error('Expression "'+rule.description+'" does not have any variables');
+							return;
+						}
+					}
+
+					/*for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						var rule = $scope.chartViewModel.data.query.rule[i];
 						if (rule.description!="START") {
 							for (var f = 0; f < rule.test.dataSource.filter.length; ++f) {
@@ -296,7 +304,7 @@ module app.query {
 								}
 							}
 						}
-					}
+					}*/
 
 					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						if ($scope.chartViewModel.data.query.rule[i].description=="START") {

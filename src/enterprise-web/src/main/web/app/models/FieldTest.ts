@@ -7,7 +7,8 @@ module app.models {
 		valueTo : ValueTo;
 		valueRange : ValueRange;
 		valueEqualTo : Value;
-		codeSet : CodeSet[];
+		codeSet : CodeSet;
+		valueSet: ValueSet;
 		codeSetLibraryItemUuid : string[];
 		negate : boolean;
 	}

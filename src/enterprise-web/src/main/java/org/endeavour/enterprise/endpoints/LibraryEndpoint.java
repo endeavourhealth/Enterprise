@@ -4,6 +4,7 @@ import org.endeavour.enterprise.json.JsonDeleteResponse;
 import org.endeavour.enterprise.json.JsonFolderContent;
 import org.endeavour.enterprise.json.JsonFolderContentsList;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
@@ -135,8 +136,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/getContentNamesforReportLibraryItem")
-    public Response getContentNamesforReportLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
+    @Path("/getContentNamesForReportLibraryItem")
+    public Response getContentNamesForReportLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
         UUID itemUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
@@ -145,7 +146,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
         DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
-        List<DbItemDependency> dependentItems = DbItemDependency.retrieveForActiveItem(activeItem);
+        List<DbItemDependency> dependentItems = DbItemDependency.retrieveForActiveItemType(activeItem, DependencyType.Uses);
 
         for (DbItemDependency dependentItem: dependentItems) {
             UUID dependentItemUuid = dependentItem.getDependentItemUuid();

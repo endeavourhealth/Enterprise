@@ -42,19 +42,35 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Config.Database }
+     * Create an instance of {@link Template }
      * 
      */
-    public Config.Database createConfigDatabase() {
-        return new Config.Database();
+    public Template createTemplate() {
+        return new Template();
     }
 
     /**
-     * Create an instance of {@link Config.Email }
+     * Create an instance of {@link Database }
      * 
      */
-    public Config.Email createConfigEmail() {
-        return new Config.Email();
+    public Database createDatabase() {
+        return new Database();
+    }
+
+    /**
+     * Create an instance of {@link WebServer }
+     * 
+     */
+    public WebServer createWebServer() {
+        return new WebServer();
+    }
+
+    /**
+     * Create an instance of {@link Email }
+     * 
+     */
+    public Email createEmail() {
+        return new Email();
     }
 
     /**

@@ -8,41 +8,14 @@
     </encoder>
   </appender>
 
-  <!-- old format for console appender, which isn't supported now -->
-  <!--<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-    </layout>
-  </appender>-->
-
-  <!-- appender for database -->
-  <!--<appender name="AzureDB" class="ch.qos.logback.classic.db.DBAppender">
-  <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-    <driverClass>net.sourceforge.jtds.jdbc.Driver</driverClass>
-    <url>jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise</url>
-    <user>devuser@mpydpvsu61</user>
-    <password>7oaG7FVsvK08sE9T5NEe</password>
-  </connectionSource>
-</appender>-->
-
-<!-- appender for database -->
-  <!--<appender name="LocalDB" class="ch.qos.logback.classic.db.DBAppender">
-  <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
-    <driverClass>net.sourceforge.jtds.jdbc.Driver</driverClass>
-    <url>jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise;instance=SQLEXPRESS</url>
-    <user>Endeavour_Enterprise_ApplicationUser</user>
-    <password>TheQuickBrownFox1234%^&amp;*</password>
-  </connectionSource>
-</appender>-->
-
 
 <!-- appender for log file-->
-  <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>EnterpriseWebServer.log</file>
     <encoder>
       <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
     </encoder>
-  </appender>-->
+  </appender>
 
 
   <logger name="org.endeavour.enterprise" level="TRACE"/>
@@ -50,8 +23,7 @@
 
   <root level="debug">
     <appender-ref ref="STDOUT" />
-    <!--<appender-ref ref="FILE" />-->
-    <!--<appender-ref ref="AzureDB" />-->
-    <!--<appender-ref ref="LocalDB" />-->
+    <appender-ref ref="FILE" />
+    <!--DB appender is added programmatically-->
 </root>
 </configuration>

@@ -17,32 +17,9 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="database">
- *           &lt;complexType>
- *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;sequence>
- *                   &lt;element name="url" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                   &lt;element name="username" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                   &lt;element name="password" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                 &lt;/sequence>
- *               &lt;/restriction>
- *             &lt;/complexContent>
- *           &lt;/complexType>
- *         &lt;/element>
- *         &lt;element name="email" minOccurs="0">
- *           &lt;complexType>
- *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;sequence>
- *                   &lt;element name="url" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                   &lt;element name="username" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                   &lt;element name="password" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                 &lt;/sequence>
- *               &lt;/restriction>
- *             &lt;/complexContent>
- *           &lt;/complexType>
- *         &lt;/element>
+ *         &lt;element name="database" type="{}database"/>
+ *         &lt;element name="webServer" type="{}webServer"/>
+ *         &lt;element name="email" type="{}email" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -54,23 +31,26 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "config", propOrder = {
     "database",
+    "webServer",
     "email"
 })
 public class Config {
 
     @XmlElement(required = true)
-    protected Config.Database database;
-    protected Config.Email email;
+    protected Database database;
+    @XmlElement(required = true)
+    protected WebServer webServer;
+    protected Email email;
 
     /**
      * Gets the value of the database property.
      * 
      * @return
      *     possible object is
-     *     {@link Config.Database }
+     *     {@link Database }
      *     
      */
-    public Config.Database getDatabase() {
+    public Database getDatabase() {
         return database;
     }
 
@@ -79,11 +59,35 @@ public class Config {
      * 
      * @param value
      *     allowed object is
-     *     {@link Config.Database }
+     *     {@link Database }
      *     
      */
-    public void setDatabase(Config.Database value) {
+    public void setDatabase(Database value) {
         this.database = value;
+    }
+
+    /**
+     * Gets the value of the webServer property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link WebServer }
+     *     
+     */
+    public WebServer getWebServer() {
+        return webServer;
+    }
+
+    /**
+     * Sets the value of the webServer property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link WebServer }
+     *     
+     */
+    public void setWebServer(WebServer value) {
+        this.webServer = value;
     }
 
     /**
@@ -91,10 +95,10 @@ public class Config {
      * 
      * @return
      *     possible object is
-     *     {@link Config.Email }
+     *     {@link Email }
      *     
      */
-    public Config.Email getEmail() {
+    public Email getEmail() {
         return email;
     }
 
@@ -103,233 +107,11 @@ public class Config {
      * 
      * @param value
      *     allowed object is
-     *     {@link Config.Email }
+     *     {@link Email }
      *     
      */
-    public void setEmail(Config.Email value) {
+    public void setEmail(Email value) {
         this.email = value;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="url" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="username" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="password" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "url",
-        "username",
-        "password"
-    })
-    public static class Database {
-
-        @XmlElement(required = true)
-        protected String url;
-        @XmlElement(required = true)
-        protected String username;
-        @XmlElement(required = true)
-        protected String password;
-
-        /**
-         * Gets the value of the url property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getUrl() {
-            return url;
-        }
-
-        /**
-         * Sets the value of the url property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setUrl(String value) {
-            this.url = value;
-        }
-
-        /**
-         * Gets the value of the username property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getUsername() {
-            return username;
-        }
-
-        /**
-         * Sets the value of the username property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setUsername(String value) {
-            this.username = value;
-        }
-
-        /**
-         * Gets the value of the password property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getPassword() {
-            return password;
-        }
-
-        /**
-         * Sets the value of the password property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setPassword(String value) {
-            this.password = value;
-        }
-
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="url" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="username" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="password" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "url",
-        "username",
-        "password"
-    })
-    public static class Email {
-
-        @XmlElement(required = true)
-        protected String url;
-        @XmlElement(required = true)
-        protected String username;
-        @XmlElement(required = true)
-        protected String password;
-
-        /**
-         * Gets the value of the url property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getUrl() {
-            return url;
-        }
-
-        /**
-         * Sets the value of the url property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setUrl(String value) {
-            this.url = value;
-        }
-
-        /**
-         * Gets the value of the username property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getUsername() {
-            return username;
-        }
-
-        /**
-         * Sets the value of the username property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setUsername(String value) {
-            this.username = value;
-        }
-
-        /**
-         * Gets the value of the password property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getPassword() {
-            return password;
-        }
-
-        /**
-         * Sets the value of the password property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setPassword(String value) {
-            this.password = value;
-        }
-
     }
 
 }

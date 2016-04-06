@@ -227,23 +227,23 @@
 	</script>
 
 <hr/>
-<h3>/api/security/setPasswordFromInviteEmail</h3>
+<h3>/api/security/setPasswordFromInviteToken</h3>
 
 	Token: <input type="text" id="inviteToken">
 	<br/>
 	Password: <input type="text" id="invitePassword">
 	<br/>
-	<button type="button" onclick="setPasswordFromInvite()">Submit</button>
+	<button type="button" onclick="setPasswordFromInviteToken()">Submit</button>
 
 	<script>
-		function setPasswordFromInvite() {
+		function setPasswordFromInviteToken() {
 
 			var emailToken = document.getElementById('inviteToken').value;
 			var newPassword = document.getElementById('invitePassword').value;
 
 			var params = {token:emailToken, password:newPassword};
 
-			post('/api/security/setPasswordFromInviteEmail/', params);
+			post('/api/security/setPasswordFromInviteToken/', params);
 	
 		}
 	</script>
@@ -871,18 +871,17 @@
 	</script>
 
 <hr/>
-<h3>/api/library/getLibraryItemNamesForReport</h3>
+<h3>/api/library/getContentNamesForReportLibraryItem</h3>
 
-	UUID: <input type="text" id="getLibraryItemNamesForReportUuid">
+	UUID: <input type="text" id="getContentNamesForReportLibraryItemUuid">
 	<br/>
-	<button type="button" onclick="getLibraryItemNamesForReport()">Submit</button>
+	<button type="button" onclick="getContentNamesForReportLibraryItem()">Submit</button>
 
 	<script>
-		function getLibraryItemNamesForReport() {
+		function getContentNamesForReportLibraryItem() {
 
-			var s = document.getElementById('getLibraryItemNamesForReportUuid').value;
-
-			get('/api/library/getLibraryItemNamesForReport', 'uuid=' + s);
+			var s = document.getElementById('getContentNamesForReportLibraryItemUuid').value;
+			get('/api/library/getContentNamesForReportLibraryItem', 'uuid=' + s);
 		}
 	</script>
 

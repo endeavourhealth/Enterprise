@@ -875,6 +875,16 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public List<DbEndUser> retrieveEndUsersForUuids(List<UUID> uuids) throws Exception {
+        if (uuids.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String where = "WHERE EndUserUuid IN (" + getParameterisedString(uuids) + ")";
+        return retrieveForWherePreparedStatement(DbEndUser.class, where, uuids);
+    }
+
+    @Override
     public List<DbOrganisation> retrieveAllOrganisations() throws Exception {
         String where = "WHERE 1=1";
         return retrieveForWherePreparedStatement(DbOrganisation.class, where);
@@ -1128,6 +1138,15 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public List<DbItem> retrieveLatestItemsForUuids(List<UUID> itemUuids) throws Exception {
+        String where = "INNER JOIN Definition.ActiveItem a"
+                + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND a.AuditUuid = " + ALIAS + ".AuditUuid"
+                + " AND " + ALIAS + ".ItemUuid IN (" + getParameterisedString(itemUuids) + ")";
+        return retrieveForWherePreparedStatement(DbItem.class, where, itemUuids);
+    }
+
+    @Override
     public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception {
         String sql = "SELECT COUNT(1)"
                 + " FROM Definition.ItemDependency d, Definition.ActiveItem a"
@@ -1253,6 +1272,14 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public List<DbRequest> retrieveRequestsForItem(UUID organisationUuid, UUID itemUuid, int count) throws Exception {
+        String where = "WHERE OrganisationUuid = ?"
+                + " AND ReportUuid = ?"
+                + " ORDER BY TimeStamp DESC";
+        return retrieveForWherePreparedStatement(DbRequest.class, count, where, organisationUuid, itemUuid);
+    }
+
+    @Override
     public List<DbJob> retrieveRecentJobs(int count) throws Exception {
         String where = "ORDER BY StartDateTime DESC";
         return retrieveForWherePreparedStatement(DbJob.class, count, where);
@@ -1355,6 +1382,14 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public DbJobReport retrieveJobReportForJobAndReportAndParameters(UUID jobUuid, UUID reportUuid, String parameters) throws Exception {
+        String where = "WHERE JobUuid = ?"
+                + " AND ReportUuid = ?"
+                + " AND Parameters = ?";
+        return retrieveOneForWherePreparedStatement(DbJobReport.class, where, jobUuid, reportUuid, parameters);
+    }
+
+    @Override
     public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception {
         String where = "WHERE JobReportUuid = ?";
         return retrieveForWherePreparedStatement(DbJobReportItem.class, where, jobReportUuid);
@@ -1406,6 +1441,28 @@ final class SqlServerDatabase implements DatabaseI {
         String where = "WHERE JobUuid = " + convertToString(jobUuid);
         retrieveForWhere(new DbJobContent().getAdapter(), where, ret);
         return ret;*/
+    }
+
+    @Override
+    public DbJobReportOrganisation retrieveJobReportOrganisationForJobReportAndOdsCode(UUID jobReportUuid, String odsCode) throws Exception {
+        String where = "WHERE JobReportUuid = ?"
+                + " AND OrganisationOdsCode = ?";
+        return retrieveOneForWherePreparedStatement(DbJobReportOrganisation.class, where, jobReportUuid, odsCode);
+    }
+
+    @Override
+    public DbJobReportItemOrganisation retrieveJobReportItemOrganisationForJobReportItemAndOdsCode(UUID jobReportItemUUid, String odsCode) throws Exception {
+        String where = "WHERE JobReportItemUuid = ?"
+                + " AND OrganisationOdsCode = ?";
+        return retrieveOneForWherePreparedStatement(DbJobReportItemOrganisation.class, where, jobReportItemUUid, odsCode);
+
+    }
+
+    @Override
+    public List<DbJobProcessorResult> retrieveJobProcessorResultsForJob(UUID jobUuid) throws Exception {
+        String where = "WHERE JobUuid = ?";
+        return retrieveForWherePreparedStatement(DbJobProcessorResult.class, where, jobUuid);
+
     }
 
     @Override

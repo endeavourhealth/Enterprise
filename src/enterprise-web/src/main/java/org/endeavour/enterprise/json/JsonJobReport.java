@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
-public final class JsonJobReport implements Serializable {
+public final class JsonJobReport {
     private String name = null;
     private Date date = null;
 

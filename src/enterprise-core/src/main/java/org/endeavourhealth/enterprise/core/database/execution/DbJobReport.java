@@ -31,9 +31,15 @@ public final class DbJobReport extends DbAbstractTable {
     private String parameters = null;
     @DatabaseColumn
     private ExecutionStatus statusId = ExecutionStatus.Executing;
+    @DatabaseColumn
+    private Integer populationCount = null;
 
     public static List<DbJobReport> retrieveRecent(UUID organisationUuid, int count) throws Exception {
         return DatabaseManager.db().retrieveJobReports(organisationUuid, count);
+    }
+
+    public static List<DbJobReport> retrieveForJob(DbJob job) throws Exception {
+        return retrieveForJob(job.getJobUuid());
     }
     public static List<DbJobReport> retrieveForJob(UUID jobUuid) throws Exception {
         return DatabaseManager.db().retrieveJobReportsForJob(jobUuid);
@@ -51,6 +57,9 @@ public final class DbJobReport extends DbAbstractTable {
     }
     public static List<DbJobReport> retrieveLatestForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception {
         return DatabaseManager.db().retrieveLatestJobReportsForItemUuids(organisationUuid, itemUuids);
+    }
+    public static DbJobReport retrieveForJobAndReportAndParameters(UUID jobUuid, UUID reportUuid, String parameters) throws Exception {
+        return DatabaseManager.db().retrieveJobReportForJobAndReportAndParameters(jobUuid, reportUuid, parameters);
     }
 
     @Override
@@ -123,5 +132,13 @@ public final class DbJobReport extends DbAbstractTable {
 
     public void setStatusId(ExecutionStatus statusId) {
         this.statusId = statusId;
+    }
+
+    public Integer getPopulationCount() {
+        return populationCount;
+    }
+
+    public void setPopulationCount(Integer populationCount) {
+        this.populationCount = populationCount;
     }
 }

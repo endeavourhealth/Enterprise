@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonEndUserList implements Serializable {
+public final class JsonEndUserList {
     private List<JsonEndUser> users = new ArrayList<JsonEndUser>();
 
     public JsonEndUserList() {

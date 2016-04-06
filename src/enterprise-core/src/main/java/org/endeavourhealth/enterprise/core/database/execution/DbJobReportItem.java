@@ -26,6 +26,9 @@ public final class DbJobReportItem extends DbAbstractTable {
     private Integer resultCount = null;
 
 
+    public static List<DbJobReportItem> retrieveForJobReport(DbJobReport jobReport) throws Exception {
+        return retrieveForJobReport(jobReport.getJobReportUuid());
+    }
     public static List<DbJobReportItem> retrieveForJobReport(UUID jobReportUuid) throws Exception {
         return DatabaseManager.db().retrieveJobReportItemsForJobReport(jobReportUuid);
     }

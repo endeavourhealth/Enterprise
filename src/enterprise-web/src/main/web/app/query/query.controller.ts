@@ -43,6 +43,28 @@ module app.query {
 				}
 			};
 		})
+		.directive('cancelChanges', function () {
+			return {
+				template: '<div>' +
+				'<div class="modal-dialog">' +
+				'<div class="modal-content">' +
+				'<div class="modal-header">' +
+				'<button type="button" class="close" ng-click="toggleCancelChanges()" aria-hidden="true">&times;</button>' +
+				'<h4 class="modal-title">{{ title }}</h4>' +
+				'</div>' +
+				'<div class="modal-body" ng-transclude></div>' +
+				'</div>' +
+				'</div>' +
+				'</div>',
+				restrict: 'E',
+				transclude: true,
+				replace: true,
+				scope: true,
+				link: function postLink(scope: any, element: any, attrs: any) {
+					scope.title = attrs.title;
+				}
+			};
+		})
 		.controller('QueryController', ['LoggerService', '$scope', '$stateParams', '$uibModal','$window','LibraryService','AdminService',
 			function QueryController (logger : app.blocks.ILoggerService, $scope : any, $stateParams : any, $modal : IModalService, $window : any,
 									  libraryService : ILibraryService, adminService : IAdminService) {
@@ -84,7 +106,7 @@ module app.query {
 				$scope.results = [
 					{value: 'GOTO_RULES', displayName: 'Go to rule'},
 					{value: 'INCLUDE', displayName: 'Include patient in final result'},
-					{value: 'EXCLUDE', displayName: 'No further action'}
+					{value: 'NO_ACTION', displayName: 'No further action'}
 				];
 
 				$scope.$on('editTest', function(event : any, ruleId : any) {
@@ -158,6 +180,18 @@ module app.query {
 					this.toggleClearQuery();
 				};
 
+				$scope.showCancelChanges = false;
+				$scope.toggleCancelChanges = function () {
+					$scope.showCancelChanges = !$scope.showCancelChanges;
+				};
+
+				$scope.cancelChangesYes = function () {
+					adminService.clearPendingChanges();
+					logger.error('Query not saved');
+					$window.history.back();
+					this.toggleCancelChanges();
+				};
+
 				//
 				// Add a new rule to the chart.
 				//
@@ -199,7 +233,7 @@ module app.query {
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "EXCLUDE",
+								action: "NO_ACTION",
 								ruleId: <any>[]
 							}
 						};
@@ -221,7 +255,7 @@ module app.query {
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "EXCLUDE",
+								action: "NO_ACTION",
 								ruleId: <any>[]
 							}
 						};
@@ -238,7 +272,7 @@ module app.query {
 								ruleId: <any>[]
 							},
 							onFail: {
-								action: "EXCLUDE",
+								action: "NO_ACTION",
 								ruleId: <any>[]
 							},
 							expression: {
@@ -262,6 +296,50 @@ module app.query {
 				};
 
 				$scope.save = function (close : boolean) {
+
+					if ($scope.queryName=="") {
+						logger.error('Please enter a name for the query');
+						return;
+					}
+
+					if ($scope.chartViewModel.data.query.rule.length==0) {
+						logger.error('Please create a rule in this query');
+						return;
+					}
+
+					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+						var rule = $scope.chartViewModel.data.query.rule[i];
+						if (!rule.test && !rule.expression && rule.description!="START") {
+							logger.error('Rule "'+rule.description+'" does not have a test');
+							return;
+						}
+					}
+
+					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+						var rule = $scope.chartViewModel.data.query.rule[i];
+						if (!rule.test && (rule.expression && rule.expression.variable.length==0) && rule.description!="START") {
+							logger.error('Expression "'+rule.description+'" does not have any variables');
+							return;
+						}
+					}
+
+					/*for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+						var rule = $scope.chartViewModel.data.query.rule[i];
+						if (rule.description!="START") {
+							for (var f = 0; f < rule.test.dataSource.filter.length; ++f) {
+								var filter = rule.test.dataSource.filter[f];
+								if (filter.field=="CODE") {
+									for (var c = 0; c < filter.codeSet.length; ++c) {
+										if (!filter.codeSet[c].codeSetValue || filter.codeSet[c].codeSetValue.length==0) {
+											logger.error('Rule "'+rule.description+'" does not have any clinical codes selected');
+											return;
+										}
+									}
+								}
+							}
+						}
+					}*/
+
 					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						if ($scope.chartViewModel.data.query.rule[i].description=="START") {
 							$scope.chartViewModel.data.query.rule.splice(i,1);
@@ -275,6 +353,8 @@ module app.query {
 					libraryService.saveLibraryItem(libraryItem)
 						.then(function(libraryItem : LibraryItem) {
 							$scope.chartViewModel.data.uuid = libraryItem.uuid;
+
+							$scope.chartViewModel = new flowchart.ChartViewModel($scope.chartViewModel.data);
 
 							var newStartRuleDataModel = {
 								description: "START",
@@ -303,13 +383,6 @@ module app.query {
 						.catch(function(data) {
 							logger.error('Error saving query', data, 'Error');
 						});;
-				}
-
-				$scope.close = function () {
-					// put code in here to check for changes
-					adminService.clearPendingChanges();
-					logger.error('Query not saved');
-					$window.history.back();
 				}
 
 				//

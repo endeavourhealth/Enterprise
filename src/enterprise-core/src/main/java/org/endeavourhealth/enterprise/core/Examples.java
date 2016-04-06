@@ -174,10 +174,82 @@ public abstract class Examples {
         jobReport.writeToDb();
     }
 
-    public static void markingJobAsFinished(DbJob job, ExecutionStatus status) throws Exception {
+    public static void markingJobAsFailed(DbJob job) throws Exception {
+        job.setStatusId(ExecutionStatus.Failed);
         job.setEndDateTime(Instant.now());
-        job.setStatusId(status);
         job.writeToDb();
+    }
+
+    public static void markingJobAsSucceeded(DbJob job) throws Exception {
+
+        List<DbAbstractTable> toSave = new ArrayList<>();
+
+        job.setEndDateTime(Instant.now());
+        job.setStatusId(ExecutionStatus.Succeeded);
+        toSave.add(job);
+
+        HashMap<Object, Object> hmProcessorResults = null; //placeholder for results from each processor node
+        List<String> organisationOdsCodes = null; //placeholder for organisations found in the results
+
+        //then combine the results from each processor node
+        List<DbJobProcessorResult> processorResults = DbJobProcessorResult.retrieveForJob(job);
+        for (DbJobProcessorResult processorResult: processorResults) {
+
+            String xml = processorResult.getResultXml();
+            //...process XML from this processor node
+
+            //mark the result as to be deleted, since we no longer need it
+            processorResult.setSaveMode(TableSaveMode.DELETE);
+            toSave.add(processorResult);
+        }
+
+        List<DbJobReport> jobReports = DbJobReport.retrieveForJob(job);
+        for (DbJobReport jobReport: jobReports) {
+
+            Integer populationCount = null; //...get from processor node results
+
+            jobReport.setPopulationCount(populationCount);
+            jobReport.setStatusId(ExecutionStatus.Succeeded);
+            toSave.add(jobReport);
+
+            //create the organisation breakdown of population counts
+            for (String organisationOdsCode: organisationOdsCodes) {
+
+                Integer organisationPopulationCount = null; //...get from processor node results
+
+                DbJobReportOrganisation jobReportOrganisation = new DbJobReportOrganisation();
+                jobReportOrganisation.setJobReportUuid(jobReport.getJobReportUuid());
+                jobReportOrganisation.setOrganisationOdsCode(organisationOdsCode);
+                jobReportOrganisation.setPopulationCount(organisationPopulationCount);
+                jobReportOrganisation.setSaveMode(TableSaveMode.INSERT);
+                toSave.add(jobReportOrganisation);
+            }
+
+            //update the job report items with the results of each query in the report
+            List<DbJobReportItem> jobReportItems = DbJobReportItem.retrieveForJobReport(jobReport);
+            for (DbJobReportItem jobReportItem: jobReportItems) {
+
+                Integer resultCount = null; //...get from processor node results
+                jobReportItem.setResultCount(resultCount);
+                toSave.add(jobReportItem);
+
+                //create the organisation breakdown for the query results
+                for (String organisationOdsCode: organisationOdsCodes) {
+
+                    Integer organisationResultCount = null; //...get from processor node results
+
+                    DbJobReportItemOrganisation jobReportItemOrganisation = new DbJobReportItemOrganisation();
+                    jobReportItemOrganisation.setJobReportItemUuid(jobReportItem.getJobReportItemUuid());
+                    jobReportItemOrganisation.setOrganisationOdsCode(organisationOdsCode);
+                    jobReportItemOrganisation.setResultCount(organisationResultCount);
+                    jobReportItemOrganisation.setSaveMode(TableSaveMode.INSERT);
+                    toSave.add(jobReportItemOrganisation);
+                }
+            }
+        }
+
+        //update our job, delete the processor results and insert the result entities in one transaction
+        DatabaseManager.db().writeEntities(toSave);
     }
 
     public static RequestParameters getRequestParametersFromJobReport(DbJobReport jobReport) throws Exception {

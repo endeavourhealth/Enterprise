@@ -26,6 +26,7 @@ angular.module('app', [
 		'app.reports',
 		'app.listOutput',
 		'app.codeSet',
+		'app.organisationSet',
 		'app.admin',
 		'app.query',
 		'flowChart',

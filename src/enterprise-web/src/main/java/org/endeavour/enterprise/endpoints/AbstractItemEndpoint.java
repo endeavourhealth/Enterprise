@@ -136,14 +136,17 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
     }
 
-    private static void validateItemTypeMatchesContainingFolder(DefinitionItemType itemType, UUID containingFolderUuid) throws Exception {
+    private static void validateItemTypeMatchesContainingFolder(boolean insert, DefinitionItemType itemType, UUID containingFolderUuid) throws Exception {
 
-        if (containingFolderUuid == null
+        //if saving a new library item or report, it must have a containing folder item
+        if (insert
+                && containingFolderUuid == null
                 && itemType != DefinitionItemType.ReportFolder
                 && itemType != DefinitionItemType.LibraryFolder) {
             throw new BadRequestException("LibraryItems and Reports must have a containing folder UUID");
         }
 
+        //if saving a folder or we're AMENDING a library item or report, then there's notning more to validate
         if (containingFolderUuid == null) {
             return;
         }
@@ -173,7 +176,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
                             String name, String description, QueryDocument queryDocument, UUID containingFolderUuid) throws Exception {
 
         //validate the containing folder type matches the itemType we're saving
-        validateItemTypeMatchesContainingFolder(itemType, containingFolderUuid);
+        validateItemTypeMatchesContainingFolder(insert, itemType, containingFolderUuid);
 
         DbActiveItem activeItem = null;
         DbItem item = null;
@@ -206,13 +209,15 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             item = DbItem.retrieveForActiveItem(activeItem);
         }
 
-        item.setSaveMode(TableSaveMode.INSERT); //force the insert every time, since we allow duplicate rows in the Item table for the same UUID
+        UUID previousAuditUuid = activeItem.getAuditUuid();
 
         //update the AuditUuid on both objects
         DbAudit audit = DbAudit.factoryNow(userUuid, orgUuid);
-        UUID previousAuditUuid = item.getAuditUuid();
         activeItem.setAuditUuid(audit.getAuditUuid());
         item.setAuditUuid(audit.getAuditUuid());
+
+        //force the insert every time, since we allow duplicate rows in the Item table for the same UUID
+        item.setSaveMode(TableSaveMode.INSERT);
 
         if (name != null) {
             item.setTitle(name);
@@ -234,10 +239,14 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         //work out any UUIDs our new item is dependent on
         if (queryDocument != null) {
             createUsingDependencies(queryDocument, activeItem, toSave);
+        } else if (item.getXmlContent().length() > 0) {
+            //if a new queryDocument wasn't provided, but the item already had one, we still need to recreate the "using" dependencies
+            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlContent());
+            createUsingDependencies(oldQueryDocument, activeItem, toSave);
         }
 
         //work out the child/contains dependency
-        updateFolderDependency(itemType, item, containingFolderUuid, toSave);
+        createFolderDependency(insert, itemType, item, previousAuditUuid, containingFolderUuid, toSave);
 
         //we can now commit to the DB
         DatabaseManager.db().writeEntities(toSave);
@@ -270,21 +279,33 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     /**
      * when a libraryItem, report or folder is saved, link it to the containing folder
      */
-    private static void updateFolderDependency(DefinitionItemType itemType, DbItem item, UUID containingFolderUuid, List<DbAbstractTable> toSave) throws Exception {
+    private static void createFolderDependency(boolean insert, DefinitionItemType itemType, DbItem item, UUID previousAuditUuid, UUID containingFolderUuid, List<DbAbstractTable> toSave) throws Exception {
 
-        //if we're saving a folder, we're working with "child of" dependencies
-        //if we're saving anything else, we're working with "contained within" dependencies
+        //work out the dependency type, based on what item type we're saving
         DependencyType dependencyType = null;
         if (itemType == DefinitionItemType.LibraryFolder
                 || itemType == DefinitionItemType.ReportFolder) {
+            //if we're saving a folder, we're working with "child of" dependencies
             dependencyType = DependencyType.IsChildOf;
         } else {
+            //if we're saving anything else, we're working with "contained within" dependencies
             dependencyType = DependencyType.IsContainedWithin;
         }
 
-        //some items are allows to be top-level and not contained within a folder
         if (containingFolderUuid == null) {
-            return;
+
+            //if saving a new item without a folder, then return out as there's no dependency to create
+            if (insert) {
+                return;
+            }
+
+            //if we're just renaming an item, then no folder UUID would have been supplied,
+            //so find out the old folder UUID so we can maintain the relationship
+            List<DbItemDependency> oldFolderDependencies = DbItemDependency.retrieveForItemType(item.getItemUuid(), previousAuditUuid, dependencyType);
+            if (!oldFolderDependencies.isEmpty()) {
+                DbItemDependency oldFolderDependency = oldFolderDependencies.get(0);
+                containingFolderUuid = oldFolderDependency.getDependentItemUuid();
+            }
         }
 
         DbItemDependency linkToParent = new DbItemDependency();

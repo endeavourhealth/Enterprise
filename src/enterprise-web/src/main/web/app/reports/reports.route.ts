@@ -22,7 +22,7 @@ module app.reports {
 						url: '/reportList',
 						templateUrl: 'app/reports/reportList.html',
 						controller: 'ReportListController',
-						controllerAs: 'reportListCtrl'
+						controllerAs: 'ctrl'
 					}
 				},
 				{

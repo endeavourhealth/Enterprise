@@ -87,14 +87,14 @@
 <script type="text/ng-template" id="folder_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
 			<span class="show-child-on-hover folder-item" ng-class="{'selection': node.uuid == reportCtrl.selectedNode.uuid}">
-				<span	ng-if="!node.hasChildren" data-nodrag class="glyphicon glyphicon-sm glyphicon-blank text-muted"></span>
-				<span ng-if="node.hasChildren" data-nodrag	class="glyphicon glyphicon-sm text-muted"
-							ng-class="{'glyphicon-chevron-right': !node.isExpanded,'glyphicon-chevron-down': node.isExpanded}"
+				<span	ng-if="!node.hasChildren" data-nodrag class="fa fa-sm fa-blank text-muted"></span>
+				<span ng-if="node.hasChildren" data-nodrag	class="fa fa-sm text-muted"
+							ng-class="{'fa-chevron-right': !node.isExpanded,'fa-chevron-down': node.isExpanded}"
 							ng-click="reportCtrl.toggleExpansion(node)"></span>
 				<span	ng-click="reportCtrl.selectNode(node)">
-					<span	class="glyphicon glyphicon-folder-open glyphicon-right-pad text-primary"></span>
+					<span	class="fa fa-folder-open fa-right-pad text-primary"></span>
 					<span>{{node.folderName}}</span>
-					<span class="glyphicon glyphicon-sm glyphicon-refresh glyphicon-refresh-animate" ng-show="node.loading"></span>
+					<span class="fa fa-sm fa-refresh fa-refresh-animate" ng-show="node.loading"></span>
 				</span>
 			</span>
 		</div>
@@ -107,7 +107,7 @@
 <script type="text/ng-template" id="content_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content show-child-on-hover">
 				<span>
-					<span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
+					<span class="fa fa-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
 					{{node.name}}
 				</span>
 		</div>
@@ -120,11 +120,11 @@
 <script type="text/ng-template" id="report_template.html">
 		<div ui-tree-handle class="tree-node tree-node-content show-child-on-hover">
 			<span>
-				<span class="glyphicon glyphicon-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
+				<span class="fa fa-right-pad {{node.type | itemTypeIdToIcon}} text-muted"></span>
 				{{node.name}}
 			</span>
 			<button type="button" class="btn btn-xs btn-danger child-to-show pull-right" data-nodrag ng-click="reportCtrl.remove(this)">
-				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+				<span class="fa fa-remove" aria-hidden="true"></span>
 			</button>
 		</div>
 		<ol ui-tree-nodes="" ng-model="node.children">

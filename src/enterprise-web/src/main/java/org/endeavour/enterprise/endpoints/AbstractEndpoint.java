@@ -40,7 +40,9 @@ public abstract class AbstractEndpoint {
 
     protected UUID getEndUserUuidFromToken(SecurityContext sc) {
         UserPrincipal up = (UserPrincipal)sc.getUserPrincipal();
-
+        if (up == null) {
+            return null;
+        }
         UserContext uc = up.getUserContext();
         return uc.getUserUuid();
     }

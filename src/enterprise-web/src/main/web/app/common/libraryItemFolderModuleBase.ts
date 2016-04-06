@@ -5,10 +5,12 @@ module app.blocks {
 	import InputBoxController = app.dialogs.InputBoxController;
 	import MessageBoxController = app.dialogs.MessageBoxController;
 	import Folder = app.models.Folder;
+	import ItemSummaryList = app.models.ItemSummaryList;
 
 	export class LibraryItemFolderModuleBase {
 		treeData : FolderNode[];
 		selectedNode : FolderNode;
+		itemSummaryList : ItemSummaryList;
 
 		constructor(
 			protected logger : ILoggerService,

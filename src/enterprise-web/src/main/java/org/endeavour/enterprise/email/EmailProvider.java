@@ -14,11 +14,27 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.PasswordAuthentication;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 public final class EmailProvider {
     private static final Logger LOG = LoggerFactory.getLogger(EmailProvider.class);
 
+<<<<<<< HEAD
+=======
+    private static final String USE_INVITATION = "invitation";
+    private static final String USE_PASSWORD_RESET = "passwordReset";
+    private static final String USE_NEW_ORGANISATION = "newOrganisation";
+
+    private static final String PARAMETER_TOKEN = "[Token]";
+    private static final String PARAMETER_TITLE = "[Title]";
+    private static final String PARAMETER_FORENAME = "[Forename]";
+    private static final String PARAMETER_SURTNAME = "[Surname]";
+    private static final String PARAMETER_ORGANISATION_NAME = "[OrganisationName]";
+    private static final String PARAMETER_ORGANISATION_ID = "[OrganisationId]";
+
+>>>>>>> parent of ae3f6fc... Fixing config
     private String url = null;
     private String password = null;
     private String username = null;
@@ -37,47 +53,51 @@ public final class EmailProvider {
         this.templates = templates;
     }
 
-    private Template findTemplate(EmailTemplateUse use) {
+    private Template findTemplate(String use) {
         for (Template template: templates) {
-            if (template.getUse().equalsIgnoreCase(use.toString())) {
+            if (template.getUse().equalsIgnoreCase(use)) {
                 return template;
             }
         }
         return null;
     }
 
-    private boolean sendEmail(EmailTemplateUse use, HashMap<EmailTemplateParameter, String> parameters) {
+    private boolean sendEmail(String use, String recipient, HashMap<String, String> parameters) {
 
-        Template t = findTemplate(use);
+        Template t = findTemplate(USE_INVITATION);
         if (t == null) {
             return false;
         }
+    }
 
-        String htmlBody = t.getHtmlBody();
-        String sendFrom = t.getSendFrom();
-        String subject = t.getSubject();
-        String sendTo = parameters.get(EmailTemplateParameter.EMAIL_TO);
+    /**
+     * sends the invite email for this person
+     */
+    public boolean sendInviteEmail(DbEndUser user, DbOrganisation org, String token) {
 
-        //replace parameters in the email body with values
-        Iterator it=parameters.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<EmailTemplateParameter, String> entry = (Map.Entry<EmailTemplateParameter, String>)it.next();
-            EmailTemplateParameter key = entry.getKey();
-            String value = entry.getValue();
-            htmlBody = htmlBody.replace(key.toString(), value);
-        }
+
+
+
+
+
+        String emailTo = user.getEmail();
+        emailTo = "drewlittler@hotmail.com";
+
+        String forename = user.getForename();
+
+        //TODO: 2016-02-22 DL - send invite email to the new user
+
+        Properties props = new Properties();
 
         //SSL
-        Properties props = new Properties();
-        props.put("mail.smtp.host", url);
+        props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.socketFactory.port", "465");
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "465");
 
         //TLS
-        /*Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
+        /*props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");*/
@@ -93,56 +113,28 @@ public final class EmailProvider {
         try {
 
             Message message = new MimeMessage(session);
-            if (sendFrom != null) {
-                message.setFrom(new InternetAddress("from-email@gmail.com"));
-            }
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(sendTo));
-            message.setSubject(subject);
-            message.setContent(htmlBody, "text/html");
+            message.setFrom(new InternetAddress("from-email@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailTo));
+            message.setSubject("Testing Subject");
+            message.setText("Dear Mail Crawler,"
+                    + "\n\n No spam to my email, please!");
 
             Transport.send(message);
-            return true;
+
+            System.out.println("Done");
 
         } catch (MessagingException e) {
-            LOG.error("Error sending email to {}", sendTo);
-            LOG.error("Exception", e);
-            return false;
+            throw new RuntimeException(e);
         }
+
     }
 
-    private HashMap<EmailTemplateParameter, String> buildEmailParameters(DbEndUser user, DbOrganisation org, String token) {
+    /**
+     * sends an email to the person, telling them about the new access that
+     * has been added to their account
+     */
+    public void sendNewAccessGrantedEmail(DbEndUser user, DbOrganisation org, List<DbAbstractTable> toSave) {
 
-        String email = user.getEmail();
-        String title = user.getTitle();
-        String forename = user.getForename();
-        String surname = user.getSurname();
-        String orgName = org.getName();
-        String orgId = org.getNationalId();
-
-        HashMap<EmailTemplateParameter, String> ret = new HashMap<>();
-        ret.put(EmailTemplateParameter.EMAIL_TO, email);
-        ret.put(EmailTemplateParameter.TOKEN, token);
-        ret.put(EmailTemplateParameter.TITLE, title);
-        ret.put(EmailTemplateParameter.FORENAME, forename);
-        ret.put(EmailTemplateParameter.SURNAME, surname);
-        ret.put(EmailTemplateParameter.ORGANISATION_NAME, orgName);
-        ret.put(EmailTemplateParameter.ORGANISATION_ID, orgId);
-
-        return ret;
+        //TODO: 2016-02-22 DL - send email to the user about new acess granted
     }
-
-
-    public boolean sendInviteEmail(DbEndUser user, DbOrganisation org, String token) {
-        HashMap<EmailTemplateParameter, String> parameters = buildEmailParameters(user, org, token);
-        return sendEmail(EmailTemplateUse.INVITATION, parameters);
-    }
-    public boolean sendPasswordResetEmail(DbEndUser user, DbOrganisation org, String token) {
-        HashMap<EmailTemplateParameter, String> parameters = buildEmailParameters(user, org, token);
-        return sendEmail(EmailTemplateUse.PASSWORD_RESET, parameters);
-    }
-    public boolean sendNewAccessGrantedEmail(DbEndUser user, DbOrganisation org) {
-        HashMap<EmailTemplateParameter, String> parameters = buildEmailParameters(user, org, "");
-        return sendEmail(EmailTemplateUse.NEW_ORGANISATION, parameters);
-    }
-
 }

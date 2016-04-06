@@ -1,21 +1,7 @@
 package org.endeavour.enterprise.email;
 
+/**
+ * Created by Drew on 06/04/2016.
+ */
 public enum EmailTemplateParameter {
-    EMAIL_TO("[EmailTo]"),
-    TOKEN("[Token]"),
-    TITLE("[Title]"),
-    FORENAME("[Forename]"),
-    SURNAME("[Surname]"),
-    ORGANISATION_NAME("[OrganisationName]"),
-    ORGANISATION_ID("[OrganisationId]");
-
-    private final String value;
-
-    EmailTemplateParameter(String value) {
-        this.value = value;
-    }
-
-    public String toString() {
-        return value;
-    }
 }

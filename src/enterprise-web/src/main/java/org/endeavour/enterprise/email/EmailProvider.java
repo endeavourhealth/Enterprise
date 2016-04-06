@@ -19,13 +19,6 @@ import java.util.*;
 public final class EmailProvider {
     private static final Logger LOG = LoggerFactory.getLogger(EmailProvider.class);
 
-    private static final String PARAMETER_TOKEN = "[Token]";
-    private static final String PARAMETER_TITLE = "[Title]";
-    private static final String PARAMETER_FORENAME = "[Forename]";
-    private static final String PARAMETER_SURTNAME = "[Surname]";
-    private static final String PARAMETER_ORGANISATION_NAME = "[OrganisationName]";
-    private static final String PARAMETER_ORGANISATION_ID = "[OrganisationId]";
-
     private String url = null;
     private String password = null;
     private String username = null;

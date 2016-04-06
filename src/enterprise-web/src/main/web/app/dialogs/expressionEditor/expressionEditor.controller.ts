@@ -247,6 +247,12 @@ module app.dialogs {
 
             vm.resultData.expressionText = vm.expressionText;
 
+            if (vm.expressionFunction1=="")
+                vm.expressionFunction1 = null;
+
+            if (vm.expressionFunction2=="")
+                vm.expressionFunction2 = null;
+
             var restriction : Restriction = {
                 fieldName : vm.expressionRestrictionFieldName1,
                 orderDirection : vm.expressionRestrictionOrderDirection1,

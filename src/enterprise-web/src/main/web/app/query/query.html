@@ -27,7 +27,7 @@
                 </button>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
                 <button type="button" class="btn btn-sm btn-success" data-ng-click="save(false)">Save</button>
                 <button type="button" class="btn btn-sm btn-warning" data-ng-click="save(true)">Save & Close</button>
-                <button type="button" class="btn btn-sm btn-danger" data-ng-click="close()">Cancel</button>
+                <button type="button" class="btn btn-sm btn-danger" data-ng-click="toggleCancelChanges()">Cancel</button>
             </div></div>
         <div class="module-body">
             <div id="queryPage">
@@ -37,11 +37,21 @@
                             <p>Are you sure you want to clear the rules in this query (changes will not be saved) ?</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" ng-click="toggleClearQuery()" class="btn btn-default">Cancel</button>
+                            <button type="submit" ng-click="toggleClearQuery()" class="btn btn-default">No</button>
                             <button type="submit" ng-click="clearQueryYes()" class="btn btn-default">Yes</button>
                         </div>
 
                     </clear-query>
+                    <cancel-changes title="Cancel Changes" ng-show="showCancelChanges">
+                        <div class="modal-body">
+                            <p>Are you sure you want to cancel the editing of this query (changes will not be saved) ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" ng-click="toggleCancelChanges()" class="btn btn-default">No</button>
+                            <button type="submit" ng-click="cancelChangesYes()" class="btn btn-default">Yes</button>
+                        </div>
+
+                    </cancel-changes>
 
                     <flow-chart
                             mouse-capture

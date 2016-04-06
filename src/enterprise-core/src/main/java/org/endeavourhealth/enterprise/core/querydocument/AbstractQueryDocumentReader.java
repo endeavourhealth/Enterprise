@@ -407,11 +407,8 @@ public abstract class AbstractQueryDocumentReader {
                 processValue(fieldTest.getValueEqualTo());
             }
 
-            List<CodeSet> codeSets = fieldTest.getCodeSet();
-            if (codeSets != null && !codeSets.isEmpty()) {
-                for (CodeSet codeSet: codeSets) {
-                    processCodeSet(codeSet);
-                }
+            if (fieldTest.getCodeSet() != null) {
+                processCodeSet(fieldTest.getCodeSet());
             }
 
         } finally {

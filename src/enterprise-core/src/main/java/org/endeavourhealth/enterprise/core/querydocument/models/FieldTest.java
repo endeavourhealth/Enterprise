@@ -25,8 +25,9 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element name="valueTo" type="{}valueTo"/>
  *           &lt;element name="valueRange" type="{}valueRange"/>
  *           &lt;element name="valueEqualTo" type="{}value"/>
- *           &lt;element name="codeSet" type="{}codeSet" maxOccurs="unbounded"/>
+ *           &lt;element name="codeSet" type="{}codeSet"/>
  *           &lt;element name="codeSetLibraryItemUuid" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+ *           &lt;element name="valueSet" type="{}valueSet"/>
  *         &lt;/choice>
  *         &lt;element name="negate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *       &lt;/sequence>
@@ -46,6 +47,7 @@ import javax.xml.bind.annotation.XmlType;
     "valueEqualTo",
     "codeSet",
     "codeSetLibraryItemUuid",
+    "valueSet",
     "negate"
 })
 public class FieldTest {
@@ -56,8 +58,9 @@ public class FieldTest {
     protected ValueTo valueTo;
     protected ValueRange valueRange;
     protected Value valueEqualTo;
-    protected List<CodeSet> codeSet;
+    protected CodeSet codeSet;
     protected List<String> codeSetLibraryItemUuid;
+    protected ValueSet valueSet;
     protected boolean negate;
 
     /**
@@ -183,30 +186,25 @@ public class FieldTest {
     /**
      * Gets the value of the codeSet property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the codeSet property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCodeSet().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link CodeSet }
-     * 
-     * 
+     * @return
+     *     possible object is
+     *     {@link CodeSet }
+     *     
      */
-    public List<CodeSet> getCodeSet() {
-        if (codeSet == null) {
-            codeSet = new ArrayList<CodeSet>();
-        }
-        return this.codeSet;
+    public CodeSet getCodeSet() {
+        return codeSet;
+    }
+
+    /**
+     * Sets the value of the codeSet property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link CodeSet }
+     *     
+     */
+    public void setCodeSet(CodeSet value) {
+        this.codeSet = value;
     }
 
     /**
@@ -236,6 +234,30 @@ public class FieldTest {
             codeSetLibraryItemUuid = new ArrayList<String>();
         }
         return this.codeSetLibraryItemUuid;
+    }
+
+    /**
+     * Gets the value of the valueSet property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ValueSet }
+     *     
+     */
+    public ValueSet getValueSet() {
+        return valueSet;
+    }
+
+    /**
+     * Sets the value of the valueSet property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ValueSet }
+     *     
+     */
+    public void setValueSet(ValueSet value) {
+        this.valueSet = value;
     }
 
     /**

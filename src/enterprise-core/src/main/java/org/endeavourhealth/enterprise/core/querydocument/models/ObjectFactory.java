@@ -100,6 +100,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ValueSet }
+     * 
+     */
+    public ValueSet createValueSet() {
+        return new ValueSet();
+    }
+
+    /**
      * Create an instance of {@link FieldTest }
      * 
      */

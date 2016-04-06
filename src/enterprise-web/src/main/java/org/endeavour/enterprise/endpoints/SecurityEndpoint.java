@@ -36,6 +36,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Path("/login")
     @Unsecured
     public Response login(@Context SecurityContext sc, JsonEndUser personParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
 
@@ -134,6 +136,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -146,6 +150,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/selectOrganisation")
     public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         DbEndUser endUser = getEndUserFromSession(sc);
         UUID endUserUuid = endUser.getEndUserUuid();
 
@@ -191,6 +197,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //return the full org details and the user's role at this place
         JsonOrganisation ret = new JsonOrganisation(org, isAdmin);
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -204,10 +212,14 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Path("/logoff")
     @Unsecured
     public Response logoff(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
+
         LOG.trace("Logoff");
 
         //replace the cookie on the client with an empty one
         NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);
+
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -222,6 +234,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Path("/setPasswordFromInviteToken")
     @Unsecured
     public Response setPasswordFromInviteToken(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         String token = parameters.getToken();
         String password = parameters.getPassword();
 
@@ -259,6 +273,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, isAdmin);
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .cookie(cookie)
@@ -271,6 +287,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Path("/sendPasswordForgottenEmail")
     @Unsecured
     public Response sendPasswordForgottenEmail(@Context SecurityContext sc, JsonUserEmail parameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         String email = parameters.getEmail();
 
         LOG.trace("sendPasswordForgottenEmail {}", email);
@@ -315,6 +333,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 }
             }
         }
+
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()

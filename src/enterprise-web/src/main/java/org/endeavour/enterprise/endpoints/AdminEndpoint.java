@@ -36,6 +36,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveOrganisation")
     public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         //validate our user is a super user
         DbEndUser user = getEndUserFromSession(sc);
         if (!user.isSuperUser()) {
@@ -96,6 +98,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         JsonOrganisation ret = new JsonOrganisation();
         ret.setUuid(org.getOrganisationUuid());
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -107,6 +111,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveUser")
     public Response saveUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
+        super.setLogbackMarkers(sc);
 
         //userParameters
         UUID uuid = userParameters.getUuid();
@@ -298,6 +303,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         JsonEndUser ret = new JsonEndUser();
         ret.setUuid(uuid);
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -356,6 +363,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteUser")
     public Response deleteUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         //first, verify the user is an admin
         boolean isAdmin = super.isAdminFromSession(sc);
         if (!isAdmin) {
@@ -385,6 +394,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
+        super.clearLogbackMarkers();
+
         //don't bother returning anything to the client
         return Response
                 .ok()
@@ -396,6 +407,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getUsers")
     public Response getUsers(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         LOG.trace("GettingUsers");
@@ -425,7 +437,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        //testSql();
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -472,6 +484,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/resendInviteEmail")
     public Response resendInviteEmail(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         //first, verify the user is an admin
         boolean isAdmin = super.isAdminFromSession(sc);
         if (!isAdmin) {
@@ -500,6 +514,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         createAndSendInvite(user, org, toSave);
 
         DatabaseManager.db().writeEntities(toSave);
+
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()

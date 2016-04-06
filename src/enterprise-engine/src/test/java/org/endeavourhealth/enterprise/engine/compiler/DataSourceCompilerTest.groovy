@@ -60,13 +60,6 @@ class DataSourceCompilerTest {
         public DataSourceAssertion assertRowInOrder(List<Integer> rowIndexes) {
 
             assert rowIndexes.equals(compiledDataSource.getRowIds());
-//
-//            assert rowIndexes.size() == compiledDataSource.getRowIds().size();
-//
-//            for (int i = 0; i < rowIndexes.size(); i++) {
-//                if (rowIndexes.get(i).)
-//            }
-
             return this;
         }
     }

@@ -42,9 +42,9 @@ module app.codeSet {
 		}
 
 		termShorten(term : string) {
-			term = term.replace(' (disorder)', '');
-			term = term.replace(' (observable entity)', '');
-			term = term.replace(' (finding)', '');
+			term = term.replace(' (disorder)','');
+			term = term.replace(' (observable entity)','');
+			term = term.replace(' (finding)','');
 			return term;
 		}
 
@@ -72,6 +72,6 @@ module app.codeSet {
 	}
 
 	angular
-		.module('app.codeSet')
+		.module('app.listOutput')
 		.controller('CodeSetController', CodeSetController);
 }

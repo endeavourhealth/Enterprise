@@ -12,7 +12,7 @@ module app.dialogs {
     'use strict';
 
     export class ExpressionEditorController extends BaseDialogController {
-        expressionText: string = "";
+        expressionText: string;
 
         expressionVariableName1: string;
         expressionRuleId1: string;
@@ -30,24 +30,12 @@ module app.dialogs {
         expressionTestField2: string;
         expressionFunction2: string;
 
-        variableLabelDisabled: Boolean = false;
-        operatorDisabled: Boolean = true;
-        numberInPeriodDisabled: Boolean = true;
-        periodDisabled: Boolean = true;
-
         newExpression : ExpressionType;
 
         editMode : boolean = false;
 
-        variableLabel: string;
-        operator: string;
-        numberInPeriod: string;
-        period: string;
-
         sortorders = ['','ASCENDING','DESCENDING'];
-        periods = ['DAYS','WEEKS','MONTHS','YEARS'];
-        labels = ['A','B'];
-        operators = ['+','-','=','<','>','<=','>='];
+        periods = ['','DAYS','WEEKS','MONTHS','YEARS'];
         rules = <any>[];
         fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
         functions = ['','AVERAGE','COUNT','MINIMUM','MAXIMUM'];
@@ -114,144 +102,22 @@ module app.dialogs {
             vm.expressionTestField1 = resultData.variable[0].fieldName;
             vm.expressionFunction1 = resultData.variable[0].function;
 
+            vm.expressionVariableName2 = resultData.variable[1].variableName;
+            vm.expressionRuleId2 = resultData.variable[1].ruleId.toString();
+            vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.fieldName;
+            vm.expressionRestrictionOrderDirection2 = resultData.variable[1].restriction.orderDirection;
+            vm.expressionRestrictionCount2 = resultData.variable[1].restriction.count.toString();
+            vm.expressionTestField2 = resultData.variable[1].fieldName;
+            vm.expressionFunction2 = resultData.variable[1].function;
 
-            if (resultData.variable.length>1) {
-                vm.expressionVariableName2 = resultData.variable[1].variableName;
-                vm.expressionRuleId2 = resultData.variable[1].ruleId.toString();
-                vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.fieldName;
-                vm.expressionRestrictionOrderDirection2 = resultData.variable[1].restriction.orderDirection;
-                vm.expressionRestrictionCount2 = resultData.variable[1].restriction.count.toString();
-                vm.expressionTestField2 = resultData.variable[1].fieldName;
-                vm.expressionFunction2 = resultData.variable[1].function;
-            }
-
-        }
-
-        variableLabelChange() {
-            var vm = this;
-
-            vm.expressionText = vm.expressionText+" "+vm.variableLabel;
-
-            vm.variableLabelDisabled = true;
-            vm.operatorDisabled = false;
-            vm.numberInPeriodDisabled = true;
-            vm.periodDisabled = true;
-        }
-
-        operatorChange() {
-            var vm = this;
-
-            vm.expressionText = vm.expressionText+" "+vm.operator;
-
-            vm.variableLabelDisabled = false;
-            vm.operatorDisabled = true;
-            vm.numberInPeriodDisabled = false;
-            vm.periodDisabled = true;
-        }
-
-        numberInPeriodChange() {
-            var vm = this;
-
-            vm.expressionText = vm.expressionText+" "+vm.numberInPeriod;
-
-            vm.variableLabelDisabled = true;
-            vm.operatorDisabled = false;
-            vm.numberInPeriodDisabled = true;
-            vm.periodDisabled = false;
-        }
-
-        periodChange() {
-            var vm = this;
-
-            vm.expressionText = vm.expressionText+" "+vm.period;
-
-            vm.variableLabelDisabled = true;
-            vm.operatorDisabled = false;
-            vm.numberInPeriodDisabled = true;
-            vm.periodDisabled = true;
-        }
-
-        backSpace() {
-            var vm = this;
-            if (vm.expressionText.substring(vm.expressionText.length-1,vm.expressionText.length)=="S") {
-                vm.expressionText = vm.expressionText.replace(" DAYS","");
-                vm.expressionText = vm.expressionText.replace(" WEEKS","");
-                vm.expressionText = vm.expressionText.replace(" MONTHS","");
-                vm.expressionText = vm.expressionText.replace(" YEARS","");
-            }
-            else
-                vm.expressionText = vm.expressionText.substring(0,vm.expressionText.length-2);
-
-            vm.variableLabelDisabled = false;
-            vm.operatorDisabled = false;
-            vm.numberInPeriodDisabled = false;
-            vm.periodDisabled = false;
         }
 
         save() {
             var vm = this;
 
-            if (!vm.expressionRuleId1) {
-                this.logger.error('Please select a data source for variable A');
-                return;
-            }
-
-            if (!vm.expressionRestrictionFieldName1) {
-                this.logger.error('Please select a sort field for variable A');
-                return;
-            }
-
-            if (!vm.expressionRestrictionOrderDirection1) {
-                this.logger.error('Please select a sort order for variable A');
-                return;
-            }
-
-            if (!vm.expressionRestrictionCount1) {
-                this.logger.error('Please select a restriction count for variable A');
-                return;
-            }
-
-            if (!vm.expressionTestField1) {
-                this.logger.error('Please select a test field for variable A');
-                return;
-            }
-
-            if (!vm.expressionText) {
-                this.logger.error('Please enter an expression calculation');
-                return;
-            }
-
-            if (vm.expressionRuleId2) {
-                if (!vm.expressionRestrictionFieldName2) {
-                    this.logger.error('Please select a sort field for variable B');
-                    return;
-                }
-
-                if (!vm.expressionRestrictionOrderDirection2) {
-                    this.logger.error('Please select a sort order for variable B');
-                    return;
-                }
-
-                if (!vm.expressionRestrictionCount2) {
-                    this.logger.error('Please select a restriction count for variable B');
-                    return;
-                }
-
-                if (!vm.expressionTestField2) {
-                    this.logger.error('Please select a test field for variable B');
-                    return;
-                }
-            }
-
             vm.resultData = vm.newExpression;
 
             vm.resultData.expressionText = vm.expressionText;
-
-            if (vm.expressionFunction1=="")
-                vm.expressionFunction1 = null;
-
-            if (vm.expressionFunction2=="")
-                vm.expressionFunction2 = null;
 
             var restriction : Restriction = {
                 fieldName : vm.expressionRestrictionFieldName1,
@@ -283,8 +149,7 @@ module app.dialogs {
                 function: vm.expressionFunction2
             };
 
-            if (vm.expressionRuleId2)
-                vm.resultData.variable.push(variableType);
+            vm.resultData.variable.push(variableType);
 
             this.ok();
         }

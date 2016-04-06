@@ -28,6 +28,7 @@ module app.library {
 
 	export class LibraryController extends LibraryItemFolderModuleBase {
 		selectedNode : FolderNode = null;
+		itemSummaryList : ItemSummaryList;
 
 		static $inject = ['LibraryService', 'FolderService', 'LoggerService', '$scope', '$uibModal', '$state'];
 

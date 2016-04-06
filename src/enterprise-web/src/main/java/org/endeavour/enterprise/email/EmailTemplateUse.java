@@ -1,7 +1,17 @@
 package org.endeavour.enterprise.email;
 
-/**
- * Created by Drew on 06/04/2016.
- */
 public enum EmailTemplateUse {
+    INVITATION("invitation"),
+    PASSWORD_RESET("passwordReset"),
+    NEW_ORGANISATION("newOrganisation");
+
+    private final String value;
+
+    EmailTemplateUse(String value) {
+        this.value = value;
+    }
+
+    public String toString() {
+        return value;
+    }
 }

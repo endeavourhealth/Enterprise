@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/restriction>
  *           &lt;/simpleType>
  *         &lt;/element>
- *         &lt;element name="sendFrom" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="sendFrom" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="subject" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="htmlBody" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *       &lt;/sequence>
@@ -48,7 +48,6 @@ public class Template {
 
     @XmlElement(required = true)
     protected String use;
-    @XmlElement(required = true)
     protected String sendFrom;
     @XmlElement(required = true)
     protected String subject;

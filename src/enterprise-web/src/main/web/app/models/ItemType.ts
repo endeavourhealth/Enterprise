@@ -21,19 +21,19 @@ module app.models {
 		return function (input:number):string {
 			switch (input) {
 				case ItemType.Folder:
-					return 'fa-folder-open';
+					return 'glyphicon-folder-open';
 				case ItemType.Report:
-					return 'fa-file';
+					return 'glyphicon-file';
 				case ItemType.Query:
-					return 'fa-question-circle';
+					return 'glyphicon-question-sign';
 				case ItemType.Test:
-					return 'fa-random';
+					return 'glyphicon-random';
 				case ItemType.Datasource:
-					return 'fa-database';
+					return 'glyphicon-hdd';
 				case ItemType.CodeSet:
-					return 'fa-tags';
+					return 'glyphicon-tags';
 				case ItemType.ListOutput:
-					return 'fa-list-alt';
+					return 'glyphicon-list-alt';
 			}
 		};
 	}

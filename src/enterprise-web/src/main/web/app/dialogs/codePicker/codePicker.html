@@ -13,7 +13,7 @@
 					<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
 								 ng-model="codePicker.searchData" ng-keyup="$event.keyCode == 13 && codePicker.search()" autofocus>
 					<span class="input-group-addon" ng-click="codePicker.search()" style="cursor: pointer">
-						<i class="fa fa-search" id="searchTerm" aria-hidden="true"></i>
+						<i class="glyphicon glyphicon-search" id="searchTerm" aria-hidden="true"></i>
 					</span>
 				</div>
 			</div>
@@ -31,7 +31,7 @@
 							 ng-class="{'previous-selection': parent.code == codePicker.previousSelection.code}">
 						{{ codePicker.getTerm(parent.code) }}
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" ng-click="codePicker.addToSelection(parent)">
-							<span class="fa fa-sm fa-plus"></span>
+							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
 						</button>
 					</div>
 				</div>
@@ -45,7 +45,7 @@
 							 ng-class="{'selection': match.code == codePicker.highlightedMatch.code}">
 						 {{ codePicker.getTerm(match.code) }}
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" ng-click="codePicker.addToSelection(match)">
-							<span class="fa fa-sm fa-plus"></span>
+							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
 						</button>
 					</div>
 				</div>
@@ -59,7 +59,7 @@
 							 ng-class="{'previous-selection': child.code == codePicker.previousSelection.code}">
 						{{ codePicker.getTerm(child.code) }}
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" ng-click="codePicker.addToSelection(child)">
-							<span class="fa fa-sm fa-plus"></span>
+							<span class="glyphicon glyphicon-sm glyphicon-plus"></span>
 						</button>
 					</div>
 				</div>
@@ -80,7 +80,7 @@
 						<span class="label label-warning" ng-show="selection.includeChildren && (selection.exclusion && selection.exclusion.length > 0)">Some children</span>
 						<span class="label label-danger" ng-show="!selection.includeChildren">No children</span>
 						<button type="button" class="btn btn-xs btn-danger pull-right child-to-show" ng-click="codePicker.removeFromSelection(selection)">
-							<span class="fa fa-sm fa-minus"></span>
+							<span class="glyphicon glyphicon-sm glyphicon-minus"></span>
 						</button>
 					</div>
 				</div>
@@ -108,13 +108,13 @@
 <script type="text/ng-template" id="nodes_renderer.html">
 	<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
 		<span class="folder-item">
-			<span class="text-success fa fa-check-circle-o"
+			<span class="text-success glyphicon glyphicon-ok-circle"
 						ng-click="codePicker.untickNode(node)"
 						ng-show="node.codeSetValue.includeChildren && (!node.codeSetValue.exclusion || node.codeSetValue.exclusion.length == 0)"> </span>
-			<span class="text-warning fa fa-times-circle-o"
+			<span class="text-warning glyphicon glyphicon-remove-circle"
 						ng-click="codePicker.tickNode(node)"
 						ng-show="node.codeSetValue.includeChildren && (node.codeSetValue.exclusion && node.codeSetValue.exclusion.length > 0)"> </span>
-			<span class="text-danger fa fa-ban"
+			<span class="text-danger glyphicon glyphicon-ban-circle"
 						ng-click="codePicker.tickNode(node)"
 						ng-show="!node.codeSetValue.includeChildren"> </span>
 			<span>{{codePicker.getTerm(node.codeSetValue.code)}}</span>

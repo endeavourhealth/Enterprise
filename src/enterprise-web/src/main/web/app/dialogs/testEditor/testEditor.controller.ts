@@ -16,6 +16,7 @@ module app.dialogs {
 	import ValueFrom = app.models.ValueFrom;
 	import ValueTo = app.models.ValueTo;
 	import Value = app.models.Value;
+	import ValueSet = app.models.ValueSet;
 	import ValueAbsoluteUnit = app.models.ValueAbsoluteUnit;
 	import ValueFromOperator = app.models.ValueFromOperator;
 	import ValueToOperator = app.models.ValueToOperator;
@@ -179,7 +180,7 @@ module app.dialogs {
 
 				switch(field) {
 					case "CODE":
-						vm.codeSelection = filter.codeSet[0].codeSetValue;
+						vm.codeSelection = filter.codeSet.codeSetValue;
 						break;
 					case "DOB":
 						if (filter.valueFrom)
@@ -202,8 +203,8 @@ module app.dialogs {
 							vm.filterValueTo = filter.valueTo.constant;
 						break;
 					case "SEX":
-						if (filter.valueEqualTo)
-							vm.filterSex = filter.valueEqualTo.constant;
+						if (filter.valueSet)
+							vm.filterSex = filter.valueSet.value[0];
 						break;
 					default:
 				}
@@ -218,7 +219,7 @@ module app.dialogs {
 
 					switch(field) {
 						case "CODE":
-							vm.fieldTestCodeSelection = fieldTest.codeSet[0].codeSetValue;
+							vm.fieldTestCodeSelection = fieldTest.codeSet.codeSetValue;
 							break;
 						case "DOB":
 							if (fieldTest.valueFrom)
@@ -241,8 +242,8 @@ module app.dialogs {
 								vm.fieldTestValueTo = fieldTest.valueTo.constant;
 							break;
 						case "SEX":
-							if (fieldTest.valueEqualTo)
-								vm.fieldTestSex = fieldTest.valueEqualTo.constant;
+							if (fieldTest.valueSet)
+								vm.fieldTestSex = fieldTest.valueSet.value[0];
 							break;
 						default:
 					}
@@ -294,15 +295,46 @@ module app.dialogs {
 					valueTo: null,
 					valueRange: null,
 					valueEqualTo: null,
-					codeSet: [],
+					codeSet: null,
+					valueSet: null,
 					codeSetLibraryItemUuid: null,
 					negate: false
 				};
 
-				fieldTest.codeSet.push(codeSet);
+				fieldTest.codeSet = codeSet;
 
 				vm.resultData.dataSource.filter.push(fieldTest);
 			});
+		}
+
+		removeFilter(filter: any) {
+			var vm = this;
+
+			alert(filter);
+
+			switch(filter) {
+				case "code":
+					vm.codeEditor = false;
+					break;
+				case "dob":
+					vm.dobEditor = false;
+					break;
+				case "sex":
+					vm.sexEditor = false;
+					break;
+				case "date":
+					vm.dateEditor = false;
+					break;
+				case "value":
+					vm.valueEditor = false;
+					break;
+				case "restriction":
+					vm.showRestriction = false;
+					break;
+				case "fieldtest": // remove each field
+					vm.viewFieldTest = false;
+					break;
+			}
 		}
 
 		showFieldTestCodePicker() {
@@ -333,12 +365,13 @@ module app.dialogs {
 					valueTo: null,
 					valueRange: null,
 					valueEqualTo: null,
-					codeSet: [],
+					codeSet: null,
+					valueSet: null,
 					codeSetLibraryItemUuid: null,
 					negate: false
 				};
 
-				fieldTest.codeSet.push(codeSet);
+				fieldTest.codeSet = codeSet;
 
 				vm.resultData.fieldTest.push(fieldTest);
 			});
@@ -475,6 +508,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -523,6 +557,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -560,20 +595,20 @@ module app.dialogs {
 			if (!value)
 				value="";
 
-			var valueEqualTo : Value = {
-				constant: value,
-				parameter: null,
-				absoluteUnit: "NUMERIC",
-				relativeUnit: null
+			var valueSet : ValueSet = {
+				value: []
 			}
+
+			valueSet.value.push(value);
 
 			var fieldTest : FieldTest = {
 				field: valueField,
 				valueFrom: null,
 				valueTo: null,
 				valueRange: null,
-				valueEqualTo: valueEqualTo,
+				valueEqualTo: null,
 				codeSet: null,
+				valueSet: valueSet,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -583,12 +618,12 @@ module app.dialogs {
 			for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
 				var filter = vm.resultData.dataSource.filter[i];
 
-				if (filter.field==valueField && filter.valueEqualTo && value!="") {
+				if (filter.field==valueField && filter.valueSet && value!="") {
 					foundEntry = true;
-					filter.valueEqualTo = valueEqualTo;
+					filter.valueSet = valueSet;
 					break;
 				}
-				else if (filter.field==valueField && filter.valueEqualTo && value=="")
+				else if (filter.field==valueField && filter.valueSet && value=="")
 					vm.resultData.dataSource.filter.splice(i, 1);
 			}
 
@@ -617,6 +652,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -660,6 +696,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -709,6 +746,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -757,6 +795,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -785,20 +824,20 @@ module app.dialogs {
 			if (!value)
 				value="";
 
-			var valueEqualTo : Value = {
-				constant: value,
-				parameter: null,
-				absoluteUnit: "NUMERIC",
-				relativeUnit: null
+			var valueSet : ValueSet = {
+				value: []
 			}
+
+			valueSet.value.push(value);
 
 			var fieldTest : FieldTest = {
 				field: valueField,
 				valueFrom: null,
 				valueTo: null,
 				valueRange: null,
-				valueEqualTo: valueEqualTo,
+				valueEqualTo: null,
 				codeSet: null,
+				valueSet: valueSet,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -808,12 +847,12 @@ module app.dialogs {
 			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
 				var ftest = vm.resultData.fieldTest[i];
 
-				if (ftest.field==valueField && ftest.valueEqualTo && value!="") {
+				if (ftest.field==valueField && ftest.valueSet && value!="") {
 					foundEntry = true;
-					fieldTest.valueEqualTo = valueEqualTo;
+					fieldTest.valueSet = valueSet;
 					break;
 				}
-				else if (ftest.field==valueField && ftest.valueEqualTo && value=="")
+				else if (ftest.field==valueField && ftest.valueSet && value=="")
 					vm.resultData.fieldTest.splice(i, 1);
 			}
 
@@ -842,6 +881,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -885,6 +925,7 @@ module app.dialogs {
 				valueRange: null,
 				valueEqualTo: null,
 				codeSet: null,
+				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
@@ -938,7 +979,7 @@ module app.dialogs {
 				for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
 					var ft = vm.resultData.fieldTest[i];
 					if (ft.field=="CODE") {
-						if (ft.codeSet[0].codeSetValue.length==0) {
+						if (ft.codeSet.codeSetValue.length==0) {
 							vm.resultData.fieldTest.splice(i, 1);
 						}
 					}

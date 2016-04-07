@@ -140,7 +140,9 @@ module app.query {
 						else {
 							var test : Test = selectedRule.data.test;
 
-							TestEditorController.open($modal, test, false)
+							var originalResultData = jQuery.extend(true, {}, test);
+
+							TestEditorController.open($modal, originalResultData, false)
 								.result.then(function(resultData : Test){
 
 								selectedRule.data.test = resultData;

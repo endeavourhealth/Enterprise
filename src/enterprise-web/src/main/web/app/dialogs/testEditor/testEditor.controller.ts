@@ -139,7 +139,7 @@ module app.dialogs {
 				fieldTest: []
 			};
 
-			if (!this.resultData)
+			if (!this.resultData.dataSource)
 				this.resultData = newTest;
 			else
 				this.initialiseEditMode(this.resultData);
@@ -310,31 +310,96 @@ module app.dialogs {
 		removeFilter(filter: any) {
 			var vm = this;
 
-			alert(filter);
+			for (var i = vm.resultData.dataSource.filter.length-1; i >= 0; --i) {
+				var f = vm.resultData.dataSource.filter[i];
 
-			switch(filter) {
-				case "code":
-					vm.codeEditor = false;
-					break;
-				case "dob":
-					vm.dobEditor = false;
-					break;
-				case "sex":
-					vm.sexEditor = false;
-					break;
-				case "date":
-					vm.dateEditor = false;
-					break;
-				case "value":
-					vm.valueEditor = false;
-					break;
-				case "restriction":
-					vm.showRestriction = false;
-					break;
-				case "fieldtest": // remove each field
-					vm.viewFieldTest = false;
-					break;
+				switch(filter) {
+					case "code":
+						if (f.field=="CODE") {
+							vm.codeEditor = false;
+							vm.resultData.dataSource.filter.splice(i, 1);
+						}
+						break;
+					case "dob":
+						if (f.field=="DOB") {
+							vm.dobEditor = false;
+							vm.resultData.dataSource.filter.splice(i, 1);
+						}
+						break;
+					case "sex":
+						if (f.field=="SEX") {
+							vm.sexEditor = false;
+							vm.resultData.dataSource.filter.splice(i, 1);
+						}
+						break;
+					case "date":
+						if (f.field=="EFFECTIVE_DATE"||f.field=="REGISTRATION_DATE") {
+							vm.dateEditor = false;
+							vm.resultData.dataSource.filter.splice(i, 1);
+						}
+						break;
+					case "value":
+						if (f.field=="VALUE"||f.field=="AGE") {
+							vm.valueEditor = false;
+							vm.resultData.dataSource.filter.splice(i, 1);
+						}
+						break;
+					case "restriction":
+						vm.showRestriction = false;
+						vm.resultData.dataSource.restriction = null;
+						break;
+
+				}
+
+
 			}
+
+		}
+
+		removeFieldTest(filter: any) {
+			var vm = this;
+
+			for (var i = vm.resultData.fieldTest.length-1; i >= 0; --i) {
+				var f = vm.resultData.fieldTest[i];
+
+				switch(filter) {
+					case "code":
+						if (f.field=="CODE") {
+							vm.fieldTestCodeEditor = false;
+							vm.resultData.fieldTest.splice(i, 1);
+						}
+						break;
+					case "dob":
+						if (f.field=="DOB") {
+							vm.fieldTestDobEditor = false;
+							vm.resultData.fieldTest.splice(i, 1);
+						}
+						break;
+					case "sex":
+						if (f.field=="SEX") {
+							vm.fieldTestSexEditor = false;
+							vm.resultData.fieldTest.splice(i, 1);
+						}
+						break;
+					case "date":
+						if (f.field=="EFFECTIVE_DATE"||f.field=="REGISTRATION_DATE") {
+							vm.fieldTestDateEditor = false;
+							vm.resultData.fieldTest.splice(i, 1);
+						}
+						break;
+					case "value":
+						if (f.field=="VALUE"||f.field=="AGE") {
+							vm.fieldTestValueEditor = false;
+							vm.resultData.fieldTest.splice(i, 1);
+						}
+						break;
+
+
+				}
+
+
+			}
+
 		}
 
 		showFieldTestCodePicker() {

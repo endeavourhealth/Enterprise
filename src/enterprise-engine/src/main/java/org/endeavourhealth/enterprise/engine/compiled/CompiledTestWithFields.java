@@ -22,13 +22,16 @@ public class CompiledTestWithFields implements ICompiledTest {
 
         ICompiledDataSource dataSource = context.getDataSourceResult(dataSourceUuid);
 
+        if (!dataSource.anyResults())
+            return false;
+
         if (dataSource.getRowIds().size() > 1)
             throw new ExecutionException("DataSource returned more than 1 row");
 
         int rowId = dataSource.getRowIds().get(0);
 
         for (FieldTestFromDataSource fieldTest: fieldTestFromDataSources) {
-            if (!fieldTest.test(dataSource, rowId));
+            if (!fieldTest.test(dataSource, rowId))
                 return false;
         }
 

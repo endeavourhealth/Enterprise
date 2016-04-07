@@ -100,10 +100,10 @@ public class ExecutionContext {
     }
 
     private void clearResults() {
-        queriesPatientExcluded.clear();
         queriesPatientIncluded.clear();
+        queriesPatientExcluded.clear();
         testsPatientIncluded.clear();
-        testsPatientIncluded.clear();
+        testsPatientExcluded.clear();
         resolvedDataSources.clear();
     }
 

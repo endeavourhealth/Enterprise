@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.engine.testhelpers
 
 import org.endeavourhealth.enterprise.core.querydocument.models.DataSource
+import org.endeavourhealth.enterprise.core.querydocument.models.FieldTest
 import org.endeavourhealth.enterprise.core.querydocument.models.Test
 
 class TestBuilder {
@@ -23,5 +24,10 @@ class TestBuilder {
 
     public Test build() {
         return test;
+    }
+
+    public TestBuilder addFieldTest(FieldTest fieldTest) {
+        test.fieldTest.add(fieldTest);
+        return this;
     }
 }

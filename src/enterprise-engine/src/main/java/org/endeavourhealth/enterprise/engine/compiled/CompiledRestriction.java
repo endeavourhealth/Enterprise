@@ -34,11 +34,15 @@ public class CompiledRestriction {
         return returnList;
     }
 
-    private void populateReturnList() {
-        int countToReturn = count;
+    private void populateTemporaryMap() {
+        for (int rowId: dataSource.getRowIds()) {
+            Object value = dataSource.getValue(rowId, fieldId);
 
-        for (int i = 0; i < countToReturn; i++) {
-            returnList.add(temporaryMap.get(i).rowId);
+            if (value == null)
+                continue;
+
+            ValueToRowId valueToRowId = new ValueToRowId(value, rowId);
+            temporaryMap.add(valueToRowId);
         }
     }
 
@@ -49,15 +53,14 @@ public class CompiledRestriction {
             Collections.sort(temporaryMap, Collections.reverseOrder());
     }
 
-    private void populateTemporaryMap() {
-        for (int rowId: dataSource.getRowIds()) {
-            Object value = dataSource.getValue(rowId, fieldId);
+    private void populateReturnList() {
+        int countToReturn = count;
 
-            if (value == null)
-                continue;
+        if (countToReturn > temporaryMap.size())
+            countToReturn = temporaryMap.size();
 
-            ValueToRowId valueToRowId = new ValueToRowId(value, rowId);
-            temporaryMap.add(valueToRowId);
+        for (int i = 0; i < countToReturn; i++) {
+            returnList.add(temporaryMap.get(i).rowId);
         }
     }
 

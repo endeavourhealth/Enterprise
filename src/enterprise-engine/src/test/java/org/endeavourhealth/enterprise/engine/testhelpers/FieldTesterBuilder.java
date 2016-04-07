@@ -4,14 +4,16 @@ import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
+import org.endeavourhealth.enterprise.engine.compiler.FieldCompilerTest;
 import org.endeavourhealth.enterprise.engine.compiler.FieldTestCompiler;
 import org.endeavourhealth.enterprise.engine.compiled.fieldTests.ICompiledFieldTest;
+import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
 import java.time.LocalDate;
 
 public class FieldTesterBuilder {
     private Field field;
-    private FieldTest fieldTest = new FieldTest();
+    private FieldTestBuilder fieldTestBuilder;
 
     public static class FieldAssertion {
 
@@ -33,34 +35,39 @@ public class FieldTesterBuilder {
 
     public FieldTesterBuilder setDataType(LogicalDataType logicalDataType) throws Exception {
 
-        field = new EntityMapBuilder()
+        EntityMapWrapper.EntityMap entityMap = new EntityMapBuilder()
                 .addEntity(logicalDataType)
-                .buildField();
+                .build();
+
+        field = entityMap.getEntities().get(0).getField(0);
+
+        fieldTestBuilder = new FieldTestBuilder(entityMap)
+            .setField(0, 0);
 
         return this;
     }
 
     public FieldTesterBuilder setFieldTest(ValueFrom value) {
-        fieldTest.setValueFrom(value);
+        fieldTestBuilder.setFieldTest(value);
         return this;
     }
 
     public FieldTesterBuilder setFieldTest(ValueTo value) {
-        fieldTest.setValueTo(value);
+        fieldTestBuilder.setFieldTest(value);
         return this;
     }
 
     public FieldTesterBuilder setFieldTest(ValueRange value) {
-        fieldTest.setValueRange(value);
+        fieldTestBuilder.setFieldTest(value);
         return this;
     }
 
     public FieldTesterBuilder negate() {
-        fieldTest.setNegate(true);
+        fieldTestBuilder.negate();
         return this;
     }
 
     public FieldAssertion build() throws Exception {
-        return new FieldAssertion(fieldTest, field);
+        return new FieldAssertion(fieldTestBuilder.build(), field);
     }
 }

@@ -6,6 +6,7 @@ import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
 import org.endeavourhealth.enterprise.engine.compiled.ICompiledDataSource;
 import org.endeavourhealth.enterprise.engine.compiled.fieldTests.*;
+import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,7 +22,7 @@ public class FieldTestCompiler {
         return new FieldTestFromDataSource(compiledFieldTest, fieldIndex);
     }
 
-    public ICompiledFieldTest createCompiledFieldTest(FieldTest valueFilter, Field field) throws UnableToCompileExpection {
+    public ICompiledFieldTest createCompiledFieldTest(FieldTest valueFilter, Field field) throws UnableToCompileExpection, InvalidQueryDocumentException {
 
         if (field.getLogicalDataType() == LogicalDataType.DATE) {
 
@@ -37,12 +38,6 @@ public class FieldTestCompiler {
 
                 GreaterThanDate from = createGreaterThanDate(valueFilter.getValueRange().getValueFrom());
                 LessThanDate to = createLessThanDate(valueFilter.getValueRange().getValueTo());
-
-                if (from.getComparisonValue().isEqual(to.getComparisonValue()))
-                    throw new UnableToCompileExpection("From value cannot be equal to To value");
-
-                if (from.getComparisonValue().isAfter(to.getComparisonValue()))
-                    throw new UnableToCompileExpection("From value cannot be greater than To value");
 
                 return new RangeDate(from, to);
             }
@@ -60,10 +55,10 @@ public class FieldTestCompiler {
                 LessThanDecimal to = createLessThanDecimal(valueFilter.getValueRange().getValueTo());
 
                 if (from.getComparisonValue().equals(to.getComparisonValue()))
-                    throw new UnableToCompileExpection("From value cannot be equal to To value");
+                    throw new InvalidQueryDocumentException("From value cannot be equal to To value");
 
-                if (from.getComparisonValue().equals(to.getComparisonValue()))
-                    throw new UnableToCompileExpection("From value cannot be greater than To value");
+                if (from.getComparisonValue().compareTo(to.getComparisonValue()) > 0)
+                    throw new InvalidQueryDocumentException("From value cannot be greater than To value");
 
                 return new RangeDecimal(from, to);
             }

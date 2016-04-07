@@ -1,23 +1,24 @@
 package org.endeavourhealth.enterprise.engine.compiler;
 
-import org.endeavourhealth.enterprise.enginecore.Library;
+import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
+
+import java.util.UUID;
 
 public class CompilerContext {
     private final EntityMapWrapper.EntityMap entityMapWrapper;
-    private final Library requiredLibraryItems;
+    private final CompiledLibrary compiledLibrary;
 
-    public CompilerContext(EntityMapWrapper.EntityMap entityMapWrapper, Library requiredLibraryItems) {
-
+    public CompilerContext(EntityMapWrapper.EntityMap entityMapWrapper, CompiledLibrary compiledLibrary) {
         this.entityMapWrapper = entityMapWrapper;
-        this.requiredLibraryItems = requiredLibraryItems;
+        this.compiledLibrary = compiledLibrary;
     }
 
     public EntityMapWrapper.EntityMap getEntityMapWrapper() {
         return entityMapWrapper;
     }
 
-    public Library getRequiredLibraryItems() {
-        return requiredLibraryItems;
+    public CompiledLibrary getCompiledLibrary() {
+        return compiledLibrary;
     }
 }

@@ -2,37 +2,37 @@ package org.endeavourhealth.enterprise.engine;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
+import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledReport;
 import org.endeavourhealth.enterprise.engine.compiler.CompilerApi;
 import org.endeavourhealth.enterprise.engine.execution.Request;
-import org.endeavourhealth.enterprise.enginecore.Library;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 import org.endeavourhealth.enterprise.enginecore.resultcounts.models.JobReportItemResult;
 import org.endeavourhealth.enterprise.enginecore.resultcounts.models.ResultCounts;
 
-import java.time.LocalDate;
 import java.util.*;
 
 public class EngineApi {
 
     private final EntityMapWrapper.EntityMap entityMap;
-    private final Library library;
+    private final List<LibraryItem> requiredLibraryItems;
     private final List<DbJobReport> jobReports;
 
     private List<Request> executionRequests = new ArrayList<>();
-    private Map<UUID, CompiledQuery> compiledQueryMap;
+    private CompiledLibrary compiledLibrary;
 
     public EngineApi(
             EntityMapWrapper.EntityMap entityMap,
-            Library library,
-            List<DbJobReport> jobReports) {
+            List<DbJobReport> jobReports,
+            List<LibraryItem> requiredLibraryItems) {
 
         this.entityMap = entityMap;
-        this.library = library;
         this.jobReports = jobReports;
+        this.requiredLibraryItems = requiredLibraryItems;
     }
 
     public void initialise() throws Exception {
@@ -40,9 +40,8 @@ public class EngineApi {
         if (CollectionUtils.isEmpty(jobReports))
             throw new Exception("Job Reports empty");
 
-        CompilerApi compilerApi = new CompilerApi(entityMap, library);
-
-        compiledQueryMap = compilerApi.compileAllQueries(library);
+        CompilerApi compilerApi = new CompilerApi(entityMap);
+        compilerApi.compiledAllLibraryItems(requiredLibraryItems);
 
         for (DbJobReport jobReport: jobReports) {
 
@@ -80,6 +79,6 @@ public class EngineApi {
     }
 
     public Processor createProcessor() {
-        return new Processor(executionRequests, compiledQueryMap);
+        return new Processor(executionRequests, compiledLibrary);
     }
 }

@@ -294,6 +294,6 @@ public abstract class Examples {
 
     public static void retrieveLibraryItemsForJob(DbJob job) throws Exception {
         UUID jobUuid = job.getJobUuid();
-        Map<UUID, Object> hm = DbItem.retrieveLibraryItemsForJob(jobUuid);
+        List<LibraryItem> hm = DbItem.retrieveLibraryItemsForJob(jobUuid);
     }
 }

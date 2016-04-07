@@ -1,13 +1,10 @@
 package org.endeavourhealth.enterprise.processornode;
 
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobContent;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
 import org.endeavourhealth.enterprise.core.entitymap.EntityMapHelper;
+import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.engine.EngineApi;
-import org.endeavourhealth.enterprise.enginecore.LibraryItem;
-import org.endeavourhealth.enterprise.enginecore.Library;
 import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
 import org.endeavourhealth.enterprise.enginecore.communication.*;
 import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
@@ -22,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete, AutoCloseable {
@@ -77,19 +72,10 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     private EngineApi createEngineApi(EntityMapWrapper.EntityMap entityMap) throws Exception {
 
-        List<DbJobContent> contentList = DbJobContent.retrieveForJob(startMessage.getJobUuid());
-        Library library = new Library();
-
-        for (DbJobContent dbJobContent : contentList) {
-            DbItem item = DbItem.retrieveForUuidAndAudit(dbJobContent.getItemUuid(), dbJobContent.getAuditUuid());
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(item.getItemUuid());
-            LibraryItem libraryItem = new LibraryItem(item.getTitle(), item.getItemUuid(), activeItem.getItemTypeId(), item.getXmlContent());
-            library.put(libraryItem);
-        }
-
         List<DbJobReport> jobReports = DbJobReport.retrieveForJob(startMessage.getJobUuid());
+        List<LibraryItem> libraryItems = DbItem.retrieveLibraryItemsForJob(startMessage.getJobUuid());
 
-        EngineApi engineApi = new EngineApi(entityMap, library, jobReports);
+        EngineApi engineApi = new EngineApi(entityMap, jobReports, libraryItems);
         engineApi.initialise();
         return engineApi;
     }

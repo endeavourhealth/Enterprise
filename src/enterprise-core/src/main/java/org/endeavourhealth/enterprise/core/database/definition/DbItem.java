@@ -69,32 +69,26 @@ public final class DbItem extends DbAbstractTable {
         return DatabaseManager.db().retrieveLatestItemsForUuids(itemUuids);
     }
 
-    public static Map<UUID, Object> retrieveLibraryItemsForJob(UUID jobUuid) throws Exception {
-        Map<UUID, Object> ret = new HashMap<>();
+    public static List<LibraryItem> retrieveLibraryItemsForJob(UUID jobUuid) throws Exception {
 
-        List<DbItem> items = DatabaseManager.db().retrieveItemsForJob(jobUuid);
-        for (DbItem item: items) {
+        List<DbItem> sourceItems = DatabaseManager.db().retrieveItemsForJob(jobUuid);
+        List<LibraryItem> libraryItems = new ArrayList<>();
+
+        for (DbItem item: sourceItems) {
 
             UUID itemUuid = item.getItemUuid();
             String xml = item.getXmlContent();
-
             LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
-            if (libraryItem.getQuery() != null) {
-                ret.put(itemUuid, libraryItem.getQuery());
-            } else if (libraryItem.getDataSource() != null) {
-                ret.put(itemUuid, libraryItem.getDataSource());
-            } else if (libraryItem.getTest() != null) {
-                ret.put(itemUuid, libraryItem.getTest());
-            } else if (libraryItem.getCodeSet() != null) {
-                ret.put(itemUuid, libraryItem.getCodeSet());
-            } else if (libraryItem.getListReport() != null) {
-                ret.put(itemUuid, libraryItem.getListReport());
-            } else {
-                throw new RuntimeException("Library item " + itemUuid + " contains no content");
-            }
+
+            UUID libraryItemUuid = UUID.fromString(libraryItem.getUuid());
+
+            if (!itemUuid.equals(libraryItemUuid))
+                throw new Exception("Database item UUID does not match LibraryItem content: " + itemUuid);
+
+            libraryItems.add(libraryItem);
         }
 
-        return ret;
+        return libraryItems;
     }
 
 

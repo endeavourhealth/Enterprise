@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.engine.compiled.fieldTests;
 
+import org.endeavourhealth.enterprise.engine.compiled.ICompiledDataSource;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataEntity;
 
 public class FieldTestFromDataSource {
@@ -11,7 +12,11 @@ public class FieldTestFromDataSource {
         this.fieldIndex = fieldIndex;
     }
 
-    public boolean test(DataEntity entity, int valueIndex) {
-        return filter.test(entity.getFields().get(fieldIndex).get(valueIndex));
+    public boolean test(DataEntity entity, int rowIndex) {
+        return filter.test(entity.getFields().get(fieldIndex).get(rowIndex));
+    }
+
+    public boolean test(ICompiledDataSource dataSource, int rowIndex) {
+        return filter.test(dataSource.getValue(rowIndex, fieldIndex));
     }
 }

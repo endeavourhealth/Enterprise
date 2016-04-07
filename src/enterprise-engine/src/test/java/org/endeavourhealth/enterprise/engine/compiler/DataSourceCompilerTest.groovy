@@ -6,20 +6,17 @@ import org.endeavourhealth.enterprise.core.querydocument.models.OrderDirection
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueAbsoluteUnit
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueFrom
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueFromOperator
-import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery
+import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary
 import org.endeavourhealth.enterprise.engine.compiled.ICompiledDataSource
 import org.endeavourhealth.enterprise.engine.execution.ExecutionContext
 import org.endeavourhealth.enterprise.engine.testhelpers.DataContainerBuilder
 import org.endeavourhealth.enterprise.engine.testhelpers.DataSourceBuilder
 import org.endeavourhealth.enterprise.engine.testhelpers.EntityMapBuilder
-import org.endeavourhealth.enterprise.enginecore.Library
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainer
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper
 import org.junit.Test
 
 import java.time.LocalDate
-
-import static org.junit.Assert.*;
 
 class DataSourceCompilerTest {
 
@@ -28,14 +25,13 @@ class DataSourceCompilerTest {
 
         public DataSourceAssertion(EntityMapWrapper.EntityMap entityMap, DataSource dataSource, DataContainer dataContainer) {
 
-            Library library = new Library();
+            CompiledLibrary library = new CompiledLibrary();
             CompilerContext compilerContext = new CompilerContext(entityMap, library)
 
             DataSourceCompiler dataSourceCompiler = new DataSourceCompiler();
             compiledDataSource = dataSourceCompiler.compile(dataSource, compilerContext);
 
-            Map<UUID, CompiledQuery> compiledQueryMap = new HashMap<>();
-            ExecutionContext executionContext = new ExecutionContext(compiledQueryMap);
+            ExecutionContext executionContext = new ExecutionContext(library);
             executionContext.setItem(dataContainer);
 
             compiledDataSource.resolve(executionContext);

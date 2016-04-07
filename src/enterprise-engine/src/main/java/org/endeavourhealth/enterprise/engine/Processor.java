@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.engine;
 
+import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery;
 import org.endeavourhealth.enterprise.engine.execution.ExecutionContext;
 import org.endeavourhealth.enterprise.engine.execution.Request;
@@ -14,9 +15,9 @@ public class Processor {
     private final ExecutionContext executionContext;
     private final List<Request> requests;
 
-    public Processor(List<Request> requests, Map<UUID, CompiledQuery> queryMap) {
+    public Processor(List<Request> requests, CompiledLibrary compiledLibrary) {
 
-        executionContext = new ExecutionContext(queryMap);
+        executionContext = new ExecutionContext(compiledLibrary);
         this.requests = requests;
     }
 

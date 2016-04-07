@@ -1,6 +1,5 @@
 package org.endeavourhealth.enterprise.engine.compiler;
 
-import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
@@ -12,13 +11,11 @@ import java.util.List;
 import java.util.UUID;
 
 class ReportCompiler {
-    private final CompilerContext compilerContext;
 
-    public ReportCompiler(CompilerContext compilerContext) {
-        this.compilerContext = compilerContext;
-    }
-
-    public CompiledReport compile(DbJobReport jobReport, RequestParameters parameters) throws UnableToCompileExpection {
+    public CompiledReport compile(
+            DbJobReport jobReport,
+            RequestParameters parameters,
+            CompilerContext compilerContext) throws UnableToCompileExpection {
 
         try {
 
@@ -26,7 +23,7 @@ class ReportCompiler {
 
             List<DbJobReportItem> jobReportItemList = DbJobReportItem.retrieveForJobReport(jobReport.getJobReportUuid());
 
-            populateChildren(null, jobReportItemList, compiledReport.getChildQueries(), compiledReport.getChildListReports());
+            populateChildren(compilerContext, null, jobReportItemList, compiledReport.getChildQueries(), compiledReport.getChildListReports());
 
             compiledReport.initialise();
 
@@ -38,6 +35,7 @@ class ReportCompiler {
     }
 
     private void populateChildren(
+            CompilerContext compilerContext,
             UUID parentJobReportItemUuid,
             List<DbJobReportItem> jobReportItemList,
             List<CompiledReport.CompiledReportQuery> childQueries,
@@ -47,19 +45,22 @@ class ReportCompiler {
         List<DbJobReportItem> rootItems = getChildren(jobReportItemList, parentJobReportItemUuid);
 
         for (DbJobReportItem dbJobReportItem: rootItems) {
-            DefinitionItemType itemType = compilerContext.getRequiredLibraryItems().getType(dbJobReportItem.getItemUuid());
+            UUID itemUuid = dbJobReportItem.getItemUuid();
 
-            if (itemType == DefinitionItemType.Query) {
-                CompiledReport.CompiledReportQuery compiledReportQuery = new CompiledReport.CompiledReportQuery(dbJobReportItem.getItemUuid(), dbJobReportItem.getJobReportItemUuid());
+            if (compilerContext.getCompiledLibrary().isItemOfTypeQuery(itemUuid)) {
+
+                CompiledReport.CompiledReportQuery compiledReportQuery = new CompiledReport.CompiledReportQuery(itemUuid, dbJobReportItem.getJobReportItemUuid());
 
                 childQueries.add(compiledReportQuery);
 
-                populateChildren(dbJobReportItem.getJobReportItemUuid(), jobReportItemList, compiledReportQuery.getChildQueries(), compiledReportQuery.getChildListReports());
+                populateChildren(compilerContext, dbJobReportItem.getJobReportItemUuid(), jobReportItemList, compiledReportQuery.getChildQueries(), compiledReportQuery.getChildListReports());
 
-            } else if (itemType == DefinitionItemType.ListOutput) {
+            } else if (compilerContext.getCompiledLibrary().isItemOfTypeListReport(itemUuid)) {
                 CompiledReport.CompiledReportListReport compiledReportListReport = new CompiledReport.CompiledReportListReport(dbJobReportItem.getItemUuid(), dbJobReportItem.getJobReportItemUuid());
 
                 childListReports.add(compiledReportListReport);
+            } else {
+                throw new UnableToCompileExpection("JobReportItem is trying to use an item that is either not loaded or not of the correct type: " + itemUuid);
             }
         }
     }

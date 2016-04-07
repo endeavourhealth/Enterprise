@@ -52,6 +52,14 @@ public class CompiledEntityDataSource implements ICompiledDataSource {
     }
 
     @Override
+    public boolean canReturnMultipleResults() {
+        if (compiledRestriction != null)
+            return compiledRestriction.canReturnMultipleResults();
+        else
+            return true;
+    }
+
+    @Override
     public void resolve(ExecutionContext executionContext) {
 
         finalRows.clear();

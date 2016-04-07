@@ -17,7 +17,7 @@ public class FieldTesterBuilder {
 
         private final ICompiledFieldTest compiledFieldTest;
 
-        public FieldAssertion(FieldTest fieldTest, Field field) throws UnableToCompileExpection {
+        public FieldAssertion(FieldTest fieldTest, Field field) throws Exception {
             FieldTestCompiler compiler = new FieldTestCompiler();
             compiledFieldTest = compiler.createCompiledFieldTest(fieldTest, field);
         }
@@ -60,7 +60,7 @@ public class FieldTesterBuilder {
         return this;
     }
 
-    public FieldAssertion build() throws UnableToCompileExpection {
+    public FieldAssertion build() throws Exception {
         return new FieldAssertion(fieldTest, field);
     }
 }

@@ -8,27 +8,6 @@ import java.util.*;
 
 public class CompiledRestriction {
 
-    private static class ValueToRowId implements Comparable {
-        public final Object value;
-        public final int rowId;
-
-        public ValueToRowId(Object value, int rowId) {
-            this.value = value;
-            this.rowId = rowId;
-        }
-
-        @Override
-        public int compareTo(Object o) {
-
-            if (value instanceof LocalDate)
-                return ((LocalDate)value).compareTo((LocalDate)((ValueToRowId)o).value);
-            else if (value instanceof BigDecimal)
-                return ((BigDecimal)value).compareTo((BigDecimal)((ValueToRowId)o).value);
-            else
-                throw new RuntimeException("Restriction type not supported: " + value.getClass().getName());
-        }
-    }
-
     private final ICompiledDataSource dataSource;
     private final int fieldId;
     private final OrderDirection orderDirection;
@@ -75,10 +54,35 @@ public class CompiledRestriction {
             Object value = dataSource.getValue(rowId, fieldId);
 
             if (value == null)
-                continue;;
+                continue;
 
             ValueToRowId valueToRowId = new ValueToRowId(value, rowId);
             temporaryMap.add(valueToRowId);
+        }
+    }
+
+    public boolean canReturnMultipleResults() {
+        return count > 1;
+    }
+
+    private static class ValueToRowId implements Comparable {
+        public final Object value;
+        public final int rowId;
+
+        public ValueToRowId(Object value, int rowId) {
+            this.value = value;
+            this.rowId = rowId;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+
+            if (value instanceof LocalDate)
+                return ((LocalDate)value).compareTo((LocalDate)((ValueToRowId)o).value);
+            else if (value instanceof BigDecimal)
+                return ((BigDecimal)value).compareTo((BigDecimal)((ValueToRowId)o).value);
+            else
+                throw new RuntimeException("Restriction type not supported: " + value.getClass().getName());
         }
     }
 }

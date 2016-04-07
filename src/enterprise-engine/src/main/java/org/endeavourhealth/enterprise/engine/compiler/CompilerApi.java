@@ -1,54 +1,77 @@
 package org.endeavourhealth.enterprise.engine.compiler;
 
-import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
-import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentHelper;
-import org.endeavourhealth.enterprise.core.querydocument.models.Query;
+import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
-import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery;
-import org.endeavourhealth.enterprise.engine.compiled.CompiledReport;
+import org.endeavourhealth.enterprise.engine.compiled.*;
 import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException;
-import org.endeavourhealth.enterprise.enginecore.Library;
-import org.endeavourhealth.enterprise.enginecore.LibraryItem;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.List;
 
 public class CompilerApi {
-    private final ReportCompiler reportCompiler;
-    private final QueryCompiler queryCompiler;
+    private final ReportCompiler reportCompiler = new ReportCompiler();
+    private final QueryCompiler queryCompiler = new QueryCompiler();
+    private final DataSourceCompiler dataSourceCompiler = new DataSourceCompiler();
+    private final TestCompiler testCompiler = new TestCompiler();
+
     private final CompilerContext compilerContext;
+    private final CompiledLibrary compiledLibrary = new CompiledLibrary();
+    private List<LibraryItem> requiredLibraryItems;
 
     public CompilerApi(
-            EntityMapWrapper.EntityMap entityMapWrapper,
-            Library requiredLibraryItems) {
+            EntityMapWrapper.EntityMap entityMapWrapper) {
 
-        compilerContext = new CompilerContext(entityMapWrapper, requiredLibraryItems);
-        this.reportCompiler = new ReportCompiler(compilerContext);
-        this.queryCompiler = new QueryCompiler();
+        compilerContext = new CompilerContext(entityMapWrapper, compiledLibrary);
     }
 
-    public Map<UUID, CompiledQuery> compileAllQueries(Library library) throws InvalidQueryDocumentException {
+    public void compiledAllLibraryItems(List<LibraryItem> requiredLibraryItems) throws Exception {
+        this.requiredLibraryItems = requiredLibraryItems;
 
-        Map<UUID, CompiledQuery> map = new HashMap<>();
+        //compileCodesets();
+        compileDataSources();
+        compileTests();
+        compileQueries();
+        //compileListReports();
+    }
 
-        for (LibraryItem libraryItem: library.getAllLibraryItems()) {
-            if (libraryItem.getItemType() == DefinitionItemType.Query) {
+    private void compileDataSources() throws Exception {
+        for (LibraryItem libraryItem : requiredLibraryItems) {
 
-                Query query = null;
-
-                CompiledQuery compiledQuery = queryCompiler.compile(compilerContext, query);
-                map.put(libraryItem.getUuid(), compiledQuery);
+            if (libraryItem.getDataSource() != null) {
+                ICompiledDataSource compiledDataSource = dataSourceCompiler.compile(libraryItem.getDataSource(), compilerContext);
+                compiledLibrary.add(libraryItem, compiledDataSource);
             }
         }
+    }
 
-        return map;
+    private void compileTests() throws Exception {
+        for (LibraryItem libraryItem : requiredLibraryItems) {
+
+            if (libraryItem.getTest() != null) {
+                ICompiledTest compiledTest = testCompiler.compile(libraryItem.getTest(), compilerContext);
+                compiledLibrary.add(libraryItem, compiledTest);
+            }
+        }
+    }
+
+    private void compileQueries() throws InvalidQueryDocumentException {
+
+        for (LibraryItem libraryItem : requiredLibraryItems) {
+
+            if (libraryItem.getQuery() != null) {
+                CompiledQuery compiledQuery = queryCompiler.compile(compilerContext, libraryItem.getQuery());
+                compiledLibrary.add(libraryItem, compiledQuery);
+            }
+        }
     }
 
     public CompiledReport compile(DbJobReport jobReport, RequestParameters parameters) throws UnableToCompileExpection {
-        return reportCompiler.compile(jobReport, parameters);
+        return reportCompiler.compile(jobReport, parameters, compilerContext);
+    }
+
+    public CompiledLibrary getCompiledLibrary() {
+        return compiledLibrary;
     }
 }

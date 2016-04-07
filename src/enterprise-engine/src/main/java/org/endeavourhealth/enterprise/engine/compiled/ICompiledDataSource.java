@@ -20,5 +20,6 @@ public interface ICompiledDataSource {
     int getFieldIndex(String logicalName) throws EntityMapException;
     Field getField(int fieldIndex);
     void setRestriction(CompiledRestriction restriction);
+    boolean canReturnMultipleResults();
 }
 

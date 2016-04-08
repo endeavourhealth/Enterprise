@@ -27,13 +27,13 @@
 							</table>
 						</div>
 					</div>
-					<div class="form-group col-md-9">
-						<label>Members</label>
-						<div ng-show="ctrl.selectedOrganisationSet" ng-click="ctrl.showOrganisationPicker()" class="form-control scroll-box-150">
-							<span ng-repeat="member in ctrl.selectedOrganisationSet.organisations">
-								<span>{{ member.name }}</span>
-								<span ng-hide="this.$last"> | </span>
-							</span>
+					<div class="form-group col-md-9" ng-show="ctrl.selectedOrganisationSet">
+						<label>Members</label> <small class="text-muted">(Click box to edit)</small>
+						<div ng-click="ctrl.showOrganisationPicker()" class="form-control scroll-box-300">
+							<div class="row striped" ng-repeat="member in ctrl.selectedOrganisationSet.organisations">
+								<div class="col-md-8">{{ member.name }}</div>
+								<div class="col-md-4">{{ member.odsCode }}</div>
+							</div>
 						</div>
 					</div>
 				</div>

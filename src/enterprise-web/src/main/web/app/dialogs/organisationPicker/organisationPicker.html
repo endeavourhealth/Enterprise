@@ -4,6 +4,14 @@
 </div>
 <div class="modal-body">
 	<form endUserRole="form" class="container-fluid">
+		<!-- Name -->
+		<div class="row" ng-show="ctrl.editMode">
+			<div class="form-group col-md-12">
+				<label class="control-label">Organisation Set Name</label>
+				<input type="text" class="form-control" ng-model="ctrl.resultData.name">
+			</div>
+		</div>
+
 		<!-- Search -->
 		<div class="row">
 			<div class="form-group col-md-12">
@@ -24,7 +32,7 @@
 		<div class="row">
 			<div class="form-group col-md-12">
 				<label>Matches</label>
-				<div class="form-control scroll-box-150">
+				<div class="form-control scroll-box-100">
 					<div class="row striped hover-box show-child-on-hover" ng-repeat="org in ctrl.searchResults">
 						<div class="col-md-8">{{ org.name }}</div>
 						<div class="col-md-3">{{ org.odsCode }}</div>
@@ -38,17 +46,18 @@
 		<div class="row">
 			<div class="form-group col-md-12">
 				<label>Selection</label><button type="button" class="btn btn-xs btn-warning pull-right" ng-click="ctrl.removeAll()">Remove all</button>
-				<div class="form-control scroll-box-50">
-					<span ng-repeat="member in ctrl.resultData.organisations">
-						<span>{{ member.name }}</span>
-						<span ng-hide="this.$last"> | </span>
-					</span>
+				<div class="form-control scroll-box-100">
+					<div class="row striped hover-box show-child-on-hover" ng-repeat="member in ctrl.resultData.organisations">
+						<div class="col-md-8">{{ member.name }}</div>
+						<div class="col-md-3">{{ member.odsCode }}</div>
+						<div class="col-md-1"><button type="button" class="btn btn-xs btn-danger child-to-show" ng-click="ctrl.removeOrganisationFromSelection(member)"><span class="fa fa-minus"></span></button></div>
+					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- Organisation Set -->
-		<div class="row"  ng-hide="ctrl.editMode">
+		<div class="row" ng-hide="ctrl.editMode">
 			<div class="form-group col-md-12">
 				<label>Defined Sets</label>
 				<div class="row">
@@ -75,7 +84,8 @@
 	</form>
 </div>
 <div class="modal-footer">
-	<button type="button" class="btn" data-ng-click="ctrl.cancel()">Cancel</button>
-	<button type="button" class="btn btn-primary" data-ng-click="ctrl.ok()">Ok</button>
+	<button type="button" class="btn bnt-default" data-ng-click="ctrl.cancel()">Cancel</button>
+	<button type="button" class="btn btn-primary" ng-hide="ctrl.editMode" data-ng-click="ctrl.ok()">Ok</button>
+	<button type="button" class="btn btn-success" ng-show="ctrl.editMode" data-ng-click="ctrl.ok()">Save</button>
 </div>
 

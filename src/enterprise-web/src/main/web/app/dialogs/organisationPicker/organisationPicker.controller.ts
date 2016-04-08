@@ -99,6 +99,11 @@ module app.dialogs {
 			}
 		}
 
+		removeOrganisationFromSelection(organisation : OrganisationSetMember) {
+			var index = this.resultData.organisations.indexOf(organisation);
+			this.resultData.organisations.splice(index, 1);
+		}
+
 		removeAll() {
 			this.resultData.organisations = [];
 		}

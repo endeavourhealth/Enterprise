@@ -6,7 +6,7 @@
 		description : string;
 		uuid : string;
 		resultCount : number;
-		percentageOfParent : number;
+		percentageOfParent : string;
 		childQueries : QueryResult[];
 	}
 }

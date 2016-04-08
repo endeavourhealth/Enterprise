@@ -85,17 +85,17 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         Boolean isAdminForAutoSelect = null;
 
         //now see what organisations the person can access
-        //if the person is a superUser, then we want to now prompt them to log on to ANY lookups
+        //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
         if (user.isSuperUser()) {
             List<DbOrganisation> orgs = DbOrganisation.retrieveForAll();
 
             for (int i = 0; i < orgs.size(); i++) {
                 DbOrganisation o = orgs.get(i);
 
-                //super-users are assumed to be admins at every lookups
+                //super-users are assumed to be admins at every organisation
                 ret.add(o, new Boolean(true));
 
-                //if there's only one lookups, automatically select it
+                //if there's only one organisation, automatically select it
                 if (orgs.size() == 1) {
                     orgToAutoSelect = o;
                     isAdminForAutoSelect = new Boolean(true);
@@ -116,7 +116,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 Boolean isAdmin = new Boolean(orgLink.isAdmin());
                 ret.add(o, isAdmin);
 
-                //if there's only one lookups, automatically select it
+                //if there's only one organisation, automatically select it
                 if (orgLinks.size() == 1) {
                     orgToAutoSelect = o;
                     isAdminForAutoSelect = new Boolean(isAdmin);
@@ -153,10 +153,10 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         LOG.trace("Selecting organisationUUID {}", orgUuid);
 
-        //validate the lookups exists
+        //validate the organisation exists
         DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
         if (org == null) {
-            throw new BadRequestException("Invalid lookups " + orgUuid);
+            throw new BadRequestException("Invalid organisation " + orgUuid);
         }
 
         //validate the person can log on there
@@ -178,13 +178,13 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             }
 
             if (link == null) {
-                throw new BadRequestException("Invalid lookups " + orgUuid + " or user doesn't have access");
+                throw new BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
             }
 
             isAdmin = link.isAdmin();
         }
 
-        //issue a new cookie, with the newly selected lookups
+        //issue a new cookie, with the newly selected organisation
         NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, isAdmin);
 
         //return the full org details and the user's role at this place
@@ -291,7 +291,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
             UUID userUuid = user.getEndUserUuid();
 
-            //the email needs to be linked to an lookups, so just choose one the user can access
+            //the email needs to be linked to an organisation, so just choose one the user can access
             List<DbOrganisationEndUserLink> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
             if (!orgLinks.isEmpty()) {
                 DbOrganisationEndUserLink firstLink = orgLinks.get(0);

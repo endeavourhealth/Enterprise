@@ -70,7 +70,7 @@ public final class LookupEndpoint extends AbstractEndpoint {
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         if (!set.getOrganisationUuid().equals(orgUuid)) {
-            throw new BadRequestException("Trying to get lookups set members for a different admin lookups");
+            throw new BadRequestException("Trying to get organisation set members for a different organisation");
         }
 
         String odsCodeStr = set.getOdsCodes();
@@ -166,7 +166,7 @@ public final class LookupEndpoint extends AbstractEndpoint {
 
         DbSourceOrganisationSet set = DbSourceOrganisationSet.retrieveSetForUuid(uuid);
         if (!set.getOrganisationUuid().equals(orgUuid)) {
-            throw new BadRequestException("Organisation set " + uuid + " belongs to a different admin lookups");
+            throw new BadRequestException("Organisation set " + uuid + " belongs to a different organisation");
         }
 
         set.setSaveMode(TableSaveMode.DELETE);

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Endpoint for the functions related to managing person and lookups entities
+ * Endpoint for the functions related to managing person and organisation entities
  */
 @Path("/admin")
 public final class AdminEndpoint extends AbstractEndpoint {
@@ -94,7 +94,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.LibraryFolder);
         }
 
-        //return the lookups UUID
+        //return the organisation UUID
         JsonOrganisation ret = new JsonOrganisation();
         ret.setUuid(org.getOrganisationUuid());
 
@@ -200,7 +200,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 uuid = user.getEndUserUuid();
             }
             //if we're trying to create a new user, but they already exist at another org,
-            //then we can just use that same user record and link it to the new lookups
+            //then we can just use that same user record and link it to the new organisation
             else {
                 createdNewPerson = Boolean.FALSE;
 
@@ -293,7 +293,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         //a password, but we still want to tell the person that they were given new access
         else {
             if (!EmailProvider.getInstance().sendNewAccessGrantedEmail(user, org)) {
-                throw new InternalServerErrorException("Failed to send new lookups email");
+                throw new InternalServerErrorException("Failed to send new organisation email");
             }
         }
 
@@ -382,7 +382,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
 
         //rather than actually deleting the user record, we mark their link
-        //at the current lookups as expired
+        //at the current organisation as expired
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
@@ -414,7 +414,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         JsonEndUserList ret = new JsonEndUserList();
 
-        //retrieve all users at this lookups
+        //retrieve all users at this organisation
         List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForOrganisationNotExpired(orgUuid);
         for (int i = 0; i < links.size(); i++) {
             DbOrganisationEndUserLink link = links.get(i);

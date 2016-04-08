@@ -210,7 +210,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getScheduleResults")
-    public Response getScheduleResults(@Context SecurityContext sc, @QueryParam("uuid") String requestUuidStr, @QueryParam("lookups") String organisationOdsCode) throws Exception {
+    public Response getScheduleResults(@Context SecurityContext sc, @QueryParam("uuid") String requestUuidStr, @QueryParam("organisation") String organisationOdsCode) throws Exception {
         super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -228,7 +228,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         }
 
         if (!request.getOrganisationUuid().equals(orgUuid)) {
-            throw new BadRequestException("Requesting a schedule at another lookups");
+            throw new BadRequestException("Requesting a schedule at another organisation");
         }
 
         //get the population count and results for each query

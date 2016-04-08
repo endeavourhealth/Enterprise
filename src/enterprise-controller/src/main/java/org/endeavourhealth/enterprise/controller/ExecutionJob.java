@@ -67,6 +67,19 @@ class ExecutionJob {
         startExecutionNodes();
     }
 
+    public void stop() {
+        dbJob.setSaveMode(TableSaveMode.UPDATE);
+        dbJob.markAsFinished(ExecutionStatus.Failed);
+
+        try {
+            dbJob.writeToDb();
+            logger.debug("Execution Job failed: " + executionUuid.toString());
+            stopExecutionNodes();
+        } catch (Exception e) {
+            logger.error("Job Finished exception", e);
+        }
+    }
+
     private void clearPreviousJobs() throws Exception {
         PreviousJobClearup.clearPreviousJobs(configuration.getCoreDatabase(), configuration.getMessageQueuing());
     }
@@ -102,7 +115,11 @@ class ExecutionJob {
 
     private UUID getLatestAuditUuid() throws Exception {
         DbAudit latestAudit = DbAudit.retrieveLatest();
-        return latestAudit.getAuditUuid();
+
+        if (latestAudit == null)
+            return null;
+        else
+            return latestAudit.getAuditUuid();
     }
 
     private List<DbRequest> getItemRequests() throws Exception {
@@ -254,6 +271,18 @@ class ExecutionJob {
         exchange.sendMessage(message);
     }
 
+    private void stopExecutionNodes() throws Exception{
+        QueueConnectionProperties queueConnectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
+
+        ProcessorNodesStopMessage.StopMessagePayload payload = new ProcessorNodesStopMessage.StopMessagePayload();
+        payload.setJobUuid(executionUuid);
+
+        ProcessorNodesStopMessage message = ProcessorNodesStopMessage.CreateAsNew(payload);
+
+        ProcessorNodesExchange exchange = new ProcessorNodesExchange(queueConnectionProperties, configuration.getMessageQueuing().getProcessorNodesExchangeName());
+        exchange.sendMessage(message);
+    }
+
     public synchronized void workerItemComplete(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload) {
         if (!executionUuid.equals(payload.getExecutionUuid()))
             return;
@@ -284,8 +313,6 @@ class ExecutionJob {
         GregorianCalendar cal1 = new GregorianCalendar();
         cal1.setTimeInMillis(now.toEpochMilli());
 
-        XMLGregorianCalendar cal2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal1);
-
-        return cal2;
+        return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal1);
     }
 }

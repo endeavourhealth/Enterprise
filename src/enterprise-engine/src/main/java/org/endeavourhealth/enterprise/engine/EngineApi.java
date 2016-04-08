@@ -42,6 +42,7 @@ public class EngineApi {
 
         CompilerApi compilerApi = new CompilerApi(entityMap);
         compilerApi.compiledAllLibraryItems(requiredLibraryItems);
+        compiledLibrary = compilerApi.getCompiledLibrary();
 
         for (DbJobReport jobReport: jobReports) {
 

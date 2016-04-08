@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.enginecore.carerecord;
 
 import net.sourceforge.jtds.jdbc.JtdsResultSet;
+import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseHelper;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainer;
@@ -121,7 +122,15 @@ public class CareRecordDal {
             List<DataField> fields = dataContainer.getDataEntities().get(entityIndex).getFields();
 
             for (int i = 0; i < entityMapFieldCount; i++) {
-                fields.get(i).add(rs.getObject(entityMapFields.get(i).getIndex()));
+
+                Field field = entityMapFields.get(i);
+
+                if (field.getLogicalDataType() == LogicalDataType.DATE)
+                    fields.get(i).add(rs.getDate(field.getIndex()).toLocalDate());
+                else if (field.getLogicalDataType() == LogicalDataType.FLOAT)
+                    fields.get(i).add(rs.getFloat(field.getIndex()));
+                else
+                    fields.get(i).add(rs.getObject(field.getIndex()));
             }
         }
     }

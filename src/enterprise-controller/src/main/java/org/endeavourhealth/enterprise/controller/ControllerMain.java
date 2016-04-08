@@ -2,8 +2,10 @@ package org.endeavourhealth.enterprise.controller;
 
 import org.endeavourhealth.enterprise.controller.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
+import org.endeavourhealth.enterprise.core.JsonSerializer;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueue;
+import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueueExecutionFailedMessage;
 import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueueWorkItemCompleteMessage;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
@@ -15,7 +17,6 @@ import java.util.concurrent.TimeoutException;
 class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueMessageReceiver {
 
     private final static Logger logger = LoggerFactory.getLogger(ControllerMain.class);
-    private SchedulerWrapper scheduler;
     private Configuration configuration;
     private ExecutionJob currentJob;
     private ControllerQueue queue;
@@ -30,7 +31,7 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
 
         initialiseControllerQueue();
 
-        scheduler = new SchedulerWrapper(configuration);
+        SchedulerWrapper scheduler = new SchedulerWrapper(configuration);
         scheduler.startDelayed(3);  //Wait 3 second before starting
     }
 
@@ -67,7 +68,8 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
 
     @Override
     public void close() throws Exception {
-
+        if (queue != null)
+            queue.close();
     }
 
     @Override
@@ -81,6 +83,17 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
             return;
 
         currentJob.workerItemComplete(payload);
+    }
+
+    @Override
+    public void receiveExecutionFailedMessage(ControllerQueueExecutionFailedMessage.ExecutionFailedPayload payload) {
+
+        String text = JsonSerializer.serialize(payload);
+
+        logger.error("Received execution failed message. " + text);
+
+        if (currentJob != null && currentJob.getExecutionUuid().equals(payload.getExecutionUuid()))
+            currentJob.stop();
     }
 
 //    public void requestCancelCurrentJob() {

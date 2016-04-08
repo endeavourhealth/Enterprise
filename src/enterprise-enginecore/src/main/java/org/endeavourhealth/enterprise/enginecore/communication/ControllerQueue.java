@@ -49,6 +49,9 @@ public class ControllerQueue implements AutoCloseable {
                 if (ControllerQueueWorkItemCompleteMessage.isTypeOf(message)) {
                     ControllerQueueWorkItemCompleteMessage realMessage = ControllerQueueWorkItemCompleteMessage.CreateFromMessage(message);
                     receiver.receiveWorkerItemCompleteMessage(realMessage.getPayload());
+                } else if (ControllerQueueExecutionFailedMessage.isTypeOf(message)) {
+                    ControllerQueueExecutionFailedMessage realMessage = ControllerQueueExecutionFailedMessage.CreateFromMessage(message);
+                    receiver.receiveExecutionFailedMessage(realMessage.getPayload());
                 } else {
                     throw new UnsupportedOperationException("Message type not supported: " + properties.getType());
                 }
@@ -61,10 +64,15 @@ public class ControllerQueue implements AutoCloseable {
     }
 
     public void sendMessage(ControllerQueueWorkItemCompleteMessage message) throws IOException {
-        channel.basicPublish("", queueName, message.getMessage());
+        channel.publishDirectlyToQueue(queueName, message.getMessage());
+    }
+
+    public void sendMessage(ControllerQueueExecutionFailedMessage message) throws IOException {
+        channel.publishDirectlyToQueue(queueName, message.getMessage());
     }
 
     public interface IControllerQueueMessageReceiver {
         void receiveWorkerItemCompleteMessage(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload);
+        void receiveExecutionFailedMessage(ControllerQueueExecutionFailedMessage.ExecutionFailedPayload payload);
     }
 }

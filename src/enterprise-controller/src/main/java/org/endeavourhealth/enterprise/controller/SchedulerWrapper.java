@@ -8,7 +8,6 @@ import java.util.Properties;
 
 class SchedulerWrapper {
 
-    private static SchedulerFactory sf;
     private static Scheduler scheduler;
 
     public SchedulerWrapper(Configuration configuration) throws SchedulerException {
@@ -30,7 +29,7 @@ class SchedulerWrapper {
         props.setProperty(StdSchedulerFactory.PROP_SCHED_SKIP_UPDATE_CHECK, "true");
         props.setProperty("org.quartz.threadPool.threadCount", "4");
 
-        sf = new StdSchedulerFactory(props);
+        SchedulerFactory sf = new StdSchedulerFactory(props);
         scheduler = sf.getScheduler();
     }
 

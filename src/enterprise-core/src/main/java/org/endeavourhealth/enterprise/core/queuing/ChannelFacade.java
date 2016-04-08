@@ -40,8 +40,12 @@ public class ChannelFacade implements AutoCloseable {
         connection = null;
     }
 
-    public void basicPublish(String exchangeName, String routingKey, Message message) throws IOException {
-        channel.basicPublish(exchangeName, routingKey, message.getProperties(), message.getBodyAsByteArray());
+    public void publishToExchange(String exchangeName, Message message) throws IOException {
+        channel.basicPublish(exchangeName, "", message.getProperties(), message.getBodyAsByteArray());
+    }
+
+    public void publishDirectlyToQueue(String queueName, Message message) throws IOException {
+        channel.basicPublish("", queueName, message.getProperties(), message.getBodyAsByteArray());
     }
 
     public void purgeQueue(String queueName) throws IOException {

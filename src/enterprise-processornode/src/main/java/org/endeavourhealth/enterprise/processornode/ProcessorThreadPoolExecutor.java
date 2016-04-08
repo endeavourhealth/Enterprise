@@ -11,6 +11,7 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
 
     public interface IBatchComplete {
         void batchComplete();
+        void errorOccurred(Throwable t);
     }
 
     private final int minimumBufferSize;
@@ -23,7 +24,7 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
     private boolean hasRaisedBatchComplete;
     private boolean addingItems;
 
-    //This is a thread safe hashset.  I love Java :)
+    //This is how you do a thread safe hashset.  I love Java :)
     private final Set<Runnable> jobsToRun = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public ProcessorThreadPoolExecutor(
@@ -42,6 +43,12 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
+
+        if (t != null) {
+            Exception exception = new Exception("Error during execution of Runnable item", t);
+            batchCompleteCallback.errorOccurred(exception);
+            return;
+        }
 
         try {
             jobsToRun.remove(r);
@@ -65,7 +72,8 @@ class ProcessorThreadPoolExecutor extends ThreadPoolExecutor {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            Exception exception = new Exception("Error during batch complete process of Runnable item", e);
+            batchCompleteCallback.errorOccurred(exception);
         }
     }
 

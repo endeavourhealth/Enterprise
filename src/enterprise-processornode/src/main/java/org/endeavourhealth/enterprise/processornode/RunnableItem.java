@@ -33,7 +33,7 @@ class RunnableItem implements Runnable{
             executionContext.getDataContainerPool().recycle(dataContainer);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error processing patient: " + dataContainer.getId(), e);
         }
     }
 }

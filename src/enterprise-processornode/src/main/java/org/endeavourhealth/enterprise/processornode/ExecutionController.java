@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete, AutoCloseable {
@@ -29,16 +30,17 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     private final Configuration configuration;
     private final ControllerQueue controllerQueue;
     private final WorkerQueue workerQueue;
+    private final UUID processorNodeUuid;
 
     private ProcessorThreadPoolExecutor executor;
     private WorkerQueueBatchMessage currentWorkerQueueBatch;
     private EngineApi engineApi;
 
-    public ExecutionController(Configuration configuration, ProcessorNodesStartMessage.StartMessagePayload startMessage) throws Exception {
-
+    public ExecutionController(UUID processorNodeUuid, Configuration configuration, ProcessorNodesStartMessage.StartMessagePayload startMessage) throws Exception {
         if (configuration.getExecutionThreads() < 1)
             throw new IllegalArgumentException("NumberOfThreads must be 1 or higher");
 
+        this.processorNodeUuid = processorNodeUuid;
         this.startMessage = startMessage;
         this.configuration = configuration;
         this.controllerQueue = createControllerQueue();
@@ -72,8 +74,8 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     private EngineApi createEngineApi(EntityMapWrapper.EntityMap entityMap) throws Exception {
 
-        List<DbJobReport> jobReports = DbJobReport.retrieveForJob(startMessage.getJobUuid());
-        List<LibraryItem> libraryItems = DbItem.retrieveLibraryItemsForJob(startMessage.getJobUuid());
+        List<DbJobReport> jobReports = DbJobReport.retrieveForJob(getJobUuid());
+        List<LibraryItem> libraryItems = DbItem.retrieveLibraryItemsForJob(getJobUuid());
 
         EngineApi engineApi = new EngineApi(entityMap, jobReports, libraryItems);
         engineApi.initialise();
@@ -113,6 +115,10 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         }
     }
 
+    public UUID getJobUuid() {
+        return startMessage.getJobUuid();
+    }
+
     @Override
     public void batchComplete() {
 
@@ -121,7 +127,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
             WorkerQueueBatchMessage.BatchMessagePayload batchMessagePayload = currentWorkerQueueBatch.getPayload();
 
             ControllerQueueWorkItemCompleteMessage message = ControllerQueueWorkItemCompleteMessage.CreateAsNew(
-                    startMessage.getJobUuid(),
+                    getJobUuid(),
                     batchMessagePayload.getMinimumId()
             );
 
@@ -135,6 +141,27 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void errorOccurred(Throwable t) {
+        logger.error("Error caught by Execution Controller", t);
+
+        try {
+
+            shutDown();
+
+            ControllerQueueExecutionFailedMessage message = ControllerQueueExecutionFailedMessage.CreateAsNew(
+                    getJobUuid(),
+                    processorNodeUuid,
+                    NetworkHelper.getLocalIpAddress(),
+                    t.toString());
+
+            controllerQueue.sendMessage(message);;
+
+        } catch (Exception e) {
+            logger.error("Error during self shutdown.", e);
         }
     }
 

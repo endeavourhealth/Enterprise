@@ -53,7 +53,7 @@ declare @Query varchar(max) = '<?xml version="1.0" encoding="UTF-8"?>
 				<action>include</action>
 			</onPass>
 			<onFail>
-				<action>exclude</action>
+				<action>noAction</action>
 			</onFail>
 			<layout>
 				<x>10</x>
@@ -107,4 +107,4 @@ values
 
 
 
-rollback transaction
+commit transaction

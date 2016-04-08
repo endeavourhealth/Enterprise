@@ -61,6 +61,9 @@ public class ProcessorNodeQueue implements AutoCloseable {
                 if (ProcessorNodesStartMessage.isTypeOf(message)) {
                     ProcessorNodesStartMessage startMessage = ProcessorNodesStartMessage.CreateFromMessage(message);
                     receiver.receiveStartMessage(startMessage.getPayload());
+                } else if (ProcessorNodesStopMessage.isTypeOf(message)) {
+                    ProcessorNodesStopMessage stopMessage = ProcessorNodesStopMessage.CreateFromMessage(message);
+                    receiver.receiveStopMessage(stopMessage.getPayload());
                 } else {
                     throw new UnsupportedOperationException("Message type not supported: " + properties.getType());
                 }
@@ -74,5 +77,6 @@ public class ProcessorNodeQueue implements AutoCloseable {
 
     public interface IProcessorNodeMessageReceiver {
         void receiveStartMessage(ProcessorNodesStartMessage.StartMessagePayload startMessage);
+        void receiveStopMessage(ProcessorNodesStopMessage.StopMessagePayload stopMessage);
     }
 }

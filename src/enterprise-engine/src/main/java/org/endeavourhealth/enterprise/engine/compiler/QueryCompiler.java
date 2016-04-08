@@ -23,15 +23,20 @@ public class QueryCompiler {
 
         nodeCompiler.compile(query);
         nodeCompiler.getRuleNodeRelationships();
+        NodeTraversal nodeTraversal = nodeCompiler.getNodeTraversal();
 
         HashMap<Node, ICompiledRule> nodeToCompiledRule = createNodeToCompiledRule(compiledRules, nodeCompiler.getRuleNodeRelationships());
 
         UUID parentQueryUuid = QueryDocumentHelper.parseOptionalUuid(query.getParentQueryUuid());
 
-        return new CompiledQuery(
-                nodeCompiler.getNodeTraversal(),
+        CompiledQuery compiledQuery = new CompiledQuery(
+                nodeTraversal,
                 nodeToCompiledRule,
                 parentQueryUuid);
+
+        nodeTraversal.initialise(compiledQuery);
+
+        return compiledQuery;
     }
 
     private HashMap<Node, ICompiledRule> createNodeToCompiledRule(HashMap<Rule, ICompiledRule> compiledRules, RuleNodeRelationships ruleNodeRelationships) {

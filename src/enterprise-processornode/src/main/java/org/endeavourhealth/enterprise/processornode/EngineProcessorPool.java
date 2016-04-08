@@ -27,13 +27,12 @@ class EngineProcessorPool {
         return queue.pop();
     }
 
-
     private Processor createProcessor() throws Exception {
 
         itemsCreated++;
 
         if (itemsCreated > maximumProcessorsAllowed)
-            throw new Exception("Maximum created items exceeded");  //If it hits this then the items are not being recycled
+            throw new Exception("Exceeded maximum number of processor objects created");  //If it hits this then the items are not being recycled
 
         return engineApi.createProcessor();
     }

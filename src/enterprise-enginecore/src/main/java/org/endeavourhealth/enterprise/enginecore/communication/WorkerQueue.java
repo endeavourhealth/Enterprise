@@ -30,7 +30,7 @@ public class WorkerQueue implements AutoCloseable {
     }
 
     public void sendMessage(WorkerQueueBatchMessage message) throws IOException {
-        channel.basicPublish("", workerQueueName, message.getMessage());
+        channel.publishDirectlyToQueue(workerQueueName, message.getMessage());
     }
 
     public void logDebug(String message) {

@@ -4,6 +4,7 @@ import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodeQueue;
 import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodesStartMessage;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
+import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodesStopMessage;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 import org.endeavourhealth.enterprise.processornode.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.processornode.configuration.ConfigurationAPI;
@@ -54,11 +55,33 @@ class ProcessorNodeMain implements AutoCloseable, ProcessorNodeQueue.IProcessorN
 
             initialiseDatabaseManager(startMessage.getCoreDatabaseConnectionDetails());
 
-            executionController = new ExecutionController(configuration, startMessage);
+            executionController = new ExecutionController(processorNodeUuid, configuration, startMessage);
 
             executionController.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Processor " + processorNodeUuid.toString(), e);
+        }
+    }
+
+    @Override
+    public void receiveStopMessage(ProcessorNodesStopMessage.StopMessagePayload stopMessage) {
+        logger.info("Processor " + processorNodeUuid.toString() + " received stop message for job " + stopMessage.getJobUuid().toString());
+
+        try {
+
+            if (executionController != null) {
+
+                if (executionController.getJobUuid().equals(stopMessage.getJobUuid())) {
+                    logger.info("Processor " + processorNodeUuid.toString() + ".  Stopping job " + stopMessage.getJobUuid().toString());
+
+                    executionController.shutDown();
+                    executionController.close();
+                    executionController = null;
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Processor " + processorNodeUuid.toString(), e);
         }
     }
 

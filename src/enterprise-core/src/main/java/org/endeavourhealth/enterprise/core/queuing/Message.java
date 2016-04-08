@@ -3,8 +3,6 @@ package org.endeavourhealth.enterprise.core.queuing;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.LongString;
 
-import java.util.UUID;
-
 public class Message {
     private AMQP.BasicProperties properties;
     private String body;
@@ -34,8 +32,8 @@ public class Message {
         LongString valueAsLongString = (LongString)valueAsObject;
         return valueAsLongString.toString();
     }
-
-    public UUID getMandatoryHeaderAsUUID(String key) {
-        return UUID.fromString(getMandatoryHeaderAsString(key));
-    }
+//
+//    public UUID getMandatoryHeaderAsUUID(String key) {
+//        return UUID.fromString(getMandatoryHeaderAsString(key));
+//    }
 }

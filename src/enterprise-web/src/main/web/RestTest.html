@@ -249,6 +249,23 @@
 	</script>
 
 <hr/>
+<h3>/api/security/sendPasswordForgottenEmail</h3>
+
+Email address: <input type="text" id="sendPasswordForgottenEmailEmail">
+<br/>
+<button type="button" onclick="sendPasswordForgottenEmail()">Submit</button>
+
+<script>
+		function sendPasswordForgottenEmail() {
+
+			var s = document.getElementById('sendPasswordForgottenEmailEmail').value;
+			var params = {email:s};
+			post('/api/security/sendPasswordForgottenEmail/', params);
+		}
+	</script>
+
+
+<hr/>
 <h3>/api/admin/getUsers</h3>
 
 	<button type="button" onclick="getUsers()">Submit</button>

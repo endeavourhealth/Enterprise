@@ -9,9 +9,12 @@ import org.endeavour.enterprise.framework.config.models.WebServer;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.lookups.SourceOrganisation;
+import org.endeavourhealth.enterprise.core.lookups.SourceOrganisationUpdater;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Startup implements ServletContextListener {
@@ -43,6 +46,7 @@ public final class Startup implements ServletContextListener {
             List<Template> templates = emailSettings.getTemplate();
             EmailProvider.getInstance().setConnectionProperties(url, username, password, templates);
         }
+
     }
 
     public void contextDestroyed(ServletContextEvent contextEvent) {

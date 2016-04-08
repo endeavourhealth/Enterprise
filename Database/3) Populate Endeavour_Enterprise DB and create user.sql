@@ -17,6 +17,7 @@ INSERT INTO Execution.Status VALUES (0, 'Executing')
 INSERT INTO Execution.Status VALUES (1, 'Succeeded')
 INSERT INTO Execution.Status VALUES (2, 'Failed')
 INSERT INTO Execution.Status VALUES (3, 'NoJobRequests')
+INSERT INTO Execution.Status VALUES (4, 'Cancelled')
 
 DECLARE @OrgId uniqueIdentifier = NEWID();
 DECLARE @RegularUser uniqueIdentifier = NEWID();

@@ -64,7 +64,7 @@ public abstract class SourceOrganisationUpdater {
                 changed = true;
             }
 
-            if (!db.getName().equals(sourceOrganisation.getName())) {
+            if (db.getName() == null || !db.getName().equals(sourceOrganisation.getName())) {
                 db.setName(sourceOrganisation.getName());
                 changed = true;
             }

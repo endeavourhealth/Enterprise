@@ -4,7 +4,8 @@ public enum ExecutionStatus {
     Executing(0),
     Succeeded(1),
     Failed(2),
-    NoJobRequests(3);
+    NoJobRequests(3),
+    Cancelled(4);
 
     private final int value;
 

@@ -70,12 +70,13 @@ final class SqlServerDatabase implements DatabaseI {
     }*/
 
     private int executeScalarQuery(String sql, Object... parameters) throws Exception {
+        LOG.trace("Executing {}", sql);
+
         Connection connection = DatabaseManager.getConnection();
         PreparedStatement s = connection.prepareStatement(sql);
         appendPreparedStatementParameters(s, parameters);
 
         try {
-            LOG.trace("Executing {}", sql);
             s.execute();
 
             ResultSet rs = s.getResultSet();
@@ -144,6 +145,8 @@ final class SqlServerDatabase implements DatabaseI {
                 T first = copy.remove(0);
 
                 String sql = getParameterisedWriteSql(first);
+                LOG.trace("Executing {}", sql);
+
                 sqlLogging.add(sql);
                 PreparedStatement s = connection.prepareStatement(sql);
                 appendWriteParameters(first, s);
@@ -627,6 +630,8 @@ final class SqlServerDatabase implements DatabaseI {
         }
     }
     private static int appendPreparedStatementParameter(PreparedStatement s, Class<?> cls, Object o, int index) throws Exception {
+        LOG.trace("Parameter {}: {}", index, o);
+
         if (cls == String.class) {
             if (o == null) {
                 s.setNull(index++, Types.VARCHAR);
@@ -824,6 +829,7 @@ final class SqlServerDatabase implements DatabaseI {
         List<T> ret = new ArrayList<>();
 
         String sql = sb.toString();
+
         LOG.trace("Executing {}", sql);
 
         Connection connection = DatabaseManager.getConnection();

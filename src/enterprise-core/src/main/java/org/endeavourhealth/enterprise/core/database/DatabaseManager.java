@@ -3,6 +3,7 @@ package org.endeavourhealth.enterprise.core.database;
 import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.db.DBAppender;
 import ch.qos.logback.classic.db.names.DefaultDBNameResolver;
+import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.db.ConnectionSource;
 import ch.qos.logback.core.db.dialect.SQLDialectCode;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
@@ -32,6 +33,7 @@ import java.util.UUID;
 public final class DatabaseManager {
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseManager.class);
     private static final String LOGGING_SCHEMA_PREFIX = "Logging.";
+    private static final String ASYNC_APPENDER = "ASYNC";
 
     //singleton
     private static DatabaseManager ourInstance = new DatabaseManager();
@@ -65,6 +67,8 @@ public final class DatabaseManager {
             cpds.setAcquireIncrement(5);
             cpds.setMaxPoolSize(20);
             cpds.setMaxStatements(180);
+
+            LOG.info("Database connection pool set up during server startup");
 
         } catch (ClassNotFoundException | PropertyVetoException e) {
             e.printStackTrace();
@@ -120,7 +124,7 @@ public final class DatabaseManager {
         //use an async appender so logging to DB doesn't block
         AsyncAppender asyncAppender = new AsyncAppender();
         asyncAppender.setContext(rootLogger.getLoggerContext());
-        asyncAppender.setName("ASYNC");
+        asyncAppender.setName(ASYNC_APPENDER);
         //    // excluding caller data (used for stack traces) improves appender's performance
         //    asyncAppender.setIncludeCallerData(false);
         //    // set threshold to 0 to disable discarding and keep all events
@@ -129,7 +133,18 @@ public final class DatabaseManager {
         asyncAppender.addAppender(dbAppender);
         asyncAppender.start();
 
+
+
         rootLogger.addAppender(asyncAppender);
+    }
+
+    public void deregisterLogbackDbAppender() {
+
+        ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        Appender appender = rootLogger.getAppender(ASYNC_APPENDER);
+        if (appender != null) {
+            appender.stop();
+        }
     }
 
     public void sqlTest() throws Exception {

@@ -40,7 +40,7 @@
 				<div class='row' ng-show="testEditor.codeEditor">
 					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Filter by Clinical Codes</label>
+							<label>Filter by Clinical Codes</label><a class="queryLink" ng-click="testEditor.removeFilter('code')">remove code filter</a>
 							<div class="form-control" style="cursor: pointer; height:auto; overflow-y:scroll; min-height: 30px; max-height: 90px;" ng-click="testEditor.showCodePicker()">
 								<span ng-repeat="selection in testEditor.codeSelection">
 									{{ testEditor.getTerm(selection.code) }}
@@ -56,7 +56,7 @@
 				<div class='row' ng-show="testEditor.dobEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Filter by {{testEditor.dobLabel}} From</label>
+							<label>Filter by {{testEditor.dobLabel}} From</label><a class="queryLink" ng-click="testEditor.removeFilter('dob')">remove DOB filter</a>
 							<p class="input-group">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dobEditorFromDatePicker" ng-model="testEditor.filterDOBFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDOBFrom, testEditor.dobLabel)" placeholder="Select {{testEditor.dobLabel}} from">
 								<span class="input-group-btn">
@@ -80,7 +80,7 @@
 				<div class='row' ng-show="testEditor.sexEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Filter by {{testEditor.sexLabel}}</label>
+							<label>Filter by {{testEditor.sexLabel}}</label><a class="queryLink" ng-click="testEditor.removeFilter('sex')">remove sex filter</a>
 							<select class="form-control" ng-model="testEditor.filterSex" ng-change="testEditor.filterValueChange(testEditor.filterSex, testEditor.sexLabel)">
 								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
 							</select>
@@ -90,7 +90,7 @@
 				<div class='row' ng-show="testEditor.dateEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Filter by {{testEditor.dateLabel}} From</label>
+							<label>Filter by {{testEditor.dateLabel}} From</label><a class="queryLink" ng-click="testEditor.removeFilter('date')">remove date filter</a>
 							<p class="input-group">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dateEditorFromDatePicker" ng-model="testEditor.filterDateFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDateFrom, testEditor.dateLabel)" placeholder="Select {{testEditor.dateLabel}} from">
 								<span class="input-group-btn">
@@ -114,7 +114,7 @@
 				<div class='row' ng-show="testEditor.valueEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Filter by {{testEditor.valueField}} From</label>
+							<label>Filter by {{testEditor.valueField}} From</label><a class="queryLink" ng-click="testEditor.removeFilter('value')">remove value filter</a>
 							<input type="text" class="form-control" ng-model="testEditor.filterValueFrom" ng-blur="testEditor.filterValueFromChange(testEditor.filterValueFrom)" placeholder="Select {{testEditor.valueField}} from">
 						</div>
 					</div>
@@ -128,10 +128,10 @@
 				<div ng-show="testEditor.addRestriction">
 					<a class="queryLink" ng-click="testEditor.toggleRestriction()"><img src="/content/img/add.png" style="width: 20px; height: 20px; margin-right: 10px"/>Add Restriction</a>
 				</div>
-				<div class='row' ng-show="testEditor.showRestriction">
+				<div class='row' ng-show="testEditor.showRestriction"><br/>
 					<div class="col-xs-3">
 						<div class="form-group">
-							<label>Sort Field</label>
+							<label>Sort Field</label><a class="queryLink" ng-click="testEditor.removeFilter('restriction')">remove restriction</a>
 							<select class="form-control" ng-model="testEditor.restrictionFieldName" ng-change="testEditor.restrictionChange(testEditor.restrictionFieldName)">
 								<option ng-repeat="restrictionfield in testEditor.fields" value="{{restrictionfield}}">{{restrictionfield}}</option>
 							</select>
@@ -182,7 +182,7 @@
 				<div class='row' ng-show="testEditor.fieldTestCodeEditor">
 					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Test by Clinical Codes</label>
+							<label>Test by Clinical Codes</label><a class="queryLink" ng-click="testEditor.removeFieldTest('code')">remove code field test</a>
 							<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showFieldTestCodePicker()">
 								<span ng-repeat="code in testEditor.fieldTestCodeSelection">
 									<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
@@ -194,7 +194,7 @@
 				<div class='row' ng-show="testEditor.fieldTestDobEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestDobLabel}} From</label>
+							<label>Test by {{testEditor.fieldTestDobLabel}} From</label><a class="queryLink" ng-click="testEditor.removeFieldTest('dob')">remove DOB field test</a>
 							<p class="input-group">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="fieldTestDobEditorFromDatePicker" ng-model="testEditor.fieldTestDOBFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDOBFrom, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} from">
 								<span class="input-group-btn">
@@ -218,7 +218,7 @@
 				<div class='row' ng-show="testEditor.fieldTestSexEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestSexLabel}}</label>
+							<label>Test by {{testEditor.fieldTestSexLabel}}</label><a class="queryLink" ng-click="testEditor.removeFieldTest('sex')">remove sex field test</a>
 							<select class="form-control" ng-model="testEditor.fieldTestSex" ng-change="testEditor.fieldTestValueChange(testEditor.fieldTestSex, testEditor.fieldTestSexLabel)">
 								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
 							</select>
@@ -228,7 +228,7 @@
 				<div class='row' ng-show="testEditor.fieldTestDateEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestDateLabel}} From</label>
+							<label>Test by {{testEditor.fieldTestDateLabel}} From</label><a class="queryLink" ng-click="testEditor.removeFieldTest('date')">remove date field test</a>
 							<p class="input-group">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="fieldTestDateFromDatePicker" ng-model="testEditor.fieldTestDateFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDateFrom, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} from">
 								<span class="input-group-btn">
@@ -252,7 +252,7 @@
 				<div class='row' ng-show="testEditor.fieldTestValueEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestValueField}} From</label>
+							<label>Test by {{testEditor.fieldTestValueField}} From</label><a class="queryLink" ng-click="testEditor.removeFieldTest('value')">remove value field test</a>
 							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueFrom" ng-blur="testEditor.fieldTestValueFromChange(testEditor.fieldTestValueFrom)" placeholder="Select {{testEditor.fieldTestValueField}} from">
 						</div>
 					</div>

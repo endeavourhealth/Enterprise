@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.framework.exceptions;
 
+import org.endeavour.enterprise.endpoints.AbstractEndpoint;
 import org.endeavour.enterprise.json.JsonServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,10 @@ public final class BaseExceptionMapper implements ExceptionMapper<Exception> {
             JsonServerException wrapper = new JsonServerException(message);
             r = r.entity(wrapper);
         }
+
+        //because we've thrown an exception, we won't have completed the endPoint functions properly
+        //so we need to remove the MDC markers here, so our thread is no longer associated with the user
+        AbstractEndpoint.clearLogbackMarkers();
 
         return r.build();
     }

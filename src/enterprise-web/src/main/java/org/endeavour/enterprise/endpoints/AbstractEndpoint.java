@@ -1,27 +1,38 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
+import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.UserPrincipal;
 import org.endeavour.enterprise.framework.security.UserContext;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
+import org.slf4j.MDC;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import java.util.UUID;
 
 public abstract class AbstractEndpoint {
+
+    private static final String MDC_MARKER_UUID = "UserUuid";
+
     @Context
     protected SecurityContext securityContext;
 
-    /*protected UserContext getUserContext()
-    {
-        return UserContext.fromSecurityContext(securityContext);
-    }*/
+    /**
+     * used to set LogBack to include the user UUID in all logging
+     */
+    protected void setLogbackMarkers(SecurityContext sc) {
+        UUID userUuid = getEndUserUuidFromToken(sc);
+        if (userUuid != null) {
+            MDC.put(MDC_MARKER_UUID, userUuid.toString());
+        }
+    }
+    public static void clearLogbackMarkers() {
+        MDC.remove(MDC_MARKER_UUID);
+    }
 
-    /*
-    * gets session data from the Token passed up
-    * */
+
     protected DbEndUser getEndUserFromSession(SecurityContext sc) throws Exception {
         UUID uuid = getEndUserUuidFromToken(sc);
         return DbEndUser.retrieveForUuid(uuid);
@@ -29,7 +40,9 @@ public abstract class AbstractEndpoint {
 
     protected UUID getEndUserUuidFromToken(SecurityContext sc) {
         UserPrincipal up = (UserPrincipal)sc.getUserPrincipal();
-
+        if (up == null) {
+            return null;
+        }
         UserContext uc = up.getUserContext();
         return uc.getUserUuid();
     }

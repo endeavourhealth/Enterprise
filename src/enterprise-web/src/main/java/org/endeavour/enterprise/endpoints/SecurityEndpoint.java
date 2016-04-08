@@ -1,13 +1,11 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavour.enterprise.email.EmailProvider;
 import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
-import org.endeavour.enterprise.json.JsonEmailInviteParameters;
-import org.endeavour.enterprise.json.JsonEndUser;
-import org.endeavour.enterprise.json.JsonOrganisation;
-import org.endeavour.enterprise.json.JsonOrganisationList;
+import org.endeavour.enterprise.json.*;
 import org.endeavourhealth.enterprise.core.Examples;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.administration.*;
@@ -24,6 +22,7 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +36,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Path("/login")
     @Unsecured
     public Response login(@Context SecurityContext sc, JsonEndUser personParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         String email = personParameters.getUsername();
         String password = personParameters.getPassword();
 
@@ -135,6 +136,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -147,6 +150,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/selectOrganisation")
     public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         DbEndUser endUser = getEndUserFromSession(sc);
         UUID endUserUuid = endUser.getEndUserUuid();
 
@@ -192,6 +197,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //return the full org details and the user's role at this place
         JsonOrganisation ret = new JsonOrganisation(org, isAdmin);
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -205,10 +212,14 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @Path("/logoff")
     @Unsecured
     public Response logoff(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
+
         LOG.trace("Logoff");
 
         //replace the cookie on the client with an empty one
         NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);
+
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -220,9 +231,11 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/setPasswordFromInviteEmail")
+    @Path("/setPasswordFromInviteToken")
     @Unsecured
-    public Response setPasswordFromInviteEmail(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Exception {
+    public Response setPasswordFromInviteToken(@Context SecurityContext sc, JsonEmailInviteParameters parameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         String token = parameters.getToken();
         String password = parameters.getPassword();
 
@@ -260,42 +273,72 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, isAdmin);
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .cookie(cookie)
                 .build();
     }
 
-
-/*    @POST
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/switchUserInRole")
-    public Response switchUserInRole(UUID userInRoleUuid) throws NotAuthorizedException
-    {
-        User user = new AdministrationData().getUser(getUserContext().getUserUuid());
+    @Path("/sendPasswordForgottenEmail")
+    @Unsecured
+    public Response sendPasswordForgottenEmail(@Context SecurityContext sc, JsonUserEmail parameters) throws Exception {
+        super.setLogbackMarkers(sc);
 
-        if (user == null)
-            throw new NotFoundException("User not found");
+        String email = parameters.getEmail();
 
-        UserInRole userInRole = user
-                .getUserInRoles()
-                .stream()
-                .filter(t -> t.getUserInRoleUuid().equals(userInRoleUuid))
-                .findFirst()
-                .orElse(null);
+        LOG.trace("sendPasswordForgottenEmail {}", email);
 
-        if (userInRole == null)
-            throw new NotFoundException("UserInRoleUuid does not exist for that user");
+        DbEndUser user = DbEndUser.retrieveForEmail(email);
+        if (user != null) {
 
-        user.setCurrentUserInRoleUuid(userInRole.getUserInRoleUuid());
+            UUID userUuid = user.getEndUserUuid();
 
-        NewCookie cookie = TokenHelper.createTokenAsCookie(user);
+            //the email needs to be linked to an organisation, so just choose one the user can access
+            List<DbOrganisationEndUserLink> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
+            if (!orgLinks.isEmpty()) {
+                DbOrganisationEndUserLink firstLink = orgLinks.get(0);
+                UUID orgUuid = firstLink.getOrganisationUuid();
+                DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
+
+                List<DbAbstractTable> toSave = new ArrayList<>();
+
+                //expire any existing email invite records, so old tokens won't work
+                List<DbEndUserEmailInvite> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
+                for (int i = 0; i < invites.size(); i++) {
+                    DbEndUserEmailInvite invite = invites.get(i);
+                    invite.setDtCompleted(Instant.now());
+                    toSave.add(invite);
+                }
+
+                //use a base64 encoded version of a random UUID
+                String tokenUuid = UUID.randomUUID().toString();
+                String token = Base64.getEncoder().encodeToString(tokenUuid.getBytes());
+
+                //now generate a new invite and send it
+                DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
+                invite.setEndUserUuid(userUuid);
+                invite.setUniqueToken(token);
+                toSave.add(invite);
+
+                //send the email. If the send fails, it'll be logged on the server, but don't return any failure
+                //indication to the client, so we don't give away whether the email existed or not
+                if (EmailProvider.getInstance().sendInviteEmail(user, org, token)) {
+                    //only save AFTER we've successfully send the invite email
+                    DatabaseManager.db().writeEntities(toSave);
+                }
+            }
+        }
+
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()
-                .entity(user)
-                .cookie(cookie)
                 .build();
-    }*/
+    }
+
 }

@@ -5,7 +5,7 @@ import org.endeavour.enterprise.framework.security.PasswordHash;
 import org.endeavour.enterprise.json.JsonEndUser;
 import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
-import org.endeavour.enterprise.utility.EmailProvider;
+import org.endeavour.enterprise.email.EmailProvider;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.administration.*;
@@ -18,10 +18,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -40,6 +36,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveOrganisation")
     public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         //validate our user is a super user
         DbEndUser user = getEndUserFromSession(sc);
         if (!user.isSuperUser()) {
@@ -100,6 +98,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         JsonOrganisation ret = new JsonOrganisation();
         ret.setUuid(org.getOrganisationUuid());
 
+        super.clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -111,6 +111,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveUser")
     public Response saveUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
+        super.setLogbackMarkers(sc);
 
         //userParameters
         UUID uuid = userParameters.getUuid();
@@ -291,7 +292,9 @@ public final class AdminEndpoint extends AbstractEndpoint {
         //if we didn't create a new person, then we don't need them to verify and create
         //a password, but we still want to tell the person that they were given new access
         else {
-            EmailProvider.getInstance().sendNewAccessGrantedEmail(user, org, toSave);
+            if (!EmailProvider.getInstance().sendNewAccessGrantedEmail(user, org)) {
+                throw new InternalServerErrorException("Failed to send new organisation email");
+            }
         }
 
         DatabaseManager.db().writeEntities(toSave);
@@ -299,6 +302,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         //return the UUID of the person back to the client
         JsonEndUser ret = new JsonEndUser();
         ret.setUuid(uuid);
+
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -338,19 +343,19 @@ public final class AdminEndpoint extends AbstractEndpoint {
     private static void createAndSendInvite(DbEndUser user, DbOrganisation org, List<DbAbstractTable> toSave) throws Exception {
         UUID userUuid = user.getEndUserUuid();
 
-        DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
-        invite.setEndUserUuid(userUuid);
-
         //use a base64 encoded version of a random UUID
         String tokenUuid = UUID.randomUUID().toString();
         String token = Base64.getEncoder().encodeToString(tokenUuid.getBytes());
+
+        DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
+        invite.setEndUserUuid(userUuid);
         invite.setUniqueToken(token);
+        toSave.add(invite);
 
         //send the invite email before saving to the DB
-        EmailProvider.getInstance().sendInviteEmail(user, org, token);
-
-        //only save AFTER we've successfully send the invite email
-        toSave.add(invite);
+        if (!EmailProvider.getInstance().sendInviteEmail(user, org, token)) {
+            throw new InternalServerErrorException("Failed to send invitation email");
+        }
     }
 
     @POST
@@ -358,6 +363,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteUser")
     public Response deleteUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         //first, verify the user is an admin
         boolean isAdmin = super.isAdminFromSession(sc);
         if (!isAdmin) {
@@ -387,6 +394,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
+        super.clearLogbackMarkers();
+
         //don't bother returning anything to the client
         return Response
                 .ok()
@@ -398,6 +407,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getUsers")
     public Response getUsers(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         LOG.trace("GettingUsers");
@@ -427,7 +437,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        //testSql();
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -474,6 +484,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/resendInviteEmail")
     public Response resendInviteEmail(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         //first, verify the user is an admin
         boolean isAdmin = super.isAdminFromSession(sc);
         if (!isAdmin) {
@@ -502,6 +514,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         createAndSendInvite(user, org, toSave);
 
         DatabaseManager.db().writeEntities(toSave);
+
+        super.clearLogbackMarkers();
 
         return Response
                 .ok()

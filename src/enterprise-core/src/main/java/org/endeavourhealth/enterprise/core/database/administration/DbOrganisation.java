@@ -2,8 +2,6 @@ package org.endeavourhealth.enterprise.core.database.administration;
 
 import org.endeavourhealth.enterprise.core.database.*;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

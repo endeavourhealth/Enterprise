@@ -6,20 +6,13 @@ import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.json.*;
-import org.endeavourhealth.enterprise.core.Examples;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.administration.*;
-import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -92,17 +85,17 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         Boolean isAdminForAutoSelect = null;
 
         //now see what organisations the person can access
-        //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
+        //if the person is a superUser, then we want to now prompt them to log on to ANY lookups
         if (user.isSuperUser()) {
             List<DbOrganisation> orgs = DbOrganisation.retrieveForAll();
 
             for (int i = 0; i < orgs.size(); i++) {
                 DbOrganisation o = orgs.get(i);
 
-                //super-users are assumed to be admins at every organisation
+                //super-users are assumed to be admins at every lookups
                 ret.add(o, new Boolean(true));
 
-                //if there's only one organisation, automatically select it
+                //if there's only one lookups, automatically select it
                 if (orgs.size() == 1) {
                     orgToAutoSelect = o;
                     isAdminForAutoSelect = new Boolean(true);
@@ -123,7 +116,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 Boolean isAdmin = new Boolean(orgLink.isAdmin());
                 ret.add(o, isAdmin);
 
-                //if there's only one organisation, automatically select it
+                //if there's only one lookups, automatically select it
                 if (orgLinks.size() == 1) {
                     orgToAutoSelect = o;
                     isAdminForAutoSelect = new Boolean(isAdmin);
@@ -136,7 +129,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -160,10 +153,10 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         LOG.trace("Selecting organisationUUID {}", orgUuid);
 
-        //validate the organisation exists
+        //validate the lookups exists
         DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
         if (org == null) {
-            throw new BadRequestException("Invalid organisation " + orgUuid);
+            throw new BadRequestException("Invalid lookups " + orgUuid);
         }
 
         //validate the person can log on there
@@ -185,19 +178,19 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             }
 
             if (link == null) {
-                throw new BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
+                throw new BadRequestException("Invalid lookups " + orgUuid + " or user doesn't have access");
             }
 
             isAdmin = link.isAdmin();
         }
 
-        //issue a new cookie, with the newly selected organisation
+        //issue a new cookie, with the newly selected lookups
         NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, isAdmin);
 
         //return the full org details and the user's role at this place
         JsonOrganisation ret = new JsonOrganisation(org, isAdmin);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -219,7 +212,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //replace the cookie on the client with an empty one
         NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -273,7 +266,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, isAdmin);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -298,7 +291,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
             UUID userUuid = user.getEndUserUuid();
 
-            //the email needs to be linked to an organisation, so just choose one the user can access
+            //the email needs to be linked to an lookups, so just choose one the user can access
             List<DbOrganisationEndUserLink> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
             if (!orgLinks.isEmpty()) {
                 DbOrganisationEndUserLink firstLink = orgLinks.get(0);
@@ -334,7 +327,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             }
         }
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()

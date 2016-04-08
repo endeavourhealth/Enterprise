@@ -31,6 +31,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getRecentDocuments")
     public Response getRecentDocuments(@Context SecurityContext sc, @QueryParam("count") int count) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID userUuid = getEndUserUuidFromToken(sc);
 
         LOG.trace("getRecentDocuments {}", count);
@@ -46,6 +48,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
             ret.add(content);
         }
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -57,6 +61,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReportActivity")
     public Response getReportActivity(@Context SecurityContext sc, @QueryParam("count") int count) throws Exception {
+        super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
@@ -77,6 +82,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
             ret.add(new JsonJobReport(name, date));
         }
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -88,6 +95,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getEngineHistory")
     public Response getEngineHistory(@Context SecurityContext sc, @QueryParam("count") int count) throws Exception {
+        super.setLogbackMarkers(sc);
 
         LOG.trace("getEngineHistory {}", count);
 
@@ -98,6 +106,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
             JsonJob jsonJob = new JsonJob(job);
             ret.add(jsonJob);
         }
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -110,6 +120,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/testDatabase")
     public Response testDatabase(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
 
         if (!getEndUserFromSession(sc).isSuperUser()) {
             throw new BadRequestException();
@@ -118,6 +129,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         LOG.trace("testDatabase");
 
         DatabaseManager.getInstance().sqlTest();
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()

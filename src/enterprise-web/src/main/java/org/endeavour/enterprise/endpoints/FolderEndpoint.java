@@ -34,7 +34,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveFolder")
     public Response saveFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception {
-        //get the parameters out
+        super.setLogbackMarkers(sc);
+
         UUID folderUuid = folderParameters.getUuid();
         String folderName = folderParameters.getFolderName();
         Integer folderType = folderParameters.getFolderType();
@@ -105,6 +106,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         JsonFolder ret = new JsonFolder();
         ret.setUuid(folderUuid);
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -116,11 +119,11 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteFolder")
     public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception {
-        //get the organisation from the server token
+        super.setLogbackMarkers(sc);
+
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
 
-        //get the parameters out
         UUID folderUuid = folderParameters.getUuid();
 
         LOG.trace("DeletingFolder FolderUUID {}", folderUuid);
@@ -135,6 +138,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         JsonDeleteResponse ret = deleteItem(folderUuid, orgUuid, userUuid);
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -147,6 +152,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolders")
     public Response getFolders(@Context SecurityContext sc, @QueryParam("folderType") int folderType, @QueryParam("parentUuid") String parentUuidStr) throws Exception {
+        super.setLogbackMarkers(sc);
+
         //convert the nominal folder type to the actual Item DefinitionType
         DefinitionItemType itemType = null;
         if (folderType == JsonFolder.FOLDER_TYPE_LIBRARY) {
@@ -199,6 +206,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             ret.add(folder);
         }
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -206,6 +215,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
     }
 
     public static void createTopLevelFolder(UUID organisationUuid, UUID userUuid, DefinitionItemType itemType) throws Exception {
+
         LOG.trace("Creating top-level folder of type {}", itemType);
 
         String title = null;
@@ -238,6 +248,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getFolderContents")
     public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID folderUuid = UUID.fromString(uuidStr);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
@@ -326,6 +338,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
                 throw new RuntimeException("Unexpected content " + item + " in folder");
             }
         }
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()

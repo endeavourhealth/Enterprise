@@ -10,6 +10,8 @@ import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
+import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisationSet;
 
 import java.util.List;
 import java.util.UUID;
@@ -110,5 +112,16 @@ public interface DatabaseI {
     public DbJobReportItemOrganisation retrieveJobReportItemOrganisationForJobReportItemAndOdsCode(UUID jobReportItemUUid, String odsCode) throws Exception;
 
     public List<DbJobProcessorResult> retrieveJobProcessorResultsForJob(UUID jobUuid) throws Exception;
+
+    public List<DbSourceOrganisationSet> retrieveAllOrganisationSets(UUID organisationUuid) throws Exception;
+
+    public List<DbSourceOrganisationSet> retrieveOrganisationSetsForSearchTerm(UUID organisationUuid, String searchTerm) throws Exception;
+
+    public List<DbSourceOrganisation> retrieveAllSourceOrganisations(boolean includeUnreferencedOnes) throws Exception;
+
+    public List<DbSourceOrganisation> retrieveSourceOrganisationsForSearch(String searchTerm) throws Exception;
+
+    public List<DbSourceOrganisation> retrieveSourceOrganisationsForOdsCodes(List<String> odsCodes) throws Exception;
+
 
 }

@@ -1,7 +1,6 @@
 package org.endeavour.enterprise.email;
 
 import org.endeavour.enterprise.framework.config.models.Template;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 import org.slf4j.Logger;

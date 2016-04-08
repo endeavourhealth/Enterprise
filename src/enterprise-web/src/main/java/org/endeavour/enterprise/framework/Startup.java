@@ -1,20 +1,16 @@
 package org.endeavour.enterprise.framework;
 
+import org.endeavour.enterprise.email.EmailProvider;
 import org.endeavour.enterprise.framework.config.ConfigSerializer;
 import org.endeavour.enterprise.framework.config.models.Config;
 import org.endeavour.enterprise.framework.config.models.Email;
 import org.endeavour.enterprise.framework.config.models.Template;
-import org.endeavour.enterprise.email.EmailProvider;
 import org.endeavour.enterprise.framework.config.models.WebServer;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
-import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.lookups.SourceOrganisation;
-import org.endeavourhealth.enterprise.core.lookups.SourceOrganisationUpdater;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.ArrayList;
 import java.util.List;
 
 public final class Startup implements ServletContextListener {

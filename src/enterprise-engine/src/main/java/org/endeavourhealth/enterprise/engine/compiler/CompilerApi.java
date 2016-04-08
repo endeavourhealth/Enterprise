@@ -40,8 +40,12 @@ public class CompilerApi {
         for (LibraryItem libraryItem : requiredLibraryItems) {
 
             if (libraryItem.getDataSource() != null) {
-                ICompiledDataSource compiledDataSource = dataSourceCompiler.compile(libraryItem.getDataSource(), compilerContext);
-                compiledLibrary.add(libraryItem, compiledDataSource);
+                try {
+                    ICompiledDataSource compiledDataSource = dataSourceCompiler.compile(libraryItem.getDataSource(), compilerContext);
+                    compiledLibrary.add(libraryItem, compiledDataSource);
+                } catch (Exception e) {
+                    throw new UnableToCompileExpection("Could not compiled DataSource: " + libraryItem.getUuid());
+                }
             }
         }
     }
@@ -50,19 +54,27 @@ public class CompilerApi {
         for (LibraryItem libraryItem : requiredLibraryItems) {
 
             if (libraryItem.getTest() != null) {
-                ICompiledTest compiledTest = testCompiler.compile(libraryItem.getTest(), compilerContext);
-                compiledLibrary.add(libraryItem, compiledTest);
+                try {
+                    ICompiledTest compiledTest = testCompiler.compile(libraryItem.getTest(), compilerContext);
+                    compiledLibrary.add(libraryItem, compiledTest);
+                } catch (Exception e) {
+                    throw new UnableToCompileExpection("Could not compiled Test: " + libraryItem.getUuid());
+                }
             }
         }
     }
 
-    private void compileQueries() throws InvalidQueryDocumentException {
+    private void compileQueries() throws Exception {
 
         for (LibraryItem libraryItem : requiredLibraryItems) {
 
             if (libraryItem.getQuery() != null) {
-                CompiledQuery compiledQuery = queryCompiler.compile(compilerContext, libraryItem.getQuery());
-                compiledLibrary.add(libraryItem, compiledQuery);
+                try {
+                    CompiledQuery compiledQuery = queryCompiler.compile(compilerContext, libraryItem.getQuery());
+                    compiledLibrary.add(libraryItem, compiledQuery);
+                } catch (Exception e) {
+                    throw new UnableToCompileExpection("Could not compiled Query: " + libraryItem.getUuid());
+                }
             }
         }
     }

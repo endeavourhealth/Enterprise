@@ -41,15 +41,26 @@ public class CompiledLibrary {
         addCompiledLibraryItem(libraryItem, compiledItem);
     }
 
-    public void addInlineDataSource(UUID dataSourceUuid, ICompiledDataSource dataSource) {
+    public void addInlineDataSource(UUID dataSourceUuid, ICompiledDataSource compiledItem) {
 
         CompiledLibraryItem item = new CompiledLibraryItem(
                 "Inline datasource",
                 dataSourceUuid,
                 true,
-                dataSource);
+                compiledItem);
 
         libraryItemMap.put(dataSourceUuid, item);
+    }
+
+    public void addInlineTest(UUID testUuid, ICompiledTest compiledItem) {
+
+        CompiledLibraryItem item = new CompiledLibraryItem(
+                "Inline test",
+                testUuid,
+                true,
+                compiledItem);
+
+        libraryItemMap.put(testUuid, item);
     }
 
     private void addCompiledLibraryItem(LibraryItem libraryItem, Object compiledItem) {

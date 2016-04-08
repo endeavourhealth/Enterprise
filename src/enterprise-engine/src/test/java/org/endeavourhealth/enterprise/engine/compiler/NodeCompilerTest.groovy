@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.engine.compiler
 
 import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException
+import org.junit.Assert
 import org.junit.Test
 
 import static org.mockito.Mockito.*;
@@ -375,8 +376,8 @@ class NodeCompilerTest {
 
             try {
                 createTraversal();
-                fail( "Expected InvalidQueryDocumentException exception but no exception thrown" );
-            } catch (InvalidQueryDocumentException e) {
+                Assert.fail("Expected InvalidQueryDocumentException exception but no exception thrown" );
+            } catch (InvalidQueryDocumentException) {
             }
         }
 

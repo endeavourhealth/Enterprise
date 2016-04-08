@@ -1,7 +1,6 @@
 package org.endeavourhealth.enterprise.engine.compiled;
 
 import com.sun.istack.internal.Nullable;
-import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.engine.execution.ExecutionContext;
 
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public class CompiledQuery implements INodeExecutor {
     }
 
     @Override
-    public boolean execute(Node node) {
+    public boolean execute(Node node) throws Exception {
 
         ICompiledRule rule = nodeToRuleMap.get(node);
 

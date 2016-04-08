@@ -7,6 +7,7 @@ import org.endeavourhealth.enterprise.core.querydocument.models.OrderDirection
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueAbsoluteUnit
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueFrom
 import org.endeavourhealth.enterprise.core.querydocument.models.ValueFromOperator
+import org.endeavourhealth.enterprise.engine.UnableToCompileExpection
 import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary
 import org.endeavourhealth.enterprise.engine.execution.ExecutionContext
 import org.endeavourhealth.enterprise.engine.testhelpers.CompiledLibraryBuilder
@@ -189,7 +190,7 @@ class TestCompilerTest {
     }
 
 
-    @Test(expected = InvalidQueryDocumentException.class)
+    @Test(expected = UnableToCompileExpection.class)
     void testCompiler_fieldTestsWithMultipleRows_exception() {
 
         EntityMapWrapper.EntityMap entityMap = new EntityMapBuilder()

@@ -4,7 +4,6 @@ import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType
 import org.endeavourhealth.enterprise.core.querydocument.models.*
 import org.endeavourhealth.enterprise.engine.testhelpers.FieldTesterBuilder
 import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException
-import org.junit.Ignore
 import org.junit.Test
 
 import java.time.LocalDate
@@ -214,7 +213,7 @@ class FieldCompilerTest {
         def to = new ValueTo(operator: ValueToOperator.LESS_THAN_OR_EQUAL_TO, constant: "50.5", absoluteUnit: ValueAbsoluteUnit.NUMERIC);
         ValueRange range = new ValueRange(valueFrom: from, valueTo: to);
 
-        FieldTesterBuilder.FieldAssertion assertion = new FieldTesterBuilder()
+        new FieldTesterBuilder()
                 .setDataType(LogicalDataType.FLOAT)
                 .setFieldTest(range)
                 .build();
@@ -227,7 +226,7 @@ class FieldCompilerTest {
         def to = new ValueTo(operator: ValueToOperator.LESS_THAN_OR_EQUAL_TO, constant: "50.5", absoluteUnit: ValueAbsoluteUnit.NUMERIC);
         ValueRange range = new ValueRange(valueFrom: from, valueTo: to);
 
-        FieldTesterBuilder.FieldAssertion assertion = new FieldTesterBuilder()
+        new FieldTesterBuilder()
                 .setDataType(LogicalDataType.FLOAT)
                 .setFieldTest(range)
                 .build();

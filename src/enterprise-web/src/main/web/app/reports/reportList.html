@@ -124,7 +124,7 @@
 										<div class="panel-body">
 											<div class="row">
 												<label class="col-md-3">Population count :</label>
-												<p class="col-md-9">{{ ctrl.selectedScheduleResults.populationCount }}</p>
+												<p class="col-md-9">{{ ctrl.selectedScheduleResults.populationCount | number }}</p>
 											</div>
 
 											<div ui-tree data-nodrop-enabled="true" data-nodrag  id="tree-root">
@@ -158,7 +158,7 @@
 				<span class="fa fa-comment fa-right-pad text-muted" uib-tooltip="{{node.description}}" ng-show="node.description"></span>
 			</div>
 			<div class="col-md-3">
-				<span>{{node.resultCount}}</span>
+				<span>{{node.resultCount | number }}</span>
 			</div>
 			<div class="col-md-3">
 				<span>{{node.percentageOfParent | number:4 }}%</span>

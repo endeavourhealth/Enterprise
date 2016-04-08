@@ -7,6 +7,8 @@ module app.dialogs {
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import Report = app.models.Report;
 	import RequestParameters = app.models.RequestParameters;
+	import IOrganisationService = app.core.IOrganisationService;
+	import OrganisationSet = app.models.OrganisationSet;
 
 	'use strict';
 
@@ -32,11 +34,14 @@ module app.dialogs {
 		patientStatusDisplay : any;
 		baselineDate : Date;
 
-		static $inject = ['$uibModalInstance', 'LoggerService', 'AdminService', 'reportUuid', 'reportName'];
+		static $inject = ['$uibModalInstance', 'LoggerService', 'AdminService', 'OrganisationService', '$uibModal',
+			'reportUuid', 'reportName'];
 
 		constructor(protected $uibModalInstance : IModalServiceInstance,
 								private logger:app.blocks.ILoggerService,
 								private adminService : IAdminService,
+								private organisationService : IOrganisationService,
+								private $modal : IModalService,
 								private reportUuid : string,
 								private reportName : string) {
 			super($uibModalInstance);
@@ -57,10 +62,30 @@ module app.dialogs {
 				baselineDate: null,
 				patientType: 'regular',
 				patientStatus: 'active',
-				organisation: null
+				organisation: []
 			};
 
 			this.resultData = requestParameters;
+		}
+
+		getOrganisationListDisplayText() {
+			if (this.resultData.organisation && this.resultData.organisation.length > 0) {
+				return this.resultData.organisation.length + ' Organisation(s)';
+			} else {
+				return 'All Organisations';
+			}
+		}
+
+		pickOrganisationList() {
+			var vm = this;
+			OrganisationPickerController.open(vm.$modal, this.resultData.organisation, null)
+				.result.then(function(organisationSet : OrganisationSet) {
+					vm.resultData.organisation = organisationSet.organisations;
+			});
+		}
+
+		clearOrganisationList() {
+			this.resultData.organisation = [];
 		}
 
 		ok() {

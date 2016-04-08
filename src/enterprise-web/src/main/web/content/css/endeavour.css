@@ -41,19 +41,28 @@
     background-color: #f8f8f8;
 }
 
+.scroll-box-50 {
+    height: 50px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 .scroll-box-150 {
     height: 150px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .scroll-box-300 {
     height: 300px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .scroll-box-450 {
     height: 450px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .show-child-on-hover .child-to-show {

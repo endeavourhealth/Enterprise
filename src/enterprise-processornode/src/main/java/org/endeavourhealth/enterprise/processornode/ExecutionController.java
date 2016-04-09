@@ -31,6 +31,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     private final ControllerQueue controllerQueue;
     private final WorkerQueue workerQueue;
     private final UUID processorNodeUuid;
+    private final Statistics statistics = new Statistics();
 
     private ProcessorThreadPoolExecutor executor;
     private WorkerQueueBatchMessage currentWorkerQueueBatch;
@@ -62,14 +63,28 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     }
 
     public void start() throws Exception {
+        statistics.jobStarted();
+        notifyControllerThatJobHasStarted();
+
         EntityMapWrapper.EntityMap entityMap = getEntityMap();
 
         this.engineApi = createEngineApi(entityMap);
 
         createProcessorThreadPoolExecutor(entityMap);
 
+        statistics.initialisationComplete();
+
         if (!requestNextWorkerQueueMessage())
             workComplete();
+    }
+
+    private void notifyControllerThatJobHasStarted() throws IOException {
+
+        ControllerQueueProcessorNodeStartedMessage message = ControllerQueueProcessorNodeStartedMessage.CreateAsNew(
+                getJobUuid(),
+                processorNodeUuid);
+
+        controllerQueue.sendMessage(message);;
     }
 
     private EngineApi createEngineApi(EntityMapWrapper.EntityMap entityMap) throws Exception {
@@ -86,7 +101,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         EngineProcessorPool engineProcessorPool = new EngineProcessorPool(engineApi, configuration.getExecutionThreads());
         DataContainerPool dataContainerPool = new DataContainerPool(configuration.getDataItemBufferSize(), entityMap);
         CareRecordDal careRecordDal = new CareRecordDal(startMessage.getCareRecordDatabaseConnectionDetails(), dataContainerPool, entityMap);
-        DataSourceRetriever dataSourceRetriever = new DataSourceRetriever(configuration.getDataItemBufferSize(), careRecordDal);
+        DataSourceRetriever dataSourceRetriever = new DataSourceRetriever(configuration.getDataItemBufferSize(), careRecordDal, statistics);
         ExecutionContext executionContext = new ExecutionContext(engineProcessorPool, dataContainerPool);
 
         executor = new ProcessorThreadPoolExecutor(
@@ -107,6 +122,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         currentWorkerQueueBatch = workerQueue.getNextMessage();
 
         if (currentWorkerQueueBatch != null) {
+            statistics.batchReceived();
             executor.setNextBatch(currentWorkerQueueBatch.getPayload().getMinimumId(), currentWorkerQueueBatch.getPayload().getMaximumId());
             return true;
         } else {
@@ -146,6 +162,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     @Override
     public void errorOccurred(Throwable t) {
+        statistics.processingComplete();
         logger.error("Error caught by Execution Controller", t);
 
         try {
@@ -165,12 +182,24 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         }
     }
 
-    public void workComplete() {
+    public void workComplete() throws IOException {
+        logger.debug("Work complete");
+        statistics.processingComplete();
 
         ResultCounts results = engineApi.getResults();
 
-        logger.debug("Work complete");
+        ControllerQueueProcessorNodeCompleteMessage message = ControllerQueueProcessorNodeCompleteMessage.CreateAsNew(
+                getJobUuid(),
+                processorNodeUuid,
+                statistics.getPatientsRetrieved(),
+                0,
+                statistics.getTotalDurationInSeconds(),
+                statistics.getInitialisationTimeInSeconds(),
+                statistics.getPatientRetrievalTimeInSeconds(),
+                statistics.getNumberOfBatches()
+        );
 
+        controllerQueue.sendMessage(message);
     }
 
     @Override

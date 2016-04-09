@@ -23,6 +23,16 @@ public class ControllerQueueWorkItemCompleteMessage {
     public static class WorkItemCompletePayload {
         private UUID executionUuid;
         private long startId;
+        private UUID processorNodeId;
+
+        public WorkItemCompletePayload() {
+        }
+
+        public WorkItemCompletePayload(UUID executionUuid, long startId, UUID processorNodeId) {
+            this.executionUuid = executionUuid;
+            this.startId = startId;
+            this.processorNodeId = processorNodeId;
+        }
 
         public UUID getExecutionUuid() {
             return executionUuid;
@@ -38,6 +48,14 @@ public class ControllerQueueWorkItemCompleteMessage {
 
         public void setStartId(long startId) {
             this.startId = startId;
+        }
+
+        public void setProcessorNodeId(UUID processorNodeId) {
+            this.processorNodeId = processorNodeId;
+        }
+
+        public UUID getProcessorNodeId() {
+            return processorNodeId;
         }
     }
 

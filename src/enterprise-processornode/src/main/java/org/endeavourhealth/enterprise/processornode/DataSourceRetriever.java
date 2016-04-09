@@ -16,10 +16,16 @@ class DataSourceRetriever {
     private long nextStartingId;
     private final long dataItemBufferSize;
     private final CareRecordDal careRecordDal;
+    private final Statistics statistics;
 
-    public DataSourceRetriever(long dataItemBufferSize, CareRecordDal careRecordDal) {
+    public DataSourceRetriever(
+            long dataItemBufferSize,
+            CareRecordDal careRecordDal,
+            Statistics statistics) {
+
         this.dataItemBufferSize = dataItemBufferSize;
         this.careRecordDal = careRecordDal;
+        this.statistics = statistics;
     }
 
     public void setBatch(long minimumId, long maximumId) {
@@ -27,7 +33,7 @@ class DataSourceRetriever {
         this.maximumId = maximumId;
     }
 
-    public Collection<DataContainer> getRecords() throws Exception {
+    public synchronized Collection<DataContainer> getRecords() throws Exception {
 
         while (true) {
 
@@ -43,11 +49,13 @@ class DataSourceRetriever {
             nextStartingId = to + 1;
 
             logger.trace("Getting records " + from + " to " + to);
+            statistics.patientRetrievalStarted();
             Map<Long, DataContainer> dataContainerMap = careRecordDal.getRecords(from, to);
 
             if (dataContainerMap.isEmpty()) {
-                continue;
+                statistics.patientRetrievalStopped(0);
             } else {
+                statistics.patientRetrievalStopped(dataContainerMap.size());
                 return dataContainerMap.values();
             }
         }

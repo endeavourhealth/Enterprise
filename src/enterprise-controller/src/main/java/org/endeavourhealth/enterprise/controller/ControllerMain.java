@@ -4,14 +4,13 @@ import org.endeavourhealth.enterprise.controller.configuration.models.Configurat
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.core.JsonSerializer;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueue;
-import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueueExecutionFailedMessage;
-import org.endeavourhealth.enterprise.enginecore.communication.ControllerQueueWorkItemCompleteMessage;
+import org.endeavourhealth.enterprise.enginecore.communication.*;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueMessageReceiver {
@@ -76,25 +75,79 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
     public synchronized void receiveWorkerItemCompleteMessage(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload) {
         logger.debug("Received worker item complete message: " + payload.getExecutionUuid().toString() + " startID: " + payload.getStartId());
 
-        if (currentJob == null)
+        if (!messageIsForCurrentJob(payload.getExecutionUuid()))
             return;
 
-        if (!currentJob.getExecutionUuid().equals(payload.getExecutionUuid()))
-            return;
-
-        currentJob.workerItemComplete(payload);
+        try {
+            currentJob.workerItemComplete(payload);
+        } catch (Exception e) {
+            logger.error("receiveWorkerItemCompleteMessage failed", e);
+            killCurrentJob();
+        }
     }
 
     @Override
     public void receiveExecutionFailedMessage(ControllerQueueExecutionFailedMessage.ExecutionFailedPayload payload) {
+        try {
+            String text = JsonSerializer.serialize(payload);
 
-        String text = JsonSerializer.serialize(payload);
+            logger.error("Received execution failed message. " + text);
 
-        logger.error("Received execution failed message. " + text);
+            if (currentJob != null && currentJob.getExecutionUuid().equals(payload.getExecutionUuid()))
+                killCurrentJob();
 
-        if (currentJob != null && currentJob.getExecutionUuid().equals(payload.getExecutionUuid()))
-            currentJob.stop();
+        } catch (Exception e) {
+            logger.error("receiveProcessorNodeStartedMessage failed", e);
+            killCurrentJob();
+        }
     }
+
+    private synchronized void killCurrentJob() {
+        if (currentJob != null) {
+
+            logger.debug("Killing current job: " + currentJob.getExecutionUuid());
+            currentJob.stop();
+            currentJob = null;
+        }
+    }
+
+    @Override
+    public void receiveProcessorNodeStartedMessage(ControllerQueueProcessorNodeStartedMessage.ProcessorNodeStartedPayload payload) {
+        try {
+            logger.debug("Received processor node started message: " + payload.getExecutionUuid().toString() + " ProcessorId: " + payload.getProcessorUuid());
+
+            if (!messageIsForCurrentJob(payload.getExecutionUuid()))
+                return;
+
+            currentJob.processorNodeStarted(payload);
+        } catch (Exception e) {
+            logger.error("receiveProcessorNodeStartedMessage failed", e);
+            killCurrentJob();
+        }
+    }
+
+    @Override
+    public void receiveProcessorNodeCompleteMessage(ControllerQueueProcessorNodeCompleteMessage.ProcessorNodeCompletePayload payload) {
+        try {
+            logger.debug("Received processor node complete message: " + payload.getExecutionUuid().toString() + " ProcessorId: " + payload.getProcessorUuid());
+
+            if (!messageIsForCurrentJob(payload.getExecutionUuid()))
+                return;
+
+            currentJob.processorNodeComplete(payload);
+        } catch (Exception e) {
+            logger.error("receiveProcessorNodeCompleteMessage failed", e);
+            killCurrentJob();
+        }
+    }
+
+    private boolean messageIsForCurrentJob(UUID executionUuid) {
+        if (currentJob == null)
+            return false;
+
+        return currentJob.getExecutionUuid().equals(executionUuid);
+    }
+
 
 //    public void requestCancelCurrentJob() {
 //        if (currentJob == null)
@@ -104,8 +157,4 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
 //        currentJob = null;
 //    }
 //
-//    public workerQueueItemComplete() {
-//        if (currentJob == null)
-//            return;
-//    }
 }

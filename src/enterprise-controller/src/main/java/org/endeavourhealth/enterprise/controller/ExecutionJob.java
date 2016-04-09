@@ -30,9 +30,8 @@ class ExecutionJob {
     private Configuration configuration;
     private final static Logger logger = LoggerFactory.getLogger(ExecutionJob.class);
     private SourceStatistics primaryTableStats;
-    private HashSet<Long> workerItemStartIds = new HashSet<>();
+    private final JobProgressTracker jobProgressTracker = new JobProgressTracker();
     private DbJob dbJob;
-
 
     public ExecutionJob(Configuration configuration) {
         this.configuration = configuration;
@@ -68,10 +67,10 @@ class ExecutionJob {
     }
 
     public void stop() {
-        dbJob.setSaveMode(TableSaveMode.UPDATE);
-        dbJob.markAsFinished(ExecutionStatus.Failed);
-
         try {
+            dbJob.setSaveMode(TableSaveMode.UPDATE);
+            dbJob.markAsFinished(ExecutionStatus.Failed);
+
             dbJob.writeToDb();
             logger.debug("Execution Job failed: " + executionUuid.toString());
             stopExecutionNodes();
@@ -218,7 +217,6 @@ class ExecutionJob {
         QueueConnectionProperties connectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
         long minimumId = primaryTableStats.getMinimumId();
         long maximumId;
-        int numberOfBatches = 0;
         String queueName = WorkerQueue.calculateWorkerQueueName(configuration.getMessageQueuing().getWorkerQueuePrefix(), executionUuid);
 
         try (WorkerQueue queue = new WorkerQueue(connectionProperties, queueName)) {
@@ -238,8 +236,7 @@ class ExecutionJob {
                         maximumId);
 
                 queue.sendMessage(message);
-                workerItemStartIds.add(minimumId);
-                numberOfBatches++;
+                jobProgressTracker.registerWorkerItemStartId(minimumId);
 
                 if (maximumId >= primaryTableStats.getMaximumId())
                     break;
@@ -247,7 +244,7 @@ class ExecutionJob {
                 minimumId = maximumId + 1;
             }
 
-            String message = String.format("Added IDs %s to %s in %s batches to Worker queue", primaryTableStats.getMinimumId(), primaryTableStats.getMaximumId(), numberOfBatches);
+            String message = String.format("Added IDs %s to %s in %s batches to Worker queue", primaryTableStats.getMinimumId(), primaryTableStats.getMaximumId(), jobProgressTracker.getTotalNumberOfBatches());
             queue.logDebug(message);
         }
     }
@@ -283,15 +280,11 @@ class ExecutionJob {
         exchange.sendMessage(message);
     }
 
-    public synchronized void workerItemComplete(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload) {
+    public synchronized void workerItemComplete(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload) throws Exception {
         if (!executionUuid.equals(payload.getExecutionUuid()))
             return;
 
-        if (workerItemStartIds.contains(payload.getStartId()))
-            workerItemStartIds.remove(payload.getStartId());
-
-        if (workerItemStartIds.isEmpty())
-            jobFinished();
+        jobProgressTracker.receivedWorkItemComplete(payload.getStartId());
     }
 
     private void jobFinished() {
@@ -314,5 +307,22 @@ class ExecutionJob {
         cal1.setTimeInMillis(now.toEpochMilli());
 
         return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal1);
+    }
+
+    public void processorNodeComplete(ControllerQueueProcessorNodeCompleteMessage.ProcessorNodeCompletePayload payload) throws Exception {
+        if (!executionUuid.equals(payload.getExecutionUuid()))
+            return;
+
+        jobProgressTracker.receivedProcessorNodeCompleteMessage(payload.getProcessorUuid());
+
+        if (jobProgressTracker.isComplete())
+            jobFinished();
+    }
+
+    public void processorNodeStarted(ControllerQueueProcessorNodeStartedMessage.ProcessorNodeStartedPayload payload) throws Exception {
+        if (!executionUuid.equals(payload.getExecutionUuid()))
+            return;
+
+        jobProgressTracker.receivedProcessorNodeStartedMessage(payload.getProcessorUuid());
     }
 }

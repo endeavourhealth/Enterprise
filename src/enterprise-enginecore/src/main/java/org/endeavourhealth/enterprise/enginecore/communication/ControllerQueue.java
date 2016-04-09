@@ -52,6 +52,13 @@ public class ControllerQueue implements AutoCloseable {
                 } else if (ControllerQueueExecutionFailedMessage.isTypeOf(message)) {
                     ControllerQueueExecutionFailedMessage realMessage = ControllerQueueExecutionFailedMessage.CreateFromMessage(message);
                     receiver.receiveExecutionFailedMessage(realMessage.getPayload());
+                } else if (ControllerQueueProcessorNodeCompleteMessage.isTypeOf(message)) {
+                    ControllerQueueProcessorNodeCompleteMessage realMessage = ControllerQueueProcessorNodeCompleteMessage.CreateFromMessage(message);
+                    receiver.receiveProcessorNodeCompleteMessage(realMessage.getPayload());
+                } else if (ControllerQueueProcessorNodeStartedMessage.isTypeOf(message)) {
+                    ControllerQueueProcessorNodeStartedMessage realMessage = ControllerQueueProcessorNodeStartedMessage.CreateFromMessage(message);
+                    receiver.receiveProcessorNodeStartedMessage(realMessage.getPayload());
+
                 } else {
                     throw new UnsupportedOperationException("Message type not supported: " + properties.getType());
                 }
@@ -71,8 +78,18 @@ public class ControllerQueue implements AutoCloseable {
         channel.publishDirectlyToQueue(queueName, message.getMessage());
     }
 
+    public void sendMessage(ControllerQueueProcessorNodeCompleteMessage message) throws IOException {
+        channel.publishDirectlyToQueue(queueName, message.getMessage());
+    }
+
+    public void sendMessage(ControllerQueueProcessorNodeStartedMessage message) throws IOException {
+        channel.publishDirectlyToQueue(queueName, message.getMessage());
+    }
+
     public interface IControllerQueueMessageReceiver {
         void receiveWorkerItemCompleteMessage(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload);
         void receiveExecutionFailedMessage(ControllerQueueExecutionFailedMessage.ExecutionFailedPayload payload);
+        void receiveProcessorNodeCompleteMessage(ControllerQueueProcessorNodeCompleteMessage.ProcessorNodeCompletePayload payload);
+        void receiveProcessorNodeStartedMessage(ControllerQueueProcessorNodeStartedMessage.ProcessorNodeStartedPayload payload);
     }
 }

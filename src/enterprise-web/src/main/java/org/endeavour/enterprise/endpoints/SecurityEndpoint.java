@@ -6,20 +6,13 @@ import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.json.*;
-import org.endeavourhealth.enterprise.core.Examples;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.administration.*;
-import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -136,7 +129,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -197,7 +190,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //return the full org details and the user's role at this place
         JsonOrganisation ret = new JsonOrganisation(org, isAdmin);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -219,7 +212,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //replace the cookie on the client with an empty one
         NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -273,7 +266,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, isAdmin);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -334,7 +327,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             }
         }
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()

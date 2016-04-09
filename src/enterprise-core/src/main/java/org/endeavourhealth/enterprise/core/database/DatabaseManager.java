@@ -7,7 +7,6 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.db.ConnectionSource;
 import ch.qos.logback.core.db.dialect.SQLDialectCode;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.util.CollectionUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
@@ -17,12 +16,13 @@ import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
 import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
+import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisationSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -234,6 +234,12 @@ public final class DatabaseManager {
 
         List<DbAbstractTable> entities = new ArrayList<>();
 
+        DbSourceOrganisation sourceOrganisation = new DbSourceOrganisation();
+        sourceOrganisation.setName("Name");
+        sourceOrganisation.setOdsCode("OdsCode");
+        sourceOrganisation.setReferencedByData(true);
+        entities.add(sourceOrganisation);
+
         DbOrganisation organisation = new DbOrganisation();
         organisation.assignPrimaryUUid();
         organisation.setName("OrgName");
@@ -274,6 +280,13 @@ public final class DatabaseManager {
         organisationEndUserLink.setDtExpired(null);
         organisationEndUserLink.setOrganisationUuid(orgUuid);
         entities.add(organisationEndUserLink);
+
+        DbSourceOrganisationSet set = new DbSourceOrganisationSet();
+        set.assignPrimaryUUid();
+        set.setOrganisationUuid(orgUuid);
+        set.setName("Name");
+        set.setOdsCodes("OdsCodes");
+        entities.add(set);
 
         DbAudit audit = new DbAudit();
         audit.assignPrimaryUUid();
@@ -379,21 +392,27 @@ public final class DatabaseManager {
         //now insert the new entities
         for (DbAbstractTable entity: entities) {
             entity.setSaveMode(TableSaveMode.INSERT);
+            LOG.debug("INSERT " + entity.getClass());
             entity.writeToDb();
+            LOG.debug("ok");
         }
 
         //now we've tested inserting, test an update to each item
         for (DbAbstractTable entity: entities) {
+            LOG.debug("UPDATE " + entity.getClass());
             entity.setSaveMode(TableSaveMode.UPDATE);
             entity.writeToDb();
+            LOG.debug("ok");
         }
 
         //now we've tested inserting and updating, we should test a delete
         Collections.reverse(entities); //reverse, so the FK dependencies don't cause problems
 
         for (DbAbstractTable entity: entities) {
+            LOG.debug("DELETE " + entity.getClass());
             entity.setSaveMode(TableSaveMode.DELETE);
             entity.writeToDb();
+            LOG.debug("ok");
         }
 
 

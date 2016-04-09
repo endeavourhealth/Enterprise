@@ -31,6 +31,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getLibraryItem")
     public Response getLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID libraryItemUuid = UUID.fromString(uuidStr);
 
         LOG.trace("GettingLibraryItem for UUID {}", libraryItemUuid);
@@ -39,6 +41,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         String xml = item.getXmlContent();
 
         LibraryItem ret = QueryDocumentSerializer.readLibraryItemFromXml(xml);
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -51,6 +55,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveLibraryItem")
     public Response saveLibraryItem(@Context SecurityContext sc, LibraryItem libraryItem) throws Exception {
+        super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
@@ -107,6 +112,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         LibraryItem ret = new LibraryItem();
         ret.setUuid(libraryItemUuid.toString());
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -118,6 +125,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteLibraryItem")
     public Response deleteLibraryItem(@Context SecurityContext sc, LibraryItem libraryItem) throws Exception {
+        super.setLogbackMarkers(sc);
 
         UUID libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -126,6 +134,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         LOG.trace("DeletingLibraryItem UUID {}", libraryItemUuid);
 
         JsonDeleteResponse ret = deleteItem(libraryItemUuid, orgUuid, userUuid);
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -138,8 +148,9 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getContentNamesForReportLibraryItem")
     public Response getContentNamesForReportLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID itemUuid = UUID.fromString(uuidStr);
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         LOG.trace("getContentNamesforReportLibraryItem for UUID {}", itemUuid);
 
@@ -155,6 +166,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             JsonFolderContent content = new JsonFolderContent(item, null);
             ret.addContent(content);
         }
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()

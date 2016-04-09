@@ -2,71 +2,55 @@
 /// <reference path="../core/library.service.ts" />
 
 module app.organisationSet {
-	import LibraryItem = app.models.LibraryItem;
-	import ILibraryService = app.core.ILibraryService;
-	import IModalScope = angular.ui.bootstrap.IModalScope;
-	import IWindowService = angular.IWindowService;
-	import CodeSetValue = app.models.CodeSetValue;
-	import ICodingService = app.core.ICodingService;
-	import Concept = app.models.Concept;
-	import CodePickerController = app.dialogs.CodePickerController;
-	import LibraryItemModuleBase = app.library.LibraryItemModuleBase;
+	import OrganisationPickerController = app.dialogs.OrganisationPickerController;
+	import IOrganisationService = app.core.IOrganisationService;
+	import OrganisationSet = app.models.OrganisationSet;
+	import OrganisationSetMember = app.models.OrganisationSetMember;
 	'use strict';
 
-	export class OrganisationSetController extends LibraryItemModuleBase {
-		libraryItem : LibraryItem;
-		termCache : any;
+	export class OrganisationSetController {
+		organisationSets : OrganisationSet[];
+		selectedOrganisationSet : OrganisationSet;
 
-		static $inject = ['LibraryService', 'LoggerService',
-			'$uibModal', 'AdminService', '$window', '$stateParams', 'CodingService'];
+		static $inject = ['$uibModal', 'OrganisationService', 'LoggerService'];
 
-		constructor(
-			protected libraryService : ILibraryService,
-			protected logger : ILoggerService,
-			protected $modal : IModalService,
-			protected adminService : IAdminService,
-			protected $window : IWindowService,
-			protected $stateParams : {itemAction : string, itemUuid : string},
-			protected codingService : ICodingService) {
-
-			super(libraryService, adminService, logger, $window, $stateParams);
-			this.termCache = {};
+		constructor(private $modal : IModalService,
+								private organisationService : IOrganisationService,
+								private log : ILoggerService) {
+			this.getRootFolders();
 		}
 
-		create(folderUuid : string) {
-			super.create(folderUuid);
-			this.libraryItem.codeSet =  {
-					codingSystem: 'SNOMED_CT',
-					codeSetValue: []
-				};
-		}
-
-		termShorten(term : string) {
-			term = term.replace(' (disorder)', '');
-			term = term.replace(' (observable entity)', '');
-			term = term.replace(' (finding)', '');
-			return term;
-		}
-
-		getTerm(code : string) : string {
+		getRootFolders() {
 			var vm = this;
-			var term = vm.termCache[code];
-			if (term) { return term; }
-			vm.termCache[code] = 'Loading...';
-
-			vm.codingService.getPreferredTerm(code)
-				.then(function(concept:Concept) {
-					vm.termCache[code] = vm.termShorten(concept.preferredTerm);
+			vm.organisationService.getOrganisationSets()
+				.then(function(result) {
+					vm.organisationSets = result;
 				});
-
-			return vm.termCache[code];
 		}
 
-		showCodePicker() {
+		selectOrganisationSet(item : any) {
 			var vm = this;
-			CodePickerController.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
-				.result.then(function(result) {
-					vm.libraryItem.codeSet.codeSetValue = result;
+
+			vm.selectedOrganisationSet = item;
+
+			// Load members if necessary
+			if (!item.organisations || item.organisations.length === 0) {
+				vm.organisationService.getOrganisationSetMembers(item.uuid)
+					.then(function (result:OrganisationSetMember[]) {
+						vm.selectedOrganisationSet.organisations = result;
+					});
+			}
+		}
+
+		showOrganisationPicker() {
+			var vm = this;
+			OrganisationPickerController.open(vm.$modal, null, vm.selectedOrganisationSet)
+				.result.then(function(organisationSet : OrganisationSet) {
+				vm.organisationService.saveOrganisationSet(organisationSet)
+					.then(function(result : OrganisationSet) {
+						vm.log.success('Organisation set saved', organisationSet, 'Save set');
+						vm.selectedOrganisationSet.organisations = organisationSet.organisations;
+					});
 			});
 		}
 	}

@@ -10,6 +10,8 @@ import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
+import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisationSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,46 +30,6 @@ final class SqlServerDatabase implements DatabaseI {
     private HashMap<TableAdapter, String> parameterisedInsertSql = new HashMap<>();
     private HashMap<TableAdapter, String> parameterisedUpdateSql = new HashMap<>();
     private HashMap<TableAdapter, String> parameterisedDeleteSql = new HashMap<>();
-
-    /**
-     * converts objects to Strings for SQL, escaping as required
-     */
-    /*private static String convertToString(Object o) {
-        if (o == null) {
-            return "null";
-        } else if (o instanceof String) {
-            String s = ((String) o).replaceAll("'", "''");
-            return "'" + s + "'";
-        } else if (o instanceof Integer) {
-            return "" + ((Integer) o).intValue();
-        } else if (o instanceof UUID) {
-            return "'" + ((UUID) o).toString() + "'";
-        } else if (o instanceof Boolean) {
-            if (((Boolean) o).booleanValue()) {
-                return "1";
-            } else {
-                return "0";
-            }
-        } else if (o instanceof Instant) {
-            Timestamp ts = Timestamp.from((Instant)o);
-            return "'" + ts.toString() + "'";
-        } else if (o instanceof DependencyType) {
-            return "" + ((DependencyType) o).getValue();
-        } else if (o instanceof DefinitionItemType) {
-            return "" + ((DefinitionItemType) o).getValue();
-        } else if (o instanceof ExecutionStatus) {
-            return "" + ((ExecutionStatus) o).getValue();
-        } else if (o instanceof List) {
-            List uuids = (List)o;
-            List<String> uuidStrs = new ArrayList<>();
-            for (Object uuid: uuids) {
-                uuidStrs.add(convertToString(uuid));
-            }
-            return String.join(", ", uuidStrs);
-        } else {
-            throw new RuntimeException("Unsupported entity for database " + o.getClass());
-        }
-    }*/
 
     private int executeScalarQuery(String sql, Object... parameters) throws Exception {
         LOG.trace("Executing {}", sql);
@@ -93,27 +55,7 @@ final class SqlServerDatabase implements DatabaseI {
             DatabaseManager.closeConnection(connection);
         }
     }
-    /*private int executeScalarQuery(String sql) throws Exception {
-        Connection connection = DatabaseManager.getConnection();
-        Statement s = connection.createStatement();
-        try {
-            LOG.trace("Executing {}", sql);
-            s.execute(sql);
 
-            ResultSet rs = s.getResultSet();
-            rs.next();
-            int ret = rs.getInt(1);
-
-            rs.close();
-
-            return ret;
-        } catch (SQLException sqlEx) {
-            LOG.error("Error with SQL {}", sql);
-            throw sqlEx;
-        } finally {
-            DatabaseManager.closeConnection(connection);
-        }
-    }*/
 
     @Override
     public SQLDialectCode getLogbackDbDialectCode() {
@@ -932,6 +874,55 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
+    public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception {
+        String where = "INNER JOIN Definition.ItemDependency d"
+                + " ON d.DependentItemUuid = ?"
+                + " AND d.DependencyTypeId = ?"
+                + " AND d.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND d.AuditUuid = " + ALIAS + ".AuditUuid"
+                + " WHERE " + ALIAS + ".OrganisationUuid = ?";
+        return retrieveForWherePreparedStatement(DbActiveItem.class, where, itemUuid, dependencyType, organisationUuid);
+
+        /*List<DbActiveItem> ret = new ArrayList<>();
+        String where = "INNER JOIN Definition.ItemDependency d"
+                + " ON d.DependentItemUuid = " + convertToString(itemUuid)
+                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
+                + " AND d.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND d.AuditUuid = " + ALIAS + ".AuditUuid"
+                + " WHERE " + ALIAS + ".OrganisationUuid = " + convertToString(organisationUuid);
+
+        retrieveForWhere(new DbActiveItem().getAdapter(), where, ret);
+        return ret;*/
+    }
+
+    @Override
+    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, int count) throws Exception {
+        String where = "INNER JOIN Definition.Item i"
+                + " ON i.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND i.AuditUuid = " + ALIAS + ".AuditUuid"
+                + " AND " + ALIAS + ".IsDeleted = 0"
+                + " INNER JOIN Definition.Audit a"
+                + " ON a.AuditUuid = i.AuditUuid"
+                + " AND a.EndUserUuid = ?"
+                + " WHERE " + ALIAS + ".ItemTypeId NOT IN (" + DefinitionItemType.LibraryFolder.getValue() + ", " + DefinitionItemType.ReportFolder.getValue() + ")"
+                + " ORDER BY a.TimeStamp DESC";
+        return retrieveForWherePreparedStatement(DbActiveItem.class, count, where, userUuid);
+
+        /*List<DbActiveItem> ret = new ArrayList<>();
+        String where = "INNER JOIN Definition.Item i"
+                + " ON i.ItemUuid = " + ALIAS + ".ItemUuid"
+                + " AND i.AuditUuid = " + ALIAS + ".AuditUuid"
+                + " AND " + ALIAS + ".IsDeleted = 0"
+                + " INNER JOIN Definition.Audit a"
+                + " ON a.AuditUuid = i.AuditUuid"
+                + " AND a.EndUserUuid = " + convertToString(userUuid)
+                + " WHERE " + ALIAS + ".ItemTypeId NOT IN (" + DefinitionItemType.LibraryFolder.getValue() + ", " + DefinitionItemType.ReportFolder.getValue() + ")"
+                + " ORDER BY a.TimeStamp DESC";
+        retrieveForWhere(new DbActiveItem().getAdapter(), count, where, ret);
+        return ret;*/
+    }
+
+    @Override
     public DbEndUserPwd retrieveEndUserPwdForUserNotExpired(UUID endUserUuid) throws Exception {
         String where = "WHERE EndUserUuid = ?"
                 + " AND DtExpired IS NULL";
@@ -1472,52 +1463,39 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
-    public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception {
-        String where = "INNER JOIN Definition.ItemDependency d"
-                + " ON d.DependentItemUuid = ?"
-                + " AND d.DependencyTypeId = ?"
-                + " AND d.ItemUuid = " + ALIAS + ".ItemUuid"
-                + " AND d.AuditUuid = " + ALIAS + ".AuditUuid"
-                + " WHERE " + ALIAS + ".OrganisationUuid = ?";
-        return retrieveForWherePreparedStatement(DbActiveItem.class, where, itemUuid, dependencyType, organisationUuid);
-
-        /*List<DbActiveItem> ret = new ArrayList<>();
-        String where = "INNER JOIN Definition.ItemDependency d"
-                + " ON d.DependentItemUuid = " + convertToString(itemUuid)
-                + " AND d.DependencyTypeId = " + convertToString(dependencyType)
-                + " AND d.ItemUuid = " + ALIAS + ".ItemUuid"
-                + " AND d.AuditUuid = " + ALIAS + ".AuditUuid"
-                + " WHERE " + ALIAS + ".OrganisationUuid = " + convertToString(organisationUuid);
-
-        retrieveForWhere(new DbActiveItem().getAdapter(), where, ret);
-        return ret;*/
+    public List<DbSourceOrganisationSet> retrieveAllOrganisationSets(UUID organisationUuid) throws Exception {
+        String where = "WHERE OrganisationUuid = ?";
+        return retrieveForWherePreparedStatement(DbSourceOrganisationSet.class, where, organisationUuid);
     }
 
     @Override
-    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, int count) throws Exception {
-        String where = "INNER JOIN Definition.Item i"
-                + " ON i.ItemUuid = " + ALIAS + ".ItemUuid"
-                + " AND i.AuditUuid = " + ALIAS + ".AuditUuid"
-                + " AND " + ALIAS + ".IsDeleted = 0"
-                + " INNER JOIN Definition.Audit a"
-                + " ON a.AuditUuid = i.AuditUuid"
-                + " AND a.EndUserUuid = ?"
-                + " WHERE " + ALIAS + ".ItemTypeId NOT IN (" + DefinitionItemType.LibraryFolder.getValue() + ", " + DefinitionItemType.ReportFolder.getValue() + ")"
-                + " ORDER BY a.TimeStamp DESC";
-        return retrieveForWherePreparedStatement(DbActiveItem.class, count, where, userUuid);
-
-        /*List<DbActiveItem> ret = new ArrayList<>();
-        String where = "INNER JOIN Definition.Item i"
-                + " ON i.ItemUuid = " + ALIAS + ".ItemUuid"
-                + " AND i.AuditUuid = " + ALIAS + ".AuditUuid"
-                + " AND " + ALIAS + ".IsDeleted = 0"
-                + " INNER JOIN Definition.Audit a"
-                + " ON a.AuditUuid = i.AuditUuid"
-                + " AND a.EndUserUuid = " + convertToString(userUuid)
-                + " WHERE " + ALIAS + ".ItemTypeId NOT IN (" + DefinitionItemType.LibraryFolder.getValue() + ", " + DefinitionItemType.ReportFolder.getValue() + ")"
-                + " ORDER BY a.TimeStamp DESC";
-        retrieveForWhere(new DbActiveItem().getAdapter(), count, where, ret);
-        return ret;*/
+    public List<DbSourceOrganisationSet> retrieveOrganisationSetsForSearchTerm(UUID organisationUuid, String searchTerm) throws Exception {
+        String where = "WHERE OrganisationUuid = ?"
+                + " AND Name LIKE ?";
+        return retrieveForWherePreparedStatement(DbSourceOrganisationSet.class, where, organisationUuid, searchTerm + "%");
     }
+
+    @Override
+    public List<DbSourceOrganisation> retrieveAllSourceOrganisations(boolean includeUnreferencedOnes) throws Exception {
+        String where = "WHERE 1=1";
+        if (!includeUnreferencedOnes) {
+            where += " AND IsReferencedByData = 1";
+        }
+        return retrieveForWherePreparedStatement(DbSourceOrganisation.class, where);
+    }
+
+    @Override
+    public List<DbSourceOrganisation> retrieveSourceOrganisationsForSearch(String searchTerm) throws Exception {
+        String where = "WHERE (Name LIKE ? OR OdsCode LIKE ?)"
+                + " AND IsReferencedByData = 1";
+        return retrieveForWherePreparedStatement(DbSourceOrganisation.class, where, searchTerm + "%", searchTerm + "%");
+    }
+
+    @Override
+    public List<DbSourceOrganisation> retrieveSourceOrganisationsForOdsCodes(List<String> odsCodes) throws Exception {
+        String where = "WHERE OdsCode IN (" + getParameterisedString(odsCodes) + ")";
+        return retrieveForWherePreparedStatement(DbSourceOrganisation.class, where, odsCodes);
+    }
+
 
 }

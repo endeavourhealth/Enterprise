@@ -3,7 +3,6 @@ package org.endeavour.enterprise.json;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 

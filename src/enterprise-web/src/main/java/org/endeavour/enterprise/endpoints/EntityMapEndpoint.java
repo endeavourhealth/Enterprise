@@ -24,10 +24,13 @@ public final class EntityMapEndpoint extends AbstractEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getEntityMap")
     public Response getEntityMap(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
 
         LOG.trace("getEntityMap");
 
         EntityMap entityMap = EntityMapHelper.loadEntityMap();
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()

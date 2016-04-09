@@ -98,7 +98,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         JsonOrganisation ret = new JsonOrganisation();
         ret.setUuid(org.getOrganisationUuid());
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -303,7 +303,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         JsonEndUser ret = new JsonEndUser();
         ret.setUuid(uuid);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -394,7 +394,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         //don't bother returning anything to the client
         return Response
@@ -437,7 +437,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -515,7 +515,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         DatabaseManager.db().writeEntities(toSave);
 
-        super.clearLogbackMarkers();
+        clearLogbackMarkers();
 
         return Response
                 .ok()

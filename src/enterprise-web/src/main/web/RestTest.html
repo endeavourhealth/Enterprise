@@ -249,6 +249,23 @@
 	</script>
 
 <hr/>
+<h3>/api/security/sendPasswordForgottenEmail</h3>
+
+Email address: <input type="text" id="sendPasswordForgottenEmailEmail">
+<br/>
+<button type="button" onclick="sendPasswordForgottenEmail()">Submit</button>
+
+<script>
+		function sendPasswordForgottenEmail() {
+
+			var s = document.getElementById('sendPasswordForgottenEmailEmail').value;
+			var params = {email:s};
+			post('/api/security/sendPasswordForgottenEmail/', params);
+		}
+	</script>
+
+
+<hr/>
 <h3>/api/admin/getUsers</h3>
 
 	<button type="button" onclick="getUsers()">Submit</button>
@@ -951,12 +968,148 @@
 
 
 <hr/>
+<h3>/api/lookup/getOrganisationSets</h3>
+
+	Search term: <input type="text" id="getOrganisationSetsSearchTerm">
+	<br/>
+	<button type="button" onclick="getOrganisationSets()">Submit</button>
+
+	<script>
+		function getOrganisationSets() {
+			var s = document.getElementById('getOrganisationSetsSearchTerm').value;
+			if (s.length > 0) {
+				get('/api/lookup/getOrganisationSets', 'searchTerm=' + s);
+			} else {
+				get('/api/lookup/getOrganisationSets');
+			}
+		}
+	</script>
+
+<hr/>
+<h3>/api/lookup/getOrganisationSetMembers</h3>
+
+	Set UUID: <input type="text" id="getOrganisationSetMembersUuid">
+	<br/>
+	<button type="button" onclick="getOrganisationSetMembers()">Submit</button>
+
+	<script>
+		function getOrganisationSetMembers() {
+			var s = document.getElementById('getOrganisationSetMembersUuid').value;
+			get('/api/lookup/getOrganisationSetMembers', 'uuid=' + s);
+		}
+	</script>
+
+<hr/>
+<h3>/api/lookup/saveOrganisationSet</h3>
+
+	Set  UUID: <input type="text" id="saveOrganisationSetUuid">(leave blank to create a new folder)
+	<br/>
+	Set name: <input type="text" id="saveOrganisationSetName">
+	<br/>
+	ODS Codes 1: <input type="text" id="saveOrganisationSetOdsCode1">
+	<br/>
+	ODS Codes 2: <input type="text" id="saveOrganisationSetOdsCode2">
+	<br/>
+	ODS Codes 3: <input type="text" id="saveOrganisationSetOdsCode3">
+	<br/>
+	<button type="button" onclick="saveOrganisationSet()">Submit</button>
+
+	<script>
+		function saveOrganisationSet() {
+
+			var params = {};
+
+			var s = document.getElementById('saveOrganisationSetUuid').value;
+			if (s.length > 0)
+			{
+				params["uuid"] = s;
+			}
+			s = document.getElementById('saveOrganisationSetName').value;
+			if (s.length > 0)
+			{
+				params["name"] = s;
+			}
+
+			var orgs = [];
+			params["organisations"] = orgs;
+
+			var s = document.getElementById('saveOrganisationSetOdsCode1').value;
+			if (s.length > 0) {
+				orgs[orgs.length] = {odsCode:s};
+			}
+			s = document.getElementById('saveOrganisationSetOdsCode2').value;
+			if (s.length > 0) {
+				orgs[orgs.length] = {odsCode:s};
+			}
+			s = document.getElementById('saveOrganisationSetOdsCode3').value;
+			if (s.length > 0) {
+				orgs[orgs.length] = {odsCode:s};
+			}
+
+			post('/api/lookup/saveOrganisationSet', params);
+		}
+	</script>
+
+
+<hr/>
+<h3>/api/lookup/deleteOrganisationSet</h3>
+
+	Set  UUID: <input type="text" id="deleteOrganisationSetUuid">
+	<br/>
+	<button type="button" onclick="deleteOrganisationSet()">Submit</button>
+
+	<script>
+		function deleteOrganisationSet() {
+
+			var s = document.getElementById('deleteOrganisationSetUuid').value;
+			var params = {uuid: s};
+			post('/api/lookup/deleteOrganisationSet', params);
+		}
+	</script>
+
+<hr/>
+<h3>/api/lookup/searchOrganisations</h3>
+
+	Search term: <input type="text" id="searchOrganisationsSearchTerm">
+	<br/>
+	<button type="button" onclick="searchOrganisations()">Submit</button>
+
+	<script>
+		function searchOrganisations() {
+			var s = document.getElementById('searchOrganisationsSearchTerm').value;
+			if (s.length > 0) {
+				get('/api/lookup/searchOrganisations', 'searchTerm=' + s);
+			} else {
+				get('/api/lookup/searchOrganisations');
+			}
+		}
+	</script>
+
+<hr/>
+<h3>/api/lookup/getOrganisations</h3>
+
+	ODS Codes (pipe delim): <input type="text" id="getOrganisationsOdsCodes">
+	<br/>
+	<button type="button" onclick="getOrganisations()">Submit</button>
+
+	<script>
+		function getOrganisations() {
+			var s = document.getElementById('getOrganisationsOdsCodes').value;
+			get('/api/lookup/getOrganisations', 'odsCodes=' + s);
+		}
+	</script>
+
+
+
+
+
+
+
+
+
+<hr/>
 <h3>Results</h3>
-
 <div id="results"></div>
-
-
-
 
 </body>
 </html> 

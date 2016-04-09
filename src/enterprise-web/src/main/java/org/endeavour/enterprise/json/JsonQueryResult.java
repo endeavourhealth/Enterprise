@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.endeavourhealth.enterprise.core.PercentageCalculator;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 
 import java.io.Serializable;
@@ -15,7 +16,7 @@ public final class JsonQueryResult {
     private String description = null;
     private UUID uuid = null;
     private Integer resultCount = null;
-    private Double percentageOfParent = null;
+    private String percentageOfParent = null;
     private List<JsonQueryResult> childQueries = null;
 
     public JsonQueryResult() {}
@@ -27,8 +28,7 @@ public final class JsonQueryResult {
         this.resultCount = resultCount;
 
         if (resultCount != null && parentCount != null) {
-            double d = (double)resultCount.intValue() / (double)parentCount.intValue();
-            this.percentageOfParent = new Double(d * 100d);
+            this.percentageOfParent = PercentageCalculator.calculatorPercentString(parentCount.doubleValue(), resultCount.intValue());
         }
     }
 
@@ -59,11 +59,11 @@ public final class JsonQueryResult {
         this.description = description;
     }
 
-    public Double getPercentageOfParent() {
+    public String getPercentageOfParent() {
         return percentageOfParent;
     }
 
-    public void setPercentageOfParent(Double percentageOfParent) {
+    public void setPercentageOfParent(String percentageOfParent) {
         this.percentageOfParent = percentageOfParent;
     }
 

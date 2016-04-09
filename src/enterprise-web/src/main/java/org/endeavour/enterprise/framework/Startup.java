@@ -1,13 +1,12 @@
 package org.endeavour.enterprise.framework;
 
+import org.endeavour.enterprise.email.EmailProvider;
 import org.endeavour.enterprise.framework.config.ConfigSerializer;
 import org.endeavour.enterprise.framework.config.models.Config;
 import org.endeavour.enterprise.framework.config.models.Email;
 import org.endeavour.enterprise.framework.config.models.Template;
-import org.endeavour.enterprise.email.EmailProvider;
 import org.endeavour.enterprise.framework.config.models.WebServer;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
-import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 
 import javax.servlet.ServletContextEvent;
@@ -43,6 +42,7 @@ public final class Startup implements ServletContextListener {
             List<Template> templates = emailSettings.getTemplate();
             EmailProvider.getInstance().setConnectionProperties(url, username, password, templates);
         }
+
     }
 
     public void contextDestroyed(ServletContextEvent contextEvent) {

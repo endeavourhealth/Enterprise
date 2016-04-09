@@ -38,8 +38,9 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReport")
-    public Response getReport(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception
-    {
+    public Response getReport(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID reportUuid = UUID.fromString(uuidStr);
 
         LOG.trace("GettingReport for UUID {}", reportUuid);
@@ -48,6 +49,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         String xml = item.getXmlContent();
 
         Report ret = QueryDocumentSerializer.readReportFromXml(xml);
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -59,8 +62,9 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveReport")
-    public Response saveReport(@Context SecurityContext sc, Report report) throws Exception
-    {
+    public Response saveReport(@Context SecurityContext sc, Report report) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
 
@@ -92,6 +96,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         Report ret = new Report();
         ret.setUuid(reportUuid.toString());
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .entity(ret)
@@ -103,6 +109,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteReport")
     public Response deleteReport(@Context SecurityContext sc, Report reportParameters) throws Exception {
+        super.setLogbackMarkers(sc);
 
         UUID reportUuid = parseUuidFromStr(reportParameters.getUuid());
         UUID orgUuid = getOrganisationUuidFromToken(sc);
@@ -111,6 +118,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         LOG.trace("DeletingReport UUID {}", reportUuid);
 
         JsonDeleteResponse ret = deleteItem(reportUuid, orgUuid, userUuid);
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -122,8 +131,9 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/scheduleReport")
-    public Response scheduleReport(@Context SecurityContext sc, RequestParameters requestParameters) throws Exception
-    {
+    public Response scheduleReport(@Context SecurityContext sc, RequestParameters requestParameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID userUuid = getEndUserUuidFromToken(sc);
 
@@ -145,6 +155,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         request.writeToDb();
 
+        clearLogbackMarkers();
+
         return Response
                 .ok()
                 .build();
@@ -155,8 +167,9 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReportSchedules")
-    public Response getReportSchedules(@Context SecurityContext sc, @QueryParam("uuid") String reportUuidStr, @QueryParam("count") int count) throws Exception
-    {
+    public Response getReportSchedules(@Context SecurityContext sc, @QueryParam("uuid") String reportUuidStr, @QueryParam("count") int count) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID reportUuid = UUID.fromString(reportUuidStr);
 
@@ -185,6 +198,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
             ret.add(new JsonReportRequest(request, job, user));
         }
 
+        clearLogbackMarkers();
 
         return Response
                 .ok()
@@ -196,8 +210,9 @@ public final class ReportEndpoint extends AbstractItemEndpoint
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getScheduleResults")
-    public Response getScheduleResults(@Context SecurityContext sc, @QueryParam("uuid") String requestUuidStr, @QueryParam("organisation") String organisationOdsCode) throws Exception
-    {
+    public Response getScheduleResults(@Context SecurityContext sc, @QueryParam("uuid") String requestUuidStr, @QueryParam("organisation") String organisationOdsCode) throws Exception {
+        super.setLogbackMarkers(sc);
+
         UUID orgUuid = getOrganisationUuidFromToken(sc);
         UUID requestUuid = UUID.fromString(requestUuidStr);
 
@@ -259,6 +274,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         JsonReportResult ret = new JsonReportResult();
         ret.setPopulationCount(populationCount);
         ret.setQueryResults(queryResults);
+
+        clearLogbackMarkers();
 
         return Response
                 .ok()

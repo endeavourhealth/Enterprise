@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="uuid"/>
  *     &lt;enumeration value="code"/>
  *     &lt;enumeration value="dataValues"/>
+ *     &lt;enumeration value="organisationODS"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -46,7 +47,9 @@ public enum LogicalDataType {
     @XmlEnumValue("code")
     CODE("code"),
     @XmlEnumValue("dataValues")
-    DATA_VALUES("dataValues");
+    DATA_VALUES("dataValues"),
+    @XmlEnumValue("organisationODS")
+    ORGANISATION_ODS("organisationODS");
     private final String value;
 
     LogicalDataType(String v) {

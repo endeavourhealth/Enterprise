@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="resultSetIndex" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="cardinality" type="{}cardinality"/>
  *         &lt;element name="populationFieldIndex" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="organisationOdsFieldIndex" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *         &lt;element name="field" type="{}field" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -41,6 +42,7 @@ import javax.xml.bind.annotation.XmlType;
     "resultSetIndex",
     "cardinality",
     "populationFieldIndex",
+    "organisationOdsFieldIndex",
     "field"
 })
 public class Entity {
@@ -54,6 +56,7 @@ public class Entity {
     @XmlSchemaType(name = "string")
     protected Cardinality cardinality;
     protected int populationFieldIndex;
+    protected Integer organisationOdsFieldIndex;
     @XmlElement(required = true)
     protected List<Field> field;
 
@@ -159,6 +162,30 @@ public class Entity {
      */
     public void setPopulationFieldIndex(int value) {
         this.populationFieldIndex = value;
+    }
+
+    /**
+     * Gets the value of the organisationOdsFieldIndex property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getOrganisationOdsFieldIndex() {
+        return organisationOdsFieldIndex;
+    }
+
+    /**
+     * Sets the value of the organisationOdsFieldIndex property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setOrganisationOdsFieldIndex(Integer value) {
+        this.organisationOdsFieldIndex = value;
     }
 
     /**

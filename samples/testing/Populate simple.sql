@@ -2,6 +2,7 @@
 select newid()
 */
 
+use Endeavour_Enterprise;
 
 begin transaction
 
@@ -107,4 +108,4 @@ values
 
 
 
-commit transaction
+rollback transaction

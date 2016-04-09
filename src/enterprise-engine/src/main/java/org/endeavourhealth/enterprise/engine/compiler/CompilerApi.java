@@ -44,7 +44,7 @@ public class CompilerApi {
                     ICompiledDataSource compiledDataSource = dataSourceCompiler.compile(libraryItem.getDataSource(), compilerContext);
                     compiledLibrary.add(libraryItem, compiledDataSource);
                 } catch (Exception e) {
-                    throw new UnableToCompileExpection("Could not compiled DataSource: " + libraryItem.getUuid());
+                    throw new UnableToCompileExpection("Could not compiled DataSource: " + libraryItem.getUuid(), e);
                 }
             }
         }
@@ -58,7 +58,7 @@ public class CompilerApi {
                     ICompiledTest compiledTest = testCompiler.compile(libraryItem.getTest(), compilerContext);
                     compiledLibrary.add(libraryItem, compiledTest);
                 } catch (Exception e) {
-                    throw new UnableToCompileExpection("Could not compiled Test: " + libraryItem.getUuid());
+                    throw new UnableToCompileExpection("Could not compiled Test: " + libraryItem.getUuid(), e);
                 }
             }
         }
@@ -73,7 +73,7 @@ public class CompilerApi {
                     CompiledQuery compiledQuery = queryCompiler.compile(compilerContext, libraryItem.getQuery());
                     compiledLibrary.add(libraryItem, compiledQuery);
                 } catch (Exception e) {
-                    throw new UnableToCompileExpection("Could not compiled Query: " + libraryItem.getUuid());
+                    throw new UnableToCompileExpection("Could not compiled Query: " + libraryItem.getUuid(), e);
                 }
             }
         }

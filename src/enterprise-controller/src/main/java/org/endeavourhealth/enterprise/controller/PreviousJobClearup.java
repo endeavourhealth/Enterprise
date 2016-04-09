@@ -4,6 +4,7 @@ import org.endeavourhealth.enterprise.controller.configuration.models.DatabaseCo
 import org.endeavourhealth.enterprise.controller.configuration.models.MessageQueuing;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
 import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobProcessorResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,12 @@ class PreviousJobClearup {
     public static void clearPreviousJobs(DatabaseConnection coreDatabase, MessageQueuing messageQueuingConfig) throws Exception {
 
         markExistingJobsAsFailed();
+        removeItemsFromJobProcessorResult();
 //        removePreviousWorkerQueues(messageQueuingConfig);
+
+    }
+
+    private static void removeItemsFromJobProcessorResult() {
 
     }
 

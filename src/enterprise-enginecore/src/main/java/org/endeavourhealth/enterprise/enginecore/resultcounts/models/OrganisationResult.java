@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="odsCode" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="resultCount" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="resultCount" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -32,7 +32,7 @@ public class OrganisationResult {
     @XmlAttribute(name = "odsCode", required = true)
     protected String odsCode;
     @XmlAttribute(name = "resultCount", required = true)
-    protected String resultCount;
+    protected int resultCount;
 
     /**
      * Gets the value of the odsCode property.
@@ -61,24 +61,16 @@ public class OrganisationResult {
     /**
      * Gets the value of the resultCount property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getResultCount() {
+    public int getResultCount() {
         return resultCount;
     }
 
     /**
      * Sets the value of the resultCount property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
-    public void setResultCount(String value) {
+    public void setResultCount(int value) {
         this.resultCount = value;
     }
 

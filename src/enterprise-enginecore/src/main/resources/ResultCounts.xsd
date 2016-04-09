@@ -3,18 +3,36 @@
 	<xs:element name="resultCounts" type="resultCounts"/>
 	<xs:complexType name="resultCounts">
 		<xs:sequence>
-			<xs:element name="jobReportItemResult" type="jobReportItemResult" maxOccurs="unbounded"/>
+			<xs:element name="jobReport" type="jobReportType"/>
 		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="jobReportItemResult">
-		<xs:sequence>
-			<xs:element name="organisation" type="organisationResult" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-		<xs:attribute name="uuid" type="xs:string" use="required"/>
-		<xs:attribute name="resultCount" type="xs:int" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="organisationResult">
 		<xs:attribute name="odsCode" type="xs:string" use="required"/>
-		<xs:attribute name="resultCount" type="xs:string" use="required"/>
+		<xs:attribute name="resultCount" type="xs:int" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="jobReportType">
+		<xs:sequence>
+			<xs:element name="jobReportUuid" type="xs:string"/>
+			<xs:element name="organisationResults">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="organisationResult" type="organisationResult" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="jobReportItemResults">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="jobReportItemResult" type="jobReportItemResultType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="jobReportItemResultType">
+		<xs:sequence>
+			<xs:element name="organisationResult" type="organisationResult" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="jobReportItemResultUuid" type="xs:string" use="required"/>
 	</xs:complexType>
 </xs:schema>

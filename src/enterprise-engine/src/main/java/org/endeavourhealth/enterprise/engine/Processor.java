@@ -1,14 +1,11 @@
 package org.endeavourhealth.enterprise.engine;
 
 import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
-import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery;
 import org.endeavourhealth.enterprise.engine.execution.ExecutionContext;
 import org.endeavourhealth.enterprise.engine.execution.Request;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainer;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class Processor {
 

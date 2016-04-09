@@ -1,6 +1,8 @@
 package org.endeavourhealth.enterprise.processornode;
 
+import org.endeavourhealth.enterprise.core.database.TableSaveMode;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobProcessorResult;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
 import org.endeavourhealth.enterprise.core.entitymap.EntityMapHelper;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
@@ -11,6 +13,7 @@ import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainerPool;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
+import org.endeavourhealth.enterprise.enginecore.resultcounts.ResultCountsHelper;
 import org.endeavourhealth.enterprise.enginecore.resultcounts.models.ResultCounts;
 import org.endeavourhealth.enterprise.processornode.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.processornode.configuration.ConfigurationAPI;
@@ -59,7 +62,8 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     }
 
     public void shutDown() throws InterruptedException {
-        executor.shutdownNow();
+        if (executor != null)
+            executor.shutdownNow();
     }
 
     public void start() throws Exception {
@@ -98,6 +102,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     }
 
     private void createProcessorThreadPoolExecutor(EntityMapWrapper.EntityMap entityMap) {
+
         EngineProcessorPool engineProcessorPool = new EngineProcessorPool(engineApi, configuration.getExecutionThreads());
         DataContainerPool dataContainerPool = new DataContainerPool(configuration.getDataItemBufferSize(), entityMap);
         CareRecordDal careRecordDal = new CareRecordDal(startMessage.getCareRecordDatabaseConnectionDetails(), dataContainerPool, entityMap);
@@ -162,10 +167,8 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     @Override
     public void errorOccurred(Throwable t) {
-        statistics.processingComplete();
-        logger.error("Error caught by Execution Controller", t);
-
         try {
+            logger.error("Error caught by Execution Controller", t);
 
             shutDown();
 
@@ -182,11 +185,13 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         }
     }
 
-    public void workComplete() throws IOException {
+    public void workComplete() throws Exception {
         logger.debug("Work complete");
         statistics.processingComplete();
 
         ResultCounts results = engineApi.getResults();
+
+        saveResultsToTemporaryBlob(results);
 
         ControllerQueueProcessorNodeCompleteMessage message = ControllerQueueProcessorNodeCompleteMessage.CreateAsNew(
                 getJobUuid(),
@@ -200,6 +205,15 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         );
 
         controllerQueue.sendMessage(message);
+    }
+
+    private void saveResultsToTemporaryBlob(ResultCounts results) throws Exception {
+        DbJobProcessorResult processorResult = new DbJobProcessorResult();
+        processorResult.setJobUuid(getJobUuid());
+        processorResult.setProcessorUuid(processorNodeUuid);
+        processorResult.setResultXml(ResultCountsHelper.serialise(results));
+        processorResult.setSaveMode(TableSaveMode.INSERT);
+        processorResult.writeToDb();
     }
 
     @Override

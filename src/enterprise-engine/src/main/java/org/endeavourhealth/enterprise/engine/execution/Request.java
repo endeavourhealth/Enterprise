@@ -14,8 +14,8 @@ public class Request {
             UUID jobReportUuid,
             CompiledReport compiledReport,
             RequestParameters parameters) {
-        this.jobReportUuid = jobReportUuid;
 
+        this.jobReportUuid = jobReportUuid;
         this.compiledReport = compiledReport;
         this.parameters = parameters;
     }

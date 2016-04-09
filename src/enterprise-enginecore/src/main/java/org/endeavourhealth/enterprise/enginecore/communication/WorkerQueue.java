@@ -29,6 +29,10 @@ public class WorkerQueue implements AutoCloseable {
         channel.queueCreate(workerQueueName, 7L);
     }
 
+    public void purge() throws IOException {
+        channel.purgeQueue(workerQueueName);
+    }
+
     public void sendMessage(WorkerQueueBatchMessage message) throws IOException {
         channel.publishDirectlyToQueue(workerQueueName, message.getMessage());
     }

@@ -11,10 +11,11 @@ import org.endeavourhealth.enterprise.engine.compiled.CompiledReport;
 import org.endeavourhealth.enterprise.engine.compiler.CompilerApi;
 import org.endeavourhealth.enterprise.engine.execution.Request;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
-import org.endeavourhealth.enterprise.enginecore.resultcounts.models.JobReportItemResult;
-import org.endeavourhealth.enterprise.enginecore.resultcounts.models.ResultCounts;
+import org.endeavourhealth.enterprise.enginecore.resultcounts.models.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class EngineApi {
 
@@ -64,19 +65,45 @@ public class EngineApi {
         for (Request request: executionRequests) {
             CompiledReport compiledReport = request.getCompiledReport();
 
-            Map<UUID, Integer> requestResults = compiledReport.getQueryResults();
+            JobReportType jobReportType = new JobReportType();
+            jobReportType.setJobReportUuid(request.getJobReportUuid().toString());
 
-            for (Map.Entry<UUID, Integer> entry: requestResults.entrySet()) {
+            jobReportType.setOrganisationResults(new JobReportType.OrganisationResults());
+            populateOrganisationResults(jobReportType.getOrganisationResults().getOrganisationResult(), compiledReport.getReportLevelResults());
 
-                JobReportItemResult result = new JobReportItemResult();
-                result.setUuid(entry.getKey().toString());
-                result.setResultCount(entry.getValue());
+            jobReportType.setJobReportItemResults(new JobReportType.JobReportItemResults());
+            populateJobItemResults(jobReportType.getJobReportItemResults().getJobReportItemResult(), compiledReport.getQueryResults());
 
-                resultCounts.getJobReportItemResult().add(result);
-            }
+            resultCounts.setJobReport(jobReportType);
         }
 
         return resultCounts;
+    }
+
+    private void populateJobItemResults(List<JobReportItemResultType> jobReportItemResult, Map<UUID, ResultCounter> queryResults) {
+
+        for (Map.Entry<UUID, ResultCounter> item: queryResults.entrySet()) {
+
+            JobReportItemResultType result = new JobReportItemResultType();
+            result.setJobReportItemResultUuid(item.getKey().toString());
+            populateOrganisationResults(result.getOrganisationResult(), item.getValue());
+            jobReportItemResult.add(result);
+        }
+    }
+
+    private void populateOrganisationResults(List<OrganisationResult> organisationResult, ResultCounter reportLevelResults) {
+
+        Map<String, AtomicInteger> results = reportLevelResults.getResults();
+
+        for (Map.Entry<String, AtomicInteger> item: results.entrySet()) {
+
+            if (item.getValue().get() > 0) {
+                OrganisationResult result = new OrganisationResult();
+                result.setOdsCode(item.getKey());
+                result.setResultCount(item.getValue().get());
+                organisationResult.add(result);
+            }
+        }
     }
 
     public Processor createProcessor() {

@@ -1,20 +1,79 @@
 package org.endeavourhealth.enterprise.engine.compiled;
 
-import org.endeavourhealth.enterprise.engine.ExecutionException;
+import org.endeavourhealth.enterprise.engine.ResultCounter;
 import org.endeavourhealth.enterprise.engine.execution.ExecutionContext;
 
 import java.util.*;
 
 public class CompiledReport {
 
-    private final List<CompiledReportQuery> rootQueries = new ArrayList<>();
-    private final List<CompiledReportListReport> rootListReports = new ArrayList<>();
+    private final List<CompiledReportQuery> rootQueries;
+    private final List<CompiledReportListReport> rootListReports;
+    private final Set<String> allowedOrganisations;
 
-    private final Map<UUID, Integer> queryResults = new HashMap<>();
+    private final ResultCounter reportLevelResults;
+    private final Map<UUID, ResultCounter> queryResults = new HashMap<>();
 
-    public void initialise() {
+    public CompiledReport(
+            Set<String> allowedOrganisations,
+            List<CompiledReportQuery> rootQueries,
+            List<CompiledReportListReport> rootListReports) {
+
+        this.allowedOrganisations = allowedOrganisations;
+        this.rootQueries = rootQueries;
+        this.rootListReports = rootListReports;
+
+        reportLevelResults = new ResultCounter(allowedOrganisations);
+
         initialiseQueryResults(rootQueries);
     }
+
+    private void initialiseQueryResults(List<CompiledReportQuery> queries) {
+
+        for (CompiledReportQuery query: queries) {
+            queryResults.put(query.getJobReportItemUuid(), new ResultCounter(allowedOrganisations));
+
+            if (query.getChildQueries() != null)
+                initialiseQueryResults(query.getChildQueries());
+        }
+    }
+
+    public void execute(ExecutionContext context) throws Exception {
+
+        if (!allowedOrganisations.contains(context.getDataContainer().getOrganisationOds()))
+            return;
+
+        reportLevelResults.recordResult(context.getDataContainer().getOrganisationOds());
+
+        executeQueryList(rootQueries, context);
+        executeReportList(rootListReports, context);
+    }
+
+    private void executeQueryList(List<CompiledReportQuery> queries, ExecutionContext context) throws Exception {
+        if (queries == null)
+            return;
+
+        for (CompiledReportQuery query: queries) {
+            if (context.getQueryResult(query.getQueryUuid())) {
+
+                queryResults.get(query.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationOds());
+
+                executeQueryList(query.childQueries, context);
+                executeReportList(query.childListReports, context);
+            }
+        }
+    }
+
+    private void executeReportList(List<CompiledReportListReport> listReports, ExecutionContext context) {
+        for (CompiledReportListReport report: listReports) {
+            report.execute(context);
+        }
+    }
+
+    public Map<UUID, ResultCounter> getQueryResults() {
+        return queryResults;
+    }
+    public ResultCounter getReportLevelResults() { return reportLevelResults; }
 
     public static class CompiledReportQuery {
         private final UUID queryUuid;
@@ -55,47 +114,5 @@ public class CompiledReport {
         public void execute(ExecutionContext context) {
 
         }
-    }
-
-    public List<CompiledReportQuery> getChildQueries() { return rootQueries; }
-    public List<CompiledReportListReport> getChildListReports() { return rootListReports; }
-
-    public void execute(ExecutionContext context) throws Exception {
-
-        executeQueryList(rootQueries, context);
-        executeReportList(rootListReports, context);
-    }
-
-    private void executeQueryList(List<CompiledReportQuery> queries, ExecutionContext context) throws Exception {
-        if (queries == null)
-            return;
-
-        for (CompiledReportQuery query: queries) {
-            if (context.getQueryResult(query.getQueryUuid())) {
-                incrementPatientResult(query.getJobReportItemUuid());
-                executeQueryList(query.childQueries, context);
-                executeReportList(query.childListReports, context);
-            }
-        }
-    }
-
-    private void executeReportList(List<CompiledReportListReport> listReports, ExecutionContext context) {
-        for (CompiledReportListReport report: listReports) {
-            report.execute(context);
-        }
-    }
-
-    private synchronized void initialiseQueryResults(List<CompiledReportQuery> rootQueries) {
-        for (CompiledReportQuery query: rootQueries) {
-            queryResults.put(query.getJobReportItemUuid(), 0);
-        }
-    }
-
-    private synchronized void incrementPatientResult(UUID reportItemUuid) {
-        queryResults.put(reportItemUuid, queryResults.get(reportItemUuid) + 1);
-    }
-
-    public synchronized Map<UUID, Integer> getQueryResults() {
-        return queryResults;
     }
 }

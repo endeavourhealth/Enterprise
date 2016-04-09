@@ -56,10 +56,12 @@ begin
 		
 	select
 		p.SK_PatientID,
+		o.ServiceProviderCode,
 		p.DateOfBirth,
 		p.Gender,
 		p.DateRegistered
 	from [07T].Patients as p
+	inner join shared.Organisation as o on o.SK_ServiceProviderID = p.SK_ServiceProviderID
 	inner join @Patients as j on j.PatientId = p.SK_PatientID;
 
 	select

@@ -1,5 +1,7 @@
 package org.endeavourhealth.enterprise.controller;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.enterprise.controller.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
@@ -7,6 +9,7 @@ import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
 import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
 import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
@@ -21,8 +24,10 @@ import org.slf4j.LoggerFactory;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 class ExecutionJob {
 
@@ -32,6 +37,8 @@ class ExecutionJob {
     private SourceStatistics primaryTableStats;
     private final JobProgressTracker jobProgressTracker = new JobProgressTracker();
     private DbJob dbJob;
+    private String workerQueueName;
+    private boolean stopping;
 
     public ExecutionJob(Configuration configuration) {
         this.configuration = configuration;
@@ -68,14 +75,16 @@ class ExecutionJob {
 
     public void stop() {
         try {
+            stopping = true;
             dbJob.setSaveMode(TableSaveMode.UPDATE);
             dbJob.markAsFinished(ExecutionStatus.Failed);
 
             dbJob.writeToDb();
             logger.debug("Execution Job failed: " + executionUuid.toString());
             stopExecutionNodes();
+            purgeWorkerQueue();
         } catch (Exception e) {
-            logger.error("Job Finished exception", e);
+            logger.error("Job stopped exception", e);
         }
     }
 
@@ -182,6 +191,8 @@ class ExecutionJob {
         if (requestParameters.getBaselineDate() == null)
             requestParameters.setBaselineDate(defaultBaselineDate);
 
+        populateRequestParametersOrganisationsWithAllOrgs(requestParameters.getOrganisation());
+
         String requestParameterString = RequestParametersSerializer.writeToXml(requestParameters);
 
         DbJobReport jobReport = new DbJobReport();
@@ -197,6 +208,24 @@ class ExecutionJob {
         jobReport.setStatusId(ExecutionStatus.Executing);
 
         return jobReport;
+    }
+
+    private void populateRequestParametersOrganisationsWithAllOrgs(List<String> requestParametersOrganisation) throws Exception {
+        if (CollectionUtils.isNotEmpty(requestParametersOrganisation))
+            return;
+
+        List<DbSourceOrganisation> all = DbSourceOrganisation.retrieveAll(false);
+        Set<String> targetSet = new HashSet<>();
+
+        for (DbSourceOrganisation source: all) {
+
+            if (StringUtils.isEmpty(source.getOdsCode()))
+                throw new Exception("Empty ODS code");
+
+            targetSet.add(source.getOdsCode());
+        }
+
+        requestParametersOrganisation.addAll(targetSet);
     }
 
     private DbJob createJobAsStarted() throws Exception {
@@ -217,9 +246,9 @@ class ExecutionJob {
         QueueConnectionProperties connectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
         long minimumId = primaryTableStats.getMinimumId();
         long maximumId;
-        String queueName = WorkerQueue.calculateWorkerQueueName(configuration.getMessageQueuing().getWorkerQueuePrefix(), executionUuid);
+        workerQueueName = WorkerQueue.calculateWorkerQueueName(configuration.getMessageQueuing().getWorkerQueuePrefix(), executionUuid);
 
-        try (WorkerQueue queue = new WorkerQueue(connectionProperties, queueName)) {
+        try (WorkerQueue queue = new WorkerQueue(connectionProperties, workerQueueName)) {
 
             queue.create();
 
@@ -246,6 +275,16 @@ class ExecutionJob {
 
             String message = String.format("Added IDs %s to %s in %s batches to Worker queue", primaryTableStats.getMinimumId(), primaryTableStats.getMaximumId(), jobProgressTracker.getTotalNumberOfBatches());
             queue.logDebug(message);
+        }
+    }
+
+    private void purgeWorkerQueue() {
+        QueueConnectionProperties connectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
+
+        try (WorkerQueue queue = new WorkerQueue(connectionProperties, workerQueueName)) {
+            queue.purge();
+        } catch (Exception e) {
+            logger.error("Error while purging worker queue: " + workerQueueName, e);
         }
     }
 
@@ -287,7 +326,10 @@ class ExecutionJob {
         jobProgressTracker.receivedWorkItemComplete(payload.getStartId());
     }
 
-    private void jobFinished() {
+    private void jobFinishedSuccessfully() {
+
+        if (stopping)
+            return;
 
         dbJob.setSaveMode(TableSaveMode.UPDATE);
         dbJob.markAsFinished(ExecutionStatus.Succeeded);
@@ -316,7 +358,7 @@ class ExecutionJob {
         jobProgressTracker.receivedProcessorNodeCompleteMessage(payload.getProcessorUuid());
 
         if (jobProgressTracker.isComplete())
-            jobFinished();
+            jobFinishedSuccessfully();
     }
 
     public void processorNodeStarted(ControllerQueueProcessorNodeStartedMessage.ProcessorNodeStartedPayload payload) throws Exception {

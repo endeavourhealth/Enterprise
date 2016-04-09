@@ -73,7 +73,7 @@ public class QueryCompiler {
 
                 ruleMap.put(rule, compiledRule);
             } catch (Exception e) {
-                throw new UnableToCompileExpection("Error in RuleID: " + rule.getId());
+                throw new UnableToCompileExpection("Error in RuleID: " + rule.getId(), e);
             }
         }
 

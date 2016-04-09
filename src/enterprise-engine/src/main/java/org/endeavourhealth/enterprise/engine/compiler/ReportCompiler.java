@@ -1,14 +1,13 @@
 package org.endeavourhealth.enterprise.engine.compiler;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledReport;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 class ReportCompiler {
 
@@ -19,19 +18,29 @@ class ReportCompiler {
 
         try {
 
-            CompiledReport compiledReport = new CompiledReport();
-
             List<DbJobReportItem> jobReportItemList = DbJobReportItem.retrieveForJobReport(jobReport.getJobReportUuid());
 
-            populateChildren(compilerContext, null, jobReportItemList, compiledReport.getChildQueries(), compiledReport.getChildListReports());
+            List<CompiledReport.CompiledReportQuery> rootQueries = new ArrayList<>();
+            List<CompiledReport.CompiledReportListReport> rootListReports = new ArrayList<>();
 
-            compiledReport.initialise();
+            populateChildren(compilerContext, null, jobReportItemList, rootQueries, rootListReports);
 
-            return compiledReport;
+            Set<String> allowedOrganisations = getAllowedOrganisations(parameters.getOrganisation());
+
+            return new CompiledReport(allowedOrganisations, rootQueries, rootListReports);
 
         } catch (Exception e) {
             throw new UnableToCompileExpection("JobReportUuid: " + jobReport.getReportUuid(), e);
         }
+    }
+
+    private Set<String> getAllowedOrganisations(List<String> organisations) throws UnableToCompileExpection {
+        if (CollectionUtils.isEmpty(organisations))
+            throw new UnableToCompileExpection("No organisations specified");
+
+        Set<String> allowedOrganisations = new HashSet<>();
+        allowedOrganisations.addAll(organisations);
+        return allowedOrganisations;
     }
 
     private void populateChildren(

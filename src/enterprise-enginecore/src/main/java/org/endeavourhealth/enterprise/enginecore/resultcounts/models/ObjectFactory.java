@@ -34,6 +34,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JobReportType }
+     * 
+     */
+    public JobReportType createJobReportType() {
+        return new JobReportType();
+    }
+
+    /**
      * Create an instance of {@link ResultCounts }
      * 
      */
@@ -50,11 +58,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JobReportItemResult }
+     * Create an instance of {@link JobReportItemResultType }
      * 
      */
-    public JobReportItemResult createJobReportItemResult() {
-        return new JobReportItemResult();
+    public JobReportItemResultType createJobReportItemResultType() {
+        return new JobReportItemResultType();
+    }
+
+    /**
+     * Create an instance of {@link JobReportType.OrganisationResults }
+     * 
+     */
+    public JobReportType.OrganisationResults createJobReportTypeOrganisationResults() {
+        return new JobReportType.OrganisationResults();
+    }
+
+    /**
+     * Create an instance of {@link JobReportType.JobReportItemResults }
+     * 
+     */
+    public JobReportType.JobReportItemResults createJobReportTypeJobReportItemResults() {
+        return new JobReportType.JobReportItemResults();
     }
 
     /**

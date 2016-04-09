@@ -1,8 +1,6 @@
 
 package org.endeavourhealth.enterprise.enginecore.resultcounts.models;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -19,7 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="jobReportItemResult" type="{}jobReportItemResult" maxOccurs="unbounded"/>
+ *         &lt;element name="jobReport" type="{}jobReportType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -30,40 +28,35 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "resultCounts", propOrder = {
-    "jobReportItemResult"
+    "jobReport"
 })
 public class ResultCounts {
 
     @XmlElement(required = true)
-    protected List<JobReportItemResult> jobReportItemResult;
+    protected JobReportType jobReport;
 
     /**
-     * Gets the value of the jobReportItemResult property.
+     * Gets the value of the jobReport property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the jobReportItemResult property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getJobReportItemResult().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JobReportItemResult }
-     * 
-     * 
+     * @return
+     *     possible object is
+     *     {@link JobReportType }
+     *     
      */
-    public List<JobReportItemResult> getJobReportItemResult() {
-        if (jobReportItemResult == null) {
-            jobReportItemResult = new ArrayList<JobReportItemResult>();
-        }
-        return this.jobReportItemResult;
+    public JobReportType getJobReport() {
+        return jobReport;
+    }
+
+    /**
+     * Sets the value of the jobReport property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link JobReportType }
+     *     
+     */
+    public void setJobReport(JobReportType value) {
+        this.jobReport = value;
     }
 
 }

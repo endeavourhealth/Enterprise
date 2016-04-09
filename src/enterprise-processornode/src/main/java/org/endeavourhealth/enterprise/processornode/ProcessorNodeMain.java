@@ -59,6 +59,10 @@ class ProcessorNodeMain implements AutoCloseable, ProcessorNodeQueue.IProcessorN
 
             executionController.start();
         } catch (Exception e) {
+
+            if (executionController != null)
+                executionController.errorOccurred(e);
+
             logger.error("Processor " + processorNodeUuid.toString(), e);
         }
     }

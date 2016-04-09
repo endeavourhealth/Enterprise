@@ -10,6 +10,7 @@ import org.endeavourhealth.enterprise.enginecore.entities.model.DataField;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 
+import javax.xml.stream.events.EndElement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -100,6 +101,11 @@ public class CareRecordDal {
         int entityIndex = entityMapWrapper.getEntityIndexByResultSetIndex(resultSetIndex);
         EntityMapWrapper.Entity entity = entityMapWrapper.getEntity(entityIndex);
         int populationFieldIndex = entity.getSource().getPopulationFieldIndex();
+        Integer organisationOdsFieldIndex = null;
+
+        if (entity.getSource().getOrganisationOdsFieldIndex() != null)
+            organisationOdsFieldIndex = entity.getSource().getOrganisationOdsFieldIndex();
+
         List<Field> entityMapFields = entity.getSource().getField();
         int entityMapFieldCount = entityMapFields.size();
 
@@ -115,6 +121,10 @@ public class CareRecordDal {
                 else {
                     dataContainer = dataContainerPool.acquire();
                     dataContainer.setId(populationId);
+
+                    if (organisationOdsFieldIndex != null)
+                        dataContainer.setOrganisationOds(rs.getString(organisationOdsFieldIndex));
+
                     dataContainerDictionary.put(populationId, dataContainer);
                 }
             }

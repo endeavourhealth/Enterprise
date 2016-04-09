@@ -5,17 +5,25 @@
 		<resultSetIndex>1</resultSetIndex>
 		<cardinality>single</cardinality>
 		<populationFieldIndex>1</populationFieldIndex>
+		<organisationOdsFieldIndex>2</organisationOdsFieldIndex>
+		<field>
+			<logicalName>ORGANISATION_ODS</logicalName>
+			<displayName>Organisation ODS Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>organisationODS</logicalDataType>
+		</field>
 		<field>
 			<logicalName>DOB</logicalName>
 			<displayName>Date Of Birth</displayName>
-			<index>2</index>
+			<index>3</index>
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>
 		<field>
 			<logicalName>SEX</logicalName>
 			<displayName>Sex</displayName>
-			<index>3</index>
+			<index>4</index>
 			<availability>search output</availability>
 			<logicalDataType>dataValues</logicalDataType>
 			<dataValues>
@@ -32,14 +40,14 @@
 		<field>
 			<logicalName>SURNAME</logicalName>
 			<displayName>Surname</displayName>
-			<index>4</index>
+			<index>5</index>
 			<availability>output</availability>
 			<logicalDataType>string</logicalDataType>
 		</field>
 		<field>
 			<logicalName>REGISTRATION_DATE</logicalName>
 			<displayName>Registration Date</displayName>
-			<index>5</index>
+			<index>6</index>
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>

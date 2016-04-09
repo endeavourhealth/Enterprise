@@ -13,6 +13,7 @@
 			<xs:element name="resultSetIndex" type="xs:int"/>
 			<xs:element name="cardinality" type="cardinality"/>
 			<xs:element name="populationFieldIndex" type="xs:int"/>
+			<xs:element name="organisationOdsFieldIndex" type="xs:int" minOccurs="0"/>
 			<xs:element name="field" type="field" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -36,6 +37,7 @@
 			<xs:enumeration value="uuid"/>
 			<xs:enumeration value="code"/>
 			<xs:enumeration value="dataValues"/>
+			<xs:enumeration value="organisationODS"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="cardinality">

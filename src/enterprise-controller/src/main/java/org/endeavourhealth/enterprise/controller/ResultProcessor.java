@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.controller;
 
+import org.endeavourhealth.enterprise.controller.jobinventory.JobReportInfo;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
@@ -23,12 +24,12 @@ class ResultProcessor {
     private ResultCounts finalResultCounts;
     private List<DbAbstractTable> toSave;
 
-    public ResultProcessor(UUID jobUuid) {
+    public ResultProcessor(UUID jobUuid, List<JobReportInfo> jobReportInfoList) {
         this.jobUuid = jobUuid;
-    }
 
-    public void registerReport(UUID jobReportUuid, Set<String> organisations) {
-        jobReportUuidToOrganisations.put(jobReportUuid, organisations);
+        for (JobReportInfo jobReportInfo : jobReportInfoList) {
+            jobReportUuidToOrganisations.put(jobReportInfo.getJobReportUuid(), jobReportInfo.getOrganisations());
+        }
     }
 
     public void complete(Set<UUID> expectedProcessorNodes) throws Exception {

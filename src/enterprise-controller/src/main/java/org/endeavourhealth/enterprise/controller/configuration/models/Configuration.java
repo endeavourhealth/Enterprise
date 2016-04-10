@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="coreDatabase" type="{}databaseConnection"/>
  *         &lt;element name="messageQueuing" type="{}messageQueuing"/>
  *         &lt;element name="careRecordDatabase" type="{}databaseConnection"/>
+ *         &lt;element name="outputFiles" type="{}outputFilesType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,7 +39,8 @@ import javax.xml.bind.annotation.XmlType;
     "patientBatchSize",
     "coreDatabase",
     "messageQueuing",
-    "careRecordDatabase"
+    "careRecordDatabase",
+    "outputFiles"
 })
 public class Configuration {
 
@@ -52,6 +54,8 @@ public class Configuration {
     protected MessageQueuing messageQueuing;
     @XmlElement(required = true)
     protected DatabaseConnection careRecordDatabase;
+    @XmlElement(required = true)
+    protected OutputFilesType outputFiles;
 
     /**
      * Gets the value of the debugging property.
@@ -187,6 +191,30 @@ public class Configuration {
      */
     public void setCareRecordDatabase(DatabaseConnection value) {
         this.careRecordDatabase = value;
+    }
+
+    /**
+     * Gets the value of the outputFiles property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link OutputFilesType }
+     *     
+     */
+    public OutputFilesType getOutputFiles() {
+        return outputFiles;
+    }
+
+    /**
+     * Sets the value of the outputFiles property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link OutputFilesType }
+     *     
+     */
+    public void setOutputFiles(OutputFilesType value) {
+        this.outputFiles = value;
     }
 
 }

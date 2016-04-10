@@ -1,6 +1,5 @@
 package org.endeavourhealth.enterprise.controller.configuration;
 
-import org.endeavourhealth.enterprise.core.Resources;
 import org.endeavourhealth.enterprise.core.XmlSerializer;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 import org.endeavourhealth.enterprise.controller.configuration.models.*;

@@ -74,6 +74,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link OutputFilesType }
+     * 
+     */
+    public OutputFilesType createOutputFilesType() {
+        return new OutputFilesType();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Configuration }{@code >}}
      * 
      */

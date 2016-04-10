@@ -17,6 +17,10 @@ class JobProgressTracker {
         remainingWorkerItemStartIds.add(minimumId);
     }
 
+    public Set<UUID> getAllProcessorNodes() {
+        return allProcessorNodes;
+    }
+
     public int getTotalNumberOfBatches() {
         return allWorkerItemStartIds.size();
     }

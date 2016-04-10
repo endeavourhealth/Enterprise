@@ -88,7 +88,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
                 getJobUuid(),
                 processorNodeUuid);
 
-        controllerQueue.sendMessage(message);;
+        controllerQueue.sendMessage(message);
     }
 
     private EngineApi createEngineApi(EntityMapWrapper.EntityMap entityMap) throws Exception {
@@ -178,7 +178,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
                     NetworkHelper.getLocalIpAddress(),
                     t.toString());
 
-            controllerQueue.sendMessage(message);;
+            controllerQueue.sendMessage(message);
 
         } catch (Exception e) {
             logger.error("Error during self shutdown.", e);

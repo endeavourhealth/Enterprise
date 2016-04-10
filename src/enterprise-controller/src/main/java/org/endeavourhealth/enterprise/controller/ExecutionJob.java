@@ -24,10 +24,8 @@ import org.slf4j.LoggerFactory;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 
 class ExecutionJob {
 
@@ -38,6 +36,7 @@ class ExecutionJob {
     private final JobProgressTracker jobProgressTracker = new JobProgressTracker();
     private DbJob dbJob;
     private String workerQueueName;
+    private ResultProcessor resultProcessor;
     private boolean stopping;
 
     public ExecutionJob(Configuration configuration) {
@@ -68,6 +67,7 @@ class ExecutionJob {
             return;
         }
 
+        resultProcessor = new ResultProcessor(getExecutionUuid());
         prepareExecutionTables(itemRequests);
         createAndPopulateWorkerQueue();
         startExecutionNodes();
@@ -207,6 +207,11 @@ class ExecutionJob {
         jobReport.setParameters(requestParameterString);
         jobReport.setStatusId(ExecutionStatus.Executing);
 
+        Set<String> organisations = new HashSet<>();
+        organisations.addAll(requestParameters.getOrganisation());
+
+        resultProcessor.registerReport(jobReport.getJobReportUuid(), organisations);
+
         return jobReport;
     }
 
@@ -215,6 +220,10 @@ class ExecutionJob {
             return;
 
         List<DbSourceOrganisation> all = DbSourceOrganisation.retrieveAll(false);
+
+        if (CollectionUtils.isEmpty(all))
+            throw new Exception("No active organisations");
+
         Set<String> targetSet = new HashSet<>();
 
         for (DbSourceOrganisation source: all) {
@@ -331,10 +340,12 @@ class ExecutionJob {
         if (stopping)
             return;
 
-        dbJob.setSaveMode(TableSaveMode.UPDATE);
-        dbJob.markAsFinished(ExecutionStatus.Succeeded);
-
         try {
+
+            resultProcessor.complete(jobProgressTracker.getAllProcessorNodes());
+            dbJob.setSaveMode(TableSaveMode.UPDATE);
+            dbJob.markAsFinished(ExecutionStatus.Succeeded);
+
             dbJob.writeToDb();
             logger.debug("Execution Job finished: " + executionUuid.toString());
         } catch (Exception e) {

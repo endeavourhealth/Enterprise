@@ -60,50 +60,9 @@ public class EngineApi {
     }
 
     public ResultCounts getResults() {
-        ResultCounts resultCounts = new ResultCounts();
 
-        for (Request request: executionRequests) {
-            CompiledReport compiledReport = request.getCompiledReport();
-
-            JobReportType jobReportType = new JobReportType();
-            jobReportType.setJobReportUuid(request.getJobReportUuid().toString());
-
-            jobReportType.setOrganisationResults(new JobReportType.OrganisationResults());
-            populateOrganisationResults(jobReportType.getOrganisationResults().getOrganisationResult(), compiledReport.getReportLevelResults());
-
-            jobReportType.setJobReportItemResults(new JobReportType.JobReportItemResults());
-            populateJobItemResults(jobReportType.getJobReportItemResults().getJobReportItemResult(), compiledReport.getQueryResults());
-
-            resultCounts.setJobReport(jobReportType);
-        }
-
-        return resultCounts;
-    }
-
-    private void populateJobItemResults(List<JobReportItemResultType> jobReportItemResult, Map<UUID, ResultCounter> queryResults) {
-
-        for (Map.Entry<UUID, ResultCounter> item: queryResults.entrySet()) {
-
-            JobReportItemResultType result = new JobReportItemResultType();
-            result.setJobReportItemResultUuid(item.getKey().toString());
-            populateOrganisationResults(result.getOrganisationResult(), item.getValue());
-            jobReportItemResult.add(result);
-        }
-    }
-
-    private void populateOrganisationResults(List<OrganisationResult> organisationResult, ResultCounter reportLevelResults) {
-
-        Map<String, AtomicInteger> results = reportLevelResults.getResults();
-
-        for (Map.Entry<String, AtomicInteger> item: results.entrySet()) {
-
-            if (item.getValue().get() > 0) {
-                OrganisationResult result = new OrganisationResult();
-                result.setOdsCode(item.getKey());
-                result.setResultCount(item.getValue().get());
-                organisationResult.add(result);
-            }
-        }
+        ResultCreator resultCreator = new ResultCreator(executionRequests);
+        return resultCreator.create();
     }
 
     public Processor createProcessor() {

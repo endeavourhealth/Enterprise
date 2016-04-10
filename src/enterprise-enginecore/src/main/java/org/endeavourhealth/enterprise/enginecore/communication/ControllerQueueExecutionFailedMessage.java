@@ -93,9 +93,6 @@ public class ControllerQueueExecutionFailedMessage {
     }
 
     public static boolean isTypeOf(Message message) {
-        if (type.equals(message.getProperties().getType()))
-            return true;
-        else
-            return false;
+        return type.equals(message.getProperties().getType());
     }
 }

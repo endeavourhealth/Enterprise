@@ -142,6 +142,7 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
     }
 
     private boolean messageIsForCurrentJob(UUID executionUuid) {
+        //noinspection SimplifiableIfStatement
         if (currentJob == null)
             return false;
 

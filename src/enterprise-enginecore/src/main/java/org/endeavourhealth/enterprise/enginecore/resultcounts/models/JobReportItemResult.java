@@ -6,22 +6,23 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for jobReportItemResultType complex type.
+ * <p>Java class for jobReportItemResult complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="jobReportItemResultType">
+ * &lt;complexType name="jobReportItemResult">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="organisationResult" type="{}organisationResult" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="organisationResult" type="{}organisationResult" maxOccurs="unbounded"/>
  *       &lt;/sequence>
- *       &lt;attribute name="jobReportItemResultUuid" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="jobReportItemUuid" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -30,14 +31,15 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "jobReportItemResultType", propOrder = {
+@XmlType(name = "jobReportItemResult", propOrder = {
     "organisationResult"
 })
-public class JobReportItemResultType {
+public class JobReportItemResult {
 
+    @XmlElement(required = true)
     protected List<OrganisationResult> organisationResult;
-    @XmlAttribute(name = "jobReportItemResultUuid", required = true)
-    protected String jobReportItemResultUuid;
+    @XmlAttribute(name = "jobReportItemUuid", required = true)
+    protected String jobReportItemUuid;
 
     /**
      * Gets the value of the organisationResult property.
@@ -69,27 +71,27 @@ public class JobReportItemResultType {
     }
 
     /**
-     * Gets the value of the jobReportItemResultUuid property.
+     * Gets the value of the jobReportItemUuid property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getJobReportItemResultUuid() {
-        return jobReportItemResultUuid;
+    public String getJobReportItemUuid() {
+        return jobReportItemUuid;
     }
 
     /**
-     * Sets the value of the jobReportItemResultUuid property.
+     * Sets the value of the jobReportItemUuid property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setJobReportItemResultUuid(String value) {
-        this.jobReportItemResultUuid = value;
+    public void setJobReportItemUuid(String value) {
+        this.jobReportItemUuid = value;
     }
 
 }

@@ -1,6 +1,8 @@
 
 package org.endeavourhealth.enterprise.enginecore.resultcounts.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="jobReport" type="{}jobReportType"/>
+ *         &lt;element name="jobReport" type="{}jobReportResult" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -33,30 +35,35 @@ import javax.xml.bind.annotation.XmlType;
 public class ResultCounts {
 
     @XmlElement(required = true)
-    protected JobReportType jobReport;
+    protected List<JobReportResult> jobReport;
 
     /**
      * Gets the value of the jobReport property.
      * 
-     * @return
-     *     possible object is
-     *     {@link JobReportType }
-     *     
-     */
-    public JobReportType getJobReport() {
-        return jobReport;
-    }
-
-    /**
-     * Sets the value of the jobReport property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the jobReport property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link JobReportType }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getJobReport().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link JobReportResult }
+     * 
+     * 
      */
-    public void setJobReport(JobReportType value) {
-        this.jobReport = value;
+    public List<JobReportResult> getJobReport() {
+        if (jobReport == null) {
+            jobReport = new ArrayList<JobReportResult>();
+        }
+        return this.jobReport;
     }
 
 }

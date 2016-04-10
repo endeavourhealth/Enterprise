@@ -17,7 +17,6 @@ import org.endeavourhealth.enterprise.enginecore.carerecord.SourceStatistics;
 import org.endeavourhealth.enterprise.enginecore.communication.*;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
-import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,18 +28,23 @@ import java.util.*;
 
 class ExecutionJob {
 
-    private UUID executionUuid = UUID.randomUUID();
-    private Configuration configuration;
+    private final UUID executionUuid = UUID.randomUUID();
+    private final Configuration configuration;
     private final static Logger logger = LoggerFactory.getLogger(ExecutionJob.class);
-    private SourceStatistics primaryTableStats;
+    private final ProcessorNodesQueueWrapper processorNodesQueueWrapper;
+    private final WorkerQueueWrapper workerQueueWrapper;
     private final JobProgressTracker jobProgressTracker = new JobProgressTracker();
+
+    private SourceStatistics primaryTableStats;
+
     private DbJob dbJob;
-    private String workerQueueName;
     private ResultProcessor resultProcessor;
     private boolean stopping;
 
     public ExecutionJob(Configuration configuration) {
         this.configuration = configuration;
+        this.processorNodesQueueWrapper = new ProcessorNodesQueueWrapper(configuration, executionUuid);
+        this.workerQueueWrapper = new WorkerQueueWrapper(configuration, executionUuid);
     }
 
     public UUID getExecutionUuid() {
@@ -70,7 +74,7 @@ class ExecutionJob {
         resultProcessor = new ResultProcessor(getExecutionUuid());
         prepareExecutionTables(itemRequests);
         createAndPopulateWorkerQueue();
-        startExecutionNodes();
+        startProcessorNodes();
     }
 
     public void stop() {
@@ -251,81 +255,19 @@ class ExecutionJob {
     }
 
     private void createAndPopulateWorkerQueue() throws Exception {
-
-        QueueConnectionProperties connectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
-        long minimumId = primaryTableStats.getMinimumId();
-        long maximumId;
-        workerQueueName = WorkerQueue.calculateWorkerQueueName(configuration.getMessageQueuing().getWorkerQueuePrefix(), executionUuid);
-
-        try (WorkerQueue queue = new WorkerQueue(connectionProperties, workerQueueName)) {
-
-            queue.create();
-
-            while (true) {
-
-                maximumId = minimumId + configuration.getPatientBatchSize() - 1;
-
-                if (maximumId > primaryTableStats.getMaximumId())
-                    maximumId = primaryTableStats.getMaximumId();
-
-                WorkerQueueBatchMessage message = WorkerQueueBatchMessage.CreateAsNew(
-                        executionUuid,
-                        minimumId,
-                        maximumId);
-
-                queue.sendMessage(message);
-                jobProgressTracker.registerWorkerItemStartId(minimumId);
-
-                if (maximumId >= primaryTableStats.getMaximumId())
-                    break;
-
-                minimumId = maximumId + 1;
-            }
-
-            String message = String.format("Added IDs %s to %s in %s batches to Worker queue", primaryTableStats.getMinimumId(), primaryTableStats.getMaximumId(), jobProgressTracker.getTotalNumberOfBatches());
-            queue.logDebug(message);
-        }
+        workerQueueWrapper.createAndPopulate(primaryTableStats, jobProgressTracker);
     }
 
     private void purgeWorkerQueue() {
-        QueueConnectionProperties connectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
-
-        try (WorkerQueue queue = new WorkerQueue(connectionProperties, workerQueueName)) {
-            queue.purge();
-        } catch (Exception e) {
-            logger.error("Error while purging worker queue: " + workerQueueName, e);
-        }
+        workerQueueWrapper.purge();
     }
 
-    private void startExecutionNodes() throws Exception {
-        QueueConnectionProperties queueConnectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
-        String workerQueueName = WorkerQueue.calculateWorkerQueueName(configuration.getMessageQueuing().getWorkerQueuePrefix(), executionUuid);
-        DatabaseConnectionDetails coreDatabaseConnectionDetails = ConfigurationAPI.convertConnection(configuration.getCoreDatabase());
-        DatabaseConnectionDetails careRecordDatabaseConnectionDetails = ConfigurationAPI.convertConnection(configuration.getCareRecordDatabase());
-
-        ProcessorNodesStartMessage.StartMessagePayload payload = new ProcessorNodesStartMessage.StartMessagePayload();
-        payload.setJobUuid(executionUuid);
-        payload.setWorkerQueueName(workerQueueName);
-        payload.setCoreDatabaseConnectionDetails(coreDatabaseConnectionDetails);
-        payload.setCareRecordDatabaseConnectionDetails(careRecordDatabaseConnectionDetails);
-        payload.setControllerQueueName(configuration.getMessageQueuing().getControllerQueueName());
-
-        ProcessorNodesStartMessage message = ProcessorNodesStartMessage.CreateAsNew(payload);
-
-        ProcessorNodesExchange exchange = new ProcessorNodesExchange(queueConnectionProperties, configuration.getMessageQueuing().getProcessorNodesExchangeName());
-        exchange.sendMessage(message);
+    private void startProcessorNodes() throws Exception {
+        processorNodesQueueWrapper.startProcessorNodes();
     }
 
     private void stopExecutionNodes() throws Exception{
-        QueueConnectionProperties queueConnectionProperties = ConfigurationAPI.convertConnection(configuration.getMessageQueuing());
-
-        ProcessorNodesStopMessage.StopMessagePayload payload = new ProcessorNodesStopMessage.StopMessagePayload();
-        payload.setJobUuid(executionUuid);
-
-        ProcessorNodesStopMessage message = ProcessorNodesStopMessage.CreateAsNew(payload);
-
-        ProcessorNodesExchange exchange = new ProcessorNodesExchange(queueConnectionProperties, configuration.getMessageQueuing().getProcessorNodesExchangeName());
-        exchange.sendMessage(message);
+        processorNodesQueueWrapper.stopProcessorNodes();
     }
 
     public synchronized void workerItemComplete(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload) throws Exception {

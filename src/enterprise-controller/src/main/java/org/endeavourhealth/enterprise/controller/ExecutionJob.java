@@ -3,6 +3,7 @@ package org.endeavourhealth.enterprise.controller;
 import org.endeavourhealth.enterprise.controller.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobInventory;
+import org.endeavourhealth.enterprise.controller.outputfiles.OutputFileApi;
 import org.endeavourhealth.enterprise.core.database.execution.*;
 import org.endeavourhealth.enterprise.enginecore.carerecord.CareRecordDal;
 import org.endeavourhealth.enterprise.enginecore.carerecord.SourceStatistics;
@@ -12,12 +13,13 @@ import org.endeavourhealth.enterprise.core.ExecutionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.datatype.DatatypeConfigurationException;
+import java.time.Instant;
 import java.util.*;
 
 class ExecutionJob {
 
     private final UUID executionUuid = UUID.randomUUID();
+    private final Instant startDateTime = Instant.now();
     private final Configuration configuration;
     private final static Logger logger = LoggerFactory.getLogger(ExecutionJob.class);
     private final ProcessorNodesQueueWrapper processorNodesQueueWrapper;
@@ -27,15 +29,15 @@ class ExecutionJob {
     private final JobInventory jobInventory = new JobInventory();
 
     private SourceStatistics primaryTableStats;
-
     private ResultProcessor resultProcessor;
+    private OutputFileApi outputFileApi;
     private boolean stopping;
 
     public ExecutionJob(Configuration configuration) {
         this.configuration = configuration;
         this.processorNodesQueueWrapper = new ProcessorNodesQueueWrapper(configuration, executionUuid);
         this.workerQueueWrapper = new WorkerQueueWrapper(configuration, executionUuid);
-        this.executionTablesWrapper = new ExecutionTablesWrapper(executionUuid);
+        this.executionTablesWrapper = new ExecutionTablesWrapper(executionUuid, startDateTime);
     }
 
     public UUID getExecutionUuid() {
@@ -65,9 +67,15 @@ class ExecutionJob {
         jobInventory.initialise(itemRequests);
         prepareJobReportParameters();
         resultProcessor = new ResultProcessor(getExecutionUuid(), jobInventory.getJobReportInfoList());
+        prepareOutputFiles();
         prepareExecutionTables();
         createAndPopulateWorkerQueue();
         startProcessorNodes();
+    }
+
+    private void prepareOutputFiles() throws Exception {
+        outputFileApi = new OutputFileApi(configuration.getOutputFiles(), jobInventory, startDateTime);
+        outputFileApi.prepareFiles();
     }
 
     private void prepareJobReportParameters() throws Exception {
@@ -141,8 +149,8 @@ class ExecutionJob {
             return;
 
         try {
-
             resultProcessor.complete(jobProgressTracker.getAllProcessorNodes());
+            outputFileApi.complete();
             executionTablesWrapper.markJobAsSuccessful();
             logger.debug("Execution Job finished: " + executionUuid.toString());
         } catch (Exception e) {

@@ -11,6 +11,7 @@ import java.util.*;
 class JobContentRetriever {
 
     private final Map<UUID, UUID> libraryItemToAuditMap = new HashMap<>();
+    private final Set<UUID> listReportItems = new HashSet<>();
 
     public JobContentRetriever(List<DbRequest> requests) throws Exception {
 
@@ -23,6 +24,10 @@ class JobContentRetriever {
 
     public Set<UUID> getAllItemsUsed() {
         return libraryItemToAuditMap.keySet();
+    }
+
+    public boolean isListReport(UUID libraryItemUuid) {
+        return listReportItems.contains(libraryItemUuid);
     }
 
     public UUID getAuditUuid(UUID libraryItemUuid) {
@@ -54,6 +59,9 @@ class JobContentRetriever {
 
         if (invalidItemType(activeItem.getItemTypeId()))
             throw new Exception("Item type not supported.  Item UUID: " + activeItem.getItemUuid() + " Type: " + activeItem.getItemTypeId().name());
+
+        if (activeItem.getItemTypeId() == DefinitionItemType.ListOutput)
+            listReportItems.add(activeItem.getItemUuid());
 
         libraryItemToAuditMap.put(activeItem.getItemUuid(), activeItem.getAuditUuid());
     }

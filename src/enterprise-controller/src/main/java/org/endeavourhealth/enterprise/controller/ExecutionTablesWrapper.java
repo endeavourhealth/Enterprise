@@ -16,12 +16,14 @@ import java.util.*;
 class ExecutionTablesWrapper {
 
     private final UUID jobUuid;
+    private final Instant startDateTime;
     private DbJob dbJob;
     private SourceStatistics primaryTableStatistics;
 
-    public ExecutionTablesWrapper(UUID jobUuid) {
+    public ExecutionTablesWrapper(UUID jobUuid, Instant startDateTime) {
 
         this.jobUuid = jobUuid;
+        this.startDateTime = startDateTime;
     }
 
     public void prepareExecutionTables(JobInventory inventory) throws Exception {
@@ -115,7 +117,7 @@ class ExecutionTablesWrapper {
 
         job.setJobUuid(jobUuid);
         job.setStatusId(ExecutionStatus.Executing);
-        job.setStartDateTime(Instant.now());
+        job.setStartDateTime(startDateTime);
         job.setBaselineAuditUuid(getLatestAuditUuid());
         job.setPatientsInDatabase(primaryTableStatistics.getRecordCount());
 
@@ -135,12 +137,10 @@ class ExecutionTablesWrapper {
         DbJob job = new DbJob();
         job.setSaveMode(TableSaveMode.INSERT);
 
-        Instant currentDate = Instant.now();
-
         job.setJobUuid(jobUuid);
         job.setStatusId(executionStatus);
-        job.setStartDateTime(currentDate);
-        job.setEndDateTime(currentDate);
+        job.setStartDateTime(startDateTime);
+        job.setEndDateTime(Instant.now());
         job.setBaselineAuditUuid(getLatestAuditUuid());
 
         if (primaryTableStatistics != null)
@@ -152,6 +152,7 @@ class ExecutionTablesWrapper {
     public void markJobAsSuccessful() throws Exception {
         dbJob.setSaveMode(TableSaveMode.UPDATE);
         dbJob.markAsFinished(ExecutionStatus.Succeeded);
+        dbJob.setEndDateTime(Instant.now());
 
         dbJob.writeToDb();
     }

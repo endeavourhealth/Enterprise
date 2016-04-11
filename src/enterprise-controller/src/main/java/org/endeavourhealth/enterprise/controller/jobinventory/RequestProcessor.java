@@ -13,11 +13,11 @@ import java.util.*;
 
 class RequestProcessor {
 
-    public static JobReportInfo createJobReportInfo(DbRequest request, JobInventory jobInventory) throws Exception {
+    public static JobReportInfo createJobReportInfo(DbRequest request, JobContentRetriever jobContentRetriever) throws Exception {
 
         try {
 
-            DbItem dbItem = DbItem.retrieveForUuidAndAudit(request.getReportUuid(), jobInventory.getItemsAuditUuid(request.getReportUuid()));
+            DbItem dbItem = DbItem.retrieveForUuidAndAudit(request.getReportUuid(), jobContentRetriever.getAuditUuid(request.getReportUuid()));
 
             String itemXml = dbItem.getXmlContent();
             Report report = QueryDocumentSerializer.readReportFromXml(itemXml);
@@ -27,7 +27,7 @@ class RequestProcessor {
 
             JobReportInfo jobReportInfo = new JobReportInfo(request);
 
-            List<JobReportItemInfo> children = createJobReportItemInfoList(report.getReportItem());
+            List<JobReportItemInfo> children = createJobReportItemInfoList(report.getReportItem(), jobContentRetriever);
             jobReportInfo.getChildren().addAll(children);
 
             return jobReportInfo;
@@ -37,7 +37,9 @@ class RequestProcessor {
         }
     }
 
-    private static List<JobReportItemInfo> createJobReportItemInfoList(List<ReportItem> reportItems) throws Exception {
+    private static List<JobReportItemInfo> createJobReportItemInfoList(
+            List<ReportItem> reportItems,
+            JobContentRetriever jobContentRetriever) throws Exception {
 
         List<JobReportItemInfo> result = new ArrayList<>();
 
@@ -47,9 +49,13 @@ class RequestProcessor {
         for (ReportItem item: reportItems) {
             UUID libraryItemUuid = getLibraryItemUuidFromReportItem(item);
             JobReportItemInfo target = new JobReportItemInfo(libraryItemUuid);
+
+            if (jobContentRetriever.isListReport(libraryItemUuid))
+                target.setListReportInfo(new ListReportInfo());
+
             result.add(target);
 
-            List<JobReportItemInfo> children = createJobReportItemInfoList(item.getReportItem());
+            List<JobReportItemInfo> children = createJobReportItemInfoList(item.getReportItem(), jobContentRetriever);
             target.getChildren().addAll(children);
         }
 

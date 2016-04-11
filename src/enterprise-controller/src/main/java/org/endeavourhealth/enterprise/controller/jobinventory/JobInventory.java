@@ -18,7 +18,7 @@ public class JobInventory {
 
         for (DbRequest request: dbRequests) {
 
-            JobReportInfo jobReportInfo = RequestProcessor.createJobReportInfo(request, this);
+            JobReportInfo jobReportInfo = RequestProcessor.createJobReportInfo(request, jobContentRetriever);
             jobReportInfoList.add(jobReportInfo);
         }
     }

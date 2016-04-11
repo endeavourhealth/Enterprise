@@ -19,6 +19,7 @@ class ExecutionTablesWrapper {
     private final Instant startDateTime;
     private DbJob dbJob;
     private SourceStatistics primaryTableStatistics;
+    private JobInventory inventory;
 
     public ExecutionTablesWrapper(UUID jobUuid, Instant startDateTime) {
 
@@ -27,6 +28,7 @@ class ExecutionTablesWrapper {
     }
 
     public void prepareExecutionTables(JobInventory inventory) throws Exception {
+        this.inventory = inventory;
 
         List<DbAbstractTable> toSave = new ArrayList<>();
 
@@ -149,12 +151,30 @@ class ExecutionTablesWrapper {
         job.writeToDb();
     }
 
-    public void markJobAsSuccessful() throws Exception {
+    public void markJobAsSuccessful(boolean shouldUpdateRequestTable) throws Exception {
+
+        List<DbAbstractTable> toSave = new ArrayList<>();
+
         dbJob.setSaveMode(TableSaveMode.UPDATE);
         dbJob.markAsFinished(ExecutionStatus.Succeeded);
         dbJob.setEndDateTime(Instant.now());
 
-        dbJob.writeToDb();
+        toSave.add(dbJob);
+
+        if (shouldUpdateRequestTable)
+            updateRequestTable(toSave);
+
+        DatabaseManager.db().writeEntities(toSave);
+    }
+
+    private void updateRequestTable(List<DbAbstractTable> toSave) throws Exception {
+        for (JobReportInfo jobReportInfo: inventory.getJobReportInfoList()) {
+
+            DbRequest request = DbRequest.retrieveForUuid(jobReportInfo.getRequest().getRequestUuid());  //get it again in case we override some values by accident
+            request.setJobUuid(jobUuid);
+            request.setSaveMode(TableSaveMode.UPDATE);
+            toSave.add(request);
+        }
     }
 
     public void markJobAsFailed() throws Exception {

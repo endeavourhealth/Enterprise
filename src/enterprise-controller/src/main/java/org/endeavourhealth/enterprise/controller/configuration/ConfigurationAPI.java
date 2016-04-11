@@ -22,6 +22,9 @@ public class ConfigurationAPI {
         if (debugging.isStartImmediately() == null)
             debugging.setStartImmediately(false);
 
+        if (debugging.isMarkRequestAsComplete() == null)
+            debugging.setMarkRequestAsComplete(true);
+
         return config;
     }
 

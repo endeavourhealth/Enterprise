@@ -151,7 +151,7 @@ class ExecutionJob {
         try {
             resultProcessor.complete(jobProgressTracker.getAllProcessorNodes());
             outputFileApi.complete();
-            executionTablesWrapper.markJobAsSuccessful();
+            executionTablesWrapper.markJobAsSuccessful(configuration.getDebugging().isMarkRequestAsComplete());  //This updates the Request table which will stop the job running again.
             logger.debug("Execution Job finished: " + executionUuid.toString());
         } catch (Exception e) {
             logger.error("Job Finished exception", e);

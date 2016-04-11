@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="startImmediately" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *         &lt;element name="maximumPatientId" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
+ *         &lt;element name="markRequestAsComplete" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -29,12 +30,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "debugging", propOrder = {
     "startImmediately",
-    "maximumPatientId"
+    "maximumPatientId",
+    "markRequestAsComplete"
 })
 public class Debugging {
 
     protected Boolean startImmediately;
     protected Integer maximumPatientId;
+    protected Boolean markRequestAsComplete;
 
     /**
      * Gets the value of the startImmediately property.
@@ -82,6 +85,30 @@ public class Debugging {
      */
     public void setMaximumPatientId(Integer value) {
         this.maximumPatientId = value;
+    }
+
+    /**
+     * Gets the value of the markRequestAsComplete property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isMarkRequestAsComplete() {
+        return markRequestAsComplete;
+    }
+
+    /**
+     * Sets the value of the markRequestAsComplete property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setMarkRequestAsComplete(Boolean value) {
+        this.markRequestAsComplete = value;
     }
 
 }

@@ -5,6 +5,7 @@ var flowchart : any;
 module app.query {
 	import TestEditorController = app.dialogs.TestEditorController;
 	import ExpressionEditorController = app.dialogs.ExpressionEditorController;
+	import QueryPickerController = app.dialogs.QueryPickerController;
 	import IModalService = angular.ui.bootstrap.IModalService;
 	import IModalSettings = angular.ui.bootstrap.IModalSettings;
 	import Test = app.models.Test;
@@ -13,6 +14,7 @@ module app.query {
 	import Query = app.models.Query;
 	import StartingRules = app.models.StartingRules;
 	import ExpressionType = app.models.ExpressionType;
+	import QuerySelection = app.models.QuerySelection;
 
 	'use strict';
 
@@ -114,7 +116,6 @@ module app.query {
 						$scope.ruleId = ruleId;
 
 						var selectedRule = $scope.chartViewModel.getSelectedRule();
-
 						if (selectedRule.data.expression) {
 							var rules = <any>[];
 
@@ -137,7 +138,7 @@ module app.query {
 								selectedRule.data.expression = resultData;
 							});
 						}
-						else {
+						else if (!selectedRule.data.queryLibraryItemUUID) {
 							var test : Test = selectedRule.data.test;
 
 							var originalResultData = jQuery.extend(true, {}, test);
@@ -202,99 +203,132 @@ module app.query {
 					// Template for a new rule.
 					//
 
-					if ($scope.nextRuleID==1) {
+					if ($scope.nextRuleID==1) { // Add to new Query
 
-						var newStartRuleDataModel = {
-							description: "START",
-							id: 0,
-							layout: {
-								x: -162,
-								y: 25
-							},
-							onPass: {
-								action: "",
-								ruleId : <any>[]
-							},
-							onFail: {
-								action: "",
-								ruleId: <any>[]
-							}
-						};
+						if (mode==1||mode==3) { // Rule or Expression
+							this.createStartRule(-162, 25);
 
-						$scope.chartViewModel.addRule(newStartRuleDataModel);
-
-						var newRuleDataModel = {
-							description: "Rule Description",
-							id: $scope.nextRuleID++,
-							layout: {
-								x: 194,
-								y: 5
-							},
-							onPass: {
-								action: "INCLUDE",
-								ruleId: <any>[]
-							},
-							onFail: {
-								action: "NO_ACTION",
-								ruleId: <any>[]
-							}
-						};
-
-						$scope.chartViewModel.addRule(newRuleDataModel);
+							this.createNewRule(194, 5);
+						}
+						else if (mode==2) { // Query as a Rule
+							var querySelection : QuerySelection;
+							var vm = this;
+							QueryPickerController.open($modal, querySelection)
+								.result.then(function(resultData : QuerySelection){
+								vm.createStartRule(-162,25);
+								vm.createNewQueryRule(194, 5, resultData);
+							});
+						}
 
 						$scope.chartViewModel.addStartingRule(1);
 					}
-					else {
-						var newRuleDataModel = {
-							description: "Rule Description",
-							id: $scope.nextRuleID++,
-							layout: {
-								x: 566,
-								y: 7
-							},
-							onPass: {
-								action: "INCLUDE",
-								ruleId: <any>[]
-							},
-							onFail: {
-								action: "NO_ACTION",
-								ruleId: <any>[]
-							}
-						};
-
-						var newExpressionRuleDataModel = {
-							description: "Expression Description",
-							id: $scope.nextRuleID++,
-							layout: {
-								x: 566,
-								y: 7
-							},
-							onPass: {
-								action: "INCLUDE",
-								ruleId: <any>[]
-							},
-							onFail: {
-								action: "NO_ACTION",
-								ruleId: <any>[]
-							},
-							expression: {
-								expressionText: "",
-								variable: <any>[]
-							}
-						};
+					else { // Add to existing Query
 
 						switch(mode) {
-							case "1":
-								$scope.chartViewModel.addRule(newRuleDataModel);
+							case "1": // normal Rule
+								this.createNewRule(566, 7);
 								break;
-							case "2":
+							case "2": // Query as a Rule
+								var querySelection : QuerySelection;
+								var vm = this;
+								QueryPickerController.open($modal, querySelection)
+									.result.then(function(resultData : QuerySelection){
+									vm.createNewQueryRule(566, 7, resultData);
+								});
 								break;
-							case "3":
-								$scope.chartViewModel.addRule(newExpressionRuleDataModel);
+							case "3": // Expression
+								this.createNewExpression(566,7);
 								break;
 						}
 					}
 				};
+
+				$scope.createStartRule = function(x:any, y:any) {
+					var newStartRuleDataModel = {
+						description: "START",
+						id: 0,
+						layout: {
+							x: x,
+							y: y
+						},
+						onPass: {
+							action: "",
+							ruleId : <any>[]
+						},
+						onFail: {
+							action: "",
+							ruleId: <any>[]
+						}
+					};
+
+					$scope.chartViewModel.addRule(newStartRuleDataModel);
+				}
+
+				$scope.createNewRule = function(x:any, y:any) {
+					var newRuleDataModel = {
+						description: "Rule Description",
+						id: $scope.nextRuleID++,
+						layout: {
+							x: x,
+							y: y
+						},
+						onPass: {
+							action: "INCLUDE",
+							ruleId: <any>[]
+						},
+						onFail: {
+							action: "NO_ACTION",
+							ruleId: <any>[]
+						}
+					};
+					$scope.chartViewModel.addRule(newRuleDataModel);
+				}
+
+				$scope.createNewExpression = function(x:any, y:any) {
+					var newExpressionRuleDataModel = {
+						description: "Expression Description",
+						id: $scope.nextRuleID++,
+						layout: {
+							x: x,
+							y: y
+						},
+						onPass: {
+							action: "INCLUDE",
+							ruleId: <any>[]
+						},
+						onFail: {
+							action: "NO_ACTION",
+							ruleId: <any>[]
+						},
+						expression: {
+							expressionText: "",
+							variable: <any>[]
+						}
+					};
+					$scope.chartViewModel.addRule(newExpressionRuleDataModel);
+				}
+
+				$scope.createNewQueryRule = function(x:any, y:any, resultData:any) {
+					var newQueryRuleDataModel = {
+						description: resultData.name+"~"+resultData.description,
+						id: $scope.nextRuleID++,
+						layout: {
+							x: x,
+							y: y
+						},
+						onPass: {
+							action: "INCLUDE",
+							ruleId: <any>[]
+						},
+						onFail: {
+							action: "NO_ACTION",
+							ruleId: <any>[]
+						},
+						queryLibraryItemUUID: resultData.id
+					};
+
+					$scope.chartViewModel.addRule(newQueryRuleDataModel);
+				}
 
 				//
 				// Delete selected rule and connections.
@@ -317,7 +351,7 @@ module app.query {
 
 					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						var rule = $scope.chartViewModel.data.query.rule[i];
-						if (!rule.test && !rule.expression && rule.description!="START") {
+						if (!rule.test && !rule.expression && !rule.queryLibraryItemUUID && rule.description!="START") {
 							logger.error('Rule "'+rule.description+'" does not have a test');
 							return;
 						}
@@ -331,22 +365,19 @@ module app.query {
 						}
 					}
 
-					/*for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
+					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						var rule = $scope.chartViewModel.data.query.rule[i];
 						if (rule.description!="START") {
-							for (var f = 0; f < rule.test.dataSource.filter.length; ++f) {
-								var filter = rule.test.dataSource.filter[f];
-								if (filter.field=="CODE") {
-									for (var c = 0; c < filter.codeSet.length; ++c) {
-										if (!filter.codeSet[c].codeSetValue || filter.codeSet[c].codeSetValue.length==0) {
-											logger.error('Rule "'+rule.description+'" does not have any clinical codes selected');
-											return;
-										}
-									}
-								}
+							if (rule.onPass.action=="") {
+								logger.error('Rule "'+rule.description+'" does not have a PASS action');
+								return;
+							}
+							if (rule.onFail.action=="") {
+								logger.error('Rule "'+rule.description+'" does not have a FAIL action');
+								return;
 							}
 						}
-					}*/
+					}
 
 					for (var i = 0; i < $scope.chartViewModel.data.query.rule.length; ++i) {
 						if ($scope.chartViewModel.data.query.rule[i].description=="START") {

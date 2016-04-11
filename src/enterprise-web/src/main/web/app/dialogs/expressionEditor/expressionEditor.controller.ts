@@ -119,7 +119,7 @@ module app.dialogs {
             if (resultData.variable.length>1) {
                 vm.expressionVariableName2 = resultData.variable[1].variableName;
                 vm.expressionRuleId2 = resultData.variable[1].ruleId.toString();
-                if (resultData.variable[0].restriction) {
+                if (resultData.variable[1].restriction) {
                     vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.fieldName;
                     vm.expressionRestrictionOrderDirection2 = resultData.variable[1].restriction.orderDirection;
                     vm.expressionRestrictionCount2 = resultData.variable[1].restriction.count.toString();

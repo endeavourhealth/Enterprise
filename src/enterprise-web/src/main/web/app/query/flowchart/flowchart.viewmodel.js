@@ -51,7 +51,20 @@ var flowchart = {};
 		this._selected = false;
 
 		this.description = function () {
-			return this.data.description || "";
+			var d = this.data.description;
+			var r = "";
+			var desc = d.split('~');
+			r = desc[0];
+			return r || "";
+		};
+
+		this.extendedDescription = function () {
+			var d = this.data.description;
+			var r = "";
+			var desc = d.split('~');
+			if (desc.length>1)
+				r = desc[1];
+			return r || "";
 		};
 
 		this.id = function () {

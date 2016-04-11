@@ -14,6 +14,11 @@
                     offset="0" stop-opacity="0.99609" stop-color="#B1EAFF"/>
             <stop offset="0.63934" stop-opacity="0.99219" stop-color="#D7F5FF"/>
         </linearGradient>
+        <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="queryRuleBackgroundGradient">
+            <stop
+                    offset="0" stop-opacity="0.99609" stop-color="gainsboro"/>
+            <stop offset="0.63934" stop-opacity="0.99219" stop-color="whitesmoke"/>
+        </linearGradient>
         <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="startRuleBackgroundGradient">
             <stop offset="0" stop-opacity="0.99609" stop-color="green"/>
             <stop offset="0.63934" stop-opacity="0.99219" stop-color="lightgreen"/>
@@ -34,7 +39,7 @@
                 r="40" cx="212" cy="30"
                 fill="url(#startRuleBackgroundGradient)"/>
 
-        <rect ng-if="rule.description()!='START' && !rule.expression()"
+        <rect ng-if="rule.description()!='START' && !rule.expression() && !rule.queryLibraryItemUUID()"
               ng-attr-class="{{rule.selected() && 'selected-rule-rect'
                       || (rule == mouseOverRule && 'mouseover-rule-rect' || 'rule-rect')}}"
               ry="10" rx="10" x="0" y="0"
@@ -50,6 +55,15 @@
               ng-attr-width="{{rule.width()}}"
               ng-attr-height="{{110}}"
               fill="url(#expressionRuleBackgroundGradient)">
+        </rect>
+
+        <rect ng-if="rule.description()!='START' && rule.queryLibraryItemUUID()"
+              ng-attr-class="{{rule.selected() && 'selected-rule-rect'
+                      || (rule == mouseOverRule && 'mouseover-rule-rect' || 'rule-rect')}}"
+              ry="10" rx="10" x="0" y="0"
+              ng-attr-width="{{rule.width()}}"
+              ng-attr-height="{{110}}"
+              fill="url(#queryRuleBackgroundGradient)">
         </rect>
 
         <text ng-if="rule.description()=='START'"
@@ -69,6 +83,7 @@
               text-anchor="middle"
               alignment-baseline="middle">
             {{rule.description()}}
+            <title>{{rule.extendedDescription()}}</title>
         </text>
 
         <text ng-click="editTest($event, rule)"
@@ -79,6 +94,7 @@
               text-anchor="middle"
               alignment-baseline="middle">
             {{firstString(rule.description(), 30)}}
+            <title>{{rule.extendedDescription()}}</title>
         </text>
 
         <text ng-click="editTest($event, rule)"
@@ -89,6 +105,7 @@
               text-anchor="middle"
               alignment-baseline="middle">
             {{secondString(rule.description(), 30)}}
+            <title>{{rule.extendedDescription()}}</title>
         </text>
 
         <g ng-if="rule.description()!='START'"

@@ -82,7 +82,7 @@
 							</p>
 							<label ng-show="testEditor.dobdatetype == 'dobrelative'">From:</label>
 							<p class="input-group" ng-show="testEditor.dobdatetype == 'dobrelative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDOBFromRelativeValue" ng-blur="testEditor.filterRelativeDateFromChange(testEditor.filterDOBFromRelativeValue, testEditor.filterDOBFromRelativePeriod, testEditor.dobLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.filterDOBFromRelativeValue" ng-blur="testEditor.filterRelativeDateFromChange(testEditor.filterDOBFromRelativeValue, testEditor.filterDOBFromRelativePeriod, testEditor.dobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDOBFromRelativePeriod" ng-change="testEditor.filterRelativeDateFromChange(testEditor.filterDOBFromRelativeValue, testEditor.filterDOBFromRelativePeriod, testEditor.dobLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date
@@ -100,7 +100,7 @@
 							</p>
 							<label ng-show="testEditor.dobdatetype == 'dobrelative'">To:</label>
 							<p class="input-group" ng-show="testEditor.dobdatetype == 'dobrelative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDOBToRelativeValue" ng-blur="testEditor.filterRelativeDateToChange(testEditor.filterDOBToRelativeValue, testEditor.filterDOBToRelativePeriod, testEditor.dobLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.filterDOBToRelativeValue" ng-blur="testEditor.filterRelativeDateToChange(testEditor.filterDOBToRelativeValue, testEditor.filterDOBToRelativePeriod, testEditor.dobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDOBToRelativePeriod" ng-change="testEditor.filterRelativeDateToChange(testEditor.filterDOBToRelativeValue, testEditor.filterDOBToRelativePeriod, testEditor.dobLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date
@@ -147,7 +147,7 @@
 							</p>
 							<label ng-show="testEditor.datetype == 'relative'">From:</label>
 							<p class="input-group" ng-show="testEditor.datetype == 'relative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDateFromRelativeValue" ng-blur="testEditor.filterRelativeDateFromChange(testEditor.filterDateFromRelativeValue, testEditor.filterDateFromRelativePeriod, testEditor.dateLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.filterDateFromRelativeValue" ng-blur="testEditor.filterRelativeDateFromChange(testEditor.filterDateFromRelativeValue, testEditor.filterDateFromRelativePeriod, testEditor.dateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDateFromRelativePeriod" ng-change="testEditor.filterRelativeDateFromChange(testEditor.filterDateFromRelativeValue, testEditor.filterDateFromRelativePeriod, testEditor.dateLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date
@@ -165,7 +165,7 @@
 							</p>
 							<label ng-show="testEditor.datetype == 'relative'">To:</label>
 							<p class="input-group" ng-show="testEditor.datetype == 'relative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDateToRelativeValue" ng-blur="testEditor.filterRelativeDateToChange(testEditor.filterDateToRelativeValue, testEditor.filterDateToRelativePeriod, testEditor.dateLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.filterDateToRelativeValue" ng-blur="testEditor.filterRelativeDateToChange(testEditor.filterDateToRelativeValue, testEditor.filterDateToRelativePeriod, testEditor.dateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDateToRelativePeriod" ng-change="testEditor.filterRelativeDateToChange(testEditor.filterDateToRelativeValue, testEditor.filterDateToRelativePeriod, testEditor.dateLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date
@@ -190,7 +190,7 @@
 					</div>
 				</div>
 				<div ng-show="testEditor.addRestriction">
-					<a class="queryLink" ng-click="testEditor.toggleRestriction()"><img src="/content/img/add.png" style="width: 20px; height: 20px; margin-right: 10px"/>Add Restriction</a>
+					<a class="queryLink" ng-click="testEditor.toggleRestriction()"><i class="fa fa-sort-amount-asc"></i> Add Restriction</a>
 				</div>
 				<div class='row' ng-show="testEditor.showRestriction"><br/>
 					<div class="col-xs-3">
@@ -285,7 +285,7 @@
 							</p>
 							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">From:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDOBFromRelativeValue" ng-blur="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDOBFromRelativeValue, testEditor.fieldTestDOBFromRelativePeriod, testEditor.fieldTestDobLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.fieldTestDOBFromRelativeValue" ng-blur="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDOBFromRelativeValue, testEditor.fieldTestDOBFromRelativePeriod, testEditor.fieldTestDobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDOBFromRelativePeriod" ng-change="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDOBFromRelativeValue, testEditor.fieldTestDOBFromRelativePeriod, testEditor.fieldTestDobLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date
@@ -303,7 +303,7 @@
 							</p>
 							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">To:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDOBToRelativeValue" ng-blur="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDOBToRelativeValue, testEditor.fieldTestDOBToRelativePeriod, testEditor.fieldTestDobLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.fieldTestDOBToRelativeValue" ng-blur="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDOBToRelativeValue, testEditor.fieldTestDOBToRelativePeriod, testEditor.fieldTestDobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDOBToRelativePeriod" ng-change="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDOBToRelativeValue, testEditor.fieldTestDOBToRelativePeriod, testEditor.fieldTestDobLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date
@@ -351,7 +351,7 @@
 							</p>
 							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">From:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDateFromRelativeValue" ng-blur="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDateFromRelativeValue, testEditor.fieldTestDateFromRelativePeriod, testEditor.fieldTestDateLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.fieldTestDateFromRelativeValue" ng-blur="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDateFromRelativeValue, testEditor.fieldTestDateFromRelativePeriod, testEditor.fieldTestDateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDateFromRelativePeriod" ng-change="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDateFromRelativeValue, testEditor.fieldTestDateFromRelativePeriod, testEditor.fieldTestDateLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date
@@ -369,7 +369,7 @@
 							</p>
 							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">To:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">
-								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDateToRelativeValue" ng-blur="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDateToRelativeValue, testEditor.fieldTestDateToRelativePeriod, testEditor.fieldTestDateLabel)">
+								<input type="number" class="form-control" style="width:80px;margin-right:10px" placeholder="no." ng-model="testEditor.fieldTestDateToRelativeValue" ng-blur="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDateToRelativeValue, testEditor.fieldTestDateToRelativePeriod, testEditor.fieldTestDateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDateToRelativePeriod" ng-change="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDateToRelativeValue, testEditor.fieldTestDateToRelativePeriod, testEditor.fieldTestDateLabel)">
 									<option ng-repeat="period in testEditor.periods" value="{{period}}">{{period}}</option>
 								</select>&nbsp;&nbsp;of the baseline date

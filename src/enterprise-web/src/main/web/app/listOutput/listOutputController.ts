@@ -87,7 +87,7 @@ module app.listOutput {
 			if (matchingFields.length === 1) {
 				return matchingFields[0].displayName;
 			}
-			return '<Unknown>';
+			return '<Select...>';
 		}
 
 		getDatasourceDisplayName() : string {

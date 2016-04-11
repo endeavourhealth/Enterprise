@@ -127,6 +127,24 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
     }
 
     @Override
+    public void requestStart() {
+        logger.debug("Received request to start new job");
+
+        try {
+            requestStartNewJob();
+        } catch (Exception e) {
+            logger.error("requestStart failed", e);
+        }
+    }
+
+    @Override
+    public void requestStop() {
+        logger.debug("Received request to stop current");
+
+        killCurrentJob();
+    }
+
+    @Override
     public void receiveProcessorNodeCompleteMessage(ControllerQueueProcessorNodeCompleteMessage.ProcessorNodeCompletePayload payload) {
         try {
             logger.debug("Received processor node complete message: " + payload.getExecutionUuid().toString() + " ProcessorId: " + payload.getProcessorUuid());

@@ -7,8 +7,6 @@ import com.rabbitmq.client.Envelope;
 import org.endeavourhealth.enterprise.core.queuing.ChannelFacade;
 import org.endeavourhealth.enterprise.core.queuing.Message;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -17,7 +15,6 @@ public class ControllerQueue implements AutoCloseable {
 
     private final ChannelFacade channel;
     private final String queueName;
-    private final static Logger logger = LoggerFactory.getLogger(ControllerQueue.class);
 
     public ControllerQueue(
             QueueConnectionProperties connectionProperties,
@@ -27,14 +24,9 @@ public class ControllerQueue implements AutoCloseable {
         channel = new ChannelFacade(connectionProperties);
     }
 
-    public void logDebug(String message) {
-        logger.debug(message);
-    }
-
     @Override
     public void close() throws Exception {
-        if (channel != null)
-            channel.close();
+        channel.close();
     }
 
     public void registerReceiver(IControllerQueueMessageReceiver receiver) throws IOException {
@@ -58,7 +50,10 @@ public class ControllerQueue implements AutoCloseable {
                 } else if (ControllerQueueProcessorNodeStartedMessage.isTypeOf(message)) {
                     ControllerQueueProcessorNodeStartedMessage realMessage = ControllerQueueProcessorNodeStartedMessage.CreateFromMessage(message);
                     receiver.receiveProcessorNodeStartedMessage(realMessage.getPayload());
-
+                } else if (ControllerQueueRequestStartMessage.isTypeOf(message)) {
+                    receiver.requestStart();
+                } else if (ControllerQueueRequestStopMessage.isTypeOf(message)) {
+                    receiver.requestStop();
                 } else {
                     throw new UnsupportedOperationException("Message type not supported: " + properties.getType());
                 }
@@ -91,5 +86,7 @@ public class ControllerQueue implements AutoCloseable {
         void receiveExecutionFailedMessage(ControllerQueueExecutionFailedMessage.ExecutionFailedPayload payload);
         void receiveProcessorNodeCompleteMessage(ControllerQueueProcessorNodeCompleteMessage.ProcessorNodeCompletePayload payload);
         void receiveProcessorNodeStartedMessage(ControllerQueueProcessorNodeStartedMessage.ProcessorNodeStartedPayload payload);
+        void requestStart();
+        void requestStop();
     }
 }

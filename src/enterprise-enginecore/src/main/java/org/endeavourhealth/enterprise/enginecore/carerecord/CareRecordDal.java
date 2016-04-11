@@ -139,6 +139,8 @@ public class CareRecordDal {
                     fields.get(i).add(rs.getDate(field.getIndex()).toLocalDate());
                 else if (field.getLogicalDataType() == LogicalDataType.FLOAT)
                     fields.get(i).add(rs.getFloat(field.getIndex()));
+                else if (field.getLogicalDataType() == LogicalDataType.DATA_VALUES)
+                    fields.get(i).add(rs.getString(field.getIndex()));
                 else
                     fields.get(i).add(rs.getObject(field.getIndex()));
             }

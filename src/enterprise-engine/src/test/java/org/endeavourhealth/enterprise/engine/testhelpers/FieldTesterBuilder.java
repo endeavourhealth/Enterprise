@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.engine.testhelpers;
 
+import org.endeavourhealth.enterprise.core.entitymap.models.DataValueType;
 import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
@@ -10,6 +11,7 @@ import org.endeavourhealth.enterprise.engine.compiled.fieldTests.ICompiledFieldT
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class FieldTesterBuilder {
     private Field field;
@@ -47,6 +49,29 @@ public class FieldTesterBuilder {
         return this;
     }
 
+    public FieldTesterBuilder setDataTypeOfDataValues(List<String>... values) {
+
+        EntityMapBuilder entityMapBuilder = new EntityMapBuilder()
+                .addEntity(LogicalDataType.DATA_VALUES);
+
+        for (List<String> value: values) {
+            String physical = value.get(0);
+            String logical = value.get(1);
+
+            entityMapBuilder.addDataValue(0, physical, logical);
+        }
+
+        EntityMapWrapper.EntityMap entityMap = entityMapBuilder.build();
+
+        field = entityMap.getEntities().get(0).getField(0);
+
+        fieldTestBuilder = new FieldTestBuilder(entityMap)
+                .setField(0, 0);
+
+        return this;
+    }
+
+
     public FieldTesterBuilder setFieldTest(ValueFrom value) {
         fieldTestBuilder.setFieldTest(value);
         return this;
@@ -58,6 +83,11 @@ public class FieldTesterBuilder {
     }
 
     public FieldTesterBuilder setFieldTest(ValueRange value) {
+        fieldTestBuilder.setFieldTest(value);
+        return this;
+    }
+
+    public FieldTesterBuilder setFieldTest(ValueSet value) {
         fieldTestBuilder.setFieldTest(value);
         return this;
     }

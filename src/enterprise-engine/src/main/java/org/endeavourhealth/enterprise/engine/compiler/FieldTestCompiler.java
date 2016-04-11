@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.engine.compiler;
 
+import org.endeavourhealth.enterprise.core.entitymap.models.DataValueType;
 import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
@@ -10,6 +11,9 @@ import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class FieldTestCompiler {
 
@@ -62,6 +66,12 @@ public class FieldTestCompiler {
 
                 return new RangeDecimal(from, to);
             }
+        } else if (field.getLogicalDataType() == LogicalDataType.DATA_VALUES) {
+
+            if (valueFilter.getValueSet() == null)
+                throw new InvalidQueryDocumentException("ValueSet not found for field of type DataValues");
+
+            return createValueSet(field.getDataValues(), valueFilter.getValueSet());
         }
 //        } else if (field.getLogicalDataType() == LogicalDataType.) {
 //
@@ -71,7 +81,29 @@ public class FieldTestCompiler {
 //            }
 //        }
 
-        throw new UnableToCompileExpection("Could not build field filter");
+        throw new UnableToCompileExpection("Could not build field filter.  Logical type: " + field.getLogicalDataType());
+    }
+
+    private ValueSetString createValueSet(List<DataValueType> dataValueList, ValueSet valueSet) throws InvalidQueryDocumentException {
+
+        Set<String> values = new HashSet<>(valueSet.getValue().size());
+
+        for (String logicalValue : valueSet.getValue()) {
+            DataValueType matchingDataValue = findDataValueType(dataValueList, logicalValue);
+
+            values.add(matchingDataValue.getPhysicalValue());
+        }
+
+        return new ValueSetString(values);
+    }
+
+    private DataValueType findDataValueType(List<DataValueType> dataValueList, String logicalValue) throws InvalidQueryDocumentException {
+        for (DataValueType dataValueType: dataValueList) {
+            if (logicalValue.equals(dataValueType.getLogicalValue()))
+                return dataValueType;
+        }
+
+        throw new InvalidQueryDocumentException("Could not find logical value: " + logicalValue);
     }
 
     private LessThanDecimal createLessThanDecimal(ValueTo value) {

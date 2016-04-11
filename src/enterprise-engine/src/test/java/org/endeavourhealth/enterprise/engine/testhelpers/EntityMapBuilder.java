@@ -1,9 +1,6 @@
 package org.endeavourhealth.enterprise.engine.testhelpers;
 
-import org.endeavourhealth.enterprise.core.entitymap.models.Entity;
-import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
-import org.endeavourhealth.enterprise.core.entitymap.models.Field;
-import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
+import org.endeavourhealth.enterprise.core.entitymap.models.*;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
 import java.util.ArrayList;
@@ -30,6 +27,20 @@ public class EntityMapBuilder {
         }
 
         entityList.add(entity);
+        return this;
+    }
+
+    public EntityMapBuilder addDataValue(int fieldIndex, String physicalValue, String logicalValue) {
+        Entity entity = entityList.get(entityList.size() - 1);
+        Field field = entity.getField().get(fieldIndex);
+
+        DataValueType dataValueType = new DataValueType();
+        dataValueType.setDisplayName("DATAVALUE_" + field.getDataValues().size());
+        dataValueType.setLogicalValue(logicalValue);
+        dataValueType.setPhysicalValue(physicalValue);
+
+        field.getDataValues().add(dataValueType);
+
         return this;
     }
 

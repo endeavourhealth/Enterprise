@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.engine.compiler
 
+import org.endeavourhealth.enterprise.core.entitymap.models.DataValueType
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType
 import org.endeavourhealth.enterprise.core.querydocument.models.*
 import org.endeavourhealth.enterprise.engine.testhelpers.FieldTesterBuilder
@@ -229,6 +230,32 @@ class FieldCompilerTest {
         new FieldTesterBuilder()
                 .setDataType(LogicalDataType.FLOAT)
                 .setFieldTest(range)
+                .build();
+    }
+
+    @Test
+    void fieldCompiler_valueSet_success() {
+
+        ValueSet valueSet = new ValueSet(value: ["A", "B"]);
+
+        FieldTesterBuilder.FieldAssertion assertion = new FieldTesterBuilder()
+                .setDataTypeOfDataValues(["1", "A"], ["2", "B"], ["3", "C"])
+                .setFieldTest(valueSet)
+                .build();
+
+        assertion.assertTrue("1");
+        assertion.assertTrue("2");
+        assertion.assertFalse("3");
+    }
+
+    @Test(expected = InvalidQueryDocumentException.class)
+    void fieldCompiler_invalidValueSet_exception() {
+
+        ValueSet valueSet = new ValueSet(value: ["B"]);
+
+        new FieldTesterBuilder()
+                .setDataTypeOfDataValues(["1", "A"])
+                .setFieldTest(valueSet)
                 .build();
     }
 }

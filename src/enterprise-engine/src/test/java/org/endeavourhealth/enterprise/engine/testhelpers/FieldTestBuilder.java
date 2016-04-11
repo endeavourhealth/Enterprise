@@ -35,6 +35,11 @@ public class FieldTestBuilder {
         return this;
     }
 
+    public FieldTestBuilder setFieldTest(ValueSet value) {
+        fieldTest.setValueSet(value);
+        return this;
+    }
+
     public FieldTestBuilder negate() {
         fieldTest.setNegate(true);
         return this;

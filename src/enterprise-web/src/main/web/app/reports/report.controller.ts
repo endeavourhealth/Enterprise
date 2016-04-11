@@ -20,6 +20,8 @@ module app.reports {
 	import IWindowService = angular.IWindowService;
 	import IFolderService = app.core.IFolderService;
 	import IReportService = app.core.IReportService;
+	import IAcceptCallback = AngularUITree.IAcceptCallback;
+	import ITreeNodeScope = AngularUITree.ITreeNodeScope;
 	'use strict';
 
 	class ReportController {
@@ -29,6 +31,7 @@ module app.reports {
 		report : Report;
 		reportContent : ReportNode[];
 		contentTreeCallbackOptions : ICallbacks;
+		structureTreeCallbackOptions : ICallbacks;
 		dataSourceMap : any;
 
 		static $inject = ['ReportService', 'FolderService', 'LoggerService', '$stateParams', 'AdminService', '$window'];
@@ -41,6 +44,7 @@ module app.reports {
 			protected adminService : IAdminService,
 			protected $window : IWindowService) {
 			this.contentTreeCallbackOptions = {dropped: this.contentTreeDroppedCallback, accept: null, dragStart: null};
+			this.structureTreeCallbackOptions = {dropped: null, accept: this.structureTreeAcceptCallback, dragStart: null};
 
 			this.getLibraryRootFolders();
 			this.performAction($stateParams.itemAction, $stateParams.itemUuid);
@@ -231,6 +235,27 @@ module app.reports {
 		contentTreeDroppedCallback(eventInfo: IEventInfo) {
 			// Convert clone model to report node
 			eventInfo.source.cloneModel.children = [];
+		}
+
+		structureTreeAcceptCallback(source: any, destination: any, destinationIndex: number): boolean {
+			// Check for same type at same level
+			if (!destination.$modelValue.every(
+					(sibling : ReportNode) => {return sibling.uuid !== source.$modelValue.uuid; })
+			) {
+				return false;
+			}
+
+			// Check for self as a parent
+			var parent : any = destination.$nodeScope;
+
+			while (parent) {
+				if (parent.$modelValue.uuid === source.$modelValue.uuid) {
+					return false;
+				}
+				parent = parent.$nodeScope;
+			}
+
+			return true;
 		}
 
 	}

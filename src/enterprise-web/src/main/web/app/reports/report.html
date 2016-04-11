@@ -62,7 +62,7 @@
 									<div class="form-group">
 										<div class="row">
 											<div class="col-md-12">
-												<div ui-tree id="report-tree">
+												<div ui-tree="reportCtrl.structureTreeCallbackOptions" id="report-tree">
 													<div class="center-float" ng-hide="reportCtrl.reportContent && reportCtrl.reportContent.length > 0">(Drag components here)</div>
 													<ol ui-tree-nodes ng-model="reportCtrl.reportContent">
 														<li ng-repeat="node in reportCtrl.reportContent" ui-tree-node ng-include="'report_template.html'">

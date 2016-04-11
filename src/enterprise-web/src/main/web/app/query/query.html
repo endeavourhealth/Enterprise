@@ -3,13 +3,19 @@
         <div class="module-heading">Query editor
             <div class="pull-right">
                 <button class="btn btn-sm btn-primary"
-                        ng-click="addNewRule(false)"
+                        ng-click="addNewRule('1')"
                         title="Add a new rule to this query">
                     Add Rule
                 </button>
 
+                <button class="btn btn-sm btn-default"
+                        ng-click="addNewRule('2')"
+                        title="Add another query as a rule to this query">
+                    Add Query as Rule
+                </button>
+
                 <button class="btn btn-sm btn-info"
-                        ng-click="addNewRule(true)"
+                        ng-click="addNewRule('3')"
                         title="Add a new expression rule to this query">
                     Add Expression
                 </button>

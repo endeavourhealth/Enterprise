@@ -197,7 +197,7 @@ module app.query {
 				//
 				// Add a new rule to the chart.
 				//
-				$scope.addNewRule = function (expression : boolean) {
+				$scope.addNewRule = function (mode : any) {
 					//
 					// Template for a new rule.
 					//
@@ -283,10 +283,16 @@ module app.query {
 							}
 						};
 
-						if (expression)
-							$scope.chartViewModel.addRule(newExpressionRuleDataModel);
-						else
-							$scope.chartViewModel.addRule(newRuleDataModel);
+						switch(mode) {
+							case "1":
+								$scope.chartViewModel.addRule(newRuleDataModel);
+								break;
+							case "2":
+								break;
+							case "3":
+								$scope.chartViewModel.addRule(newExpressionRuleDataModel);
+								break;
+						}
 					}
 				};
 

@@ -12,8 +12,23 @@ module app.models {
 	}
 
 	export function itemTypeIdToString() {
-		return function(input:number):string {
-			return ItemType[input];
+		return function (input:number):string {
+			switch (input) {
+				case ItemType.Folder:
+					return 'Folder';
+				case ItemType.Report:
+					return 'Report';
+				case ItemType.Query:
+					return 'Query';
+				case ItemType.Test:
+					return 'Test';
+				case ItemType.Datasource:
+					return 'Datasource';
+				case ItemType.CodeSet:
+					return 'Code set';
+				case ItemType.ListOutput:
+					return 'List report';
+			}
 		};
 	}
 

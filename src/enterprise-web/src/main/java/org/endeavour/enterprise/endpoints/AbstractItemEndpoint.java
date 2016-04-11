@@ -1,6 +1,8 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.json.JsonDeleteResponse;
+import org.endeavour.enterprise.json.JsonMoveItem;
+import org.endeavour.enterprise.json.JsonMoveItems;
 import org.endeavour.enterprise.utility.QueryDocumentReaderFindDependentUuids;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
@@ -323,5 +325,51 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         } else {
             return UUID.fromString(uuidStr);
         }
+    }
+
+    protected void moveItems(UUID userUuid, UUID orgUuid, JsonMoveItems parameters) throws Exception {
+
+        UUID folderUuid = parameters.getDestinationFolder();
+        if (folderUuid == null) {
+            throw new BadRequestException("No destination folder UUID supplied");
+        }
+        DbActiveItem folderActiveItem = DbActiveItem.retrieveForItemUuid(folderUuid);
+        if (!folderActiveItem.getOrganisationUuid().equals(orgUuid)) {
+            throw new BadRequestException("Cannot move items to folder owned by another organisation");
+        }
+
+        List<DbAbstractTable> toSave = new ArrayList<>();
+
+        DbAudit audit = DbAudit.factoryNow(userUuid, orgUuid);
+        UUID auditUuid = audit.getAuditUuid();
+        toSave.add(audit);
+
+        for (JsonMoveItem itemParameter: parameters.getItems()) {
+            UUID itemUuid = itemParameter.getUuid();
+
+            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
+            DbItem item = DbItem.retrieveForActiveItem(activeItem);
+
+            if (!activeItem.getOrganisationUuid().equals(orgUuid)) {
+                throw new BadRequestException("Cannot move items belonging to another organisation");
+            }
+
+            item.setAuditUuid(auditUuid);
+            item.setSaveMode(TableSaveMode.INSERT); //force insert of new item
+            toSave.add(item);
+
+            UUID previousAuditUuid = activeItem.getAuditUuid();
+            activeItem.setAuditUuid(auditUuid);
+            toSave.add(activeItem);
+
+            //"using" dependencies
+            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlContent());
+            createUsingDependencies(oldQueryDocument, activeItem, toSave);
+
+            //folder dependecies
+            createFolderDependency(false, activeItem.getItemTypeId(), item, previousAuditUuid, folderUuid, toSave);
+        }
+
+        DatabaseManager.db().writeEntities(toSave);
     }
 }

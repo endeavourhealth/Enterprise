@@ -896,7 +896,7 @@ final class SqlServerDatabase implements DatabaseI {
     }
 
     @Override
-    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, int count) throws Exception {
+    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, UUID organisationUuid, int count) throws Exception {
         String where = "INNER JOIN Definition.Item i"
                 + " ON i.ItemUuid = " + ALIAS + ".ItemUuid"
                 + " AND i.AuditUuid = " + ALIAS + ".AuditUuid"
@@ -905,8 +905,9 @@ final class SqlServerDatabase implements DatabaseI {
                 + " ON a.AuditUuid = i.AuditUuid"
                 + " AND a.EndUserUuid = ?"
                 + " WHERE " + ALIAS + ".ItemTypeId NOT IN (" + DefinitionItemType.LibraryFolder.getValue() + ", " + DefinitionItemType.ReportFolder.getValue() + ")"
+                + " AND " + ALIAS + ".OrganisationUuid = ?"
                 + " ORDER BY a.TimeStamp DESC";
-        return retrieveForWherePreparedStatement(DbActiveItem.class, count, where, userUuid);
+        return retrieveForWherePreparedStatement(DbActiveItem.class, count, where, userUuid, organisationUuid);
 
         /*List<DbActiveItem> ret = new ArrayList<>();
         String where = "INNER JOIN Definition.Item i"

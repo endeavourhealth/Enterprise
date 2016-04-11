@@ -108,19 +108,22 @@ module app.dialogs {
 
             vm.expressionVariableName1 = resultData.variable[0].variableName;
             vm.expressionRuleId1 = resultData.variable[0].ruleId.toString();
-            vm.expressionRestrictionFieldName1 = resultData.variable[0].restriction.fieldName;
-            vm.expressionRestrictionOrderDirection1 = resultData.variable[0].restriction.orderDirection;
-            vm.expressionRestrictionCount1 = resultData.variable[0].restriction.count.toString();
+            if (resultData.variable[0].restriction) {
+                vm.expressionRestrictionFieldName1 = resultData.variable[0].restriction.fieldName;
+                vm.expressionRestrictionOrderDirection1 = resultData.variable[0].restriction.orderDirection;
+                vm.expressionRestrictionCount1 = resultData.variable[0].restriction.count.toString();
+            }
             vm.expressionTestField1 = resultData.variable[0].fieldName;
             vm.expressionFunction1 = resultData.variable[0].function;
-
 
             if (resultData.variable.length>1) {
                 vm.expressionVariableName2 = resultData.variable[1].variableName;
                 vm.expressionRuleId2 = resultData.variable[1].ruleId.toString();
-                vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.fieldName;
-                vm.expressionRestrictionOrderDirection2 = resultData.variable[1].restriction.orderDirection;
-                vm.expressionRestrictionCount2 = resultData.variable[1].restriction.count.toString();
+                if (resultData.variable[1].restriction) {
+                    vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.fieldName;
+                    vm.expressionRestrictionOrderDirection2 = resultData.variable[1].restriction.orderDirection;
+                    vm.expressionRestrictionCount2 = resultData.variable[1].restriction.count.toString();
+                }
                 vm.expressionTestField2 = resultData.variable[1].fieldName;
                 vm.expressionFunction2 = resultData.variable[1].function;
             }
@@ -196,21 +199,6 @@ module app.dialogs {
                 return;
             }
 
-            if (!vm.expressionRestrictionFieldName1) {
-                this.logger.error('Please select a sort field for variable A');
-                return;
-            }
-
-            if (!vm.expressionRestrictionOrderDirection1) {
-                this.logger.error('Please select a sort order for variable A');
-                return;
-            }
-
-            if (!vm.expressionRestrictionCount1) {
-                this.logger.error('Please select a restriction count for variable A');
-                return;
-            }
-
             if (!vm.expressionTestField1) {
                 this.logger.error('Please select a test field for variable A');
                 return;
@@ -222,21 +210,6 @@ module app.dialogs {
             }
 
             if (vm.expressionRuleId2) {
-                if (!vm.expressionRestrictionFieldName2) {
-                    this.logger.error('Please select a sort field for variable B');
-                    return;
-                }
-
-                if (!vm.expressionRestrictionOrderDirection2) {
-                    this.logger.error('Please select a sort order for variable B');
-                    return;
-                }
-
-                if (!vm.expressionRestrictionCount2) {
-                    this.logger.error('Please select a restriction count for variable B');
-                    return;
-                }
-
                 if (!vm.expressionTestField2) {
                     this.logger.error('Please select a test field for variable B');
                     return;
@@ -259,6 +232,10 @@ module app.dialogs {
                 count : Number(vm.expressionRestrictionCount1)
             }
 
+            if (!vm.expressionRestrictionFieldName1||vm.expressionRestrictionFieldName1=="undefined"||vm.expressionRestrictionFieldName1=="") {
+                restriction = null;
+            }
+
             var variableType : VariableType = {
                 variableName: "A",
                 ruleId: Number(vm.expressionRuleId1),
@@ -273,6 +250,10 @@ module app.dialogs {
                 fieldName : vm.expressionRestrictionFieldName2,
                 orderDirection : vm.expressionRestrictionOrderDirection2,
                 count : Number(vm.expressionRestrictionCount2)
+            }
+
+            if (!vm.expressionRestrictionFieldName2||vm.expressionRestrictionFieldName2=="undefined"||vm.expressionRestrictionFieldName2=="") {
+                restriction = null;
             }
 
             var variableType : VariableType = {

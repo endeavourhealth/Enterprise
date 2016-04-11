@@ -18,9 +18,10 @@
 					<span uib-dropdown>
 						<button type="button" class="btn btn-xs btn-default child-to-show pull-right" uib-dropdown-toggle>...</button>
 						<ul uib-dropdown-menu>
-							<li><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
-							<li><a ui-sref="app.listOutputAction({itemUuid: node.uuid, itemAction: 'add'})">Add list output</a></li>
-							<li><a ui-sref="app.codeSetAction({itemUuid: node.uuid, itemAction: 'add'})">Add code set</a></li>
+							<li ng-show="ctrl.folderType == 1"><a ui-sref="app.queryAction({itemUuid: node.uuid, itemAction: 'add'})">Add query</a></li>
+							<li ng-show="ctrl.folderType == 1"><a ui-sref="app.listOutputAction({itemUuid: node.uuid, itemAction: 'add'})">Add list report</a></li>
+							<li ng-show="ctrl.folderType == 1"><a ui-sref="app.codeSetAction({itemUuid: node.uuid, itemAction: 'add'})">Add code set</a></li>
+							<li ng-show="ctrl.folderType == 2"><a ui-sref="app.reportAction({itemUuid: node.uuid, itemAction: 'add'})">Add report</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a ng-click="ctrl.addChildFolder(node)">Add child folder</a></li>
 							<li role="separator" class="divider"></li>

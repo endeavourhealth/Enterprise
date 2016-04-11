@@ -24,10 +24,10 @@
 
 	<webServer>
 		<!--local host cookie-->
-		<cookieDomain>localHost</cookieDomain>
+		<cookieDomain>localhost</cookieDomain>
 
 		<!--AIMES cookie-->
-	<!--<cookieDomain>10.11.87.69</cookieDomain>-->
+		<!--<cookieDomain>37.48.245.69</cookieDomain>-->
 </webServer>
 
 <!--GMail settings-->

@@ -19,7 +19,7 @@
 
 
   <logger name="org.endeavour.enterprise" level="TRACE"/>
-  
+  <logger name="com.mchange" level="INFO"/>  <!--not interested in logback debug logging -->
 
   <root level="debug">
     <appender-ref ref="STDOUT" />

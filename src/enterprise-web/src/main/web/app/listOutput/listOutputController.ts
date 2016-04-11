@@ -62,6 +62,10 @@ module app.listOutput {
 			TestEditorController.open(this.$modal, test, true)
 				.result.then(function(dataSourceContainer : { dataSource : DataSource }) {
 					datasourceContainer.dataSource = dataSourceContainer.dataSource;
+					if (vm.selectedListReportGroup.heading === '') {
+						vm.selectedListReportGroup.heading = vm.getDatasourceDisplayName();
+					}
+
 					vm.loadDataSourceAvailableFieldList();
 					vm.adminService.setPendingChanges();
 			});
@@ -83,7 +87,7 @@ module app.listOutput {
 			if (matchingFields.length === 1) {
 				return matchingFields[0].displayName;
 			}
-			return '<Unknown>';
+			return '<Select...>';
 		}
 
 		getDatasourceDisplayName() : string {
@@ -101,7 +105,7 @@ module app.listOutput {
 
 		addListGroup() {
 			this.selectedListReportGroup = {
-				heading: 'New list group',
+				heading: '',
 				fieldBased: {
 					dataSource: null,
 					fieldOutput: []
@@ -129,6 +133,13 @@ module app.listOutput {
 			this.selectedListReportGroup.fieldBased.fieldOutput.splice(scope.$index, 1);
 			if (this.selectedFieldOutput === scope.item) {
 				this.selectedFieldOutput = null;
+			}
+		}
+
+		setItemField(item : FieldOutput, field : Field) {
+			item.field = field.logicalName;
+			if (item.heading === '') {
+				item.heading = field.displayName;
 			}
 		}
 

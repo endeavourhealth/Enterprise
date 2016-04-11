@@ -67,6 +67,7 @@ public final class DatabaseManager {
             cpds.setAcquireIncrement(5);
             cpds.setMaxPoolSize(20);
             cpds.setMaxStatements(180);
+            cpds.setMaxIdleTime(300); //if a connection is idle for 5 mins, discard it
 
             LOG.info("Database connection pool set up during server startup");
 
@@ -196,7 +197,7 @@ public final class DatabaseManager {
 
         db().retrieveActiveItemDependentItems(UUID.randomUUID(), UUID.randomUUID(), DependencyType.Uses);
 
-        db().retrieveActiveItemRecentItems(UUID.randomUUID(), 5);
+        db().retrieveActiveItemRecentItems(UUID.randomUUID(), UUID.randomUUID(), 5);
 
         db().retrieveCountDependencies(UUID.randomUUID(), DependencyType.IsChildOf);
 

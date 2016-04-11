@@ -54,15 +54,35 @@ module app.dialogs {
 		ruleDatasource : string;
 		filterDateFrom : Date;
 		filterDateTo : Date;
+		filterDateFromRelativeValue : String;
+		filterDateToRelativeValue : String;
+		filterDateFromRelativePeriod : String;
+		filterDateToRelativePeriod : String;
+		datetype: String;
+		dobdatetype: String;
+		fieldTestDatetype: String;
+		fieldTestDobdatetype: String;
 		filterDOBFrom : Date;
 		filterDOBTo : Date;
+		filterDOBFromRelativeValue : String;
+		filterDOBToRelativeValue : String;
+		filterDOBFromRelativePeriod : String;
+		filterDOBToRelativePeriod : String;
 		filterValueFrom : string;
 		filterValueTo : string;
 		filterSex : string;
 		fieldTestDateFrom : Date;
 		fieldTestDateTo : Date;
+		fieldTestDateFromRelativeValue : String;
+		fieldTestDateToRelativeValue : String;
+		fieldTestDateFromRelativePeriod : String;
+		fieldTestDateToRelativePeriod : String;
 		fieldTestDOBFrom : Date;
 		fieldTestDOBTo : Date;
+		fieldTestDOBFromRelativeValue : String;
+		fieldTestDOBToRelativeValue : String;
+		fieldTestDOBFromRelativePeriod : String;
+		fieldTestDOBToRelativePeriod : String;
 		fieldTestValueFrom : string;
 		fieldTestValueTo : string;
 		fieldTestSex : string;
@@ -76,6 +96,7 @@ module app.dialogs {
 		sexFilter : boolean = false;
 		ageFilter : boolean = false;
 		regFilter : boolean = false;
+		disableRestrictionCount : boolean = false;
 
 		editMode : boolean = false;
 
@@ -87,6 +108,7 @@ module app.dialogs {
 		sortorders = ['','ASCENDING','DESCENDING'];
 		fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
 		genders = ['','MALE','FEMALE','UNKNOWN'];
+		periods = ['','WEEK','MONTH','YEAR'];
 
 		public static open($modal : IModalService, test : Test, dataSourceOnly : boolean) : IModalServiceInstance {
 			var options : IModalSettings = {
@@ -139,18 +161,20 @@ module app.dialogs {
 				fieldTest: []
 			};
 
-			if (!this.resultData.dataSource)
+			if (!this.resultData||!this.resultData.dataSource)
 				this.resultData = newTest;
 			else
 				this.initialiseEditMode(this.resultData);
 
 			if (!this.dataSourceOnly) {
 				vm.viewFieldTest = true;
-				vm.title = "Test Editor"
+				vm.title = "Test Editor";
+				vm.disableRestrictionCount = true;
 			}
 			else {
 				vm.title = "Data Source Editor";
 				vm.viewFieldTest = false;
+				vm.disableRestrictionCount = false;
 			}
 		}
 
@@ -183,17 +207,53 @@ module app.dialogs {
 						vm.codeSelection = filter.codeSet.codeSetValue;
 						break;
 					case "DOB":
-						if (filter.valueFrom)
-							vm.filterDOBFrom = new Date(filter.valueFrom.constant);
-						if (filter.valueTo)
-							vm.filterDOBTo = new Date(filter.valueTo.constant);
+						if (filter.valueFrom) {
+							if (filter.valueFrom.absoluteUnit) {
+								vm.filterDOBFrom = new Date(filter.valueFrom.constant);
+								vm.dobdatetype = "dobabsolute";
+							}
+							else if (filter.valueFrom.relativeUnit) {
+								vm.filterDOBFromRelativeValue = filter.valueFrom.constant;
+								vm.filterDOBFromRelativePeriod = filter.valueFrom.relativeUnit;
+								vm.dobdatetype = "dobrelative";
+							}
+						}
+						if (filter.valueTo) {
+							if (filter.valueTo.absoluteUnit) {
+								vm.filterDOBTo = new Date(filter.valueTo.constant);
+								vm.dobdatetype = "dobabsolute";
+							}
+							else if (filter.valueTo.relativeUnit) {
+								vm.filterDOBToRelativeValue = filter.valueTo.constant;
+								vm.filterDOBToRelativePeriod = filter.valueTo.relativeUnit;
+								vm.dobdatetype = "dobrelative";
+							}
+						}
 						break;
 					case "EFFECTIVE_DATE":
 					case "REGISTRATION_DATE":
-						if (filter.valueFrom)
-							vm.filterDateFrom = new Date(filter.valueFrom.constant);
-						if (filter.valueTo)
-							vm.filterDateTo = new Date(filter.valueTo.constant);
+						if (filter.valueFrom) {
+							if (filter.valueFrom.absoluteUnit) {
+								vm.filterDateFrom = new Date(filter.valueFrom.constant);
+								vm.datetype = "absolute";
+							}
+							else if (filter.valueFrom.relativeUnit) {
+								vm.filterDateFromRelativeValue = filter.valueFrom.constant;
+								vm.filterDateFromRelativePeriod = filter.valueFrom.relativeUnit;
+								vm.datetype = "relative";
+							}
+						}
+						if (filter.valueTo) {
+							if (filter.valueTo.absoluteUnit) {
+								vm.filterDateTo = new Date(filter.valueTo.constant);
+								vm.datetype = "absolute";
+							}
+							else if (filter.valueTo.relativeUnit) {
+								vm.filterDateToRelativeValue = filter.valueTo.constant;
+								vm.filterDateToRelativePeriod = filter.valueTo.relativeUnit;
+								vm.datetype = "relative";
+							}
+						}
 						break;
 					case "VALUE":
 					case "AGE":
@@ -222,17 +282,53 @@ module app.dialogs {
 							vm.fieldTestCodeSelection = fieldTest.codeSet.codeSetValue;
 							break;
 						case "DOB":
-							if (fieldTest.valueFrom)
-								vm.fieldTestDOBFrom = new Date(fieldTest.valueFrom.constant);
-							if (fieldTest.valueTo)
-								vm.fieldTestDOBTo = new Date(fieldTest.valueTo.constant);
+							if (fieldTest.valueFrom) {
+								if (fieldTest.valueFrom.absoluteUnit) {
+									vm.fieldTestDOBFrom = new Date(fieldTest.valueFrom.constant);
+									vm.fieldTestDobdatetype = "fieldtestdobabsolute";
+								}
+								else if (fieldTest.valueFrom.relativeUnit) {
+									vm.fieldTestDOBFromRelativeValue = fieldTest.valueFrom.constant;
+									vm.fieldTestDOBFromRelativePeriod = fieldTest.valueFrom.relativeUnit;
+									vm.fieldTestDobdatetype = "fieldtestdobrelative";
+								}
+							}
+							if (fieldTest.valueTo) {
+								if (fieldTest.valueTo.absoluteUnit) {
+									vm.fieldTestDOBTo = new Date(fieldTest.valueTo.constant);
+									vm.fieldTestDobdatetype = "fieldtestdobabsolute";
+								}
+								else if (fieldTest.valueTo.relativeUnit) {
+									vm.fieldTestDOBToRelativeValue = fieldTest.valueTo.constant;
+									vm.fieldTestDOBToRelativePeriod = fieldTest.valueTo.relativeUnit;
+									vm.fieldTestDobdatetype = "fieldtestdobrelative";
+								}
+							}
 							break;
 						case "EFFECTIVE_DATE":
 						case "REGISTRATION_DATE":
-							if (fieldTest.valueFrom)
-								vm.fieldTestDateFrom = new Date(fieldTest.valueFrom.constant);
-							if (fieldTest.valueTo)
-								vm.fieldTestDateTo = new Date(fieldTest.valueTo.constant);
+							if (fieldTest.valueFrom) {
+								if (fieldTest.valueFrom.absoluteUnit) {
+									vm.fieldTestDateFrom = new Date(fieldTest.valueFrom.constant);
+									vm.fieldTestDatetype = "fieldtestabsolute";
+								}
+								else if (fieldTest.valueFrom.relativeUnit) {
+									vm.fieldTestDateFromRelativeValue = fieldTest.valueFrom.constant;
+									vm.fieldTestDateFromRelativePeriod = fieldTest.valueFrom.relativeUnit;
+									vm.fieldTestDatetype = "fieldtestrelative";
+								}
+							}
+							if (fieldTest.valueTo) {
+								if (fieldTest.valueTo.absoluteUnit) {
+									vm.fieldTestDateTo = new Date(fieldTest.valueTo.constant);
+									vm.fieldTestDatetype = "fieldtestabsolute";
+								}
+								else if (fieldTest.valueTo.relativeUnit) {
+									vm.fieldTestDateToRelativeValue = fieldTest.valueTo.constant;
+									vm.fieldTestDateToRelativePeriod = fieldTest.valueTo.relativeUnit;
+									vm.fieldTestDatetype = "fieldtestrelative";
+								}
+							}
 							break;
 						case "VALUE":
 						case "AGE":
@@ -596,6 +692,50 @@ module app.dialogs {
 				vm.resultData.dataSource.filter.push(fieldTest);
 		}
 
+		filterRelativeDateFromChange(value : any, period : any, dateField : any) {
+			var vm = this;
+
+			if (!value)
+				value="";
+
+			var valueFrom : ValueFrom = {
+				constant: value,
+				parameter: null,
+				absoluteUnit: null,
+				relativeUnit: period,
+				operator: "GREATER_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: dateField,
+				valueFrom: valueFrom,
+				valueTo: null,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				valueSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
+				var filter = vm.resultData.dataSource.filter[i];
+
+				if (filter.field==dateField && filter.valueFrom && value!="" && value!=null) {
+					foundEntry = true;
+					filter.valueFrom = valueFrom;
+					break;
+				}
+				else if (filter.field==dateField && filter.valueFrom && (value=="" || value==null))
+					vm.resultData.dataSource.filter.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="" && value!=null)
+				vm.resultData.dataSource.filter.push(fieldTest);
+		}
+
 		filterDateToChange(value : any, dateField : any) {
 			var vm = this;
 
@@ -612,6 +752,50 @@ module app.dialogs {
 				parameter: null,
 				absoluteUnit: "DATE",
 				relativeUnit: null,
+				operator: "LESS_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: dateField,
+				valueFrom: null,
+				valueTo: valueTo,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				valueSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
+				var filter = vm.resultData.dataSource.filter[i];
+
+				if (filter.field==dateField && filter.valueTo && value!="" && value!=null) {
+					foundEntry = true;
+					filter.valueTo = valueTo;
+					break;
+				}
+				else if (filter.field==dateField && filter.valueTo && (value=="" || value==null))
+					vm.resultData.dataSource.filter.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="" && value!=null)
+				vm.resultData.dataSource.filter.push(fieldTest);
+		}
+
+		filterRelativeDateToChange(value : any, period : any, dateField : any) {
+			var vm = this;
+
+			if (!value)
+				value="";
+
+			var valueTo : ValueTo = {
+				constant: value,
+				parameter: null,
+				absoluteUnit: null,
+				relativeUnit: period,
 				operator: "LESS_THAN_OR_EQUAL_TO"
 			}
 
@@ -823,7 +1007,51 @@ module app.dialogs {
 
 				if (ftest.field==dateField && ftest.valueFrom && value!="" && value!=null) {
 					foundEntry = true;
-					fieldTest.valueFrom = valueFrom;
+					ftest.valueFrom = valueFrom;
+					break;
+				}
+				else if (ftest.field==dateField && ftest.valueFrom && (value=="" || value==null))
+					vm.resultData.fieldTest.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="" && value!=null)
+				vm.resultData.fieldTest.push(fieldTest);
+		}
+
+		fieldTestRelativeDateFromChange(value : any, period : any, dateField : any) {
+			var vm = this;
+
+			if (!value)
+				value="";
+
+			var valueFrom : ValueFrom = {
+				constant: value,
+				parameter: null,
+				absoluteUnit: null,
+				relativeUnit: period,
+				operator: "GREATER_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: dateField,
+				valueFrom: valueFrom,
+				valueTo: null,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				valueSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+				var ftest = vm.resultData.fieldTest[i];
+
+				if (ftest.field==dateField && ftest.valueFrom && value!="" && value!=null) {
+					foundEntry = true;
+					ftest.valueFrom = valueFrom;
 					break;
 				}
 				else if (ftest.field==dateField && ftest.valueFrom && (value=="" || value==null))
@@ -872,7 +1100,51 @@ module app.dialogs {
 
 				if (ftest.field==dateField && ftest.valueTo && value!="" && value!=null) {
 					foundEntry = true;
-					fieldTest.valueTo = valueTo;
+					ftest.valueTo = valueTo;
+					break;
+				}
+				else if (ftest.field==dateField && ftest.valueTo && (value=="" || value==null))
+					vm.resultData.fieldTest.splice(i, 1);
+			}
+
+			if (!foundEntry && value!="" && value!=null)
+				vm.resultData.fieldTest.push(fieldTest);
+		}
+
+		fieldTestRelativeDateToChange(value : any, period : any, dateField : any) {
+			var vm = this;
+
+			if (!value)
+				value="";
+
+			var valueTo : ValueTo = {
+				constant: value,
+				parameter: null,
+				absoluteUnit: null,
+				relativeUnit: period,
+				operator: "LESS_THAN_OR_EQUAL_TO"
+			}
+
+			var fieldTest : FieldTest = {
+				field: dateField,
+				valueFrom: null,
+				valueTo: valueTo,
+				valueRange: null,
+				valueEqualTo: null,
+				codeSet: null,
+				valueSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			var foundEntry : boolean = false;
+
+			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
+				var ftest = vm.resultData.fieldTest[i];
+
+				if (ftest.field==dateField && ftest.valueTo && value!="" && value!=null) {
+					foundEntry = true;
+					ftest.valueTo = valueTo;
 					break;
 				}
 				else if (ftest.field==dateField && ftest.valueTo && (value=="" || value==null))
@@ -914,7 +1186,7 @@ module app.dialogs {
 
 				if (ftest.field==valueField && ftest.valueSet && value!="") {
 					foundEntry = true;
-					fieldTest.valueSet = valueSet;
+					ftest.valueSet = valueSet;
 					break;
 				}
 				else if (ftest.field==valueField && ftest.valueSet && value=="")
@@ -958,7 +1230,7 @@ module app.dialogs {
 
 				if (ftest.field==vm.fieldTestValueField && ftest.valueFrom && value!="") {
 					foundEntry = true;
-					fieldTest.valueFrom = valueFrom;
+					ftest.valueFrom = valueFrom;
 					break;
 				}
 				else if (ftest.field==vm.fieldTestValueField && ftest.valueFrom && value=="")
@@ -1002,7 +1274,7 @@ module app.dialogs {
 
 				if (ftest.field==vm.fieldTestValueField && ftest.valueTo && value!="") {
 					foundEntry = true;
-					fieldTest.valueTo = valueTo;
+					ftest.valueTo = valueTo;
 					break;
 				}
 				else if (ftest.field==vm.fieldTestValueField && ftest.valueTo && value=="")

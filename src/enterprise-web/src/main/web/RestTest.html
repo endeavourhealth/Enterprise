@@ -903,6 +903,48 @@ Email address: <input type="text" id="sendPasswordForgottenEmailEmail">
 	</script>
 
 <hr/>
+<h3>/api/library/moveLibraryItems</h3>
+
+	Destination folder UUID: <input type="text" id="moveLibraryItemsFolderUuid">
+	<br/>
+	Item 1 UUID: <input type="text" id="moveLibraryItemsItem1Uuid">
+	<br/>
+	Item 2 UUID: <input type="text" id="moveLibraryItemsItem2Uuid">
+	<br/>
+	Item 3 UUID: <input type="text" id="moveLibraryItemsItem3Uuid">
+	<br/>
+	<button type="button" onclick="moveLibraryItems()">Submit</button>
+
+	<script>
+		function moveLibraryItems() {
+
+			var s = document.getElementById('moveLibraryItemsFolderUuid').value;
+			var params = {destinationFolder:s};
+
+			var items = [];
+			params["items"] = items;
+
+			var s = document.getElementById('moveLibraryItemsItem1Uuid').value;
+			if (s.length > 0) {
+				items[items.length] = {uuid:s};
+			}
+			s = document.getElementById('moveLibraryItemsItem2Uuid').value;
+			if (s.length > 0) {
+				items[items.length] = {uuid:s};
+			}
+			s = document.getElementById('moveLibraryItemsItem3Uuid').value;
+			if (s.length > 0) {
+				items[items.length] = {uuid:s};
+			}
+
+			post('/api/library/moveLibraryItems', params);
+		}
+	</script>
+
+
+
+
+<hr/>
 <h3>/api/dashboard/getRecentDocuments</h3>
 
 	Count: <input type="number" min="1" value="5" id="getRecentDocumentsCount">

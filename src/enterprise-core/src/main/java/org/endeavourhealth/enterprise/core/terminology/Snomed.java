@@ -178,13 +178,13 @@ abstract class Snomed {
         }
 
         //test basic Termlex functions
-        System.out.println("Preferred term of " + concept + ": " + getPreferredTerm(concept));
+        LOG.debug("Preferred term of " + concept + ": " + getPreferredTerm(concept));
 
-        System.out.println("Children of " + concept);
+        LOG.debug("Children of " + concept);
         List<String> v = getChildren(concept);
         dumpWithDesc(v);
 
-        System.out.println("Descendants of " + concept);
+        LOG.debug("Descendants of " + concept);
         v = getDescendants(concept);
         dumpWithDesc(v);
 
@@ -213,13 +213,13 @@ abstract class Snomed {
 
         HashSet<String> hs = enumerateConcepts(cs);
 
-        System.out.println("Enumeration of " + concept);
+        LOG.debug("Enumeration of " + concept);
         dumpWithDesc(hs);
     }
     private static void dumpWithDesc(Iterable<? extends CharSequence> elements) {
 
         if (elements == null) {
-            System.out.println("\tNULL");
+            LOG.debug("\tNULL");
             return;
         }
 
@@ -231,13 +231,13 @@ abstract class Snomed {
             v.add("\t" + term + ": " + concept);
         }
 
-        System.out.println("\t==" + v.size() + " results");
+        LOG.debug("\t==" + v.size() + " results");
 
         String[] arr = v.toArray(new String[0]);
         Arrays.sort(arr);
 
         for (String s: arr) {
-            System.out.println(s);
+            LOG.debug(s);
         }
     }*/
 

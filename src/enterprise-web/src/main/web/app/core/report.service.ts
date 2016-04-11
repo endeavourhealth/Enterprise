@@ -43,7 +43,7 @@ module app.core {
 					'uuid': uuid
 				}
 			};
-			return this.httpGet('api/library/getContentNamesforReportLibraryItem', request);
+			return this.httpGet('api/library/getContentNamesForReportLibraryItem', request);
 		}
 
 		scheduleReport(requestParameters : RequestParameters):ng.IPromise<any> {

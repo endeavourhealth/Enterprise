@@ -34,12 +34,13 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         super.setLogbackMarkers(sc);
 
         UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         LOG.trace("getRecentDocuments {}", count);
 
         List<JsonFolderContent> ret = new ArrayList<>();
 
-        List<DbActiveItem> activeItems = DatabaseManager.db().retrieveActiveItemRecentItems(userUuid, count);
+        List<DbActiveItem> activeItems = DatabaseManager.db().retrieveActiveItemRecentItems(userUuid, orgUuid, count);
         for (DbActiveItem activeItem: activeItems) {
             DbItem item = DbItem.retrieveForActiveItem(activeItem);
             DbAudit audit = DbAudit.retrieveForUuid(item.getAuditUuid());
@@ -121,6 +122,9 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Path("/testDatabase")
     public Response testDatabase(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
+
+        DbActiveItem a = new DbActiveItem();
+        a.writeToDb();
 
         if (!getEndUserFromSession(sc).isSuperUser()) {
             throw new BadRequestException();

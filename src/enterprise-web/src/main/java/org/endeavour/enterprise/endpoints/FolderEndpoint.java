@@ -206,6 +206,8 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             ret.add(folder);
         }
 
+        Collections.sort(ret.getFolders());
+
         clearLogbackMarkers();
 
         return Response
@@ -337,6 +339,10 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             } else {
                 throw new RuntimeException("Unexpected content " + item + " in folder");
             }
+        }
+
+        if (ret.getContents() != null) {
+            Collections.sort(ret.getContents());
         }
 
         clearLogbackMarkers();

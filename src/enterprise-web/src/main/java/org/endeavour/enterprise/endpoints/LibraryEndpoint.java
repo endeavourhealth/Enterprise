@@ -3,6 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.json.JsonDeleteResponse;
 import org.endeavour.enterprise.json.JsonFolderContent;
 import org.endeavour.enterprise.json.JsonFolderContentsList;
+import org.endeavour.enterprise.json.JsonMoveItems;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
@@ -172,6 +173,27 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         return Response
                 .ok()
                 .entity(ret)
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/moveLibraryItems")
+    public Response moveLibraryItems(@Context SecurityContext sc, JsonMoveItems parameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
+
+        LOG.trace("moveLibraryItems");
+
+        super.moveItems(userUuid, orgUuid, parameters);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
                 .build();
     }
 }

@@ -67,7 +67,7 @@ public interface DatabaseI {
 
     public List<DbActiveItem> retrieveActiveItemDependentItems(UUID organisationUuid, UUID itemUuid, DependencyType dependencyType) throws Exception;
 
-    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, int count) throws Exception;
+    public List<DbActiveItem> retrieveActiveItemRecentItems(UUID userUuid, UUID organisationUuid, int count) throws Exception;
 
     public int retrieveCountDependencies(UUID itemUuid, DependencyType dependencyType) throws Exception;
 

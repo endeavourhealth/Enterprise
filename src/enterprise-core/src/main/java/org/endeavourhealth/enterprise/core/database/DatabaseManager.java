@@ -196,7 +196,7 @@ public final class DatabaseManager {
 
         db().retrieveActiveItemDependentItems(UUID.randomUUID(), UUID.randomUUID(), DependencyType.Uses);
 
-        db().retrieveActiveItemRecentItems(UUID.randomUUID(), 5);
+        db().retrieveActiveItemRecentItems(UUID.randomUUID(), UUID.randomUUID(), 5);
 
         db().retrieveCountDependencies(UUID.randomUUID(), DependencyType.IsChildOf);
 

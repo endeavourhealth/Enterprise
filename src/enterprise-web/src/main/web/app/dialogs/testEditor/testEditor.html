@@ -40,7 +40,8 @@
 				<div class='row' ng-show="testEditor.codeEditor">
 					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Filter by Clinical Codes</label><a class="queryLink" ng-click="testEditor.removeFilter('code')">remove CODE filter</a>
+							<label>Filter by Clinical Codes:</label>
+							<a class="queryLink" ng-click="testEditor.removeFilter('code')"><i class="fa fa-times"></i> Remove filter</a>
 							<div class="form-control" style="cursor: pointer; height:auto; overflow-y:scroll; min-height: 30px; max-height: 90px;" ng-click="testEditor.showCodePicker()">
 								<span ng-repeat="selection in testEditor.codeSelection">
 									{{ testEditor.getTerm(selection.code) }}
@@ -54,30 +55,31 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.dobEditor">
-					<div class="col-xs-6">
+					<div class="col-xs-9">
 						<div class="form-group">
-							<label>Filter DOB by</label><a class="queryLink" ng-click="testEditor.removeFilter('dob')">remove DOB filter</a>
-							<p class="input-group">
+							<label>Filter by DOB:</label>
+							<div style="float: right" class="input-group">
 								<label for="dobrelative">Relative Dates</label>&nbsp;&nbsp;
 								<input id="dobrelative" type="radio" name="dobdatetype" ng-model="testEditor.dobdatetype" value="dobrelative">
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;
 								<label for="dobabsolute">Absolute Dates</label>&nbsp;&nbsp;
 								<input id="dobabsolute" type="radio" name="dobdatetype" ng-model="testEditor.dobdatetype" value="dobabsolute">
-							</p>
+								<a class="queryLink" ng-click="testEditor.removeFilter('dob')"><i class="fa fa-times"></i> Remove filter</a>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.dobEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.dobdatetype == 'dobabsolute'">Filter by {{testEditor.dobLabel}} From</label>
+							<label ng-show="testEditor.dobdatetype == 'dobabsolute'">From:</label>
 							<p class="input-group" ng-show="testEditor.dobdatetype == 'dobabsolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dobEditorFromDatePicker" ng-model="testEditor.filterDOBFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDOBFrom, testEditor.dobLabel)" placeholder="Select {{testEditor.dobLabel}} from">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dobEditorFromDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.dobdatetype == 'dobrelative'">Filter by {{testEditor.dobLabel}} From</label>
+							<label ng-show="testEditor.dobdatetype == 'dobrelative'">From:</label>
 							<p class="input-group" ng-show="testEditor.dobdatetype == 'dobrelative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDOBFromRelativeValue" ng-blur="testEditor.filterRelativeDateFromChange(testEditor.filterDOBFromRelativeValue, testEditor.filterDOBFromRelativePeriod, testEditor.dobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDOBFromRelativePeriod" ng-change="testEditor.filterRelativeDateFromChange(testEditor.filterDOBFromRelativeValue, testEditor.filterDOBFromRelativePeriod, testEditor.dobLabel)">
@@ -88,14 +90,14 @@
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.dobdatetype == 'dobabsolute'">Filter by {{testEditor.dobLabel}} To</label>
+							<label ng-show="testEditor.dobdatetype == 'dobabsolute'">To:</label>
 							<p class="input-group" ng-show="testEditor.dobdatetype == 'dobabsolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dobEditorToDatePicker" ng-model="testEditor.filterDOBTo" ng-blur="testEditor.filterDateToChange(testEditor.filterDOBTo, testEditor.dobLabel)" placeholder="Select {{testEditor.dobLabel}} to">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dobEditorToDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.dobdatetype == 'dobrelative'">Filter by {{testEditor.dobLabel}} To</label>
+							<label ng-show="testEditor.dobdatetype == 'dobrelative'">To:</label>
 							<p class="input-group" ng-show="testEditor.dobdatetype == 'dobrelative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDOBToRelativeValue" ng-blur="testEditor.filterRelativeDateToChange(testEditor.filterDOBToRelativeValue, testEditor.filterDOBToRelativePeriod, testEditor.dobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDOBToRelativePeriod" ng-change="testEditor.filterRelativeDateToChange(testEditor.filterDOBToRelativeValue, testEditor.filterDOBToRelativePeriod, testEditor.dobLabel)">
@@ -108,7 +110,8 @@
 				<div class='row' ng-show="testEditor.sexEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Filter by {{testEditor.sexLabel}}</label><a class="queryLink" ng-click="testEditor.removeFilter('sex')">remove SEX filter</a>
+							<label>Filter by {{testEditor.sexLabel}}:</label>
+							<a class="queryLink" ng-click="testEditor.removeFilter('sex')"><i class="fa fa-times"></i> Remove filter</a>
 							<select class="form-control" ng-model="testEditor.filterSex" ng-change="testEditor.filterValueChange(testEditor.filterSex, testEditor.sexLabel)">
 								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
 							</select>
@@ -116,30 +119,31 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.dateEditor">
-					<div class="col-xs-6">
+					<div class="col-xs-9">
 						<div class="form-group">
-							<label>Filter {{testEditor.dateLabel}} by</label><a class="queryLink" ng-click="testEditor.removeFilter('date')">remove {{testEditor.dateLabel}} filter</a>
-							<p class="input-group">
+							<label>Filter by {{testEditor.dateLabel}}:</label>
+							<div style="float: right" class="input-group">
 								<label for="relative">Relative Dates</label>&nbsp;&nbsp;
 								<input id="relative" type="radio" name="datetype" ng-model="testEditor.datetype" value="relative">
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;
 								<label for="absolute">Absolute Dates</label>&nbsp;&nbsp;
 								<input id="absolute" type="radio" name="datetype" ng-model="testEditor.datetype" value="absolute">
-							</p>
+								<a class="queryLink" ng-click="testEditor.removeFilter('date')"><i class="fa fa-times"></i> Remove filter</a>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.dateEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.datetype == 'absolute'">Filter by {{testEditor.dateLabel}} From</label>
+							<label ng-show="testEditor.datetype == 'absolute'">From:</label>
 							<p class="input-group" ng-show="testEditor.datetype == 'absolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dateEditorFromDatePicker" ng-model="testEditor.filterDateFrom" ng-blur="testEditor.filterDateFromChange(testEditor.filterDateFrom, testEditor.dateLabel)" placeholder="Select {{testEditor.dateLabel}} from">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dateEditorFromDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.datetype == 'relative'">Filter by {{testEditor.dateLabel}} From</label>
+							<label ng-show="testEditor.datetype == 'relative'">From:</label>
 							<p class="input-group" ng-show="testEditor.datetype == 'relative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDateFromRelativeValue" ng-blur="testEditor.filterRelativeDateFromChange(testEditor.filterDateFromRelativeValue, testEditor.filterDateFromRelativePeriod, testEditor.dateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDateFromRelativePeriod" ng-change="testEditor.filterRelativeDateFromChange(testEditor.filterDateFromRelativeValue, testEditor.filterDateFromRelativePeriod, testEditor.dateLabel)">
@@ -150,14 +154,14 @@
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.datetype == 'absolute'">Filter by {{testEditor.dateLabel}} To</label>
+							<label ng-show="testEditor.datetype == 'absolute'">To:</label>
 							<p class="input-group" ng-show="testEditor.datetype == 'absolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dateEditorToDatePicker" ng-model="testEditor.filterDateTo" ng-blur="testEditor.filterDateToChange(testEditor.filterDateTo, testEditor.dateLabel)" placeholder="Select {{testEditor.dateLabel}} to">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dateEditorToDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.datetype == 'relative'">Filter by {{testEditor.dateLabel}} To</label>
+							<label ng-show="testEditor.datetype == 'relative'">To:</label>
 							<p class="input-group" ng-show="testEditor.datetype == 'relative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.filterDateToRelativeValue" ng-blur="testEditor.filterRelativeDateToChange(testEditor.filterDateToRelativeValue, testEditor.filterDateToRelativePeriod, testEditor.dateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.filterDateToRelativePeriod" ng-change="testEditor.filterRelativeDateToChange(testEditor.filterDateToRelativeValue, testEditor.filterDateToRelativePeriod, testEditor.dateLabel)">
@@ -170,13 +174,14 @@
 				<div class='row' ng-show="testEditor.valueEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Filter by {{testEditor.valueField}} From</label><a class="queryLink" ng-click="testEditor.removeFilter('value')">remove {{testEditor.valueField}} filter</a>
+							<label>Filter by {{testEditor.valueField}} From:</label>
+							<a class="queryLink" ng-click="testEditor.removeFilter('value')"><i class="fa fa-times"></i> Remove filter</a>
 							<input type="text" class="form-control" ng-model="testEditor.filterValueFrom" ng-blur="testEditor.filterValueFromChange(testEditor.filterValueFrom)" placeholder="Select {{testEditor.valueField}} from">
 						</div>
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Filter by {{testEditor.valueField}} To</label>
+							<label>Filter by {{testEditor.valueField}} To:</label>
 							<input type="text" class="form-control" ng-model="testEditor.filterValueTo" ng-blur="testEditor.filterValueToChange(testEditor.filterValueTo)" placeholder="Select {{testEditor.valueField}} to">
 						</div>
 					</div>
@@ -187,7 +192,7 @@
 				<div class='row' ng-show="testEditor.showRestriction"><br/>
 					<div class="col-xs-3">
 						<div class="form-group">
-							<label>Sort Field</label><a class="queryLink" ng-click="testEditor.removeFilter('restriction')">remove restriction</a>
+							<label>Sort Field</label>
 							<select class="form-control" ng-model="testEditor.restrictionFieldName" ng-change="testEditor.restrictionChange(testEditor.restrictionFieldName)">
 								<option ng-repeat="restrictionfield in testEditor.fields" value="{{restrictionfield}}">{{restrictionfield}}</option>
 							</select>
@@ -207,6 +212,7 @@
 							<input type="text" class="form-control" ng-disabled="true" ng-model="testEditor.restrictionCount" placeholder="1" ng-blur="testEditor.restrictionChange(testEditor.restrictionCount)">
 						</div>
 					</div>
+					<a class="queryLink" ng-click="testEditor.removeFilter('restriction')"><i class="fa fa-times"></i> Remove restriction</a>
 				</div>
 				<br/>
 			</form>
@@ -238,7 +244,8 @@
 				<div class='row' ng-show="testEditor.fieldTestCodeEditor">
 					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Test by Clinical Codes</label><a class="queryLink" ng-click="testEditor.removeFieldTest('code')">remove CODE field test</a>
+							<label>Test by Clinical Codes:</label>
+							<a class="queryLink" ng-click="testEditor.removeFieldTest('code')"><i class="fa fa-times"></i> Remove field test</a>
 							<div class="form-control" style="cursor: pointer; height:auto; overflow:visible; min-height: 30px" ng-click="testEditor.showFieldTestCodePicker()">
 								<span ng-repeat="code in testEditor.fieldTestCodeSelection">
 									<span ng-hide="this.$first">, </span>{{ testEditor.getTerm(code.code) }}<span ng-repeat="exclusion in code.exclusion">, {{ testEditor.getTerm(exclusion.code) }} (exclusion)</span>
@@ -248,30 +255,31 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestDobEditor">
-					<div class="col-xs-6">
+					<div class="col-xs-9">
 						<div class="form-group">
-							<label>Filter DOB by</label><a class="queryLink" ng-click="testEditor.removeFieldTest('dob')">remove DOB filter</a>
-							<p class="input-group">
+							<label>Test by DOB:</label>
+							<div style="float: right" class="input-group">
 								<label for="fieldtestdobrelative">Relative Dates</label>&nbsp;&nbsp;
 								<input id="fieldtestdobrelative" type="radio" name="fieldTestDobdatetype" ng-model="testEditor.fieldTestDobdatetype" value="fieldtestdobrelative">
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;
 								<label for="fieldtestdobabsolute">Absolute Dates</label>&nbsp;&nbsp;
 								<input id="fieldtestdobabsolute" type="radio" name="fieldTestDobdatetype" ng-model="testEditor.fieldTestDobdatetype" value="fieldtestdobabsolute">
-							</p>
+								<a class="queryLink" ng-click="testEditor.removeFieldTest('dob')"><i class="fa fa-times"></i> Remove field test</a>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestDobEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobabsolute'">Filter by {{testEditor.fieldTestDobLabel}} From</label>
+							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobabsolute'">From:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobabsolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dobEditorFromDatePicker" ng-model="testEditor.fieldTestDOBFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDOBFrom, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} from">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dobEditorFromDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">Filter by {{testEditor.fieldTestDobLabel}} From</label>
+							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">From:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDOBFromRelativeValue" ng-blur="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDOBFromRelativeValue, testEditor.fieldTestDOBFromRelativePeriod, testEditor.fieldTestDobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDOBFromRelativePeriod" ng-change="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDOBFromRelativeValue, testEditor.fieldTestDOBFromRelativePeriod, testEditor.fieldTestDobLabel)">
@@ -282,14 +290,14 @@
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobabsolute'">Filter by {{testEditor.fieldTestDobLabel}} To</label>
+							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobabsolute'">To:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobabsolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dobEditorToDatePicker" ng-model="testEditor.fieldTestDOBTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDOBTo, testEditor.fieldTestDobLabel)" placeholder="Select {{testEditor.fieldTestDobLabel}} to">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dobEditorToDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">Filter by {{testEditor.fieldTestDobLabel}} To</label>
+							<label ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">To:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDobdatetype == 'fieldtestdobrelative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDOBToRelativeValue" ng-blur="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDOBToRelativeValue, testEditor.fieldTestDOBToRelativePeriod, testEditor.fieldTestDobLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDOBToRelativePeriod" ng-change="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDOBToRelativeValue, testEditor.fieldTestDOBToRelativePeriod, testEditor.fieldTestDobLabel)">
@@ -303,7 +311,8 @@
 				<div class='row' ng-show="testEditor.fieldTestSexEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestSexLabel}}</label><a class="queryLink" ng-click="testEditor.removeFieldTest('sex')">remove SEX field test</a>
+							<label>Test by {{testEditor.fieldTestSexLabel}}:</label>
+							<a class="queryLink" ng-click="testEditor.removeFieldTest('sex')"><i class="fa fa-times"></i> Remove field test</a>
 							<select class="form-control" ng-model="testEditor.fieldTestSex" ng-change="testEditor.fieldTestValueChange(testEditor.fieldTestSex, testEditor.fieldTestSexLabel)">
 								<option ng-repeat="gender in testEditor.genders" value="{{gender}}">{{gender}}</option>
 							</select>
@@ -311,30 +320,31 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestDateEditor">
-					<div class="col-xs-6">
+					<div class="col-xs-9">
 						<div class="form-group">
-							<label>Filter {{testEditor.fieldTestDateLabel}} by</label><a class="queryLink" ng-click="testEditor.removeFieldTest('date')">remove {{testEditor.fieldTestDateLabel}} filter</a>
-							<p class="input-group">
+							<label>Test by {{testEditor.fieldTestDateLabel}}:</label>
+							<div style="float: right" class="input-group">
 								<label for="fieldtestrelative">Relative Dates</label>&nbsp;&nbsp;
 								<input id="fieldtestrelative" type="radio" name="fieldTestDatetype" ng-model="testEditor.fieldTestDatetype" value="fieldtestrelative">
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&nbsp;&nbsp;&nbsp;
 								<label for="fieldtestabsolute">Absolute Dates</label>&nbsp;&nbsp;
 								<input id="fieldtestabsolute" type="radio" name="fieldTestDatetype" ng-model="testEditor.fieldTestDatetype" value="fieldtestabsolute">
-							</p>
+								<a class="queryLink" ng-click="testEditor.removeFieldTest('date')"><i class="fa fa-times"></i> Remove field test</a>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestDateEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestabsolute'">Filter by {{testEditor.fieldTestDateLabel}} From</label>
+							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestabsolute'">From:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDatetype == 'fieldtestabsolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dateEditorFromDatePicker" ng-model="testEditor.fieldTestDateFrom" ng-blur="testEditor.fieldTestDateFromChange(testEditor.fieldTestDateFrom, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} from">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dateEditorFromDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">Filter by {{testEditor.fieldTestDateLabel}} From</label>
+							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">From:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDateFromRelativeValue" ng-blur="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDateFromRelativeValue, testEditor.fieldTestDateFromRelativePeriod, testEditor.fieldTestDateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDateFromRelativePeriod" ng-change="testEditor.fieldTestRelativeDateFromChange(testEditor.fieldTestDateFromRelativeValue, testEditor.fieldTestDateFromRelativePeriod, testEditor.fieldTestDateLabel)">
@@ -345,14 +355,14 @@
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestabsolute'">Filter by {{testEditor.fieldTestDateLabel}} To</label>
+							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestabsolute'">To:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDatetype == 'fieldtestabsolute'">
 								<input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" is-open="dateEditorToDatePicker" ng-model="testEditor.fieldTestDateTo" ng-blur="testEditor.fieldTestDateToChange(testEditor.fieldTestDateTo, testEditor.fieldTestDateLabel)" placeholder="Select {{testEditor.fieldTestDateLabel}} to">
 								<span class="input-group-btn">
 									<button type="button" class="btn btn-default" ng-click="dateEditorToDatePicker = true"><i class="fa fa-calendar"></i></button>
 								</span>
 							</p>
-							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">Filter by {{testEditor.fieldTestDateLabel}} To</label>
+							<label ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">To:</label>
 							<p class="input-group" ng-show="testEditor.fieldTestDatetype == 'fieldtestrelative'">
 								<input type="text" class="form-control" style="width:50px;margin-right:10px" ng-model="testEditor.fieldTestDateToRelativeValue" ng-blur="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDateToRelativeValue, testEditor.fieldTestDateToRelativePeriod, testEditor.fieldTestDateLabel)">
 								<select class="form-control" style="width:100px" ng-model="testEditor.fieldTestDateToRelativePeriod" ng-change="testEditor.fieldTestRelativeDateToChange(testEditor.fieldTestDateToRelativeValue, testEditor.fieldTestDateToRelativePeriod, testEditor.fieldTestDateLabel)">
@@ -365,13 +375,14 @@
 				<div class='row' ng-show="testEditor.fieldTestValueEditor">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestValueField}} From</label><a class="queryLink" ng-click="testEditor.removeFieldTest('value')">remove {{testEditor.fieldTestValueField}} field test</a>
+							<label>Test by {{testEditor.fieldTestValueField}} From:</label>
+							<a class="queryLink" ng-click="testEditor.removeFieldTest('value')"><i class="fa fa-times"></i> Remove field test</a>
 							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueFrom" ng-blur="testEditor.fieldTestValueFromChange(testEditor.fieldTestValueFrom)" placeholder="Select {{testEditor.fieldTestValueField}} from">
 						</div>
 					</div>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestValueField}} To</label>
+							<label>Test by {{testEditor.fieldTestValueField}} To:</label>
 							<input type="text" class="form-control" ng-model="testEditor.fieldTestValueTo" ng-blur="testEditor.fieldTestValueToChange(testEditor.fieldTestValueTo)" placeholder="Select {{testEditor.fieldTestValueField}} to">
 						</div>
 					</div>

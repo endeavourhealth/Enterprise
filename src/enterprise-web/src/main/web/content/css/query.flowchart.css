@@ -251,7 +251,7 @@ The element (in this case the SVG element) that contains the draggable elements.
 
 .queryLink {
 	cursor: pointer;
-	padding-left: 10px;
+	padding-left: 20px;
 	display: inline-block;
 
 }

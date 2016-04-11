@@ -6,7 +6,6 @@ import org.endeavourhealth.enterprise.core.queuing.Message;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -54,10 +53,10 @@ public class WorkerQueue implements AutoCloseable {
         return prefix + executionUuid.toString();
     }
 
-    public WorkerQueueBatchMessage getNextMessage() throws IOException {
+    public WorkerQueueBatchMessage getNextMessage() throws Exception {
 
         if (deliveryTag != null)
-            throw new InvalidStateException("DeliveryTag is not null");
+            throw new Exception("DeliveryTag is not null");
 
         GetResponse response = channel.basicGet(workerQueueName);
 

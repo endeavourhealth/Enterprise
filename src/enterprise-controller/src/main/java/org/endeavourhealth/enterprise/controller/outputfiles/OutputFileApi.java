@@ -78,6 +78,9 @@ public class OutputFileApi {
     }
 
     public void complete() throws Exception {
+        if (noFiles())
+            return;
+
         nameHandler.renameTemporaryFolder();
     }
 }

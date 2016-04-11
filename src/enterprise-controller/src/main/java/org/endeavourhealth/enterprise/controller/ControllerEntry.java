@@ -11,6 +11,7 @@ public class ControllerEntry {
 
             System.out.println("");
             System.out.println("Press enter to exit");
+            //noinspection ResultOfMethodCallIgnored
             System.in.read();
         }
 

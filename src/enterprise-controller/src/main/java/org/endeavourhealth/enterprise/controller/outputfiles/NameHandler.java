@@ -3,6 +3,8 @@ package org.endeavourhealth.enterprise.controller.outputfiles;
 import java.io.File;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 class NameHandler {
@@ -21,9 +23,9 @@ class NameHandler {
     }
 
     private String formatStartDateTimeForName() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-        LocalDateTime localDateTime = LocalDateTime.from(startDateTime);
-        return localDateTime.format(formatter);
+        return DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+                .withZone(ZoneOffset.UTC)
+                .format(startDateTime);
     }
 
     public void buildJobFolder() throws Exception {

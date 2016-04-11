@@ -24,6 +24,7 @@ class ProcessorNodeMain implements AutoCloseable, ProcessorNodeQueue.IProcessorN
     private ExecutionController executionController;
 
     public void start() throws Exception {
+        logger.info("Processor node: " + processorNodeUuid.toString());
 
         loadConfiguration();
         registerProcessorNodeQueue();

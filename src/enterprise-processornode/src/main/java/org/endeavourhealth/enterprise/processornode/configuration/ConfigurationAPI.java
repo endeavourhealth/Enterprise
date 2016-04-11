@@ -3,31 +3,35 @@ package org.endeavourhealth.enterprise.processornode.configuration;
 import org.endeavourhealth.enterprise.core.XmlSerializer;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.endeavourhealth.enterprise.processornode.configuration.models.*;
-import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ConfigurationAPI {
 
     public Configuration loadConfiguration() throws Exception {
 
-        Configuration config = XmlSerializer.deserializeFromResource(Configuration.class, "processornode.config", "ProcessorNode.xsd");
+        String configLocation = System.getProperty("config.file");
 
-        if (config.getDebugging() == null)
-            config.setDebugging(new Debugging());
+        Configuration configuration;
 
-        return config;
+        if (configLocation == null)
+            configuration = XmlSerializer.deserializeFromResource(Configuration.class, "processornode.config", "ProcessorNode.xsd");
+        else {
+            Path file = Paths.get(configLocation);
+            configuration = XmlSerializer.deserializeFromFile(Configuration.class, file, "ProcessorNode.xsd");
+        }
+
+        if (configuration.getDebugging() == null)
+            configuration.setDebugging(new Debugging());
+
+        return configuration;
     }
 
     public static QueueConnectionProperties convertConnection(MessageQueuing configuration) {
-        QueueConnectionProperties connectionProperties = new QueueConnectionProperties(
+        return new QueueConnectionProperties(
                 configuration.getIpAddress(),
                 configuration.getUsername(),
                 configuration.getPassword());
-
-        return connectionProperties;
     }
 }

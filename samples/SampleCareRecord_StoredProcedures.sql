@@ -66,6 +66,7 @@ begin
 
 	select
 		o.SK_PatientID,
+		o.[SnomedConceptCode],
 		--o.LegacyCode,
 		--o.OriginalTerm,
 		o.EventDate,

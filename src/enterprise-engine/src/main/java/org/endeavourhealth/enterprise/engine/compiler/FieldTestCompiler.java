@@ -4,6 +4,7 @@ import org.endeavourhealth.enterprise.core.entitymap.models.DataValueType;
 import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
+import org.endeavourhealth.enterprise.core.terminology.TerminologyService;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
 import org.endeavourhealth.enterprise.engine.compiled.ICompiledDataSource;
 import org.endeavourhealth.enterprise.engine.compiled.fieldTests.*;
@@ -72,16 +73,44 @@ public class FieldTestCompiler {
                 throw new InvalidQueryDocumentException("ValueSet not found for field of type DataValues");
 
             return createValueSet(field.getDataValues(), valueFilter.getValueSet());
+
+        } else if (field.getLogicalDataType() == LogicalDataType.CODE) {
+
+            if (valueFilter.getCodeSet() == null)
+                throw new InvalidQueryDocumentException("CodeSet not found for field of type CodeFieldTest");
+
+            return createCodeSet(valueFilter.getCodeSet());
         }
 //        } else if (field.getLogicalDataType() == LogicalDataType.) {
 //
 //            if (valueFilter.getCodeSets() != null) {
 //
-//                return new Code(valueFilter.getCodeSets().get(0).getCodeSetValues().get(0).getCode());
+//                return new CodeFieldTest(valueFilter.getCodeSets().get(0).getCodeSetValues().get(0).getCode());
 //            }
 //        }
 
         throw new UnableToCompileExpection("Could not build field filter.  Logical type: " + field.getLogicalDataType());
+    }
+
+    private ICompiledFieldTest createCodeSet(CodeSet codeSet) throws UnableToCompileExpection {
+
+        HashSet<String> conceptStrings = TerminologyService.enumerateConcepts(codeSet);
+
+        Set<Long> concepts = new HashSet<>();
+
+        for (String value: conceptStrings) {
+            Long item;
+
+            try {
+                item = Long.parseLong(value);
+            } catch (Exception e) {
+                throw new UnableToCompileExpection("Could not convert code to Long: " + value);
+            }
+
+            concepts.add(item);
+        }
+
+        return new CodeFieldTest(concepts);
     }
 
     private ValueSetString createValueSet(List<DataValueType> dataValueList, ValueSet valueSet) throws InvalidQueryDocumentException {

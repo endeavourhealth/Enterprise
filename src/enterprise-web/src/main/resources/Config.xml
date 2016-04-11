@@ -24,7 +24,7 @@
 
 	<webServer>
 		<!--local host cookie-->
-		<cookieDomain>localHost</cookieDomain>
+		<cookieDomain>localhost</cookieDomain>
 
 		<!--AIMES cookie-->
 	<!--<cookieDomain>10.11.87.69</cookieDomain>-->

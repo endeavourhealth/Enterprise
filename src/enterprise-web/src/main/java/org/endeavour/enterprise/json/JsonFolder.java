@@ -10,7 +10,7 @@ import java.util.UUID;
  * JSON object used to manipulate folders, such as creating, moving and renaming
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonFolder {
+public final class JsonFolder implements Comparable {
 
     public static final int FOLDER_TYPE_LIBRARY = 1;
     public static final int FOLDER_TYPE_REPORTS = 2;
@@ -97,5 +97,11 @@ public final class JsonFolder {
 
     public void setHasChildren(Boolean hasChildren) {
         this.hasChildren = hasChildren;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        JsonFolder other = (JsonFolder)o;
+        return folderName.compareTo(other.folderName);
     }
 }

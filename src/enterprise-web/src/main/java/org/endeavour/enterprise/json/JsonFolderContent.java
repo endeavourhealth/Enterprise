@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonFolderContent {
+public final class JsonFolderContent implements Comparable {
     private UUID uuid = null;
     private Integer type = null;
     private String typeDesc = null;
@@ -111,5 +111,11 @@ public final class JsonFolderContent {
 
     public void setIsScheduled(Boolean scheduled) {
         isScheduled = scheduled;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        JsonFolderContent other = (JsonFolderContent)o;
+        return name.compareTo(other.name);
     }
 }

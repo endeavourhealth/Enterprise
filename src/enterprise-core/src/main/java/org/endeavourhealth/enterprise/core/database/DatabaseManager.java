@@ -67,6 +67,7 @@ public final class DatabaseManager {
             cpds.setAcquireIncrement(5);
             cpds.setMaxPoolSize(20);
             cpds.setMaxStatements(180);
+            cpds.setMaxIdleTime(300); //if a connection is idle for 5 mins, discard it
 
             LOG.info("Database connection pool set up during server startup");
 

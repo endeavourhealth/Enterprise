@@ -123,6 +123,9 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     public Response testDatabase(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
 
+        DbActiveItem a = new DbActiveItem();
+        a.writeToDb();
+
         if (!getEndUserFromSession(sc).isSuperUser()) {
             throw new BadRequestException();
         }

@@ -1,9 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.json.JsonDeleteResponse;
-import org.endeavour.enterprise.json.JsonQueryResult;
-import org.endeavour.enterprise.json.JsonReportRequest;
-import org.endeavour.enterprise.json.JsonReportResult;
+import org.endeavour.enterprise.json.*;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
@@ -329,5 +326,26 @@ public final class ReportEndpoint extends AbstractItemEndpoint
                 populateReportResults(result, hmResultsByItem, hmItemsByUuid, childReportItems, queryResult);
             }
         }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/moveReports")
+    public Response moveReports(@Context SecurityContext sc, JsonMoveItems parameters) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        UUID orgUuid = getOrganisationUuidFromToken(sc);
+        UUID userUuid = getEndUserUuidFromToken(sc);
+
+        LOG.trace("moveReports");
+
+        super.moveItems(userUuid, orgUuid, parameters);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .build();
     }
 }

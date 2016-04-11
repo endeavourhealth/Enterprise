@@ -5,6 +5,9 @@ import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDeta
 import org.endeavourhealth.enterprise.controller.configuration.models.*;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class ConfigurationAPI {
 
     public Configuration loadConfiguration() throws Exception {
@@ -37,10 +40,19 @@ public class ConfigurationAPI {
     }
 
     private static Configuration getConfiguration() throws Exception {
-
         //"src/discovery-controller/src/main/resources/controller.config";
 
-        Configuration configuration = XmlSerializer.deserializeFromResource(Configuration.class, "controller.config", "Controller.xsd");
+        String configLocation = System.getProperty("config.file");
+
+        Configuration configuration;
+
+        if (configLocation == null)
+            configuration = XmlSerializer.deserializeFromResource(Configuration.class, "controller.config", "Controller.xsd");
+        else {
+            Path file = Paths.get(configLocation);
+            configuration = XmlSerializer.deserializeFromFile(Configuration.class, file, "Controller.xsd");
+        }
+
         return configuration;
     }
 }

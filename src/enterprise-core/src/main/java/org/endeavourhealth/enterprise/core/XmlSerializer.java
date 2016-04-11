@@ -14,6 +14,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Path;
 
 public abstract class XmlSerializer {
 
@@ -37,7 +38,11 @@ public abstract class XmlSerializer {
 
     private static String removeXmlStringNoNamespace(String xmlString) {
         return xmlString.replaceAll("xsi:noNamespaceSchemaLocation=.*?(\"|\').*?(\"|\')", ""); /* remove xmlns declaration */
+    }
 
+    public static <T> T deserializeFromFile(Class cls, Path file, String xsdName) throws Exception {
+        String xml = FileHelper.readTextFile(file);
+        return deserializeFromString(cls, xml, xsdName);
     }
 
 //    public static <T> T deserializeFromString(Class cls, String xml, String xsdName) throws ParserConfigurationException, JAXBException, IOException, SAXException {

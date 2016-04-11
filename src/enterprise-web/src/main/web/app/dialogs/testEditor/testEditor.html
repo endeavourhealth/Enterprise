@@ -38,6 +38,7 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.codeEditor">
+					<hr/>
 					<div class="col-xs-12">
 						<div class="form-group">
 							<label>Filter by Clinical Codes:</label>
@@ -55,14 +56,14 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.dobEditor">
-					<div class="col-xs-9">
+					<hr/>
+					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Filter by DOB:</label>
-							<div style="float: right" class="input-group">
-								<label for="dobrelative">Relative Dates</label>&nbsp;&nbsp;
+							<div class="input-group">
+								<label for="dobrelative">Filter by DOB using relative dates</label>&nbsp;&nbsp;
 								<input id="dobrelative" type="radio" name="dobdatetype" ng-model="testEditor.dobdatetype" value="dobrelative">
-								&nbsp;&nbsp;&nbsp;
-								<label for="dobabsolute">Absolute Dates</label>&nbsp;&nbsp;
+								&nbsp;
+								<label for="dobabsolute">or absolute dates</label>&nbsp;&nbsp;
 								<input id="dobabsolute" type="radio" name="dobdatetype" ng-model="testEditor.dobdatetype" value="dobabsolute">
 								<a class="queryLink" ng-click="testEditor.removeFilter('dob')"><i class="fa fa-times"></i> Remove filter</a>
 							</div>
@@ -108,6 +109,7 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.sexEditor">
+					<hr/>
 					<div class="col-xs-6">
 						<div class="form-group">
 							<label>Filter by {{testEditor.sexLabel}}:</label>
@@ -119,14 +121,14 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.dateEditor">
-					<div class="col-xs-9">
+					<hr/>
+					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Filter by {{testEditor.dateLabel}}:</label>
-							<div style="float: right" class="input-group">
-								<label for="relative">Relative Dates</label>&nbsp;&nbsp;
+							<div class="input-group">
+								<label for="relative">Filter by {{testEditor.dateLabel}} using relative dates</label>&nbsp;&nbsp;
 								<input id="relative" type="radio" name="datetype" ng-model="testEditor.datetype" value="relative">
-								&nbsp;&nbsp;&nbsp;
-								<label for="absolute">Absolute Dates</label>&nbsp;&nbsp;
+								&nbsp;
+								<label for="absolute">or absolute dates</label>&nbsp;&nbsp;
 								<input id="absolute" type="radio" name="datetype" ng-model="testEditor.datetype" value="absolute">
 								<a class="queryLink" ng-click="testEditor.removeFilter('date')"><i class="fa fa-times"></i> Remove filter</a>
 							</div>
@@ -172,6 +174,7 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.valueEditor">
+					<hr/>
 					<div class="col-xs-6">
 						<div class="form-group">
 							<label>Filter by {{testEditor.valueField}} From:</label>
@@ -242,6 +245,7 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestCodeEditor">
+					<hr/>
 					<div class="col-xs-12">
 						<div class="form-group">
 							<label>Test by Clinical Codes:</label>
@@ -255,14 +259,14 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestDobEditor">
-					<div class="col-xs-9">
+					<hr/>
+					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Test by DOB:</label>
-							<div style="float: right" class="input-group">
-								<label for="fieldtestdobrelative">Relative Dates</label>&nbsp;&nbsp;
+							<div class="input-group">
+								<label for="fieldtestdobrelative">Test by DOB using relative dates</label>&nbsp;&nbsp;
 								<input id="fieldtestdobrelative" type="radio" name="fieldTestDobdatetype" ng-model="testEditor.fieldTestDobdatetype" value="fieldtestdobrelative">
-								&nbsp;&nbsp;&nbsp;
-								<label for="fieldtestdobabsolute">Absolute Dates</label>&nbsp;&nbsp;
+								&nbsp;
+								<label for="fieldtestdobabsolute">or absolute dates</label>&nbsp;&nbsp;
 								<input id="fieldtestdobabsolute" type="radio" name="fieldTestDobdatetype" ng-model="testEditor.fieldTestDobdatetype" value="fieldtestdobabsolute">
 								<a class="queryLink" ng-click="testEditor.removeFieldTest('dob')"><i class="fa fa-times"></i> Remove field test</a>
 							</div>
@@ -309,6 +313,7 @@
 				</div>
 
 				<div class='row' ng-show="testEditor.fieldTestSexEditor">
+					<hr/>
 					<div class="col-xs-6">
 						<div class="form-group">
 							<label>Test by {{testEditor.fieldTestSexLabel}}:</label>
@@ -320,14 +325,14 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestDateEditor">
-					<div class="col-xs-9">
+					<hr/>
+					<div class="col-xs-12">
 						<div class="form-group">
-							<label>Test by {{testEditor.fieldTestDateLabel}}:</label>
-							<div style="float: right" class="input-group">
-								<label for="fieldtestrelative">Relative Dates</label>&nbsp;&nbsp;
+							<div class="input-group">
+								<label for="fieldtestrelative">Test by {{testEditor.fieldTestDateLabel}} using relative dates</label>&nbsp;&nbsp;
 								<input id="fieldtestrelative" type="radio" name="fieldTestDatetype" ng-model="testEditor.fieldTestDatetype" value="fieldtestrelative">
-								&nbsp;&nbsp;&nbsp;
-								<label for="fieldtestabsolute">Absolute Dates</label>&nbsp;&nbsp;
+								&nbsp;
+								<label for="fieldtestabsolute">or absolute dates</label>&nbsp;&nbsp;
 								<input id="fieldtestabsolute" type="radio" name="fieldTestDatetype" ng-model="testEditor.fieldTestDatetype" value="fieldtestabsolute">
 								<a class="queryLink" ng-click="testEditor.removeFieldTest('date')"><i class="fa fa-times"></i> Remove field test</a>
 							</div>
@@ -373,6 +378,7 @@
 					</div>
 				</div>
 				<div class='row' ng-show="testEditor.fieldTestValueEditor">
+					<hr/>
 					<div class="col-xs-6">
 						<div class="form-group">
 							<label>Test by {{testEditor.fieldTestValueField}} From:</label>

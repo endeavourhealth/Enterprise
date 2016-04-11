@@ -96,6 +96,7 @@ module app.dialogs {
 		sexFilter : boolean = false;
 		ageFilter : boolean = false;
 		regFilter : boolean = false;
+		disableRestrictionCount : boolean = false;
 
 		editMode : boolean = false;
 
@@ -167,11 +168,13 @@ module app.dialogs {
 
 			if (!this.dataSourceOnly) {
 				vm.viewFieldTest = true;
-				vm.title = "Test Editor"
+				vm.title = "Test Editor";
+				vm.disableRestrictionCount = true;
 			}
 			else {
 				vm.title = "Data Source Editor";
 				vm.viewFieldTest = false;
+				vm.disableRestrictionCount = false;
 			}
 		}
 

@@ -160,7 +160,7 @@ module app.dialogs {
 				fieldTest: []
 			};
 
-			if (!this.resultData.dataSource)
+			if (!this.resultData||!this.resultData.dataSource)
 				this.resultData = newTest;
 			else
 				this.initialiseEditMode(this.resultData);

@@ -39,7 +39,7 @@
 												ng-click="ctrl.selectFolderItem(item)">
 											<td>
 												<a ng-click="ctrl.viewItem(item)">{{item.name}}</a>
-												<span class="fa fa-comment fa-right-pad text-muted" uib-tooltip="{{item.description}}" ng-show="item.description"></span>
+												<span class="fa fa-info-circle fa-right-pad text-muted" uib-tooltip="{{item.description}}" ng-show="item.description"></span>
 											</td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 											<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
@@ -157,7 +157,7 @@
 							ng-class="{'fa-chevron-right': !node.isExpanded,'fa-chevron-down': node.isExpanded}"
 							ng-click="node.isExpanded = !node.isExpanded"></span>
 				<span>{{node.name}}</span>
-				<span class="fa fa-comment fa-right-pad text-muted" uib-tooltip="{{node.description}}" ng-show="node.description"></span>
+				<span class="fa fa-info-circle fa-right-pad text-muted" uib-tooltip="{{node.description}}" ng-show="node.description"></span>
 			</div>
 			<div class="col-md-3">
 				<span>{{node.resultCount | number }}</span>

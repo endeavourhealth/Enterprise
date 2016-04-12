@@ -56,7 +56,7 @@
                             <tr class="hover-box show-child-on-hover" ng-repeat="item in queryPicker.itemSummaryList.contents | filter: { type: 2 } | orderBy:sortField:sortReverse">
                                 <td>
                                     <a style="cursor: pointer" ng-click="queryPicker.actionItem(item,'edit')">{{item.name}}</a>
-                                    <span class="fa fa-comment fa-right-pad text-muted" uib-tooltip="{{item.description}}" ng-show="item.description"></span>
+                                    <span class="fa fa-info-circle fa-right-pad text-muted" uib-tooltip="{{item.description}}" ng-show="item.description"></span>
                                 </td>
                                 <td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
                             </tr>

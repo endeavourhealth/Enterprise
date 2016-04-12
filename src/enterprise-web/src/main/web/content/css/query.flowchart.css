@@ -254,6 +254,7 @@ The element (in this case the SVG element) that contains the draggable elements.
 	border: 1px solid #337ab7;
 	background-color: #e6f2ff;
 	border-radius: 3px 3px 3px 3px;
+
 }
 
 .queryLink {
@@ -276,4 +277,5 @@ The element (in this case the SVG element) that contains the draggable elements.
 .expressionTable {
 	width: 100%;
 }
+
 

@@ -1,3 +1,9 @@
+<style>
+	.form-group {
+		margin-bottom: 0px;
+	}
+</style>
+
 <div class="modal-header">
 	<button type="button" class="close" data-ng-click="testEditor.cancel()" aria-hidden="true">&times;</button>
 	<h4 class="modal-title">{{testEditor.title}}</h4>
@@ -5,13 +11,13 @@
 <div class="modal-body">
 
 	<uib-tabset active="active">
-		<uib-tab index="0" heading="Data Source">
+		<uib-tab index="0" heading="Data Source Filters & Restrictions">
 			<br/>
 			<form role="form">
 				<div class='row'>
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label>Data Source</label>
+							<label>Data Source (Record Heading)</label>
 							<select class="form-control" ng-model="testEditor.ruleDatasource" ng-change="testEditor.dataSourceChange(testEditor.ruleDatasource)" ng-disabled="testEditor.editMode">
 								<option ng-repeat="datasource in testEditor.datasources" value="{{datasource}}">{{datasource}}</option>
 							</select>
@@ -190,7 +196,8 @@
 					</div>
 				</div>
 				<div ng-show="testEditor.addRestriction">
-					<a class="queryLink" ng-click="testEditor.toggleRestriction()"><i class="fa fa-sort-amount-asc"></i> Add Restriction</a>
+					<hr/>
+					<a class="queryLink" ng-click="testEditor.toggleRestriction()"><i class="fa fa-sort-amount-asc"></i> Add Restriction (limit the number of entries filtered)</a>
 				</div>
 				<div class='row' ng-show="testEditor.showRestriction"><br/>
 					<div class="col-xs-3">
@@ -220,7 +227,7 @@
 				<br/>
 			</form>
 		</uib-tab>
-		<uib-tab index="1" heading="Additional Field Test" ng-show="testEditor.viewFieldTest">
+		<uib-tab index="1" heading="Additional Test Against the Data Source Result" ng-show="testEditor.viewFieldTest">
 			<br/>
 			<form role="form">
 				<div class='row'>

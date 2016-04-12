@@ -10,6 +10,13 @@ Styles for rule and connectors.
 	cursor: pointer;
 }
 
+.rule-type-text {
+	font-size: 9px;
+	fill: black;
+	font-weight: bold;
+	cursor: pointer;
+}
+
 .rule-text:hover {
 	font-size: 14px;
 	fill: blue;
@@ -209,7 +216,7 @@ The element (in this case the SVG element) that contains the draggable elements.
 }
 
 .queryDiv {
-	height: 220px;
+	height: 255px;
 	width: 300px;
 	border: 1px solid #337ab7;
 	background-color: #e6f2ff;

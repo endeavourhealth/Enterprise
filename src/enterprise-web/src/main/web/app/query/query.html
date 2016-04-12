@@ -80,7 +80,7 @@
                                         <label class="control-label" style="padding: 0px 10px 0px 15px;">Query Name:</label>
                                         <input class="form-control" type="text" name="input" ng-model="queryName" style="margin: 0px 0px 15px 10px;width:275px" ng-change="queryNameChange()">
                                         <label class="control-label" style="padding: 0px 10px 0px 15px;">Query Description:</label>
-                                        <textarea class="form-control" ng-model="queryDescription" style="height: 55px; margin: 0px 0px 15px 10px;width:275px" ng-change="queryDescriptionChange()">
+                                        <textarea class="form-control" ng-model="queryDescription" style="height: 90px; margin: 0px 0px 15px 10px;width:275px" ng-change="queryDescriptionChange()">
                                         </textarea>
                                     </fieldset>
                                 </form>
@@ -98,13 +98,13 @@
                                 <form class="form">
                                     <fieldset>
                                         <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule Description:</label>
-                                        <input class="form-control" type="text" name="input" ng-model="ruleDescription" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleDescriptionChange()">
+                                        <input class="form-control" ng-disabled="disableRuleProps" type="text" name="input" ng-model="ruleDescription" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleDescriptionChange()">
                                         <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule PASS Action:</label>
-                                        <select class="form-control" ng-model="rulePassAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="rulePassActionChange()">
+                                        <select class="form-control" ng-disabled="disableRuleProps" ng-model="rulePassAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="rulePassActionChange()">
                                             <option ng-repeat="result in results" value="{{result.value}}">{{result.displayName}}</option>
                                         </select>
                                         <label class="control-label" style="padding: 0px 10px 0px 15px;">Rule FAIL Action:</label>
-                                        <select class="form-control" ng-model="ruleFailAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleFailActionChange()">
+                                        <select class="form-control" ng-disabled="disableRuleProps" ng-model="ruleFailAction" style="margin: 0px 0px 15px 10px;width:275px" ng-change="ruleFailActionChange()">
                                             <option ng-repeat="result in results" value="{{result.value}}">{{result.displayName}}</option>
                                         </select>
                                     </fieldset>

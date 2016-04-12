@@ -71,17 +71,19 @@ module app.dialogs {
 		selectSet(organisationSet : OrganisationSet) {
 			var vm = this;
 			if (organisationSet === null) {
+				// Clear uuid and name (but not organisation list in case of "Save As")
 				vm.resultData.uuid = null;
 				vm.resultData.name = '<New Organisation Set>';
 			} else {
-				vm.resultData = organisationSet;
-				// Load members if necessary
-				if (!vm.resultData.organisations || vm.resultData.organisations === 0) {
-					vm.organisationService.getOrganisationSetMembers(organisationSet.uuid)
-						.then(function (result) {
-							vm.resultData.organisations = result;
-						});
-				}
+				// Create COPY of selected set (in case of "Save As")
+				vm.resultData = {
+					uuid : organisationSet.uuid,
+					name : organisationSet.name
+				};
+				vm.organisationService.getOrganisationSetMembers(organisationSet.uuid)
+					.then(function (result) {
+						vm.resultData.organisations = result;
+					});
 			}
 		}
 

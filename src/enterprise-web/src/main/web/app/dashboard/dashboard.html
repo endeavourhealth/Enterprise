@@ -64,8 +64,11 @@
 				<div class="panel-heading">Engine State <span class="fa fa-sm fa-refresh fa-refresh-animate" ng-hide="dashboard.engineState"></span></div>
 				<div class="panel-body">
 					<i>{{dashboard.engineState.status}}</i>
-					<button type="button" class="btn btn-default pull-right">
+					<button type="button" class="btn btn-default pull-right" ng-hide="dashboard.engineState.status == 'Running'" ng-click="dashboard.startEngine()">
 						Start <span class="fa fa-play" aria-hidden="true"></span>
+					</button>
+					<button type="button" class="btn btn-default pull-right" ng-show="dashboard.engineState.status == 'Running'" ng-click="dashboard.stopEngine()">
+						Stop <span class="fa fa-stop" aria-hidden="true"></span>
 					</button>
 				</div>
 			</div>

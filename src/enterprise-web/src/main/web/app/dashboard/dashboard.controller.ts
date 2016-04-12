@@ -69,6 +69,30 @@ module app.dashboard {
 				});
 		}
 
+		startEngine() {
+			var vm = this;
+			vm.dashboardService.startEngine()
+				.then(function(result) {
+					vm.logger.success('Engine started', result, 'Start engine');
+					vm.getEngineState();
+				})
+				.catch(function(error) {
+					vm.logger.success('Error starting enging', error, 'Start engine');
+				});
+		}
+
+		stopEngine() {
+			var vm = this;
+			vm.dashboardService.stopEngine()
+				.then(function(result) {
+					vm.logger.success('Engine stopped', result, 'Stop engine');
+					vm.getEngineState();
+				})
+				.catch(function(error) {
+					vm.logger.success('Error stopping enging', error, 'Stop engine');
+				});
+		}
+
 		actionItem(item : FolderItem, action : string) {
 			switch (item.type) {
 				case ItemType.Query:

@@ -6,12 +6,13 @@
 <script type="text/ng-template" id="library_folder_template.html">
 	<div ui-tree-handle class="tree-node tree-node-content" style="cursor:pointer">
 			<span class="show-child-on-hover folder-item"
+						ng-click="ctrl.selectNode(node)" style="cursor:pointer"
 						ng-class="{'selection': node.uuid == ctrl.selectedNode.uuid}">
 				<span	ng-if="!node.hasChildren" data-nodrag class="fa fa-sm fa-blank text-muted"></span>
 				<span ng-if="node.hasChildren" data-nodrag	class="fa fa-sm text-muted"
 							ng-class="{'fa-chevron-right': !node.isExpanded,'fa-chevron-down': node.isExpanded}"
 							ng-click="ctrl.toggleExpansion(node)"></span>
-				<span ng-click="ctrl.selectNode(node)" style="cursor:pointer">
+				<span>
 					<span	class="fa fa-folder-open fa-right-pad text-primary"></span>
 					<span>{{node.folderName}}</span>
 					<span class="fa fa-sm fa-refresh fa-refresh-animate" ng-show="node.loading"></span>

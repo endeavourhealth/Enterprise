@@ -82,6 +82,9 @@ module app.reports {
 			vm.reportService.scheduleReport(requestParameters)
 				.then(function(result) {
 					vm.logger.success('Report queued', result, 'Run report');
+					if (requestParameters.reportUuid === vm.selectedReport.uuid) {
+						vm.selectFolderItem(vm.selectedReport);
+					}
 				})
 				.catch(function(error) {
 					vm.logger.error('Error queueing report', error, 'Run report');

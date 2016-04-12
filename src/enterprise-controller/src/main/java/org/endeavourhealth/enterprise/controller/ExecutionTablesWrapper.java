@@ -171,7 +171,7 @@ class ExecutionTablesWrapper {
         for (JobReportInfo jobReportInfo: inventory.getJobReportInfoList()) {
 
             DbRequest request = DbRequest.retrieveForUuid(jobReportInfo.getRequest().getRequestUuid());  //get it again in case we override some values by accident
-            request.setJobUuid(jobUuid);
+            request.setJobReportUuid(jobReportInfo.getJobReportUuid());
             request.setSaveMode(TableSaveMode.UPDATE);
             toSave.add(request);
         }

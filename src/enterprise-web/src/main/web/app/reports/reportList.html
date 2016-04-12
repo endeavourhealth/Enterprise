@@ -45,10 +45,10 @@
 											<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>
 												<div class="child-to-show">
-													<button type="button" class="btn btn-primary btn-xs" ng-click="ctrl.run(item)">Run</button>
+													<button type="button" class="btn btn-primary btn-xs" ng-click="ctrl.run(item)">Queue</button>
 													<span uib-dropdown>
 														<button type="button" class="btn btn-xs btn-default" uib-dropdown-toggle>...</button>
-														<ul uib-dropdown-menu>
+														<ul uib-dropdown-menu class="dropdown-menu-right">
 															<li class="disabled"><a href="#">Rename</a></li>
 															<li><a ng-click="ctrl.deleteItem(item)">Delete</a></li>
 															<li role="separator" class="divider"></li>

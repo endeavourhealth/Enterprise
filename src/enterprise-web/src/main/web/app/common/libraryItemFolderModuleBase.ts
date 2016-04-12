@@ -54,7 +54,7 @@ module app.blocks {
 			}
 		}
 
-		selectNode(node : FolderNode) {
+		protected selectNode(node : FolderNode) {
 			if (node === this.selectedNode) { return; }
 			var vm = this;
 

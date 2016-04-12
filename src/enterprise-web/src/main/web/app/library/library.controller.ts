@@ -86,6 +86,52 @@ module app.library {
 			};
 			this.moduleStateService.setState('library', state);
 		}
+
+		cutItem(item : FolderItem) {
+			var vm = this;
+			vm.libraryService.getLibraryItem(item.uuid)
+				.then(function(libraryItem : LibraryItem) {
+					vm.moduleStateService.setState('libraryClipboard', libraryItem);
+					vm.logger.success('Item cut to clipboard', libraryItem, 'Cut');
+				})
+				.catch(function(error) {
+					vm.logger.error('Error cutting to clipboard', error, 'Cut');
+				});
+		}
+
+		copyItem(item : FolderItem) {
+			var vm = this;
+			vm.libraryService.getLibraryItem(item.uuid)
+				.then(function(libraryItem : LibraryItem) {
+					vm.moduleStateService.setState('libraryClipboard', libraryItem);
+					libraryItem.uuid = null;		// Force save as new
+					vm.logger.success('Item copied to clipboard', libraryItem, 'Copy');
+				})
+				.catch(function(error) {
+					vm.logger.error('Error copying to clipboard', error, 'Copy');
+				});
+		}
+
+		pasteItem(node : FolderNode) {
+			var vm = this;
+			var libraryItem : LibraryItem = vm.moduleStateService.getState('libraryClipboard') as LibraryItem;
+			if (libraryItem) {
+				libraryItem.folderUuid = node.uuid;
+				vm.libraryService.saveLibraryItem(libraryItem)
+					.then(function(result) {
+						vm.logger.success('Item pasted to folder', libraryItem, 'Paste');
+						// reload folder if still selection
+						if (vm.selectedNode.uuid === node.uuid) {
+							vm.selectedNode = null;
+							vm.selectNode(node);
+						}
+					})
+					.catch(function(error){
+						vm.logger.error('Error pasting clipboard', error, 'Paste');
+					});
+			}
+		}
+
 	}
 
 	angular

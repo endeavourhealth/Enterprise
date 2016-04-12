@@ -34,23 +34,23 @@ public class OutputFileApi {
     }
 
     public void prepareFiles() throws Exception {
-
-        //nameHandler.buildJobFolder();
-
-        Path path = Paths.get("H:\\Deletable\\", "Temp");
-        File file = new File(path.toString());
-
-        if (!file.mkdir())
-            throw new Exception("Could not make path: " + path.toString());
-
-        Path path2 = Paths.get("H:\\Deletable\\", "Temp", "Test.csv");
-        Files.createFile(path2);
-
-        try(  PrintWriter out = new PrintWriter( path2.toString() )  ){
-
-            String header = "First,Second,Third";
-            out.println(header);
-        }
+//
+//        //nameHandler.buildJobFolder();
+//
+//        Path path = Paths.get("/home/endadmin/discoveryoutput", "Temp");
+//        File file = new File(path.toString());
+//
+//        if (!file.mkdir())
+//            throw new Exception("Could not make path: " + path.toString());
+//
+//        Path path2 = Paths.get("/home/endadmin/discoveryoutput", "Temp", "Test.csv");
+//        Files.createFile(path2);
+//
+//        try(  PrintWriter out = new PrintWriter( path2.toString() )  ){
+//
+//            String header = "First,Second,Third";
+//            out.println(header);
+//        }
 //
 //        Files.createDirectories(path.getParent());
 //

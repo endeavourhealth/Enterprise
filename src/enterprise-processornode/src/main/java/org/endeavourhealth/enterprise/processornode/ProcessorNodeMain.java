@@ -47,44 +47,28 @@ class ProcessorNodeMain implements AutoCloseable, ProcessorNodeQueue.IProcessorN
     @Override
     public void receiveStartMessage(ProcessorNodesStartMessage.StartMessagePayload startMessage) {
 
+        logger.info("Processor " + processorNodeUuid.toString() + " received start message for job " + startMessage.getJobUuid().toString());
 
-        Path path = Paths.get("H:\\Deletable\\", "Temp", "Test.csv");
+        try {
 
-        try(FileWriter fw = new FileWriter(path.toString(), true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw))
-        {
-            out.println("the text");
-            //more code
-            out.println("more text");
-            //more code
-        } catch (IOException e) {
-            logger.error("Writing to file: " + e);
+            if (executionController != null) {
+                executionController.shutDown();
+                executionController.close();
+                executionController = null;
+            }
+
+            initialiseDatabaseManager(startMessage.getCoreDatabaseConnectionDetails());
+
+            executionController = new ExecutionController(processorNodeUuid, configuration, startMessage);
+
+            executionController.start();
+        } catch (Exception e) {
+
+            if (executionController != null)
+                executionController.errorOccurred(e);
+
+            logger.error("Processor " + processorNodeUuid.toString(), e);
         }
-
-//
-//        logger.info("Processor " + processorNodeUuid.toString() + " received start message for job " + startMessage.getJobUuid().toString());
-//
-//        try {
-//
-//            if (executionController != null) {
-//                executionController.shutDown();
-//                executionController.close();
-//                executionController = null;
-//            }
-//
-//            initialiseDatabaseManager(startMessage.getCoreDatabaseConnectionDetails());
-//
-//            executionController = new ExecutionController(processorNodeUuid, configuration, startMessage);
-//
-//            executionController.start();
-//        } catch (Exception e) {
-//
-//            if (executionController != null)
-//                executionController.errorOccurred(e);
-//
-//            logger.error("Processor " + processorNodeUuid.toString(), e);
-//        }
     }
 
     @Override

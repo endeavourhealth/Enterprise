@@ -24,7 +24,8 @@ public final class DbJobReportItem extends DbAbstractTable {
     private UUID auditUuid = null;
     @DatabaseColumn
     private Integer resultCount = null;
-
+    @DatabaseColumn
+    private String fileLocation = null;
 
     public static List<DbJobReportItem> retrieveForJobReport(DbJobReport jobReport) throws Exception {
         return retrieveForJobReport(jobReport.getJobReportUuid());
@@ -87,5 +88,13 @@ public final class DbJobReportItem extends DbAbstractTable {
 
     public void setResultCount(Integer resultCount) {
         this.resultCount = resultCount;
+    }
+
+    public String getFileLocation() {
+        return fileLocation;
+    }
+
+    public void setFileLocation(String fileLocation) {
+        this.fileLocation = fileLocation;
     }
 }

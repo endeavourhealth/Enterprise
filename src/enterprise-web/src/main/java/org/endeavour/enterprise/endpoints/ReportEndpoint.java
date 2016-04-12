@@ -173,9 +173,15 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         LOG.trace("getPastSchedules for report UUID {} and count {}", reportUuid, count);
 
         List<DbRequest> requests = DbRequest.retrieveForItem(orgUuid, reportUuid, count);
+        List<DbJobReport> jobReports = DbJobReport.retrieveForRequests(requests);
+        List<DbJob> jobs = DbJob.retrieveForJobReports(jobReports);
+
+        HashMap<UUID, DbJobReport> hmJobReportsByUuid = new HashMap<>();
+        for (DbJobReport jobReport: jobReports) {
+            hmJobReportsByUuid.put(jobReport.getJobReportUuid(), jobReport);
+        }
 
         HashMap<UUID, DbJob> hmJobsByUuid = new HashMap<>();
-        List<DbJob> jobs = DbJob.retrieveForRequests(requests);
         for (DbJob job: jobs) {
             hmJobsByUuid.put(job.getJobUuid(), job);
         }
@@ -189,7 +195,12 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         List<JsonReportRequest> ret = new ArrayList<>();
 
         for (DbRequest request: requests) {
-            DbJob job = hmJobsByUuid.get(request.getJobUuid());
+
+            DbJob job = null;
+            DbJobReport jobReport = hmJobReportsByUuid.get(request.getJobReportUuid());
+            if (jobReport != null) {
+                job = hmJobsByUuid.get(jobReport.getJobUuid());
+            }
             DbEndUser user = hmUsersByUuid.get(request.getEndUserUuid());
 
             ret.add(new JsonReportRequest(request, job, user));
@@ -216,11 +227,11 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         LOG.trace("getScheduleResults for request UUID {}", requestUuid);
 
         DbRequest request = DbRequest.retrieveForUuid(requestUuid);
-        UUID jobUuid = request.getJobUuid();
+        UUID jobReportUuid = request.getJobReportUuid();
         UUID reportUuid = request.getReportUuid();
         String parameters = request.getParameters();
 
-        if (jobUuid == null) {
+        if (jobReportUuid == null) {
             throw new BadRequestException("Schedule not run yet");
         }
 
@@ -232,7 +243,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         Integer populationCount = null;
         HashMap<UUID, Integer> hmResultsByQuery = new HashMap<>();
 
-        DbJobReport jobReport = DbJobReport.retrieveForJobAndReportAndParameters(jobUuid, reportUuid, parameters);
+        DbJobReport jobReport = DbJobReport.retrieveForUuid(jobReportUuid);
         if (organisationOdsCode == null) {
             populationCount = jobReport.getPopulationCount();
         } else {

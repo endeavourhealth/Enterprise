@@ -3,11 +3,13 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavour.enterprise.json.JsonFolderContent;
 import org.endeavour.enterprise.json.JsonJob;
 import org.endeavour.enterprise.json.JsonJobReport;
+import org.endeavour.enterprise.json.JsonProcessorStatus;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.database.execution.DbJobProcessorResult;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,16 +125,66 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     public Response testDatabase(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
 
-        DbActiveItem a = new DbActiveItem();
-        a.writeToDb();
-
         if (!getEndUserFromSession(sc).isSuperUser()) {
             throw new BadRequestException();
         }
 
+        DbJobProcessorResult.deleteAllResults();
+
         LOG.trace("testDatabase");
 
-        DatabaseManager.getInstance().sqlTest();
+        //DatabaseManager.getInstance().sqlTest();
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getProcessorStatus")
+    public Response getProcessorStatus(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        LOG.trace("getProcessorStatus");
+
+        JsonProcessorStatus ret = new JsonProcessorStatus("Stopped");
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/startProcessor")
+    public Response startProcessor(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        LOG.trace("startProcessor");
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/stopProcessor")
+    public Response stopProcessor(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        LOG.trace("stopProcessor");
 
         clearLogbackMarkers();
 

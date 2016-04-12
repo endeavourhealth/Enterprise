@@ -56,6 +56,23 @@ final class SqlServerDatabase implements DatabaseI {
         }
     }
 
+    private void executeQueryNoResult(String sql, Object... parameters) throws Exception {
+        LOG.trace("Executing {}", sql);
+
+        Connection connection = DatabaseManager.getConnection();
+        PreparedStatement s = connection.prepareStatement(sql);
+        appendPreparedStatementParameters(s, parameters);
+
+        try {
+            s.execute();
+        } catch (SQLException sqlEx) {
+            LOG.error("Error with SQL {}", sql);
+            throw sqlEx;
+        } finally {
+            DatabaseManager.closeConnection(connection);
+        }
+    }
+
 
     @Override
     public SQLDialectCode getLogbackDbDialectCode() {
@@ -1241,32 +1258,16 @@ final class SqlServerDatabase implements DatabaseI {
             return new ArrayList<>();
         }
 
-        String where = "WHERE JobUuid IS NULL"
+        String where = "WHERE JobReportUuid IS NULL"
                 + " AND OrganisationUuid = ?"
                 + " AND ReportUuid IN (" + getParameterisedString(itemUuids) + ")";
         return retrieveForWherePreparedStatement(DbRequest.class, where, organisationUuid, itemUuids);
-
-        /*List<DbRequest> ret = new ArrayList<>();
-        if (itemUuids.isEmpty()) {
-            return ret;
-        }
-
-        String where = "WHERE JobUuid IS NULL"
-                + " AND OrganisationUuid = " + convertToString(organisationUuid)
-                + " AND ReportUuid IN (" + convertToString(itemUuids) + ")";
-        retrieveForWhere(new DbRequest().getAdapter(), where, ret);
-        return ret;*/
     }
 
     @Override
     public List<DbRequest> retrievePendingRequests() throws Exception {
-        String where = "WHERE JobUuid IS NULL";
+        String where = "WHERE JobReportUuid IS NULL";
         return retrieveForWherePreparedStatement(DbRequest.class, where);
-
-        /*List<DbRequest> ret = new ArrayList<>();
-        String where = "WHERE JobUuid IS NULL";
-        retrieveForWhere(new DbRequest().getAdapter(), where, ret);
-        return ret;*/
     }
 
     @Override
@@ -1317,6 +1318,17 @@ final class SqlServerDatabase implements DatabaseI {
         return ret;*/
     }
 
+    @Override
+    public List<DbJob> retrieveJobsForJobReportUuids(List<UUID> uuids) throws Exception {
+        if (uuids.isEmpty()) {
+            return new ArrayList<DbJob>();
+        }
+
+        String where = "INNER JOIN ON Execution.JobReport r "
+                + " ON r.JobReportUuid IN (" + getParameterisedString(uuids) + ")"
+                + " AND r.JobUuid = " + ALIAS + ".JobUuid";
+        return retrieveForWherePreparedStatement(DbJob.class, where, uuids);
+    }
 
 
     @Override
@@ -1385,6 +1397,12 @@ final class SqlServerDatabase implements DatabaseI {
                 + " AND ReportUuid = ?"
                 + " AND Parameters = ?";
         return retrieveOneForWherePreparedStatement(DbJobReport.class, where, jobUuid, reportUuid, parameters);
+    }
+
+    @Override
+    public List<DbJobReport> retrieveJobReportsForUuids(List<UUID> uuids) throws Exception {
+        String where = "WHERE JobReportUuid IN (" + getParameterisedString(uuids) + ")";
+        return retrieveForWherePreparedStatement(DbJobReport.class, where, uuids);
     }
 
     @Override
@@ -1461,6 +1479,12 @@ final class SqlServerDatabase implements DatabaseI {
         String where = "WHERE JobUuid = ?";
         return retrieveForWherePreparedStatement(DbJobProcessorResult.class, where, jobUuid);
 
+    }
+
+    @Override
+    public void deleteAllJobProcessorResults() throws Exception {
+        String sql = "DELETE FROM Execution.JobProcessorResult";
+        executeQueryNoResult(sql);
     }
 
     @Override

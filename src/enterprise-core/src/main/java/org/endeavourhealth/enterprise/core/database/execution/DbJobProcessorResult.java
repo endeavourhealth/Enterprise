@@ -24,6 +24,9 @@ public final class DbJobProcessorResult extends DbAbstractTable {
     public static List<DbJobProcessorResult> retrieveForJob(UUID jobUuid) throws Exception {
         return DatabaseManager.db().retrieveJobProcessorResultsForJob(jobUuid);
     }
+    public static void deleteAllResults() throws Exception {
+        DatabaseManager.db().deleteAllJobProcessorResults();
+    }
 
     @Override
     public TableAdapter getAdapter() {

@@ -13,6 +13,7 @@ import org.endeavourhealth.enterprise.core.database.execution.*;
 import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
 import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisationSet;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -91,6 +92,8 @@ public interface DatabaseI {
 
     public List<DbJob> retrieveJobsForUuids(List<UUID> uuids) throws Exception;
 
+    public List<DbJob> retrieveJobsForJobReportUuids(List<UUID> uuids) throws Exception;
+
     public List<DbJobReport> retrieveJobReports(UUID organisationUuid, int count) throws Exception;
 
     public List<DbJobReport> retrieveJobReportsForJob(UUID jobUuid) throws Exception;
@@ -98,6 +101,8 @@ public interface DatabaseI {
     public List<DbJobReport> retrieveLatestJobReportsForItemUuids(UUID organisationUuid, List<UUID> itemUuids) throws Exception;
 
     public DbJobReport retrieveJobReportForJobAndReportAndParameters(UUID jobUuid, UUID reportUuid, String parameters) throws Exception;
+
+    public List<DbJobReport> retrieveJobReportsForUuids(List<UUID> uuids) throws Exception;
 
     public List<DbJobReportItem> retrieveJobReportItemsForJobReport(UUID jobReportUuid) throws Exception;
 
@@ -112,6 +117,8 @@ public interface DatabaseI {
     public DbJobReportItemOrganisation retrieveJobReportItemOrganisationForJobReportItemAndOdsCode(UUID jobReportItemUUid, String odsCode) throws Exception;
 
     public List<DbJobProcessorResult> retrieveJobProcessorResultsForJob(UUID jobUuid) throws Exception;
+
+    public void deleteAllJobProcessorResults() throws Exception;
 
     public List<DbSourceOrganisationSet> retrieveAllOrganisationSets(UUID organisationUuid) throws Exception;
 

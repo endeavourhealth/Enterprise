@@ -65,7 +65,7 @@ public abstract class Examples {
             toSave.add(jobReport);
 
             //update the request to link back to the job
-            request.setJobUuid(jobUuid);
+            request.setJobReportUuid(jobReportUuid);
             toSave.add(request);
 
             //then create the JobReportItem objects for each query and listOutput in the report being requested

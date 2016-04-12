@@ -35,15 +35,7 @@ public final class DbJob extends DbAbstractTable {
         }
         return retrieveForUuids(uuids);
     }
-    public static List<DbJob> retrieveForRequests(List<DbRequest> requests) throws Exception {
-        List<UUID> uuids = new ArrayList<>();
-        for (DbRequest request: requests) {
-            if (request.getJobUuid() != null) {
-                uuids.add(request.getJobUuid());
-            }
-        }
-        return retrieveForUuids(uuids);
-    }
+
     public static List<DbJob> retrieveForUuids(List<UUID> uuids) throws Exception {
         return DatabaseManager.db().retrieveJobsForUuids(uuids);
     }

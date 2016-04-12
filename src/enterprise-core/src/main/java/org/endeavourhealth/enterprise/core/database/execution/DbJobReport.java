@@ -62,6 +62,20 @@ public final class DbJobReport extends DbAbstractTable {
         return DatabaseManager.db().retrieveJobReportForJobAndReportAndParameters(jobUuid, reportUuid, parameters);
     }
 
+    public static List<DbJobReport> retrieveForRequests(List<DbRequest> requests) throws Exception {
+        List<UUID> uuids = new ArrayList<>();
+        for (DbRequest request: requests) {
+            if (request.getJobReportUuid() != null) {
+                uuids.add(request.getJobReportUuid());
+            }
+        }
+        return DatabaseManager.db().retrieveJobReportsForUuids(uuids);
+    }
+
+    public static DbJobReport retrieveForUuid(UUID uuid) throws Exception {
+        return DatabaseManager.db().retrieveForPrimaryKeys(DbJobReport.class, uuid);
+    }
+
     @Override
     public TableAdapter getAdapter() {
         return adapter;

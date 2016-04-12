@@ -998,6 +998,39 @@ Email address: <input type="text" id="sendPasswordForgottenEmailEmail">
 	</script>
 
 <hr/>
+<h3>/api/dashboard/getProcessorStatus</h3>
+
+	<button type="button" onclick="getProcessorStatus()">Submit</button>
+
+	<script>
+		function getProcessorStatus() {
+			get('/api/dashboard/getProcessorStatus');
+		}
+	</script>
+
+<hr/>
+<h3>/api/dashboard/startProcessor</h3>
+
+	<button type="button" onclick="startProcessor()">Submit</button>
+
+	<script>
+		function startProcessor() {
+			post('/api/dashboard/startProcessor');
+		}
+	</script>
+
+<hr/>
+<h3>/api/dashboard/stopProcessor</h3>
+
+	<button type="button" onclick="stopProcessor()">Submit</button>
+
+	<script>
+		function stopProcessor() {
+			post('/api/dashboard/stopProcessor');
+		}
+	</script>
+
+<hr/>
 <h3>/api/entity/getEntityMap</h3>
 
 	<button type="button" onclick="getEntityMap()">Submit</button>

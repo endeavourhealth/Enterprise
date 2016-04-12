@@ -366,7 +366,7 @@ public final class DatabaseManager {
         request.assignPrimaryUUid();
         request.setReportUuid(itemUuid);
         request.setEndUserUuid(userUuid);
-        request.setJobUuid(null);
+        request.setJobReportUuid(null);
         request.setOrganisationUuid(orgUuid);
         request.setParameters("Parameters");
         request.setTimeStamp(Instant.now());

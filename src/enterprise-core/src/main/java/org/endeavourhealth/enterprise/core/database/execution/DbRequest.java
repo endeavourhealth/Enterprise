@@ -27,7 +27,7 @@ public final class DbRequest extends DbAbstractTable {
     @DatabaseColumn
     private String parameters = null;
     @DatabaseColumn
-    private UUID jobUuid = null;
+    private UUID jobReportUuid = null;
 
     public static DbRequest retrieveForUuid(UUID requestUuid) throws Exception {
         return DatabaseManager.db().retrieveForPrimaryKeys(DbRequest.class, requestUuid);
@@ -109,11 +109,11 @@ public final class DbRequest extends DbAbstractTable {
         this.timeStamp = timeStamp;
     }
 
-    public UUID getJobUuid() {
-        return jobUuid;
+    public UUID getJobReportUuid() {
+        return jobReportUuid;
     }
 
-    public void setJobUuid(UUID jobUuid) {
-        this.jobUuid = jobUuid;
+    public void setJobReportUuid(UUID jobReportUuid) {
+        this.jobReportUuid = jobReportUuid;
     }
 }

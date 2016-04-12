@@ -48,7 +48,7 @@
 											<td>
 												<div class="child-to-show">
 													<button type="button" class="btn btn-primary btn-xs" ng-click="ctrl.run(item)">Queue</button>
-													<div uib-dropdown dropdown-append-to-body>
+													<span uib-dropdown dropdown-append-to-body>
 														<button type="button" class="btn btn-xs btn-default" uib-dropdown-toggle>...</button>
 														<ul uib-dropdown-menu class="dropdown-menu-right">
 															<li class="disabled"><a href="#">Rename</a></li>
@@ -58,7 +58,7 @@
 															<li class="disabled"><a href="#">Copy</a></li>
 															<li class="disabled"><a href="#">Paste</a></li>
 														</ul>
-													</div>
+													</span>
 												</div>
 											</td>
 										</tr>
@@ -84,7 +84,11 @@
 														ng-class="{'selection': schedule.uuid == ctrl.selectedSchedule.uuid}"
 														ng-click="ctrl.selectSchedule(schedule)">
 													<td>{{ schedule.date | date:'dd-MMM-yyyy HH:mm:ss' }}</td>
-													<td>{{ schedule.status }}</td>
+													<td>
+														<span class="text-muted fa fa-clock-o" ng-show="schedule.status == 'Scheduled'"></span>
+														<span class="text-muted fa fa-check" ng-hide="schedule.status == 'Scheduled'"></span>
+														{{ schedule.status }}
+													</td>
 												</tr>
 											</tbody>
 										</table>

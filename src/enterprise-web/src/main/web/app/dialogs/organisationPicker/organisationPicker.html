@@ -12,6 +12,32 @@
 			</div>
 		</div>
 
+		<!-- Organisation Set -->
+		<div class="row" ng-hide="ctrl.editMode">
+			<div class="form-group col-md-12">
+				<label>Defined Sets</label>
+				<div class="row">
+					<div class="col-md-9">
+						<div class="btn-group btn-block dropdown" uib-dropdown>
+							<button type="button" class="btn btn-default btn-block" uib-dropdown-toggle>
+								<div>
+									<span style="float: left">{{ ctrl.resultData.name }}</span><span style="float: right; vertical-align: middle"><i class="fa fa-caret-down"></i></span>
+								</div>
+							</button>
+							<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="btn-append-to-body">
+								<li role="menuitem"><a ng-click="ctrl.selectSet(null)">&lt;New Organisation Set&gt;</a></li>
+								<li class="divider"></li>
+								<li role="menuitem" ng-repeat="orgSet in ctrl.organisationSetList"><a ng-click="ctrl.selectSet(orgSet)">{{ orgSet.name }}</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<Button type="button" class="btn btn-success btn-block" ng-click="ctrl.saveSet()">Save Set</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Search -->
 		<div class="row">
 			<div class="form-group col-md-12">
@@ -51,32 +77,6 @@
 						<div class="col-md-8">{{ member.name }}</div>
 						<div class="col-md-3">{{ member.odsCode }}</div>
 						<div class="col-md-1"><button type="button" class="btn btn-xs btn-danger child-to-show" ng-click="ctrl.removeOrganisationFromSelection(member)"><span class="fa fa-minus"></span></button></div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Organisation Set -->
-		<div class="row" ng-hide="ctrl.editMode">
-			<div class="form-group col-md-12">
-				<label>Defined Sets</label>
-				<div class="row">
-					<div class="col-md-9">
-						<div class="btn-group btn-block dropdown" uib-dropdown>
-							<button type="button" class="btn btn-default btn-block" uib-dropdown-toggle>
-								<div>
-									<span style="float: left">{{ ctrl.resultData.name }}</span><span style="float: right; vertical-align: middle"><i class="fa fa-caret-down"></i></span>
-								</div>
-							</button>
-							<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="btn-append-to-body">
-								<li role="menuitem"><a ng-click="ctrl.selectSet(null)">&lt;New Organisation Set&gt;</a></li>
-								<li class="divider"></li>
-								<li role="menuitem" ng-repeat="orgSet in ctrl.organisationSetList"><a ng-click="ctrl.selectSet(orgSet)">{{ orgSet.name }}</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="col-md-3">
-						<Button type="button" class="btn btn-success btn-block" ng-click="ctrl.saveSet()">Save Set</Button>
 					</div>
 				</div>
 			</div>

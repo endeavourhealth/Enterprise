@@ -22,6 +22,7 @@ module app.reports {
 	import ReportSchedule = app.models.ReportSchedule;
 	import ReportResult = app.models.ReportResult;
 	import LibraryItemFolderModuleBase = app.blocks.LibraryItemFolderModuleBase;
+	import IModuleStateService = app.core.IModuleStateService;
 	'use strict';
 
 	export class ReportListController extends LibraryItemFolderModuleBase {
@@ -30,15 +31,34 @@ module app.reports {
 		selectedSchedule : ReportSchedule;
 		selectedScheduleResults : ReportResult;
 
-		static $inject = ['ReportService', 'FolderService', 'LoggerService', '$scope', '$uibModal'];
+		static $inject = ['ReportService', 'FolderService', 'LoggerService', 'ModuleStateService', '$scope', '$uibModal',
+			'$state'];
 
 		constructor(
 			protected reportService:IReportService,
 			protected folderService : IFolderService,
 			protected logger : ILoggerService,
+			protected moduleStateService : IModuleStateService,
 			protected $scope : IScope,
-			protected $modal : IModalService) {
+			protected $modal : IModalService,
+			protected $state : IStateService) {
 			super(logger, $modal, folderService, FolderType.Report);
+
+			var state = moduleStateService.getState('reportList');
+			if (state) {
+				this.selectedNode = state.selectedNode;
+				this.treeData = state.treeData;
+				this.itemSummaryList = state.itemSummaryList;
+				this.selectedReport = state.selectedReport;
+				this.selectedReportSchedules = state.selectedReportSchedules;
+				this.selectedSchedule = state.selectedSchedule;
+				this.selectedScheduleResults = state.selectedScheduleResults;
+			}
+		}
+
+		viewItem(item : FolderItem) {
+			this.saveState();
+			this.$state.go('app.reportAction', {itemUuid: item.uuid, itemAction: 'edit'});
 		}
 
 		run(item : FolderItem) {
@@ -89,6 +109,20 @@ module app.reports {
 					scope.remove();
 				});
 		}
+
+		saveState() {
+			var state = {
+				selectedNode : this.selectedNode,
+				treeData : this.treeData,
+				itemSummaryList : this.itemSummaryList,
+				selectedReport : this.selectedReport,
+				selectedReportSchedules : this.selectedReportSchedules,
+				selectedSchedule : this.selectedSchedule,
+				selectedScheduleResults : this.selectedScheduleResults
+			};
+			this.moduleStateService.setState('reportList', state);
+		}
+
 	}
 
 	angular

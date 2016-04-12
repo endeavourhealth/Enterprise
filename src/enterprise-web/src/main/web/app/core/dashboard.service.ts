@@ -21,7 +21,7 @@ module app.core {
 		getEngineHistory():ng.IPromise<EngineHistoryItem[]> {
 			var request = {
 				params: {
-					'count': 3
+					'count': 5
 				}
 			};
 
@@ -31,7 +31,7 @@ module app.core {
 		getRecentDocumentsData():ng.IPromise<FolderItem[]> {
 			var request = {
 				params: {
-					'count': 3
+					'count': 5
 				}
 			};
 
@@ -45,7 +45,7 @@ module app.core {
 		getReportActivityData():ng.IPromise<ReportActivityItem[]> {
 			var request = {
 				params: {
-					'count': 3
+					'count': 5
 				}
 			};
 

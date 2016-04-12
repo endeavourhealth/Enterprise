@@ -73,6 +73,7 @@ module app.query {
 
 				$scope.queryName = "";
 				$scope.queryDescription = "";
+				$scope.disableRuleProps = false;
 
 				$scope.nextRuleID = 1;
 
@@ -153,6 +154,12 @@ module app.query {
 				});
 
 				$scope.$on('ruleDescription', function(event : any, description : any) {
+					if (description=="START") {
+						$scope.disableRuleProps = true;
+					}
+					else {
+						$scope.disableRuleProps = false;
+					}
 					$scope.ruleDescription = description;
 				});
 

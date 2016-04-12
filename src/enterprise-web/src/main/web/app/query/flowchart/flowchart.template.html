@@ -74,6 +74,32 @@
             {{rule.description()}}
         </text>
 
+        <text ng-if="rule.description()!='START' && !rule.expression() && !rule.queryLibraryItemUUID()"
+              class="rule-type-text"
+              x="18"
+              y="20"
+
+              alignment-baseline="middle">
+              RULE
+        </text>
+
+        <text ng-if="rule.description()!='START' && rule.expression()"
+              class="rule-type-text"
+              x="18"
+              y="20"
+
+              alignment-baseline="middle">
+            EXPRESSION
+        </text>
+
+        <text ng-if="rule.description()!='START' && rule.queryLibraryItemUUID()"
+              class="rule-type-text"
+              x="18"
+              y="20"
+
+              alignment-baseline="middle">
+            QUERY
+        </text>
 
         <text ng-click="editTest($event, rule)"
               ng-if="rule.description()!='START' && rule.description().length<=30"

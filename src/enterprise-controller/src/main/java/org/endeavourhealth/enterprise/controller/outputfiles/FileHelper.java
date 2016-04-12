@@ -5,9 +5,6 @@ import java.io.File;
 class FileHelper {
     public static void makeDirectory(File directory) throws Exception {
 
-        if (!directory.isDirectory())
-            throw new Exception("Not a directory: " + directory.getAbsolutePath());
-
         if (!directory.mkdir()) {
             throw new Exception("Could not create folder: " + directory.getAbsolutePath());
         }

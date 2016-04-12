@@ -2,6 +2,7 @@ package org.endeavourhealth.enterprise.controller.jobinventory;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
@@ -25,7 +26,7 @@ class RequestProcessor {
             if (CollectionUtils.isEmpty(report.getReportItem()))
                 throw new InvalidQueryDocumentException(request.getReportUuid(), "No ReportItems");
 
-            JobReportInfo jobReportInfo = new JobReportInfo(request);
+            JobReportInfo jobReportInfo = new JobReportInfo(request, report.getName());
 
             List<JobReportItemInfo> children = createJobReportItemInfoList(report.getReportItem(), jobContentRetriever);
             jobReportInfo.getChildren().addAll(children);

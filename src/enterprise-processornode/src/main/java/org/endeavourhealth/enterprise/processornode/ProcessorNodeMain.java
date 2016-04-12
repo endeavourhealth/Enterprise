@@ -11,7 +11,9 @@ import org.endeavourhealth.enterprise.processornode.configuration.ConfigurationA
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
@@ -44,28 +46,45 @@ class ProcessorNodeMain implements AutoCloseable, ProcessorNodeQueue.IProcessorN
 
     @Override
     public void receiveStartMessage(ProcessorNodesStartMessage.StartMessagePayload startMessage) {
-        logger.info("Processor " + processorNodeUuid.toString() + " received start message for job " + startMessage.getJobUuid().toString());
 
-        try {
 
-            if (executionController != null) {
-                executionController.shutDown();
-                executionController.close();
-                executionController = null;
-            }
+        Path path = Paths.get("H:\\Deletable\\", "Temp", "Test.csv");
 
-            initialiseDatabaseManager(startMessage.getCoreDatabaseConnectionDetails());
-
-            executionController = new ExecutionController(processorNodeUuid, configuration, startMessage);
-
-            executionController.start();
-        } catch (Exception e) {
-
-            if (executionController != null)
-                executionController.errorOccurred(e);
-
-            logger.error("Processor " + processorNodeUuid.toString(), e);
+        try(FileWriter fw = new FileWriter(path.toString(), true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
+            out.println("the text");
+            //more code
+            out.println("more text");
+            //more code
+        } catch (IOException e) {
+            logger.error("Writing to file: " + e);
         }
+
+//
+//        logger.info("Processor " + processorNodeUuid.toString() + " received start message for job " + startMessage.getJobUuid().toString());
+//
+//        try {
+//
+//            if (executionController != null) {
+//                executionController.shutDown();
+//                executionController.close();
+//                executionController = null;
+//            }
+//
+//            initialiseDatabaseManager(startMessage.getCoreDatabaseConnectionDetails());
+//
+//            executionController = new ExecutionController(processorNodeUuid, configuration, startMessage);
+//
+//            executionController.start();
+//        } catch (Exception e) {
+//
+//            if (executionController != null)
+//                executionController.errorOccurred(e);
+//
+//            logger.error("Processor " + processorNodeUuid.toString(), e);
+//        }
     }
 
     @Override

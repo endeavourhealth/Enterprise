@@ -11,13 +11,15 @@ import java.util.UUID;
 
 public class JobReportInfo {
     private final UUID jobReportUuid = UUID.randomUUID();
+    private final String reportName;
     private final List<JobReportItemInfo> children = new ArrayList<>();
     private final DbRequest request;
     private Set<String> organisations;
     private RequestParameters requestParameters;
 
-    public JobReportInfo(DbRequest request) {
+    public JobReportInfo(DbRequest request, String reportName) {
         this.request = request;
+        this.reportName = reportName;
     }
 
     public UUID getReportUuid() {
@@ -50,5 +52,9 @@ public class JobReportInfo {
 
     public String getParametersAsString() {
         return RequestParametersSerializer.writeToXml(requestParameters);
+    }
+
+    public String getReportName() {
+        return reportName;
     }
 }

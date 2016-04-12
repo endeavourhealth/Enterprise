@@ -1,6 +1,8 @@
 package org.endeavourhealth.enterprise.controller.outputfiles;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -29,10 +31,16 @@ class NameHandler {
     }
 
     public void buildJobFolder() throws Exception {
-        String folderName = "Temporary_" + formatStartDateTimeForName();
+        //String folderName = "Temporary_" + formatStartDateTimeForName();
+        String folderName = "Temporary";
         String fullFolderName = rootDirectory + "/" + folderName;
         temporaryFolder = new File(fullFolderName);
         FileHelper.makeDirectory(temporaryFolder);
+    }
+
+    public Path getTestFile() {
+        String folderName = "Temporary";
+        return Paths.get(rootDirectory, folderName, "Test.csv");
     }
 
     public void renameTemporaryFolder() throws Exception {

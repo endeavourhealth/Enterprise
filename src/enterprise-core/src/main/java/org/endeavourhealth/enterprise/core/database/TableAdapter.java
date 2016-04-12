@@ -3,6 +3,7 @@ package org.endeavourhealth.enterprise.core.database;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +97,8 @@ public final class TableAdapter {
                 method.invoke(entity, DependencyType.get(reader.readInt()));
             } else if (type == ExecutionStatus.class) {
                 method.invoke(entity, ExecutionStatus.get(reader.readInt()));
+            } else if (type == ProcessorState.class) {
+                method.invoke(entity, ProcessorState.get(reader.readInt()));
             } else {
                 throw new RuntimeException("Unsupported field class for database persistance " + type);
             }

@@ -130,5 +130,6 @@ public interface DatabaseI {
 
     public List<DbSourceOrganisation> retrieveSourceOrganisationsForOdsCodes(List<String> odsCodes) throws Exception;
 
+    public DbProcessorStatus retrieveCurrentProcessorStatus() throws Exception;
 
 }

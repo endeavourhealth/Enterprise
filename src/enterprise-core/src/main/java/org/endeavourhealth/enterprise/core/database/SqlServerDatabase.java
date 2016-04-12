@@ -1522,5 +1522,11 @@ final class SqlServerDatabase implements DatabaseI {
         return retrieveForWherePreparedStatement(DbSourceOrganisation.class, where, odsCodes);
     }
 
+    @Override
+    public DbProcessorStatus retrieveCurrentProcessorStatus() throws Exception {
+        String where = "WHERE 1=1";
+        return retrieveOneForWherePreparedStatement(DbProcessorStatus.class, where);
+    }
+
 
 }

@@ -58,6 +58,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link MessagingQueue }
+     * 
+     */
+    public MessagingQueue createMessagingQueue() {
+        return new MessagingQueue();
+    }
+
+    /**
      * Create an instance of {@link WebServer }
      * 
      */

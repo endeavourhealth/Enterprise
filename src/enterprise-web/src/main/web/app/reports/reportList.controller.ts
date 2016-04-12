@@ -46,9 +46,9 @@ module app.reports {
 
 			var state = moduleStateService.getState('reportList');
 			if (state) {
-				this.selectedNode = state.selectedNode;
 				this.treeData = state.treeData;
-				this.itemSummaryList = state.itemSummaryList;
+				this.selectNode(state.selectedNode);
+
 				this.selectedReport = state.selectedReport;
 				this.selectedReportSchedules = state.selectedReportSchedules;
 				this.selectedSchedule = state.selectedSchedule;

@@ -43,9 +43,8 @@ module app.library {
 
 			var state = moduleStateService.getState('library');
 			if (state) {
-				this.selectedNode = state.selectedNode;
 				this.treeData = state.treeData;
-				this.itemSummaryList = state.itemSummaryList;
+				this.selectNode(state.selectedNode);
 			}
 		}
 

@@ -175,11 +175,33 @@ angular.module('flowChart', ['dragging'] )
 			//
 			this.translateCoordinates = function(x, y) {
 				svg_elem = document.getElementsByTagName("svg")[0];
+				var s = document.getElementById('flowChart').style.zoom;
+				if (s=="90%") {
+					x=x+(x*12/100);
+					y=y+(y*12/100);
+				}
+				else if (s=="80%") {
+					x=x+(x*26/100);
+					y=y+(y*26/100);
+				}
+				else if (s=="70%") {
+					x=x+(x*42/100);
+					y=y+(y*42/100);
+				}
+				else if (s=="60%") {
+					x=x+(x*68/100);
+					y=y+(y*68/100);
+				}
+				else if (s=="50%") {
+					x=x+(x*102/100);
+					y=y+(y*102/100);
+				}
 				var matrix = svg_elem.getScreenCTM();
 				var point = svg_elem.createSVGPoint();
 				point.x = x;
 				point.y = y;
-				return point.matrixTransform(matrix.inverse());
+				var r = point.matrixTransform(matrix.inverse());
+				return r;
 			};
 
 			//

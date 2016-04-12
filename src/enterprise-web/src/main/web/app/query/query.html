@@ -2,38 +2,49 @@
     <div class="container-fluid">
         <div class="module-heading">Query editor
             <div class="pull-right">
+                <button class="btn btn-sm btn-default"
+                        ng-click="zoomIn()"
+                        title="Zoom in the chart">
+                    <i class="fa fa-search-plus"></i> Zoom In
+                </button>
+                <button class="btn btn-sm btn-default"
+                        ng-click="zoomOut()"
+                        title="Zoom out the chart">
+                    <i class="fa fa-search-minus"></i> Zoom Out
+                </button>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
                 <button class="btn btn-sm btn-primary"
                         ng-click="addNewRule('1')"
                         title="Add a new rule to this query">
-                    Add Rule
+                    <i class="fa fa-plus"></i> Add Rule
                 </button>
 
                 <button class="btn btn-sm btn-default"
                         ng-click="addNewRule('2')"
                         title="Add another query as a rule to this query">
-                    Add Query as Rule
+                    <i class="fa fa-plus"></i> Add Query as Rule
                 </button>
 
                 <button class="btn btn-sm btn-info"
                         ng-click="addNewRule('3')"
                         title="Add a new expression rule to this query">
-                    Add Expression
+                    <i class="fa fa-plus"></i> Add Expression
                 </button>
 
                 <button class="btn btn-sm btn-warning"
                         ng-click="deleteSelected()"
                         ng-disabled="chartViewModel.getSelectedRule().length == 0"
                         title="Delete selected rule and connections">
-                    Delete Selected
+                    <i class="fa fa-times"></i> Delete Selected
                 </button>
                 <button class="btn btn-sm btn-danger"
                         ng-click="toggleClearQuery()"
                         title="Clear the rules in this this query without saving">
-                    Clear Rules
-                </button>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-                <button type="button" class="btn btn-sm btn-success" data-ng-click="save(false)">Save</button>
-                <button type="button" class="btn btn-sm btn-warning" data-ng-click="save(true)">Save & Close</button>
-                <button type="button" class="btn btn-sm btn-danger" data-ng-click="toggleCancelChanges()">Cancel</button>
+                    <i class="fa fa-eraser"></i> Clear Rules
+                </button>
+                &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+                <button type="button" class="btn btn-sm btn-success" data-ng-click="save(false)"><i class="fa fa-save"></i> Save</button>
+                <button type="button" class="btn btn-sm btn-warning" data-ng-click="save(true)"><i class="fa fa-save"></i> Save & Close</button>
+                <button type="button" class="btn btn-sm btn-danger" data-ng-click="toggleCancelChanges()"><i class="fa fa-undo"></i> Cancel</button>
             </div></div>
         <div class="module-body">
             <div id="queryPage">
@@ -59,7 +70,7 @@
 
                     </cancel-changes>
 
-                    <flow-chart
+                    <flow-chart id="flowChart" ng-style="{'zoom': zoomPercent}"
                             mouse-capture
                             chart="chartViewModel">
                     </flow-chart>

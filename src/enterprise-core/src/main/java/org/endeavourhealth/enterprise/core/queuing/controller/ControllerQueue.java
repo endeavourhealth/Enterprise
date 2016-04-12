@@ -81,6 +81,14 @@ public class ControllerQueue implements AutoCloseable {
         channel.publishDirectlyToQueue(queueName, message.getMessage());
     }
 
+    public void sendMessage(ControllerQueueRequestStartMessage message) throws IOException {
+        channel.publishDirectlyToQueue(queueName, message.getMessage());
+    }
+
+    public void sendMessage(ControllerQueueRequestStopMessage message) throws IOException {
+        channel.publishDirectlyToQueue(queueName, message.getMessage());
+    }
+
     public interface IControllerQueueMessageReceiver {
         void receiveWorkerItemCompleteMessage(ControllerQueueWorkItemCompleteMessage.WorkItemCompletePayload payload);
         void receiveExecutionFailedMessage(ControllerQueueExecutionFailedMessage.ExecutionFailedPayload payload);

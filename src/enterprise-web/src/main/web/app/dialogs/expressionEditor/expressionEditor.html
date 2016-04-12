@@ -12,13 +12,13 @@
         <table class="expressionTable">
             <tr>
                 <td colspan="2">
-                    <div class="editorSection" >Define Data Source Variables</div>
+                    <div class="editorSection">Data Source Calculations and Comparisons</div>
                 </td>
             </tr>
             <tr>
                 <td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top; border-right: 1px solid gainsboro">
                     <div class='row'>
-                        <div class="col-xs-9">
+                        <div class="col-xs-12">
                             <div class="form-group">
                                 <label>Data Source A.</label>
                                 <select class="form-control" ng-model="expressionEditor.expressionRuleId1">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div class='row' >
-                        <div class="col-xs-6">
+                        <div class="col-xs-5">
                             <div class="form-group">
                                 <label>Sort Field</label>
                                 <select class="form-control" ng-model="expressionEditor.expressionRestrictionFieldName1">
@@ -44,7 +44,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <div class="form-group">
                                 <label>Count</label>
                                 <input type="text" class="form-control" ng-model="expressionEditor.expressionRestrictionCount1">
@@ -73,7 +73,7 @@
                 </td>
                 <td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top">
                     <div class='row'>
-                        <div class="col-xs-9">
+                        <div class="col-xs-12">
                             <div class="form-group">
                                 <label>Data Source B.</label>
                                 <select class="form-control" ng-model="expressionEditor.expressionRuleId2">
@@ -83,7 +83,7 @@
                         </div>
                     </div>
                     <div class='row' >
-                        <div class="col-xs-6">
+                        <div class="col-xs-5">
                             <div class="form-group">
                                 <label>Sort Field</label>
                                 <select class="form-control" ng-model="expressionEditor.expressionRestrictionFieldName2">
@@ -99,7 +99,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <div class="form-group">
                                 <label>Count</label>
                                 <input type="text" class="form-control" ng-model="expressionEditor.expressionRestrictionCount2">
@@ -136,7 +136,7 @@
 
                         <div class="col-xs-2">
                             <div class="form-group">
-                                <label>Pick Variable</label>
+                                <label>Pick Data Source</label>
                                 <select class="form-control" ng-model="expressionEditor.variableLabel" style="height: 50px;" multiple ng-click="expressionEditor.variableLabelChange()" ng-disabled="expressionEditor.variableLabelDisabled">
                                     <option ng-repeat="label in expressionEditor.labels" value="{{label}}">{{label}}</option>
                                 </select>

@@ -23,6 +23,7 @@ module app.reports {
 	import ReportResult = app.models.ReportResult;
 	import LibraryItemFolderModuleBase = app.blocks.LibraryItemFolderModuleBase;
 	import IModuleStateService = app.core.IModuleStateService;
+	import ItemType = app.models.ItemType;
 	'use strict';
 
 	export class ReportListController extends LibraryItemFolderModuleBase {
@@ -56,9 +57,16 @@ module app.reports {
 			}
 		}
 
-		viewItem(item : FolderItem) {
+		actionItem(uuid : string, type : ItemType, action : string) {
 			this.saveState();
-			this.$state.go('app.reportAction', {itemUuid: item.uuid, itemAction: 'edit'});
+			switch (type) {
+				case ItemType.Report:
+					this.$state.go('app.reportAction', {itemUuid: uuid, itemAction: action});
+					break;
+				default:
+					this.logger.error('Invalid item type', type, 'Item ' + action);
+					break;
+			}
 		}
 
 		run(item : FolderItem) {
@@ -119,7 +127,6 @@ module app.reports {
 			var state = {
 				selectedNode : this.selectedNode,
 				treeData : this.treeData,
-				itemSummaryList : this.itemSummaryList,
 				selectedReport : this.selectedReport,
 				selectedReportSchedules : this.selectedReportSchedules,
 				selectedSchedule : this.selectedSchedule,

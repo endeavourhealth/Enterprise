@@ -48,17 +48,20 @@ module app.library {
 			}
 		}
 
-		actionItem(item : FolderItem, action : string) {
+		actionItem(uuid : string, type : ItemType, action : string) {
 			this.saveState();
-			switch (item.type) {
+			switch (type) {
 				case ItemType.Query:
-					this.$state.go('app.queryAction', {itemUuid: item.uuid, itemAction: action});
+					this.$state.go('app.queryAction', {itemUuid: uuid, itemAction: action});
 					break;
 				case ItemType.ListOutput:
-					this.$state.go('app.listOutputAction', {itemUuid: item.uuid, itemAction: action});
+					this.$state.go('app.listOutputAction', {itemUuid: uuid, itemAction: action});
 					break;
 				case ItemType.CodeSet:
-					this.$state.go('app.codeSetAction', {itemUuid: item.uuid, itemAction: action});
+					this.$state.go('app.codeSetAction', {itemUuid: uuid, itemAction: action});
+					break;
+				default:
+					this.logger.error('Invalid item type', type, 'Item ' + action);
 					break;
 			}
 		}
@@ -79,8 +82,7 @@ module app.library {
 		saveState() {
 			var state = {
 				selectedNode : this.selectedNode,
-				treeData : this.treeData,
-				itemSummaryList : this.itemSummaryList
+				treeData : this.treeData
 			};
 			this.moduleStateService.setState('library', state);
 		}

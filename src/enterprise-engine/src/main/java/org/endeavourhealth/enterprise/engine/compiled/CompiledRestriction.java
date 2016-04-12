@@ -68,7 +68,7 @@ public class CompiledRestriction {
         return count > 1;
     }
 
-    private static class ValueToRowId implements Comparable {
+    private static class ValueToRowId implements Comparable<ValueToRowId> {
         public final Object value;
         public final int rowId;
 
@@ -78,12 +78,12 @@ public class CompiledRestriction {
         }
 
         @Override
-        public int compareTo(Object o) {
+        public int compareTo(ValueToRowId o) {
 
             if (value instanceof LocalDate)
-                return ((LocalDate)value).compareTo((LocalDate)((ValueToRowId)o).value);
+                return ((LocalDate)value).compareTo((LocalDate)o.value);
             else if (value instanceof BigDecimal)
-                return ((BigDecimal)value).compareTo((BigDecimal)((ValueToRowId)o).value);
+                return ((BigDecimal)value).compareTo((BigDecimal)o.value);
             else
                 throw new RuntimeException("Restriction type not supported: " + value.getClass().getName());
         }

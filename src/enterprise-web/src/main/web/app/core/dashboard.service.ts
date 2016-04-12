@@ -37,7 +37,7 @@ module app.core {
 		}
 
 		getEngineState():ng.IPromise<EngineState> {
-			return this.httpGet('app/core/data/enginestate.json');
+			return this.httpGet('api/dashboard/getProcessorStatus');
 		}
 
 		getReportActivityData():ng.IPromise<ReportActivityItem[]> {

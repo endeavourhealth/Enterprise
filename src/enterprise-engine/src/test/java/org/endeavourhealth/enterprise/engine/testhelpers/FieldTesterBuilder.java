@@ -49,7 +49,8 @@ public class FieldTesterBuilder {
         return this;
     }
 
-    public FieldTesterBuilder setDataTypeOfDataValues(List<String>... values) {
+    @SafeVarargs
+		public final FieldTesterBuilder setDataTypeOfDataValues(List<String>... values) {
 
         EntityMapBuilder entityMapBuilder = new EntityMapBuilder()
                 .addEntity(LogicalDataType.DATA_VALUES);

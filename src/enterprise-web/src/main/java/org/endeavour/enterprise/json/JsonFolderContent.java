@@ -116,6 +116,6 @@ public final class JsonFolderContent implements Comparable {
     @Override
     public int compareTo(Object o) {
         JsonFolderContent other = (JsonFolderContent)o;
-        return name.compareTo(other.name);
+        return name.compareToIgnoreCase(other.name);
     }
 }

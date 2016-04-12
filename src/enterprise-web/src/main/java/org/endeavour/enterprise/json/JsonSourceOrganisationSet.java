@@ -57,6 +57,6 @@ public final class JsonSourceOrganisationSet implements Comparable {
     @Override
     public int compareTo(Object o) {
         JsonSourceOrganisationSet other = (JsonSourceOrganisationSet)o;
-        return name.compareTo(other.getName());
+        return name.compareToIgnoreCase(other.getName());
     }
 }

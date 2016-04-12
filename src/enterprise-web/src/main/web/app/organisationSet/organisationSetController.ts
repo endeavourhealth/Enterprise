@@ -6,6 +6,7 @@ module app.organisationSet {
 	import IOrganisationService = app.core.IOrganisationService;
 	import OrganisationSet = app.models.OrganisationSet;
 	import OrganisationSetMember = app.models.OrganisationSetMember;
+	import MessageBoxController = app.dialogs.MessageBoxController;
 	'use strict';
 
 	export class OrganisationSetController {
@@ -25,10 +26,13 @@ module app.organisationSet {
 			vm.organisationService.getOrganisationSets()
 				.then(function(result) {
 					vm.organisationSets = result;
+				})
+				.catch(function (error) {
+					vm.log.error('Failed to load sets', error, 'Load sets');
 				});
 		}
 
-		selectOrganisationSet(item : any) {
+		selectOrganisationSet(item : OrganisationSet) {
 			var vm = this;
 
 			vm.selectedOrganisationSet = item;
@@ -50,7 +54,27 @@ module app.organisationSet {
 					.then(function(result : OrganisationSet) {
 						vm.log.success('Organisation set saved', organisationSet, 'Save set');
 						vm.selectedOrganisationSet.organisations = organisationSet.organisations;
+					})
+					.catch(function (error) {
+						vm.log.error('Failed to save set', error, 'Save set');
 					});
+			});
+		}
+
+		deleteSet(item : OrganisationSet) {
+			var vm = this;
+			MessageBoxController.open(vm.$modal,
+																'Delete Organisation Set', 'Are you sure you want to delete the set?', 'Yes', 'No')
+				.result.then(function() {
+					vm.organisationService.deleteOrganisationSet(item)
+						.then(function() {
+							var i = vm.organisationSets.indexOf(item);
+							vm.organisationSets.splice(i, 1);
+							vm.log.success('Organisation set deleted', item, 'Delete set');
+						})
+						.catch(function(error) {
+							vm.log.error('Failed to delete set', error, 'Delete set');
+						});
 			});
 		}
 	}

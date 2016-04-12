@@ -12,6 +12,7 @@
 								<thead>
 									<tr>
 										<th class="col-md-10">Title</th>
+										<th class="col-md-2"></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -21,6 +22,9 @@
 											ng-click="ctrl.selectOrganisationSet(item)">
 										<td>
 											{{item.name}}
+										</td>
+										<td>
+											<button type="button" class="btn btn-danger btn-xs child-to-show" ng-click="ctrl.deleteSet(item)"><span class="fa fa-remove"></span></button>
 										</td>
 									</tr>
 								</tbody>

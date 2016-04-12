@@ -10,6 +10,7 @@ module app.core {
 		getOrganisationSetMembers(uuid : string):ng.IPromise<OrganisationSetMember[]>;
 		searchOrganisations(searchCriteria : string):ng.IPromise<OrganisationSetMember[]>;
 		saveOrganisationSet(organisationSet : OrganisationSet):ng.IPromise<OrganisationSet>;
+		deleteOrganisationSet(organisationSet : OrganisationSet):ng.IPromise<void>;
 	}
 
 	export class OrganisationService extends BaseHttpService implements IOrganisationService {
@@ -40,6 +41,10 @@ module app.core {
 
 		saveOrganisationSet(organisationSet : OrganisationSet) {
 			return this.httpPost('api/lookup/saveOrganisationSet', organisationSet);
+		}
+
+		deleteOrganisationSet(organisationSet : OrganisationSet) {
+			return this.httpPost('api/lookup/deleteOrganisationSet', organisationSet);
 		}
 	}
 

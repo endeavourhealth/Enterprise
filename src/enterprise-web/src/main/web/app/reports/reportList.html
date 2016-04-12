@@ -38,7 +38,7 @@
 												ng-class="{'selection': item.uuid == ctrl.selectedReport.uuid}"
 												ng-click="ctrl.selectFolderItem(item)">
 											<td>
-												<a ui-sref="app.reportAction({itemUuid: item.uuid, itemAction: 'edit'})">{{item.name}}</a>
+												<a ng-click="ctrl.viewItem(item)">{{item.name}}</a>
 												<span class="fa fa-comment fa-right-pad text-muted" uib-tooltip="{{item.description}}" ng-show="item.description"></span>
 											</td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>

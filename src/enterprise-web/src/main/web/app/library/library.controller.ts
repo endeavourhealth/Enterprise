@@ -63,6 +63,19 @@ module app.library {
 			}
 		}
 
+		deleteItem(item : FolderItem) {
+			var vm = this;
+			vm.libraryService.deleteLibraryItem(item.uuid)
+				.then(function(result) {
+					var i = vm.itemSummaryList.contents.indexOf(item);
+					vm.itemSummaryList.contents.splice(i, 1);
+					vm.logger.success('Library item deleted', result, 'Delete item');
+				})
+				.catch(function(error) {
+					vm.logger.error('Error deleting library item', error, 'Delete item');
+				});
+		}
+
 		saveState() {
 			var state = {
 				selectedNode : this.selectedNode,

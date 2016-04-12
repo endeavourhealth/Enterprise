@@ -12,7 +12,7 @@ module app.core {
 	export interface IReportService {
 		saveReport(report : Report):ng.IPromise<Report>;
 		getReport(uuid : string):ng.IPromise<Report>;
-		deleteReport(report : Report):ng.IPromise<any>;
+		deleteReport(uuid : string):ng.IPromise<any>;
 		scheduleReport(requestParameters : RequestParameters):ng.IPromise<any>;
 		getContentNamesForReportLibraryItem(uuid : string):ng.IPromise<{contents : UuidNameKVP[]}>;
 		getReportSchedules(uuid : string, count : number):ng.IPromise<ReportSchedule[]>;
@@ -24,8 +24,11 @@ module app.core {
 			return this.httpPost('api/report/saveReport', report);
 		}
 
-		deleteReport(report: Report):ng.IPromise<any> {
-			return this.httpPost('api/report/deleteReport', report);
+		deleteReport(uuid: string):ng.IPromise<any> {
+			var request = {
+				'uuid': uuid
+			};
+			return this.httpPost('api/report/deleteReport', request);
 		}
 
 		getReport(uuid : string):ng.IPromise<Report> {

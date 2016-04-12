@@ -102,11 +102,16 @@ module app.reports {
 				});
 		}
 
-		deleteItem(scope : any) {
+		deleteItem(item : FolderItem) {
 			var vm = this;
-			vm.reportService.deleteReport(scope.$modelValue)
+			vm.reportService.deleteReport(item.uuid)
 				.then(function(result) {
-					scope.remove();
+					var i = vm.itemSummaryList.contents.indexOf(item);
+					vm.itemSummaryList.contents.splice(i, 1);
+					vm.logger.success('Report deleted', result, 'Delete report');
+				})
+				.catch(function(error) {
+					vm.logger.error('Error deleting report', error, 'Delete report');
 				});
 		}
 

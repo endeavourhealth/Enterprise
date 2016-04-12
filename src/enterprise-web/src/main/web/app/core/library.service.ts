@@ -8,7 +8,7 @@ module app.core {
 	export interface ILibraryService {
 		getLibraryItem(uuid : string):ng.IPromise<LibraryItem>;
 		saveLibraryItem(libraryItem : LibraryItem):ng.IPromise<LibraryItem>;
-		deleteLibraryItem(libraryItem : LibraryItem):ng.IPromise<any>;
+		deleteLibraryItem(uuid : string):ng.IPromise<any>;
 		getEntityMap():ng.IPromise<EntityMap>;
 	}
 
@@ -27,8 +27,11 @@ module app.core {
 			return this.httpPost('api/library/saveLibraryItem', libraryItem);
 		}
 
-		deleteLibraryItem(libraryItem : LibraryItem):ng.IPromise<any> {
-			return this.httpPost('api/library/deleteLibraryItem', libraryItem);
+		deleteLibraryItem(uuid : string):ng.IPromise<any> {
+			var request = {
+				uuid : uuid
+			};
+			return this.httpPost('api/library/deleteLibraryItem', request);
 		}
 
 		getEntityMap():ng.IPromise<EntityMap> {

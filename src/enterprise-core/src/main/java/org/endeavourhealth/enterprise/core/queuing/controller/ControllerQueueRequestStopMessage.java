@@ -1,26 +1,26 @@
-package org.endeavourhealth.enterprise.enginecore.communication;
+package org.endeavourhealth.enterprise.core.queuing.controller;
 
 import com.rabbitmq.client.AMQP;
 import org.endeavourhealth.enterprise.core.queuing.Message;
 
-public class ControllerQueueRequestStartMessage {
+public class ControllerQueueRequestStopMessage {
 
     private Message message;
-    private static final String type = "requestStart";
+    private static final String type = "requestStop";
 
     public Message getMessage() {
         return message;
     }
 
-    private ControllerQueueRequestStartMessage(Message message) {
+    private ControllerQueueRequestStopMessage(Message message) {
         this.message = message;
     }
 
-    public static ControllerQueueRequestStartMessage CreateFromMessage(Message message) {
-        return new ControllerQueueRequestStartMessage(message);
+    public static ControllerQueueRequestStopMessage CreateFromMessage(Message message) {
+        return new ControllerQueueRequestStopMessage(message);
     }
 
-    public static ControllerQueueRequestStartMessage CreateAsNew() {
+    public static ControllerQueueRequestStopMessage CreateAsNew() {
 
         AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder();
 
@@ -30,7 +30,7 @@ public class ControllerQueueRequestStartMessage {
 
         Message newMessage = new Message(properties, null);
 
-        return new ControllerQueueRequestStartMessage(newMessage);
+        return new ControllerQueueRequestStopMessage(newMessage);
     }
 
     public static boolean isTypeOf(Message message) {

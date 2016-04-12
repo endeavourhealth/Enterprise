@@ -1,4 +1,4 @@
-package org.endeavourhealth.enterprise.enginecore.communication;
+package org.endeavourhealth.enterprise.core.queuing.controller;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Consumer;

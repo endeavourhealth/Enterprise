@@ -4,7 +4,7 @@ import org.endeavourhealth.enterprise.controller.configuration.models.Configurat
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.core.JsonSerializer;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.enginecore.communication.*;
+import org.endeavourhealth.enterprise.core.queuing.controller.*;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

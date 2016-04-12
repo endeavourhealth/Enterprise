@@ -6,22 +6,20 @@ import org.endeavourhealth.enterprise.controller.jobinventory.JobInventory;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobReportInfo;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobReportItemInfo;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class OutputFileApi {
 
     private final OutputFilesType configuration;
     private final JobInventory jobInventory;
-    private final List<JobReportItemInfo> listReports = new ArrayList<>();
-    //private final NameHandler nameHandler;
+    private final Instant startDateTime;
+    private List<JobReportItemInfo> listReports;
+    private final List<Folder> folders = new ArrayList<>();
+
+    private Path temporaryJobFolder;
 
     public OutputFileApi(
             OutputFilesType configuration,
@@ -30,92 +28,57 @@ public class OutputFileApi {
 
         this.configuration = configuration;
         this.jobInventory = jobInventory;
-        //this.nameHandler = new NameHandler(configuration.getRootFolder(), startDateTime);
+        this.startDateTime = startDateTime;
     }
 
     public void prepareFiles() throws Exception {
-//
-//        //nameHandler.buildJobFolder();
-//
-//        Path path = Paths.get("/home/endadmin/discoveryoutput", "Temp");
-//        File file = new File(path.toString());
-//
-//        if (!file.mkdir())
-//            throw new Exception("Could not make path: " + path.toString());
-//
-//        Path path2 = Paths.get("/home/endadmin/discoveryoutput", "Temp", "Test.csv");
-//        Files.createFile(path2);
-//
-//        try(  PrintWriter out = new PrintWriter( path2.toString() )  ){
-//
-//            String header = "First,Second,Third";
-//            out.println(header);
-//        }
-//
-//        Files.createDirectories(path.getParent());
-//
-//        try {
-//            Files.createFile(path);
-//        } catch (FileAlreadyExistsException e) {
-//            System.err.println("already exists: " + e.getMessage());
-//        }
-//
-//        PrintWriter out = new PrintWriter("filename.txt");
 
-//        Stack<String> folderStack = new Stack<>();
-//
-//        for (JobReportInfo jobReportInfo : jobInventory.getJobReportInfoList()) {
-//
-//            folderStack.push(jobReportInfo.getReportName());
-//
-//            prepareFolders(jobReportInfo.getChildren(), folderStack);
-//
-//            folderStack.pop();
-//        }
-//
-//        if (noFiles())
-//            return;
-//
-//        nameHandler.buildJobFolder();
+        listReports = getListReports();
 
+        if (noFiles())
+            return;
+
+        populateFolders();
+
+        if (folders.isEmpty())
+            throw new Exception("There are list reports but the folders field is empty");
+
+
+    }
+
+
+    private void populateFolders() throws Exception {
+
+        FolderBuilder folderBuilder = new FolderBuilder(jobInventory, folders, configuration, startDateTime);
+        folderBuilder.build();
+
+        temporaryJobFolder = folderBuilder.getTemporaryJobFolder();
     }
 
     private boolean noFiles() {
         return listReports.isEmpty();
     }
 
-    private void prepareFolders(List<JobReportItemInfo> items, Stack<String> folderStack) {
+    private List<JobReportItemInfo> getListReports() {
+        List<JobReportItemInfo> target = new ArrayList<>();
 
-//        if (CollectionUtils.isEmpty(items))
-//            return;
-//
-//        for (JobReportItemInfo jobReportItemInfo: items) {
-//
-//            if (jobReportItemInfo.getListReportInfo() != null) {
-//                jobReportItemInfo.getListReportInfo().setFolderStack(folderStack);
-//                listReports.add(jobReportItemInfo);
-//            }
-//
-//            if (hasListReportDescendent(jobReportItemInfo.getChildren())) {
-//
-//                String itemName = jobInventory.getLibraryItemName(jobReportItemInfo.getLibraryItemUuid());
-//                folderStack.push(itemName);
-//                prepareFolders(jobReportItemInfo.getChildren(), folderStack);
-//                folderStack.pop();
-//            }
-//        }
+        for (JobReportInfo item: jobInventory.getJobReportInfoList()) {
+            getListReports(item.getChildren(), target);
+        }
+
+        return target;
     }
 
-    private void addListReports(List<JobReportItemInfo> items, List<JobReportItemInfo> list) {
+    private void getListReports(List<JobReportItemInfo> items, List<JobReportItemInfo> target) {
 
         if (CollectionUtils.isEmpty(items))
             return;
 
         for (JobReportItemInfo item: items) {
             if (item.getListReportInfo() != null)
-                list.add(item);
+                target.add(item);
 
-            addListReports(item.getChildren(), list);
+            getListReports(item.getChildren(), target);
         }
     }
 

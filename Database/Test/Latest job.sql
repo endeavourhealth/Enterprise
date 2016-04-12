@@ -6,6 +6,7 @@ order by j.StartDateTime desc
 
 select *
 from [Execution].[Job] as j
+left join Execution.Status as s on s.StatusId = j.StatusId
 where j.JobUuid = @JobUuid
 
 select *

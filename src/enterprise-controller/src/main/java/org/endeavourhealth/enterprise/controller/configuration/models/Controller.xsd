@@ -43,6 +43,7 @@
 	</xs:complexType>
 	<xs:complexType name="outputFilesType">
 		<xs:sequence>
+			<xs:element name="temporaryFolder" type="xs:string"/>
 			<xs:element name="rootFolder" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>

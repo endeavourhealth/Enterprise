@@ -1,50 +1,36 @@
 package org.endeavourhealth.enterprise.controller.outputfiles;
 
+import org.endeavourhealth.enterprise.controller.jobinventory.JobInventory;
+import org.endeavourhealth.enterprise.controller.jobinventory.JobReportInfo;
+import org.endeavourhealth.enterprise.controller.jobinventory.JobReportItemInfo;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 class NameHandler {
 
-    private final String rootDirectory;
-    private final Instant startDateTime;
-    private File temporaryFolder;
-
-    public NameHandler(String rootDirectory, Instant startDateTime) throws Exception {
-
-        this.rootDirectory = rootDirectory;
-        this.startDateTime = startDateTime;
-
-        File file = new File(rootDirectory);
-        FileHelper.checkDirectoryExists(file);
-    }
-
-    private String formatStartDateTimeForName() {
-        return DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+    private static String formatInstantForName(Instant instant) {
+        return DateTimeFormatter.ofPattern("yyyyMMdd HHmmss")
                 .withZone(ZoneOffset.UTC)
-                .format(startDateTime);
+                .format(instant);
     }
 
-    public void buildJobFolder() throws Exception {
-        //String folderName = "Temporary_" + formatStartDateTimeForName();
-        String folderName = "Temporary";
-        String fullFolderName = rootDirectory + "/" + folderName;
-        temporaryFolder = new File(fullFolderName);
-        FileHelper.makeDirectory(temporaryFolder);
+    public static String calculatePreferredName(JobReportInfo jobReportInfo) {
+        return jobReportInfo.getReportName() + " - Scheduled " + formatInstantForName(jobReportInfo.getRequest().getTimeStamp());
     }
 
-    public Path getTestFile() {
-        String folderName = "Temporary";
-        return Paths.get(rootDirectory, folderName, "Test.csv");
+    public static String calculatePreferredName(
+            JobReportItemInfo jobReportItemInfo,
+            JobInventory jobInventory) throws Exception {
+
+        return jobInventory.getItemName(jobReportItemInfo.getLibraryItemUuid());
     }
 
-    public void renameTemporaryFolder() throws Exception {
-        String newFolderName = "Job_" + formatStartDateTimeForName();
-        FileHelper.renameDirectory(temporaryFolder, newFolderName);
+    public static String calculateJobName(Instant startDateTime) {
+        return "Execution " + formatInstantForName(startDateTime);
     }
 }

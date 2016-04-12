@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element name="temporaryFolder" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="rootFolder" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -28,12 +29,39 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "outputFilesType", propOrder = {
+    "temporaryFolder",
     "rootFolder"
 })
 public class OutputFilesType {
 
     @XmlElement(required = true)
+    protected String temporaryFolder;
+    @XmlElement(required = true)
     protected String rootFolder;
+
+    /**
+     * Gets the value of the temporaryFolder property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTemporaryFolder() {
+        return temporaryFolder;
+    }
+
+    /**
+     * Sets the value of the temporaryFolder property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTemporaryFolder(String value) {
+        this.temporaryFolder = value;
+    }
 
     /**
      * Gets the value of the rootFolder property.

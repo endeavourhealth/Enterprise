@@ -1,17 +1,23 @@
 package org.endeavourhealth.enterprise.controller.jobinventory;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 public class ListReportInfo {
-    private List<String> folders;
+    private Path folderBranch;
+    private String rootName;
 
-    public void setFolderStack(Stack<String> folderStack) {
-        //noinspection unchecked
+    public void setFolderBranch(Path folderBranch) {
+        this.folderBranch = folderBranch;
+    }
 
-        List<String> folders = new ArrayList<>();
-        folders.addAll(folderStack);  //This will not alter the stack.
+    public String getRootName() {
+        return rootName;
+    }
 
+    public void setRootName(String rootName) {
+        this.rootName = rootName;
     }
 }

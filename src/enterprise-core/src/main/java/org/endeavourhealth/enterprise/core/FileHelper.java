@@ -1,8 +1,10 @@
 package org.endeavourhealth.enterprise.core;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileHelper {
 
@@ -18,5 +20,14 @@ public class FileHelper {
         } catch (Exception e) {
             throw new Exception("Error reading file: " + file.getFileName(), e);
         }
+    }
+
+    public static boolean pathNotExists(String path) {
+        Path pathObject = Paths.get(path);
+        return Files.notExists(pathObject);
+    }
+
+    public static void createFolder(Path folder) throws IOException {
+        Files.createDirectory(folder);
     }
 }

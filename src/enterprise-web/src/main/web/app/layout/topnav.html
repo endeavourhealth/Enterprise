@@ -8,19 +8,19 @@
 			Logged in : {{topnav.currentUser.title}} {{topnav.currentUser.forename}} {{topnav.currentUser.surname}}
 
 
-			<div class="dropdown" uib-dropdown>
-				Organisation : <a href="#" class="dropdown-toggle" uib-dropdown-toggle>
-				{{ topnav.selectedRole.organisationName }}
-				<span class="caret"></span>
-			</a>
-				<ul uib-dropdown-menu>
-					<li ng-repeat="endUserRole in topnav.currentUser.userInRoles">
-						<a href="#" ng-click="topnav.updateRole(endUserRole.userInRoleUuid)">
-							{{ endUserRole.organisationName }}
-						</a>
-					</li>
-				</ul>
-			</div>
+			<!--<div class="dropdown" uib-dropdown>-->
+				<!--Organisation : <a href="#" class="dropdown-toggle" uib-dropdown-toggle>-->
+				<!--{{ topnav.selectedRole.organisationName }}-->
+				<!--<span class="caret"></span>-->
+			<!--</a>-->
+				<!--<ul uib-dropdown-menu>-->
+					<!--<li ng-repeat="endUserRole in topnav.currentUser.userInRoles">-->
+						<!--<a href="#" ng-click="topnav.updateRole(endUserRole.userInRoleUuid)">-->
+							<!--{{ endUserRole.organisationName }}-->
+						<!--</a>-->
+					<!--</li>-->
+				<!--</ul>-->
+			<!--</div>-->
 		</div>
 	</div>
 </div>

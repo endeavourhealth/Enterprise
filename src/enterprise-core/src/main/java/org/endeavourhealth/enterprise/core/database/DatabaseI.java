@@ -132,4 +132,6 @@ public interface DatabaseI {
 
     public DbProcessorStatus retrieveCurrentProcessorStatus() throws Exception;
 
+    public void deleteCurrentProcessorStatus() throws Exception;
+
 }

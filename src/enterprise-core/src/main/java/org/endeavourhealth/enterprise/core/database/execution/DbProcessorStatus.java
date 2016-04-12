@@ -2,10 +2,7 @@ package org.endeavourhealth.enterprise.core.database.execution;
 
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.ProcessorState;
-import org.endeavourhealth.enterprise.core.database.DatabaseColumn;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.TableAdapter;
+import org.endeavourhealth.enterprise.core.database.*;
 
 public final class DbProcessorStatus extends DbAbstractTable {
     private static TableAdapter adapter = new TableAdapter(DbProcessorStatus.class);
@@ -17,6 +14,14 @@ public final class DbProcessorStatus extends DbAbstractTable {
 
     public static DbProcessorStatus retrieveCurrentStatus() throws Exception {
         return DatabaseManager.db().retrieveCurrentProcessorStatus();
+    }
+    public static void setCurrentStatus(ProcessorState state) throws Exception {
+        DatabaseManager.db().deleteCurrentProcessorStatus();
+
+        DbProcessorStatus status = new DbProcessorStatus();
+        status.setStateId(state);
+        status.setSaveMode(TableSaveMode.INSERT);
+        status.writeToDb();
     }
 
     @Override

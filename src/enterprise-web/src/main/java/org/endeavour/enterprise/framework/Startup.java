@@ -6,7 +6,9 @@ import org.endeavour.enterprise.framework.config.models.*;
 import org.endeavour.enterprise.framework.config.models.RabbitMq;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.utility.MessagingQueueProvider;
+import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.execution.DbProcessorStatus;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -51,6 +53,7 @@ public final class Startup implements ServletContextListener {
             String queueName = queueSettings.getQueueName();
             MessagingQueueProvider.getInstance().setConnectionProperties(url, username, password, queueName);
         }
+
     }
 
     public void contextDestroyed(ServletContextEvent contextEvent) {

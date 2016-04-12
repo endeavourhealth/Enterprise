@@ -13,10 +13,11 @@ public class AuthenticationFilterFeature implements DynamicFeature
 {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
-        boolean usePackageFilter = true;
+
 
         String packageName = (String) featureContext.getConfiguration().getProperties().get(ServerProperties.PROVIDER_PACKAGES);
 
+        boolean usePackageFilter = true;
         if ((packageName == null) || (packageName.trim().equals(""))) {
             usePackageFilter = false;
 
@@ -25,7 +26,7 @@ public class AuthenticationFilterFeature implements DynamicFeature
 
         if ((!usePackageFilter) || (resourceInfo.getResourceClass().getName().startsWith(packageName))) {
             if (!containsUnsecuredAnnotation(resourceInfo.getResourceMethod().getAnnotations())) {
-                AuthenticationFilter authenticationFilter = new AuthenticationFilter();
+                AuthenticationFilter authenticationFilter = new AuthenticationFilter(false, false);
                 featureContext.register(authenticationFilter);
             }
         }

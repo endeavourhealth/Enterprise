@@ -5,7 +5,7 @@
 	<xs:complexType name="requestParameters">
 		<xs:sequence>
 			<xs:element name="reportUuid" type="xs:string"/>
-			<xs:element name="baselineDate" type="xs:date"/>
+			<xs:element name="baselineDate" type="xs:date" minOccurs="0"/>
 			<xs:element name="patientType">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">

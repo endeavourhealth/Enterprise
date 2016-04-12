@@ -12,15 +12,24 @@ import java.io.IOException;
 import java.util.Map;
 
 @Priority(Priorities.AUTHENTICATION)
-public class AuthenticationFilter implements ContainerRequestFilter {
+public final class AuthenticationFilter implements ContainerRequestFilter {
+
+    private boolean requiresAdmin = false;
+    private boolean requiresSuperUser = false;
+
+    public AuthenticationFilter(boolean requiresAdmin, boolean requiresSuperUser) {
+        this.requiresAdmin = requiresAdmin;
+        this.requiresSuperUser = requiresSuperUser;
+    }
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
         try {
             Map<String, Cookie> cookies = containerRequestContext.getCookies();
 
-            if (!cookies.containsKey(SecurityConfig.AUTH_COOKIE_NAME))
+            if (!cookies.containsKey(SecurityConfig.AUTH_COOKIE_NAME)) {
                 throw new NotAuthorizedException("Cookie not found");
+            }
 
             Cookie cookie = cookies.get(SecurityConfig.AUTH_COOKIE_NAME);
 

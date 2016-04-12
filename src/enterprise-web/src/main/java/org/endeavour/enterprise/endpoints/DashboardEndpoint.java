@@ -5,6 +5,7 @@ import org.endeavour.enterprise.json.JsonJob;
 import org.endeavour.enterprise.json.JsonJobReport;
 import org.endeavour.enterprise.json.JsonProcessorStatus;
 import org.endeavour.enterprise.utility.MessagingQueueProvider;
+import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
@@ -180,6 +181,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         LOG.trace("startProcessor");
 
         MessagingQueueProvider.getInstance().startProcessor();
+        DbProcessorStatus.setCurrentStatus(ProcessorState.Starting);
 
         clearLogbackMarkers();
 
@@ -198,6 +200,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         LOG.trace("stopProcessor");
 
         MessagingQueueProvider.getInstance().stopProcessor();
+        DbProcessorStatus.setCurrentStatus(ProcessorState.Stopping);
 
         clearLogbackMarkers();
 

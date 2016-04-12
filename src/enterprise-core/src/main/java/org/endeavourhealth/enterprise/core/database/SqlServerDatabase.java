@@ -1163,6 +1163,10 @@ final class SqlServerDatabase implements DatabaseI {
 
     @Override
     public List<DbItem> retrieveLatestItemsForUuids(List<UUID> itemUuids) throws Exception {
+        if (itemUuids.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         String where = "INNER JOIN Definition.ActiveItem a"
                 + " ON a.ItemUuid = " + ALIAS + ".ItemUuid"
                 + " AND a.AuditUuid = " + ALIAS + ".AuditUuid"
@@ -1410,6 +1414,10 @@ final class SqlServerDatabase implements DatabaseI {
 
     @Override
     public List<DbJobReport> retrieveJobReportsForUuids(List<UUID> uuids) throws Exception {
+        if (uuids.isEmpty()) {
+            return new ArrayList<DbJobReport>();
+        }
+
         String where = "WHERE JobReportUuid IN (" + getParameterisedString(uuids) + ")";
         return retrieveForWherePreparedStatement(DbJobReport.class, where, uuids);
     }
@@ -1527,6 +1535,9 @@ final class SqlServerDatabase implements DatabaseI {
 
     @Override
     public List<DbSourceOrganisation> retrieveSourceOrganisationsForOdsCodes(List<String> odsCodes) throws Exception {
+        if (odsCodes.isEmpty()) {
+            return new ArrayList<>();
+        }
         String where = "WHERE OdsCode IN (" + getParameterisedString(odsCodes) + ")";
         return retrieveForWherePreparedStatement(DbSourceOrganisation.class, where, odsCodes);
     }

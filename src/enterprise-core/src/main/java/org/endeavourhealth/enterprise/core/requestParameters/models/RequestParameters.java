@@ -22,7 +22,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="reportUuid" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="baselineDate" type="{http://www.w3.org/2001/XMLSchema}date"/>
+ *         &lt;element name="baselineDate" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/>
  *         &lt;element name="patientType">
  *           &lt;simpleType>
  *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -61,7 +61,6 @@ public class RequestParameters {
 
     @XmlElement(required = true)
     protected String reportUuid;
-    @XmlElement(required = true)
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar baselineDate;
     @XmlElement(required = true)

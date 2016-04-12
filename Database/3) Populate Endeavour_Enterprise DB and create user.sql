@@ -19,6 +19,12 @@ INSERT INTO Execution.Status VALUES (2, 'Failed')
 INSERT INTO Execution.Status VALUES (3, 'NoJobRequests')
 INSERT INTO Execution.Status VALUES (4, 'Cancelled')
 
+INSERT INTO Execution.ProcessorState VALUEs (1, 'Idle')
+INSERT INTO Execution.ProcessorState VALUEs (2, 'Starting')
+INSERT INTO Execution.ProcessorState VALUEs (3, 'Running')
+INSERT INTO Execution.ProcessorState VALUEs (4, 'Stopping')
+
+
 DECLARE @OrgId uniqueIdentifier = NEWID();
 DECLARE @RegularUser uniqueIdentifier = NEWID();
 DECLARE @AdminUser uniqueIdentifier = NEWID();

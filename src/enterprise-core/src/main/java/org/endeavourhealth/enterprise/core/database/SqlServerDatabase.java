@@ -4,6 +4,7 @@ import ch.qos.logback.core.db.dialect.SQLDialectCode;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.administration.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
@@ -65,6 +66,8 @@ final class SqlServerDatabase implements DatabaseI {
 
         try {
             s.execute();
+            connection.commit();
+
         } catch (SQLException sqlEx) {
             LOG.error("Error with SQL {}", sql);
             throw sqlEx;
@@ -640,6 +643,12 @@ final class SqlServerDatabase implements DatabaseI {
                 s.setNull(index++, Types.INTEGER);
             } else {
                 s.setInt(index++, ((ExecutionStatus)o).getValue());
+            }
+        } else if (cls == ProcessorState.class) {
+            if (o == null) {
+                s.setNull(index++, Types.INTEGER);
+            } else {
+                s.setInt(index++, ((ProcessorState)o).getValue());
             }
         } else if (o instanceof List) { //use instanceof in case it's a sub-class of a List
             //if we've been supplied a list, then iterate through, adding each item in the list
@@ -1520,6 +1529,18 @@ final class SqlServerDatabase implements DatabaseI {
     public List<DbSourceOrganisation> retrieveSourceOrganisationsForOdsCodes(List<String> odsCodes) throws Exception {
         String where = "WHERE OdsCode IN (" + getParameterisedString(odsCodes) + ")";
         return retrieveForWherePreparedStatement(DbSourceOrganisation.class, where, odsCodes);
+    }
+
+    @Override
+    public DbProcessorStatus retrieveCurrentProcessorStatus() throws Exception {
+        String where = "WHERE 1=1";
+        return retrieveOneForWherePreparedStatement(DbProcessorStatus.class, where);
+    }
+
+    @Override
+    public void deleteCurrentProcessorStatus() throws Exception {
+        String sql = "DELETE FROM Execution.ProcessorStatus";
+        executeQueryNoResult(sql);
     }
 
 

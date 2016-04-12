@@ -12,6 +12,8 @@ module app.core {
 		getRecentDocumentsData() : ng.IPromise<FolderItem[]>;
 		getEngineState() : ng.IPromise<EngineState>;
 		getReportActivityData() : ng.IPromise<ReportActivityItem[]>;
+		startEngine() : ng.IPromise<any>;
+		stopEngine() : ng.IPromise<any>;
 	}
 
 	export class DashboardService extends BaseHttpService implements IDashboardService {
@@ -37,7 +39,7 @@ module app.core {
 		}
 
 		getEngineState():ng.IPromise<EngineState> {
-			return this.httpGet('app/core/data/enginestate.json');
+			return this.httpGet('api/dashboard/getProcessorStatus');
 		}
 
 		getReportActivityData():ng.IPromise<ReportActivityItem[]> {
@@ -49,6 +51,15 @@ module app.core {
 
 			return this.httpGet('api/dashboard/getReportActivity', request);
 		}
+
+		startEngine() : ng.IPromise<any> {
+			return this.httpPost('api/dashboard/startProcessor');
+		}
+
+		stopEngine() : ng.IPromise<any> {
+			return this.httpPost('api/dashboard/stopProcessor');
+		}
+
 	}
 
 	angular

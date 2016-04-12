@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="database" type="{}database"/>
  *         &lt;element name="webServer" type="{}webServer"/>
+ *         &lt;element name="messagingQueue" type="{}messagingQueue" minOccurs="0"/>
  *         &lt;element name="email" type="{}email" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -32,6 +33,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "config", propOrder = {
     "database",
     "webServer",
+    "messagingQueue",
     "email"
 })
 public class Config {
@@ -40,6 +42,7 @@ public class Config {
     protected Database database;
     @XmlElement(required = true)
     protected WebServer webServer;
+    protected MessagingQueue messagingQueue;
     protected Email email;
 
     /**
@@ -88,6 +91,30 @@ public class Config {
      */
     public void setWebServer(WebServer value) {
         this.webServer = value;
+    }
+
+    /**
+     * Gets the value of the messagingQueue property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link MessagingQueue }
+     *     
+     */
+    public MessagingQueue getMessagingQueue() {
+        return messagingQueue;
+    }
+
+    /**
+     * Sets the value of the messagingQueue property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link MessagingQueue }
+     *     
+     */
+    public void setMessagingQueue(MessagingQueue value) {
+        this.messagingQueue = value;
     }
 
     /**

@@ -4,6 +4,7 @@ import org.endeavour.enterprise.json.JsonFolderContent;
 import org.endeavour.enterprise.json.JsonJob;
 import org.endeavour.enterprise.json.JsonJobReport;
 import org.endeavour.enterprise.json.JsonProcessorStatus;
+import org.endeavour.enterprise.utility.MessagingQueueProvider;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
 import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
@@ -11,6 +12,7 @@ import org.endeavourhealth.enterprise.core.database.definition.DbItem;
 import org.endeavourhealth.enterprise.core.database.execution.DbJob;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobProcessorResult;
 import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.database.execution.DbProcessorStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,7 +153,14 @@ public final class DashboardEndpoint extends AbstractEndpoint {
 
         LOG.trace("getProcessorStatus");
 
-        JsonProcessorStatus ret = new JsonProcessorStatus("Stopped");
+        String desc = null;
+        DbProcessorStatus s = DbProcessorStatus.retrieveCurrentStatus();
+        if (s == null) {
+            desc = "Unknown";
+        } else {
+            desc = s.getStateId().toString();
+        }
+        JsonProcessorStatus ret = new JsonProcessorStatus(desc);
 
         clearLogbackMarkers();
 
@@ -170,6 +179,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
 
         LOG.trace("startProcessor");
 
+        MessagingQueueProvider.getInstance().startProcessor();
+
         clearLogbackMarkers();
 
         return Response
@@ -186,10 +197,15 @@ public final class DashboardEndpoint extends AbstractEndpoint {
 
         LOG.trace("stopProcessor");
 
+        MessagingQueueProvider.getInstance().stopProcessor();
+
         clearLogbackMarkers();
 
         return Response
                 .ok()
                 .build();
     }
+
+
+
 }

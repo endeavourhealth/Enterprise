@@ -35,7 +35,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr class="hover-box show-child-on-hover"
+										<tr class="hover-box show-child-on-hover" style="cursor: pointer"
 												ng-repeat="item in ctrl.itemSummaryList.contents | orderBy:sortField:sortReverse"
 												ng-class="{'selection': item.uuid == ctrl.selectedReport.uuid}"
 												ng-click="ctrl.selectFolderItem(item)">
@@ -78,7 +78,7 @@
 												</tr>
 											</thead>
 											<tbody>
-												<tr class="hover-box"
+												<tr class="hover-box" style="cursor: pointer"
 														ng-repeat="schedule in ctrl.selectedReportSchedules"
 														ng-class="{'selection': schedule.uuid == ctrl.selectedSchedule.uuid}"
 														ng-click="ctrl.selectSchedule(schedule)">

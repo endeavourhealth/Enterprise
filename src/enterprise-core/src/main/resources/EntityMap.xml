@@ -21,9 +21,16 @@
 			<logicalDataType>date</logicalDataType>
 		</field>
 		<field>
+			<logicalName>AGE</logicalName>
+			<displayName>Age</displayName>
+			<index>4</index>
+			<availability>search output</availability>
+			<logicalDataType>float</logicalDataType>
+		</field>
+		<field>
 			<logicalName>SEX</logicalName>
 			<displayName>Sex</displayName>
-			<index>4</index>
+			<index>5</index>
 			<availability>search output</availability>
 			<logicalDataType>dataValues</logicalDataType>
 			<dataValues>
@@ -40,7 +47,7 @@
 		<field>
 			<logicalName>REGISTRATION_DATE</logicalName>
 			<displayName>Registration Date</displayName>
-			<index>5</index>
+			<index>6</index>
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>

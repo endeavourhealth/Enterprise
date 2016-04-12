@@ -58,6 +58,7 @@ begin
 		p.SK_PatientID,
 		o.ServiceProviderCode,
 		p.DateOfBirth,
+		floor( (cast(getdate() as integer) - cast( cast(p.DateOfBirth as datetime) as integer)) / 365.25) as Age,
 		p.Gender,
 		p.DateRegistered
 	from [07T].Patients as p

@@ -3,7 +3,9 @@ package org.endeavourhealth.enterprise.controller;
 import org.endeavourhealth.enterprise.controller.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.core.JsonSerializer;
+import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.execution.DbProcessorStatus;
 import org.endeavourhealth.enterprise.core.queuing.controller.*;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
@@ -58,11 +60,19 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
     }
 
     public synchronized void requestStartNewJob() throws Exception {
-        if (currentJob != null)
-            return;
 
-        currentJob = new ExecutionJob(configuration);
-        currentJob.start();
+        if (currentJob == null) {
+            currentJob = new ExecutionJob(configuration);
+
+            if (currentJob.start())
+                setProcessorStatus(ProcessorState.Running);
+            else {
+                setProcessorStatus(ProcessorState.Idle);
+                currentJob = null;
+            }
+        } else {
+            setProcessorStatus(ProcessorState.Running);
+        }
     }
 
     @Override
@@ -109,6 +119,17 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
             currentJob.stop();
             currentJob = null;
         }
+
+        setProcessorStatus(ProcessorState.Idle);
+    }
+
+    private void setProcessorStatus(ProcessorState state) {
+
+        try {
+            DbProcessorStatus.setCurrentStatus(ProcessorState.Idle);
+        } catch (Exception e) {
+            logger.error("Error while setting processor status" , e);
+        }
     }
 
     @Override
@@ -133,7 +154,7 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
         try {
             requestStartNewJob();
         } catch (Exception e) {
-            logger.error("requestStart failed", e);
+            logger.error("requestStart failed" , e);
         }
     }
 
@@ -152,7 +173,11 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
             if (!messageIsForCurrentJob(payload.getExecutionUuid()))
                 return;
 
-            currentJob.processorNodeComplete(payload);
+            if (currentJob.processorNodeComplete(payload)) {
+                currentJob = null;
+                setProcessorStatus(ProcessorState.Idle);
+            }
+
         } catch (Exception e) {
             logger.error("receiveProcessorNodeCompleteMessage failed", e);
             killCurrentJob();

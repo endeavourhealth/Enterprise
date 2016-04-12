@@ -4,6 +4,7 @@ import org.endeavourhealth.enterprise.controller.configuration.models.Configurat
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobInventory;
 import org.endeavourhealth.enterprise.controller.outputfiles.OutputFileApi;
+import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.execution.*;
 import org.endeavourhealth.enterprise.core.queuing.controller.ControllerQueueProcessorNodeCompleteMessage;
 import org.endeavourhealth.enterprise.core.queuing.controller.ControllerQueueProcessorNodeStartedMessage;
@@ -46,7 +47,7 @@ class ExecutionJob {
         return executionUuid;
     }
 
-    public void start() throws Exception {
+    public boolean start() throws Exception {
         logger.debug("Starting job: " + executionUuid);
 
         clearPreviousJobs();
@@ -55,7 +56,7 @@ class ExecutionJob {
         if (itemRequests.isEmpty()) {
             executionTablesWrapper.createJobAsFinished(ExecutionStatus.NoJobRequests);
             logger.debug("No jobs to run.  Job UUID: " + executionUuid);
-            return;
+            return false;
         }
 
         setPatientStatistics();
@@ -63,7 +64,7 @@ class ExecutionJob {
         if (primaryTableStats.getRecordCount() == 0) {
             executionTablesWrapper.createJobAsFinished(ExecutionStatus.Failed);
             logger.error("Tried to start execution but zero patients to process.  Job UUID: " + executionUuid);
-            return;
+            return false;
         }
 
         jobInventory.initialise(itemRequests);
@@ -73,6 +74,8 @@ class ExecutionJob {
         prepareExecutionTables();
         createAndPopulateWorkerQueue();
         startProcessorNodes();
+
+        return true;
     }
 
     private void prepareOutputFiles() throws Exception {
@@ -160,14 +163,18 @@ class ExecutionJob {
         }
     }
 
-    public void processorNodeComplete(ControllerQueueProcessorNodeCompleteMessage.ProcessorNodeCompletePayload payload) throws Exception {
+    public boolean processorNodeComplete(ControllerQueueProcessorNodeCompleteMessage.ProcessorNodeCompletePayload payload) throws Exception {
         if (!executionUuid.equals(payload.getExecutionUuid()))
-            return;
+            return false;
 
         jobProgressTracker.receivedProcessorNodeCompleteMessage(payload.getProcessorUuid());
 
-        if (jobProgressTracker.isComplete())
+        if (jobProgressTracker.isComplete()) {
             jobFinishedSuccessfully();
+            return true;
+        }
+
+        return false;
     }
 
     public void processorNodeStarted(ControllerQueueProcessorNodeStartedMessage.ProcessorNodeStartedPayload payload) throws Exception {

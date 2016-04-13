@@ -3,8 +3,6 @@ package org.endeavourhealth.enterprise.engine.compiler;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
-import java.util.UUID;
-
 public class CompilerContext {
     private final EntityMapWrapper.EntityMap entityMapWrapper;
     private final CompiledLibrary compiledLibrary;

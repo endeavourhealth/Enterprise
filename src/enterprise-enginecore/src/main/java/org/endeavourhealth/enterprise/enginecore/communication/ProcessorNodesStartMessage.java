@@ -27,6 +27,7 @@ public class ProcessorNodesStartMessage {
         private DatabaseConnectionDetails coreDatabaseConnectionDetails;
         private DatabaseConnectionDetails careRecordDatabaseConnectionDetails;
         private String controllerQueueName;
+        private String streamingFolder;
 
         public UUID getJobUuid() {
             return jobUuid;
@@ -66,6 +67,14 @@ public class ProcessorNodesStartMessage {
 
         public void setControllerQueueName(String controllerQueueName) {
             this.controllerQueueName = controllerQueueName;
+        }
+
+        public String getStreamingFolder() {
+            return streamingFolder;
+        }
+
+        public void setStreamingFolder(String streamingFolder) {
+            this.streamingFolder = streamingFolder;
         }
     }
 

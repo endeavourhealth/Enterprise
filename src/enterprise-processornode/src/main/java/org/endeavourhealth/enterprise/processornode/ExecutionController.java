@@ -36,10 +36,12 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     private final WorkerQueue workerQueue;
     private final UUID processorNodeUuid;
     private final Statistics statistics = new Statistics();
+    private final FileWriter fileWriter;
 
     private ProcessorThreadPoolExecutor executor;
     private WorkerQueueBatchMessage currentWorkerQueueBatch;
     private EngineApi engineApi;
+    private EngineProcessorPool engineProcessorPool;
 
     public ExecutionController(UUID processorNodeUuid, Configuration configuration, ProcessorNodesStartMessage.StartMessagePayload startMessage) throws Exception {
         if (configuration.getExecutionThreads() < 1)
@@ -50,6 +52,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
         this.configuration = configuration;
         this.controllerQueue = createControllerQueue();
         this.workerQueue = createWorkerQueue();
+        this.fileWriter = new FileWriter(startMessage);
     }
 
     private WorkerQueue createWorkerQueue() throws IOException, TimeoutException {
@@ -104,7 +107,7 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     private void createProcessorThreadPoolExecutor(EntityMapWrapper.EntityMap entityMap) {
 
-        EngineProcessorPool engineProcessorPool = new EngineProcessorPool(engineApi, configuration.getExecutionThreads());
+        engineProcessorPool = new EngineProcessorPool(engineApi, configuration.getExecutionThreads());
         DataContainerPool dataContainerPool = new DataContainerPool(configuration.getDataItemBufferSize(), entityMap);
         CareRecordDal careRecordDal = new CareRecordDal(startMessage.getCareRecordDatabaseConnectionDetails(), dataContainerPool, entityMap);
         DataSourceRetriever dataSourceRetriever = new DataSourceRetriever(configuration.getDataItemBufferSize(), careRecordDal, statistics);
@@ -152,6 +155,8 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
                     getJobUuid(),
                     batchMessagePayload.getMinimumId()
             );
+
+            fileWriter.flushFilesToDisk(engineProcessorPool.getAllProcessors());
 
             controllerQueue.sendMessage(message);
             workerQueue.acknowledgePreviousMessage();

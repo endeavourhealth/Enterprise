@@ -2,10 +2,16 @@ package org.endeavourhealth.enterprise.engine;
 
 import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
 import org.endeavourhealth.enterprise.engine.execution.ExecutionContext;
+import org.endeavourhealth.enterprise.engine.execution.listreports.FileContentBuilder;
+import org.endeavourhealth.enterprise.engine.execution.listreports.FileReference;
 import org.endeavourhealth.enterprise.engine.execution.Request;
+import org.endeavourhealth.enterprise.engine.execution.listreports.InMemoryFiles;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Processor {
 
@@ -30,5 +36,9 @@ public class Processor {
                 throw new ExecutionException("Request UUID: " + request.getJobReportUuid(), e);
             }
         }
+    }
+
+    public InMemoryFiles getInMemoryFiles() {
+        return executionContext.getInMemoryFiles();
     }
 }

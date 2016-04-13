@@ -6,11 +6,11 @@ import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery;
 import org.endeavourhealth.enterprise.engine.compiled.ICompiledDataSource;
 import org.endeavourhealth.enterprise.engine.compiled.ICompiledTest;
+import org.endeavourhealth.enterprise.engine.execution.listreports.FileContentBuilder;
+import org.endeavourhealth.enterprise.engine.execution.listreports.InMemoryFiles;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainer;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class ExecutionContext {
 
@@ -26,6 +26,8 @@ public class ExecutionContext {
 
     private final Set<UUID> resolvedDataSources = new HashSet<>();
     private RequestParameters requestParameters;
+
+    private final InMemoryFiles listReportFiles = new InMemoryFiles();
 
     public ExecutionContext(CompiledLibrary compiledLibrary) {
 
@@ -127,5 +129,13 @@ public class ExecutionContext {
 
     public DataContainer getDataContainer() {
         return dataContainer;
+    }
+
+    public FileContentBuilder getFileContentBuilder(UUID jobReportItemUuid, int groupId) {
+        return listReportFiles.getFileContentBuilder(jobReportItemUuid, groupId);
+    }
+
+    public InMemoryFiles getInMemoryFiles() {
+        return listReportFiles;
     }
 }

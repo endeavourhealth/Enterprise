@@ -81,20 +81,23 @@ class FolderBuilder {
 
     private void createFolders() throws Exception {
 
-        if (FileHelper.pathNotExists(configuration.getTemporaryFolder()))
-            throw new Exception("Temporary folder does not exist: " + configuration.getTemporaryFolder());
+        if (FileHelper.pathNotExists(configuration.getStreamingFolder()))
+            throw new Exception("Streaming folder does not exist: " + configuration.getStreamingFolder());
 
-        if (FileHelper.pathNotExists(configuration.getRootFolder()))
-            throw new Exception("Root folder does not exist: " + configuration.getRootFolder());
+        if (FileHelper.pathNotExists(configuration.getWorkingFolder()))
+            throw new Exception("Working folder does not exist: " + configuration.getWorkingFolder());
+
+        if (FileHelper.pathNotExists(configuration.getTargetFolder()))
+            throw new Exception("Target folder does not exist: " + configuration.getTargetFolder());
 
         String jobFolderName = NameHandler.calculateJobName(startDateTime);
         Path branchPath = Paths.get(jobFolderName);
-        Path temporaryFolder = Paths.get(configuration.getTemporaryFolder());
-        temporaryJobFolder = temporaryFolder.resolve(branchPath);
+        Path workingFolder = Paths.get(configuration.getWorkingFolder());
+        temporaryJobFolder = workingFolder.resolve(branchPath);
 
         FileHelper.createFolder(temporaryJobFolder);
 
-        addBranchPaths(temporaryFolder, branchPath, folders);
+        addBranchPaths(workingFolder, branchPath, folders);
         setFileInfo(folders);
     }
 

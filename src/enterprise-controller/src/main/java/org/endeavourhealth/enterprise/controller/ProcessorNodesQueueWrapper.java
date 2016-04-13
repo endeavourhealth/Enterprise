@@ -32,6 +32,7 @@ class ProcessorNodesQueueWrapper {
         payload.setCoreDatabaseConnectionDetails(coreDatabaseConnectionDetails);
         payload.setCareRecordDatabaseConnectionDetails(careRecordDatabaseConnectionDetails);
         payload.setControllerQueueName(configuration.getMessageQueuing().getControllerQueueName());
+        payload.setStreamingFolder(configuration.getOutputFiles().getStreamingFolder());
 
         ProcessorNodesStartMessage message = ProcessorNodesStartMessage.CreateAsNew(payload);
 

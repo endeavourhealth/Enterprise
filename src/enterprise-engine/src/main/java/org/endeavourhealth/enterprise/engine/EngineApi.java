@@ -10,6 +10,7 @@ import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledReport;
 import org.endeavourhealth.enterprise.engine.compiler.CompilerApi;
 import org.endeavourhealth.enterprise.engine.execution.Request;
+import org.endeavourhealth.enterprise.engine.execution.listreports.FileReference;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 import org.endeavourhealth.enterprise.enginecore.resultcounts.models.*;
 

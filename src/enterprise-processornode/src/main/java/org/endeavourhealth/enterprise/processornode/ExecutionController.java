@@ -151,12 +151,12 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
             WorkerQueueBatchMessage.BatchMessagePayload batchMessagePayload = currentWorkerQueueBatch.getPayload();
 
+            fileWriter.flushFilesToDisk(engineProcessorPool.getAllProcessors(), batchMessagePayload.getMinimumId());
+
             ControllerQueueWorkItemCompleteMessage message = ControllerQueueWorkItemCompleteMessage.CreateAsNew(
                     getJobUuid(),
                     batchMessagePayload.getMinimumId()
             );
-
-            fileWriter.flushFilesToDisk(engineProcessorPool.getAllProcessors());
 
             controllerQueue.sendMessage(message);
             workerQueue.acknowledgePreviousMessage();

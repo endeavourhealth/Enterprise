@@ -2,10 +2,12 @@ package org.endeavourhealth.enterprise.engine.execution;
 
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.engine.ExecutionException;
+import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledLibrary;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledQuery;
 import org.endeavourhealth.enterprise.engine.compiled.ICompiledDataSource;
 import org.endeavourhealth.enterprise.engine.compiled.ICompiledTest;
+import org.endeavourhealth.enterprise.engine.compiled.listreports.CompiledListReport;
 import org.endeavourhealth.enterprise.engine.execution.listreports.FileContentBuilder;
 import org.endeavourhealth.enterprise.engine.execution.listreports.InMemoryFiles;
 import org.endeavourhealth.enterprise.enginecore.entities.model.DataContainer;
@@ -78,6 +80,11 @@ public class ExecutionContext {
 
             return result;
         }
+    }
+
+    public void executeListReport(UUID itemUuid, UUID jobReportItemUuid) throws Exception {
+        CompiledListReport compiledListReport = compiledLibrary.getCompiledListReport(itemUuid);
+        compiledListReport.execute(this, jobReportItemUuid);
     }
 
     public ICompiledDataSource getDataSourceResult(UUID dataSourceUuid) throws Exception {

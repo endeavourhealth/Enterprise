@@ -79,7 +79,7 @@ class ExecutionJob {
     }
 
     private void prepareOutputFiles() throws Exception {
-        outputFileApi = new OutputFileApi(configuration.getOutputFiles(), jobInventory, startDateTime);
+        outputFileApi = new OutputFileApi(configuration.getOutputFiles(), jobInventory, getExecutionUuid(), startDateTime);
         outputFileApi.prepareFiles();
     }
 

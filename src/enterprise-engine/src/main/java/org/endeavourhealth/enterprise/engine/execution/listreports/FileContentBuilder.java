@@ -8,8 +8,10 @@ public class FileContentBuilder {
     private boolean isFirstColumn = true;
 
     public void newRow() {
-        if (isFirstRow)
+        if (isFirstRow) {
             isFirstRow = false;
+            isFirstColumn = true;
+        }
         else
             stringBuilder.append('\n');
     }
@@ -28,6 +30,16 @@ public class FileContentBuilder {
     }
 
     public void clear() {
+        isFirstRow = true;
+        isFirstColumn = true;
         stringBuilder.setLength(0);
+    }
+
+    public String getContent() {
+        return stringBuilder.toString();
+    }
+
+    public boolean hasContent() {
+        return stringBuilder.length() > 0;
     }
 }

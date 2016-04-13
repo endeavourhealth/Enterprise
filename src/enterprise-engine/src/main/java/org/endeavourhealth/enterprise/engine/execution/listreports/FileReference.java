@@ -23,4 +23,12 @@ public class FileReference {
     public FileContentBuilder getFileContentBuilder() {
         return fileContentBuilder;
     }
+
+    public boolean hasContent() {
+        return fileContentBuilder.hasContent();
+    }
+
+    public void clearContent() {
+        fileContentBuilder.clear();
+    }
 }

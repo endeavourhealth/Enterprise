@@ -12,6 +12,12 @@ public class ListReportOutputFieldContainer {
     }
 
     public String getResult(ICompiledDataSource dataSource, int rowIndex) {
-        return listReportOutputField.getResult(dataSource.getValue(rowIndex, sourceFieldIndex));
+
+        Object value = dataSource.getValue(rowIndex, sourceFieldIndex);
+
+        if (value == null)
+            return null;
+        else
+            return listReportOutputField.getResult(dataSource.getValue(rowIndex, sourceFieldIndex));
     }
 }

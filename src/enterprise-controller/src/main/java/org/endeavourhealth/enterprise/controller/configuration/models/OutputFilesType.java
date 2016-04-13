@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element name="ftpConnection" type="{}ftpConnection" minOccurs="0"/>
  *         &lt;element name="streamingFolder" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="workingFolder" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="targetFolder" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -30,18 +31,44 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "outputFilesType", propOrder = {
+    "ftpConnection",
     "streamingFolder",
     "workingFolder",
     "targetFolder"
 })
 public class OutputFilesType {
 
+    protected FtpConnection ftpConnection;
     @XmlElement(required = true)
     protected String streamingFolder;
     @XmlElement(required = true)
     protected String workingFolder;
     @XmlElement(required = true)
     protected String targetFolder;
+
+    /**
+     * Gets the value of the ftpConnection property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FtpConnection }
+     *     
+     */
+    public FtpConnection getFtpConnection() {
+        return ftpConnection;
+    }
+
+    /**
+     * Sets the value of the ftpConnection property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link FtpConnection }
+     *     
+     */
+    public void setFtpConnection(FtpConnection value) {
+        this.ftpConnection = value;
+    }
 
     /**
      * Gets the value of the streamingFolder property.

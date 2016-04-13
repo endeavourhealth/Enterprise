@@ -64,7 +64,7 @@ public class CompiledReport {
         }
     }
 
-    private void executeReportList(List<CompiledReportListReport> listReports, ExecutionContext context) {
+    private void executeReportList(List<CompiledReportListReport> listReports, ExecutionContext context) throws Exception {
         for (CompiledReportListReport report: listReports) {
             report.execute(context);
         }
@@ -86,14 +86,9 @@ public class CompiledReport {
             this.jobReportItemUuid = jobReportItemUuid;
         }
 
-        public boolean execute() {
-            return true;
-        }
-
         public UUID getQueryUuid() {
             return queryUuid;
         }
-
         public UUID getJobReportItemUuid() {
             return jobReportItemUuid;
         }
@@ -111,8 +106,8 @@ public class CompiledReport {
             this.jobReportItemUuid = jobReportItemUuid;
         }
 
-        public void execute(ExecutionContext context) {
-
+        public void execute(ExecutionContext context) throws Exception {
+            context.executeListReport(listReportUuid, jobReportItemUuid);
         }
     }
 }

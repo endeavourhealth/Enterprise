@@ -2,6 +2,7 @@ package org.endeavourhealth.enterprise.controller;
 
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.controller.configuration.models.Configuration;
+import org.endeavourhealth.enterprise.core.FtpWrapper;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodesExchange;
 import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodesStartMessage;
@@ -9,6 +10,8 @@ import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodesSto
 import org.endeavourhealth.enterprise.enginecore.communication.WorkerQueue;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 class ProcessorNodesQueueWrapper {
@@ -32,7 +35,18 @@ class ProcessorNodesQueueWrapper {
         payload.setCoreDatabaseConnectionDetails(coreDatabaseConnectionDetails);
         payload.setCareRecordDatabaseConnectionDetails(careRecordDatabaseConnectionDetails);
         payload.setControllerQueueName(configuration.getMessageQueuing().getControllerQueueName());
-        payload.setStreamingFolder(configuration.getOutputFiles().getStreamingFolder());
+
+        Path path = Paths.get(configuration.getOutputFiles().getStreamingFolder(), executionUuid.toString());
+        payload.setStreamingFolder(path.toString());
+
+        if (configuration.getOutputFiles().getFtpConnection() != null) {
+            FtpWrapper.FtpConnectionDetails ftpConnectionDetails = new FtpWrapper.FtpConnectionDetails(
+                    configuration.getOutputFiles().getFtpConnection().getHost(),
+                    configuration.getOutputFiles().getFtpConnection().getUsername(),
+                    configuration.getOutputFiles().getFtpConnection().getPassword());
+
+            payload.setFtpConnectionDetails(ftpConnectionDetails);
+        }
 
         ProcessorNodesStartMessage message = ProcessorNodesStartMessage.CreateAsNew(payload);
 

@@ -11,19 +11,27 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 class FolderBuilder {
     private final JobInventory jobInventory;
     private final List<Folder> folders;
     private final OutputFilesType configuration;
+    private final UUID jobUuid;
     private final Instant startDateTime;
     private Path temporaryJobFolder;
 
-    public FolderBuilder(JobInventory jobInventory, List<Folder> folders, OutputFilesType configuration, Instant startDateTime) {
+    public FolderBuilder(
+            JobInventory jobInventory,
+            List<Folder> folders,
+            OutputFilesType configuration,
+            UUID jobUuid,
+            Instant startDateTime) {
 
         this.jobInventory = jobInventory;
         this.folders = folders;
         this.configuration = configuration;
+        this.jobUuid = jobUuid;
         this.startDateTime = startDateTime;
     }
 
@@ -84,8 +92,14 @@ class FolderBuilder {
         if (FileHelper.pathNotExists(configuration.getStreamingFolder()))
             throw new Exception("Streaming folder does not exist: " + configuration.getStreamingFolder());
 
+        Path completeStreamingFolder = Paths.get(configuration.getStreamingFolder(), jobUuid.toString());
+        FileHelper.createFolder(completeStreamingFolder);
+
         if (FileHelper.pathNotExists(configuration.getWorkingFolder()))
             throw new Exception("Working folder does not exist: " + configuration.getWorkingFolder());
+
+        Path completeWorkingFolder = Paths.get(configuration.getWorkingFolder(), jobUuid.toString());
+        FileHelper.createFolder(completeWorkingFolder);
 
         if (FileHelper.pathNotExists(configuration.getTargetFolder()))
             throw new Exception("Target folder does not exist: " + configuration.getTargetFolder());

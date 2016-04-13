@@ -75,9 +75,9 @@ public class CompiledLibrary {
         return (ICompiledTest)item.getCompiledItem();
     }
 
-    public ICompiledTest getCompiledListReport(UUID listReportUuid) throws UnableToCompileExpection {
+    public CompiledListReport getCompiledListReport(UUID listReportUuid) throws UnableToCompileExpection {
         CompiledLibraryItem item = getCompiledLibraryItem(listReportUuid, "ListReport");
-        return (ICompiledTest)item.getCompiledItem();
+        return (CompiledListReport)item.getCompiledItem();
     }
 
     public boolean isItemOfTypeQuery(UUID itemUuid) throws UnableToCompileExpection {

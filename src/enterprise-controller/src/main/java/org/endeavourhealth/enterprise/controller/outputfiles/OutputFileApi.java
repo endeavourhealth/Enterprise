@@ -10,11 +10,13 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class OutputFileApi {
 
     private final OutputFilesType configuration;
     private final JobInventory jobInventory;
+    private final UUID jobUuid;
     private final Instant startDateTime;
     private List<JobReportItemInfo> listReports;
     private final List<Folder> folders = new ArrayList<>();
@@ -24,10 +26,12 @@ public class OutputFileApi {
     public OutputFileApi(
             OutputFilesType configuration,
             JobInventory jobInventory,
+            UUID jobUuid,
             Instant startDateTime) throws Exception {
 
         this.configuration = configuration;
         this.jobInventory = jobInventory;
+        this.jobUuid = jobUuid;
         this.startDateTime = startDateTime;
     }
 
@@ -49,7 +53,7 @@ public class OutputFileApi {
 
     private void populateFolders() throws Exception {
 
-        FolderBuilder folderBuilder = new FolderBuilder(jobInventory, folders, configuration, startDateTime);
+        FolderBuilder folderBuilder = new FolderBuilder(jobInventory, folders, configuration, jobUuid, startDateTime);
         folderBuilder.build();
 
         temporaryJobFolder = folderBuilder.getTemporaryJobFolder();

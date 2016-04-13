@@ -63,7 +63,7 @@ public class ListReportCompiler {
 
     private ListReportOutputFieldContainer compileField(
             FieldOutput source,
-            ICompiledDataSource dataSource) throws EntityMapException {
+            ICompiledDataSource dataSource) throws EntityMapException, UnableToCompileExpection {
 
         int fieldIndex = dataSource.getFieldIndex(source.getField());
         Field field = dataSource.getField(fieldIndex);

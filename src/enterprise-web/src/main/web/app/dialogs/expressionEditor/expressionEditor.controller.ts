@@ -47,7 +47,7 @@ module app.dialogs {
         sortorders = ['','ASCENDING','DESCENDING'];
         periods = ['DAYS','WEEKS','MONTHS','YEARS'];
         labels = ['A','B'];
-        operators = ['+','-','=','<','>','<=','>='];
+        operators = ['+','-','=','<','>','<=','>=','AND'];
         rules = <any>[];
         fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
         functions = ['','AVERAGE','COUNT','MINIMUM','MAXIMUM'];

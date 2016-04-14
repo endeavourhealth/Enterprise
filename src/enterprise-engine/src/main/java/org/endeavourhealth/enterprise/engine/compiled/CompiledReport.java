@@ -12,7 +12,7 @@ public class CompiledReport {
     private final Set<String> allowedOrganisations;
 
     private final ResultCounter reportLevelResults;
-    private final Map<UUID, ResultCounter> queryResults = new HashMap<>();
+    private final Map<UUID, ResultCounter> jobReportItemResults = new HashMap<>();
 
     public CompiledReport(
             Set<String> allowedOrganisations,
@@ -26,15 +26,25 @@ public class CompiledReport {
         reportLevelResults = new ResultCounter(allowedOrganisations);
 
         initialiseQueryResults(rootQueries);
+        initialiseListReportResults(rootListReports);
     }
 
     private void initialiseQueryResults(List<CompiledReportQuery> queries) {
 
         for (CompiledReportQuery query: queries) {
-            queryResults.put(query.getJobReportItemUuid(), new ResultCounter(allowedOrganisations));
+            jobReportItemResults.put(query.getJobReportItemUuid(), new ResultCounter(allowedOrganisations));
 
-            if (query.getChildQueries() != null)
+            if (query.getChildQueries() != null) {
                 initialiseQueryResults(query.getChildQueries());
+                initialiseListReportResults(query.getChildListReports());
+            }
+        }
+    }
+
+    private void initialiseListReportResults(List<CompiledReportListReport> reports) {
+
+        for (CompiledReportListReport report: reports) {
+            jobReportItemResults.put(report.getJobReportItemUuid(), new ResultCounter(allowedOrganisations));
         }
     }
 
@@ -56,7 +66,7 @@ public class CompiledReport {
         for (CompiledReportQuery query: queries) {
             if (context.getQueryResult(query.getQueryUuid())) {
 
-                queryResults.get(query.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationOds());
+                jobReportItemResults.get(query.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationOds());
 
                 executeQueryList(query.childQueries, context);
                 executeReportList(query.childListReports, context);
@@ -66,13 +76,15 @@ public class CompiledReport {
 
     private void executeReportList(List<CompiledReportListReport> listReports, ExecutionContext context) throws Exception {
         for (CompiledReportListReport report: listReports) {
+            jobReportItemResults.get(report.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationOds());
             report.execute(context);
         }
     }
 
-    public Map<UUID, ResultCounter> getQueryResults() {
-        return queryResults;
+    public Map<UUID, ResultCounter> getJobReportItemResults() {
+        return jobReportItemResults;
     }
+
     public ResultCounter getReportLevelResults() { return reportLevelResults; }
 
     public static class CompiledReportQuery {
@@ -108,6 +120,10 @@ public class CompiledReport {
 
         public void execute(ExecutionContext context) throws Exception {
             context.executeListReport(listReportUuid, jobReportItemUuid);
+        }
+
+        public UUID getJobReportItemUuid() {
+            return jobReportItemUuid;
         }
     }
 }

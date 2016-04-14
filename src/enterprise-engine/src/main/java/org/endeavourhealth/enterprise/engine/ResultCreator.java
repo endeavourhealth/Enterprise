@@ -27,7 +27,7 @@ class ResultCreator {
             resultCountBuilder.startNewJobReportResult(request.getJobReportUuid());
 
             populateJobResults(compiledReport.getReportLevelResults());
-            populateJobItemResults(compiledReport.getQueryResults());
+            populateJobItemResults(compiledReport.getJobReportItemResults());
         }
 
         return resultCountBuilder.build();

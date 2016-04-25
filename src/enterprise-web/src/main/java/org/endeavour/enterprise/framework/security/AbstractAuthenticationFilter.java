@@ -1,26 +1,28 @@
 package org.endeavour.enterprise.framework.security;
 
 import org.endeavour.enterprise.framework.exceptions.NotAuthorizedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Map;
 
 @Priority(Priorities.AUTHENTICATION)
-public final class AuthenticationFilter implements ContainerRequestFilter {
+public abstract class AbstractAuthenticationFilter implements ContainerRequestFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractAuthenticationFilter.class);
 
-    private boolean requiresAdmin = false;
-    private boolean requiresSuperUser = false;
+    @Context
+    protected HttpServletRequest request;
 
-    public AuthenticationFilter(boolean requiresAdmin, boolean requiresSuperUser) {
-        this.requiresAdmin = requiresAdmin;
-        this.requiresSuperUser = requiresSuperUser;
-    }
+    public AbstractAuthenticationFilter() {}
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
@@ -35,12 +37,16 @@ public final class AuthenticationFilter implements ContainerRequestFilter {
 
             String tokenString = cookie.getValue();
 
-            UserContext userContext = TokenHelper.validateToken(tokenString);
+            UserContext userContext = TokenHelper.parseUserContextFromToken(request, tokenString);
 
+            //let our sub-classes perform additional validation
+            doSpecificAuthoriationCheck(userContext);
 
             containerRequestContext.setSecurityContext(new UserSecurityContext(userContext));
         } catch (Exception e) {
             containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }
+
+    public abstract void doSpecificAuthoriationCheck(UserContext cx) throws NotAuthorizedException;
 }

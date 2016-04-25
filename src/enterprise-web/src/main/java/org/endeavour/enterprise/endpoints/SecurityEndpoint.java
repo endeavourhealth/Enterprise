@@ -82,11 +82,12 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         JsonOrganisationList ret = ret = new JsonOrganisationList();
         DbOrganisation orgToAutoSelect = null;
-        Boolean isAdminForAutoSelect = null;
+        boolean isAdminForAutoSelect = false;
+        boolean isSuperUser = user.isSuperUser();
 
         //now see what organisations the person can access
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
-        if (user.isSuperUser()) {
+        if (isSuperUser) {
             List<DbOrganisation> orgs = DbOrganisation.retrieveForAll();
 
             for (int i = 0; i < orgs.size(); i++) {
@@ -98,7 +99,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 //if there's only one organisation, automatically select it
                 if (orgs.size() == 1) {
                     orgToAutoSelect = o;
-                    isAdminForAutoSelect = new Boolean(true);
+                    isAdminForAutoSelect = true;
                 }
             }
         }
@@ -113,13 +114,13 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 DbOrganisationEndUserLink orgLink = orgLinks.get(i);
                 UUID orgUuid = orgLink.getOrganisationUuid();
                 DbOrganisation o = DbOrganisation.retrieveForUuid(orgUuid);
-                Boolean isAdmin = new Boolean(orgLink.isAdmin());
+                Boolean isAdmin = orgLink.isAdmin();
                 ret.add(o, isAdmin);
 
                 //if there's only one organisation, automatically select it
                 if (orgLinks.size() == 1) {
                     orgToAutoSelect = o;
-                    isAdminForAutoSelect = new Boolean(isAdmin);
+                    isAdminForAutoSelect = isAdmin;
                 }
             }
         }
@@ -127,7 +128,9 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         //set the user details in the return object as well
         ret.setUser(new JsonEndUser(user, null, mustChangePassword));
 
-        NewCookie cookie = TokenHelper.createTokenAsCookie(user, orgToAutoSelect, isAdminForAutoSelect);
+        String host = TokenHelper.getRequestingHostFromRequest(request);
+
+        NewCookie cookie = TokenHelper.createTokenAsCookie(host, user, orgToAutoSelect, isAdminForAutoSelect, isSuperUser);
 
         clearLogbackMarkers();
 
@@ -159,11 +162,13 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             throw new BadRequestException("Invalid organisation " + orgUuid);
         }
 
+        DbEndUser user = getEndUserFromSession(sc);
+
         //validate the person can log on there
         boolean isAdmin = false;
+        boolean isSuperUser = user.isSuperUser();
 
-        DbEndUser user = getEndUserFromSession(sc);
-        if (user.isSuperUser()) {
+        if (isSuperUser) {
             //super users are always admin
             isAdmin = true;
         } else {
@@ -184,8 +189,10 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             isAdmin = link.isAdmin();
         }
 
+        String host = getRequestingHostFromSecurityContext(sc);
+
         //issue a new cookie, with the newly selected organisation
-        NewCookie cookie = TokenHelper.createTokenAsCookie(endUser, org, isAdmin);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(host, endUser, org, isAdmin, isSuperUser);
 
         //return the full org details and the user's role at this place
         JsonOrganisation ret = new JsonOrganisation(org, isAdmin);
@@ -210,7 +217,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         LOG.trace("Logoff");
 
         //replace the cookie on the client with an empty one
-        NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, false);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(null, null, null, false, false);
 
         clearLogbackMarkers();
 
@@ -260,11 +267,14 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         DbOrganisationEndUserLink link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, userUuid);
         boolean isAdmin = link.isAdmin();
 
+        boolean isSuperUser = isSuperUserFromSecurityContext(sc);
+        String host = getRequestingHostFromSecurityContext(sc);
+
         //create cookie
         DbEndUser user = DbEndUser.retrieveForUuid(userUuid);
         DbOrganisation org = getOrganisationFromSession(sc);
 
-        NewCookie cookie = TokenHelper.createTokenAsCookie(user, org, isAdmin);
+        NewCookie cookie = TokenHelper.createTokenAsCookie(host, user, org, isAdmin, isSuperUser);
 
         clearLogbackMarkers();
 

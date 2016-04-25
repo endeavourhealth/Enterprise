@@ -196,14 +196,18 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         for (DbRequest request: requests) {
 
+            String parameterXml = request.getParameters();
             DbJob job = null;
+
             DbJobReport jobReport = hmJobReportsByUuid.get(request.getJobReportUuid());
             if (jobReport != null) {
+                parameterXml = jobReport.getParameters(); //if our request has been run, use the parameters of when it was run
                 job = hmJobsByUuid.get(jobReport.getJobUuid());
             }
+
             DbEndUser user = hmUsersByUuid.get(request.getEndUserUuid());
 
-            ret.add(new JsonReportRequest(request, job, user));
+            ret.add(new JsonReportRequest(request, job, user, parameterXml));
         }
 
         clearLogbackMarkers();

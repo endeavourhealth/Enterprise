@@ -149,7 +149,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         DbEndUser userLoggedOn = getEndUserFromSession(sc);
         if (uuid == null
                 || !userLoggedOn.getEndUserUuid().equals(uuid)) {
-            if (!isAdminFromSession(sc)) {
+            if (!isAdminFromSecurityContext(sc)) {
                 throw new NotAuthorizedException("Must be an admin to create new users or amend others");
             }
         }
@@ -366,7 +366,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         super.setLogbackMarkers(sc);
 
         //first, verify the user is an admin
-        boolean isAdmin = super.isAdminFromSession(sc);
+        boolean isAdmin = super.isAdminFromSecurityContext(sc);
         if (!isAdmin) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
@@ -487,7 +487,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         super.setLogbackMarkers(sc);
 
         //first, verify the user is an admin
-        boolean isAdmin = super.isAdminFromSession(sc);
+        boolean isAdmin = super.isAdminFromSecurityContext(sc);
         if (!isAdmin) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }

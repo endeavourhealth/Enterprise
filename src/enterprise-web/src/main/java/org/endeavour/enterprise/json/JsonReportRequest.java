@@ -23,9 +23,8 @@ public final class JsonReportRequest {
 
     public JsonReportRequest() { }
 
-    public JsonReportRequest(DbRequest request, DbJob job, DbEndUser user) throws Exception {
+    public JsonReportRequest(DbRequest request, DbJob job, DbEndUser user, String parameterXml) throws Exception {
 
-        String xml = request.getParameters();
         String status = "Scheduled";
         if (job != null) {
             status = job.getStatusId().toString();
@@ -37,7 +36,7 @@ public final class JsonReportRequest {
         this.status = status;
         this.endUserUuid = request.getEndUserUuid();
         this.endUserName = userName;
-        this.parameters = RequestParametersSerializer.readFromXml(xml);
+        this.parameters = RequestParametersSerializer.readFromXml(parameterXml);
     }
 
     /**

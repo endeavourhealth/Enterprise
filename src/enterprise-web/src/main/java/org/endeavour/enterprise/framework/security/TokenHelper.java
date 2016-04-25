@@ -8,6 +8,7 @@ import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
 import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
 
 import javax.naming.AuthenticationException;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.NewCookie;
 import java.time.Instant;
 import java.util.*;
@@ -17,16 +18,17 @@ public class TokenHelper {
     private static final String TOKEN_TYPE_JWT = "JWT";
     private static final String TOKEN_ISSUED_AT = "iat";
     private static final String TOKEN_USER = "usr";
-    private static final String TOKEN_ROLE = "rol";
+    private static final String TOKEN_ROLE_ADMIN = "adm";
+    private static final String TOKEN_ROLE_SUPER = "spr";
     private static final String TOKEN_ORGANISATION = "org";
+    private static final String TOKEN_HOST = "hst";
 
-
-    public static NewCookie createTokenAsCookie(DbEndUser person, DbOrganisation org, boolean isAdmin) {
-        String token = createToken(person, org, isAdmin);
+    public static NewCookie createTokenAsCookie(String host, DbEndUser person, DbOrganisation org, boolean isAdmin, boolean isSuperUser) {
+        String token = createToken(host, person, org, isAdmin, isSuperUser);
         return createCookie(token);
     }
 
-    private static String createToken(DbEndUser person, DbOrganisation org, boolean isAdmin) {
+    private static String createToken(String host, DbEndUser person, DbOrganisation org, boolean isAdmin, boolean isSuperUser) {
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
 
@@ -35,10 +37,13 @@ public class TokenHelper {
             bodyParameterMap.put(TOKEN_USER, person.getEndUserUuid());
         }
 
+        bodyParameterMap.put(TOKEN_HOST, host);
+        bodyParameterMap.put(TOKEN_ROLE_ADMIN, isAdmin);
+        bodyParameterMap.put(TOKEN_ROLE_SUPER, isSuperUser);
+
         //if the person has multiple orgs they can log on to, then we may pass in null until they select one
         if (org != null) {
             bodyParameterMap.put(TOKEN_ORGANISATION, org.getOrganisationUuid());
-            bodyParameterMap.put(TOKEN_ROLE, isAdmin);
         }
 
         JwtBuilder builder = Jwts.builder()
@@ -66,7 +71,7 @@ public class TokenHelper {
                 false);
     }
 
-    public static UserContext validateToken(String token) throws Exception {
+    public static UserContext parseUserContextFromToken(HttpServletRequest request, String token) throws Exception {
         Claims claims = Jwts
                 .parser()
                 .setSigningKey(SecurityConfig.TOKEN_SIGNING_SECRET)
@@ -81,22 +86,37 @@ public class TokenHelper {
             throw new AuthenticationException("Token expired");
         }
 
-        //a token will ALWAYS have a user ID, unless we've logged the user off, in which case this'll cause a
-        //null pointer and fail validation
-        UUID userUuid = UUID.fromString((String) claims.get(TOKEN_USER));
-
-        //a token may not have an orgaisation selected, if they have access to multiple organisations
-        //but haven't selected one to operate at yet
-        UUID organisationUuid = null;
-        boolean isAdmin = false;
-
-        String orgUuidStr = (String) claims.get(TOKEN_ORGANISATION);
-        if (orgUuidStr != null) {
-            organisationUuid = UUID.fromString(orgUuidStr);
-            isAdmin = ((Boolean)claims.get(TOKEN_ROLE)).booleanValue();
+        String userUuidStr = (String)claims.get(TOKEN_USER);
+        if (userUuidStr == null) {
+            throw new AuthenticationException("User logged off");
         }
 
-        return new UserContext(userUuid, organisationUuid, isAdmin, tokenIssued);
+        UUID userUuid = UUID.fromString(userUuidStr);
+        String host = (String)claims.get(TOKEN_HOST);
+        boolean isAdmin = ((Boolean)claims.get(TOKEN_ROLE_ADMIN)).booleanValue();;
+        boolean isSuperUser = ((Boolean)claims.get(TOKEN_ROLE_SUPER)).booleanValue();;
+
+        //users may not have an org selected
+        UUID organisationUuid = null;
+        String orgUuidStr = (String)claims.get(TOKEN_ORGANISATION);
+        if (orgUuidStr != null) {
+            organisationUuid = UUID.fromString(orgUuidStr);
+        }
+
+        String requestingHost = getRequestingHostFromRequest(request);
+        if (!host.equals(requestingHost)) {
+            throw new AuthenticationException("Host IP changed");
+        }
+
+        return new UserContext(host, userUuid, organisationUuid, isAdmin, isSuperUser, tokenIssued);
+    }
+
+    public static String getRequestingHostFromRequest(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-FORWARDED-FOR"); //get the true source of the request, even if behind a proxy
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
     }
 
 }

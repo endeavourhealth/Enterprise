@@ -6,6 +6,6 @@ public final class UserAuthenticationFilter extends AbstractAuthenticationFilter
 
     @Override
     public void doSpecificAuthoriationCheck(UserContext cx) throws NotAuthorizedException {
-        //this implementation has no extra checks
+        //this implementation has no extra checks other than having a signed on user
     }
 }

@@ -1,5 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavour.enterprise.framework.security.RequiresAdmin;
+import org.endeavour.enterprise.framework.security.RequiresSuperUser;
 import org.endeavour.enterprise.json.JsonFolderContent;
 import org.endeavour.enterprise.json.JsonJob;
 import org.endeavour.enterprise.json.JsonJobReport;
@@ -125,6 +127,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/testDatabase")
+    @RequiresSuperUser
     public Response testDatabase(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
 
@@ -175,6 +178,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/startProcessor")
+    @RequiresAdmin
     public Response startProcessor(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
 
@@ -194,6 +198,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/stopProcessor")
+    @RequiresAdmin
     public Response stopProcessor(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
 

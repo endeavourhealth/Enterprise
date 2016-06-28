@@ -2,6 +2,8 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.framework.security.PasswordHash;
+import org.endeavour.enterprise.framework.security.RequiresAdmin;
+import org.endeavour.enterprise.framework.security.RequiresSuperUser;
 import org.endeavour.enterprise.json.JsonEndUser;
 import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
@@ -35,6 +37,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveOrganisation")
+    @RequiresSuperUser
     public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Exception {
         super.setLogbackMarkers(sc);
 
@@ -362,14 +365,9 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteUser")
+    @RequiresAdmin
     public Response deleteUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
         super.setLogbackMarkers(sc);
-
-        //first, verify the user is an admin
-        boolean isAdmin = super.isAdminFromSecurityContext(sc);
-        if (!isAdmin) {
-            throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
-        }
 
         //userParameters
         UUID userUuid = userParameters.getUuid();
@@ -483,14 +481,9 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/resendInviteEmail")
+    @RequiresAdmin
     public Response resendInviteEmail(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
         super.setLogbackMarkers(sc);
-
-        //first, verify the user is an admin
-        boolean isAdmin = super.isAdminFromSecurityContext(sc);
-        if (!isAdmin) {
-            throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
-        }
 
         //userParameters
         UUID userUuid = userParameters.getUuid();

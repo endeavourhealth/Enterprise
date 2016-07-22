@@ -5,8 +5,8 @@ import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.UserPrincipal;
 import org.endeavour.enterprise.framework.security.UserContext;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
-import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.models.EnduserEntity;
+import org.endeavourhealth.enterprise.core.database.models.OrganisationEntity;
 import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,9 +39,9 @@ public abstract class AbstractEndpoint {
     }
 
 
-    protected DbEndUser getEndUserFromSession(SecurityContext sc) throws Exception {
+    protected EnduserEntity getEndUserFromSession(SecurityContext sc) throws Exception {
         UUID uuid = getEndUserUuidFromToken(sc);
-        return DbEndUser.retrieveForUuid(uuid);
+        return EnduserEntity.retrieveForUuid(uuid);
     }
 
     protected UUID getEndUserUuidFromToken(SecurityContext sc) {
@@ -53,9 +53,9 @@ public abstract class AbstractEndpoint {
         return uc.getUserUuid();
     }
 
-    protected DbOrganisation getOrganisationFromSession(SecurityContext sc) throws Exception {
+    protected OrganisationEntity getOrganisationFromSession(SecurityContext sc) throws Exception {
         UUID uuid = getOrganisationUuidFromToken(sc);
-        return DbOrganisation.retrieveForUuid(uuid);
+        return OrganisationEntity.retrieveForUuid(uuid);
     }
 
     protected UUID getOrganisationUuidFromToken(SecurityContext sc) throws Exception {

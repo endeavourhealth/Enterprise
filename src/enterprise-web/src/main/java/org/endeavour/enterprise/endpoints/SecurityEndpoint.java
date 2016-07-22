@@ -7,12 +7,14 @@ import org.endeavour.enterprise.framework.security.TokenHelper;
 import org.endeavour.enterprise.framework.security.Unsecured;
 import org.endeavour.enterprise.json.*;
 import org.endeavourhealth.enterprise.core.database.*;
-import org.endeavourhealth.enterprise.core.database.administration.*;
+
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -43,55 +45,57 @@ public final class SecurityEndpoint extends AbstractEndpoint {
             throw new BadRequestException("Missing username or password in request");
         }
 
-        DbEndUser user = DbEndUser.retrieveForEmail(email);
+        EnduserEntity user = EnduserEntity.retrieveForEmail(email);
+
         if (user == null) {
             throw new NotAuthorizedException("No user found for email");
         }
 
         //retrieve the most recent password for the person
-        UUID uuid = user.getEndUserUuid();
+        UUID uuid = user.getEnduseruuid();
 
-        DbEndUserPwd pwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
+        EnduserpwdEntity pwd = EnduserpwdEntity.retrieveEndUserPwdForUserNotExpired(uuid);
+
         if (pwd == null) {
             throw new NotAuthorizedException("No active password for email");
         }
 
         //validate the password
-        String hash = pwd.getPwdHash();
+        String hash = pwd.getPwdhash();
         if (!PasswordHash.validatePassword(password, hash)) {
 
-            int failedAttempts = pwd.getFailedAttempts();
+            int failedAttempts = pwd.getFailedattempts();
             failedAttempts ++;
-            pwd.setFailedAttempts(failedAttempts);
+            pwd.setFailedattempts(failedAttempts);
             if (failedAttempts >= SecurityConfig.MAX_FAILED_PASSWORD_ATTEMPTS) {
-                pwd.setDtExpired(Instant.now());
+                pwd.setDtexpired(Timestamp.from(Instant.now()));
             }
-            pwd.writeToDb();
+            pwd.writeToDb(pwd);
 
             throw new NotAuthorizedException("Invalid password");
         }
 
         Boolean mustChangePassword = null;
-        if (pwd.isOneTimeUse()) {
-            pwd.setDtExpired(Instant.now());
+        if (pwd.getIsonetimeuse()) {
+            pwd.setDtexpired(Timestamp.from(Instant.now()));
             mustChangePassword = Boolean.TRUE;
         }
 
-        pwd.setFailedAttempts(0);
-        pwd.writeToDb();
+        pwd.setFailedattempts(0);
+        pwd.writeToDb(pwd);
 
         JsonOrganisationList ret = ret = new JsonOrganisationList();
-        DbOrganisation orgToAutoSelect = null;
+        OrganisationEntity orgToAutoSelect = null;
         boolean isAdminForAutoSelect = false;
-        boolean isSuperUser = user.isSuperUser();
+        boolean isSuperUser = user.getIssuperuser();
 
         //now see what organisations the person can access
         //if the person is a superUser, then we want to now prompt them to log on to ANY organisation
         if (isSuperUser) {
-            List<DbOrganisation> orgs = DbOrganisation.retrieveForAll();
+            List<OrganisationEntity> orgs = OrganisationEntity.retrieveForAll();
 
             for (int i = 0; i < orgs.size(); i++) {
-                DbOrganisation o = orgs.get(i);
+                OrganisationEntity o = orgs.get(i);
 
                 //super-users are assumed to be admins at every organisation
                 ret.add(o, new Boolean(true));
@@ -105,16 +109,16 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         }
         //if the person ISN'T a superUser, then we look at the person/org link, so see where they can log on to
         else {
-            List<DbOrganisationEndUserLink> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(uuid);
+            List<OrganisationenduserlinkEntity> orgLinks = OrganisationenduserlinkEntity.retrieveForEndUserNotExpired(uuid);
             if (orgLinks.isEmpty()) {
                 throw new NotAuthorizedException("No organisations to log on to");
             }
 
             for (int i = 0; i < orgLinks.size(); i++) {
-                DbOrganisationEndUserLink orgLink = orgLinks.get(i);
-                UUID orgUuid = orgLink.getOrganisationUuid();
-                DbOrganisation o = DbOrganisation.retrieveForUuid(orgUuid);
-                Boolean isAdmin = orgLink.isAdmin();
+                OrganisationenduserlinkEntity orgLink = orgLinks.get(i);
+                UUID orgUuid = orgLink.getOrganisationuuid();
+                OrganisationEntity o = OrganisationEntity.retrieveForUuid(orgUuid);
+                Boolean isAdmin = orgLink.getIsadmin();
                 ret.add(o, isAdmin);
 
                 //if there's only one organisation, automatically select it
@@ -148,8 +152,8 @@ public final class SecurityEndpoint extends AbstractEndpoint {
     public Response selectOrganisation(@Context SecurityContext sc, JsonOrganisation orgParameters) throws Exception {
         super.setLogbackMarkers(sc);
 
-        DbEndUser endUser = getEndUserFromSession(sc);
-        UUID endUserUuid = endUser.getEndUserUuid();
+        EnduserEntity endUser = getEndUserFromSession(sc);
+        UUID endUserUuid = endUser.getEnduseruuid();
 
         //the only parameter is the org UUID
         UUID orgUuid = orgParameters.getUuid();
@@ -157,26 +161,26 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         LOG.trace("Selecting organisationUUID {}", orgUuid);
 
         //validate the organisation exists
-        DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
+        OrganisationEntity org = OrganisationEntity.retrieveForUuid(orgUuid);
         if (org == null) {
             throw new BadRequestException("Invalid organisation " + orgUuid);
         }
 
-        DbEndUser user = getEndUserFromSession(sc);
+        EnduserEntity user = getEndUserFromSession(sc);
 
         //validate the person can log on there
         boolean isAdmin = false;
-        boolean isSuperUser = user.isSuperUser();
+        boolean isSuperUser = user.getIssuperuser();
 
         if (isSuperUser) {
             //super users are always admin
             isAdmin = true;
         } else {
-            DbOrganisationEndUserLink link = null;
-            List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(endUserUuid);
+            OrganisationenduserlinkEntity link = null;
+            List<OrganisationenduserlinkEntity> links = OrganisationenduserlinkEntity.retrieveForEndUserNotExpired(endUserUuid);
             for (int i = 0; i < links.size(); i++) {
-                DbOrganisationEndUserLink l = links.get(i);
-                if (l.getOrganisationUuid().equals(orgUuid)) {
+                OrganisationenduserlinkEntity l = links.get(i);
+                if (l.getOrganisationuuid().equals(orgUuid)) {
                     link = l;
                     break;
                 }
@@ -186,7 +190,7 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 throw new BadRequestException("Invalid organisation " + orgUuid + " or user doesn't have access");
             }
 
-            isAdmin = link.isAdmin();
+            isAdmin = link.getIsadmin();
         }
 
         String host = getRequestingHostFromSecurityContext(sc);
@@ -242,37 +246,38 @@ public final class SecurityEndpoint extends AbstractEndpoint {
         LOG.trace("SettingPasswordFromInviteEmail");
 
         //find the invite for the token
-        DbEndUserEmailInvite invite = DbEndUserEmailInvite.retrieveForToken(token);
+        EnduseremailinviteEntity invite = EnduseremailinviteEntity.retrieveForToken(token);
         if (invite == null) {
             throw new javax.ws.rs.BadRequestException("No invite found for token");
         }
 
-        UUID userUuid = invite.getEndUserUuid();
+        UUID userUuid = invite.getEnduseruuid();
         String hash = PasswordHash.createHash(password);
 
         //now we've found the invite, we can set up the new password for the user
-        DbEndUserPwd p = new DbEndUserPwd();
-        p.setEndUserUuid(userUuid);
-        p.setPwdHash(hash);
+        EnduserpwdEntity p = new EnduserpwdEntity();
+        p.setEnduseruuid(userUuid);
+        p.setPwdhash(hash);
 
         //save
-        p.writeToDb();
+        p.writeToDb(p);
 
         //now we've correctly set up the new password for the user, we can delete the invite
-        invite.setDtCompleted(Instant.now());
-        invite.writeToDb();
+        invite.setDtcompleted(Timestamp.from(Instant.now()));
+        DataManager db = new DataManager();
+        db.saveUserInvite(invite);
 
         //retrieve the link entity for the org and person
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        DbOrganisationEndUserLink link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, userUuid);
-        boolean isAdmin = link.isAdmin();
+        OrganisationenduserlinkEntity link = OrganisationenduserlinkEntity.retrieveForOrganisationEndUserNotExpired(orgUuid, userUuid);
+        boolean isAdmin = link.getIsadmin();
 
         boolean isSuperUser = isSuperUserFromSecurityContext(sc);
         String host = getRequestingHostFromSecurityContext(sc);
 
         //create cookie
-        DbEndUser user = DbEndUser.retrieveForUuid(userUuid);
-        DbOrganisation org = getOrganisationFromSession(sc);
+        EnduserEntity user = EnduserEntity.retrieveForUuid(userUuid);
+        OrganisationEntity org = getOrganisationFromSession(sc);
 
         NewCookie cookie = TokenHelper.createTokenAsCookie(host, user, org, isAdmin, isSuperUser);
 
@@ -296,26 +301,25 @@ public final class SecurityEndpoint extends AbstractEndpoint {
 
         LOG.trace("sendPasswordForgottenEmail {}", email);
 
-        DbEndUser user = DbEndUser.retrieveForEmail(email);
+        EnduserEntity user = EnduserEntity.retrieveForEmail(email);
         if (user != null) {
 
-            UUID userUuid = user.getEndUserUuid();
+            UUID userUuid = user.getEnduseruuid();
+            List<EnduseremailinviteEntity> invitesToSave = new ArrayList<>();
 
             //the email needs to be linked to an organisation, so just choose one the user can access
-            List<DbOrganisationEndUserLink> orgLinks = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
+            List<OrganisationenduserlinkEntity> orgLinks = OrganisationenduserlinkEntity.retrieveForEndUserNotExpired(userUuid);
             if (!orgLinks.isEmpty()) {
-                DbOrganisationEndUserLink firstLink = orgLinks.get(0);
-                UUID orgUuid = firstLink.getOrganisationUuid();
-                DbOrganisation org = DbOrganisation.retrieveForUuid(orgUuid);
-
-                List<DbAbstractTable> toSave = new ArrayList<>();
+                OrganisationenduserlinkEntity firstLink = orgLinks.get(0);
+                UUID orgUuid = firstLink.getOrganisationuuid();
+                OrganisationEntity org = OrganisationEntity.retrieveForUuid(orgUuid);
 
                 //expire any existing email invite records, so old tokens won't work
-                List<DbEndUserEmailInvite> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
+                List<EnduseremailinviteEntity> invites = EnduseremailinviteEntity.retrieveForEndUserNotCompleted(userUuid);
                 for (int i = 0; i < invites.size(); i++) {
-                    DbEndUserEmailInvite invite = invites.get(i);
-                    invite.setDtCompleted(Instant.now());
-                    toSave.add(invite);
+                    EnduseremailinviteEntity invite = invites.get(i);
+                    invite.setDtcompleted(Timestamp.from(Instant.now()));
+                    invitesToSave.add(invite);
                 }
 
                 //use a base64 encoded version of a random UUID
@@ -323,16 +327,16 @@ public final class SecurityEndpoint extends AbstractEndpoint {
                 String token = Base64.getEncoder().encodeToString(tokenUuid.getBytes());
 
                 //now generate a new invite and send it
-                DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
-                invite.setEndUserUuid(userUuid);
-                invite.setUniqueToken(token);
-                toSave.add(invite);
+                EnduseremailinviteEntity invite = new EnduseremailinviteEntity();
+                invite.setEnduseruuid(userUuid);
+                invite.setUniquetoken(token);
 
                 //send the email. If the send fails, it'll be logged on the server, but don't return any failure
                 //indication to the client, so we don't give away whether the email existed or not
                 if (EmailProvider.getInstance().sendInviteEmail(user, org, token)) {
                     //only save AFTER we've successfully send the invite email
-                    DatabaseManager.db().writeEntities(toSave);
+                    DataManager db = new DataManager();
+                    db.saveUserInvites(invitesToSave, invite);
                 }
             }
         }

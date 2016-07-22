@@ -1,13 +1,14 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+import org.endeavourhealth.enterprise.core.ExecutionStatus;
+import org.endeavourhealth.enterprise.core.ProcessorState;
+import org.endeavourhealth.enterprise.core.database.models.EnduserEntity;
+import org.endeavourhealth.enterprise.core.database.models.JobEntity;
+import org.endeavourhealth.enterprise.core.database.models.RequestEntity;
 import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,18 +24,18 @@ public final class JsonReportRequest {
 
     public JsonReportRequest() { }
 
-    public JsonReportRequest(DbRequest request, DbJob job, DbEndUser user, String parameterXml) throws Exception {
+    public JsonReportRequest(RequestEntity request, JobEntity job, EnduserEntity user, String parameterXml) throws Exception {
 
         String status = "Scheduled";
         if (job != null) {
-            status = job.getStatusId().toString();
+            status = String.valueOf(ExecutionStatus.get(job.getStatusid()));
         }
         String userName = user.getForename() + " " + user.getSurname();
 
-        this.uuid = request.getRequestUuid();
-        this.date = new Date(request.getTimeStamp().toEpochMilli());
+        this.uuid = request.getRequestuuid();
+        this.date = new Date(request.getTimestamp().getTime());
         this.status = status;
-        this.endUserUuid = request.getEndUserUuid();
+        this.endUserUuid = request.getEnduseruuid();
         this.endUserName = userName;
         this.parameters = RequestParametersSerializer.readFromXml(parameterXml);
     }

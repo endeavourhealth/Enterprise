@@ -6,9 +6,10 @@ import org.endeavour.enterprise.json.JsonFolderContentsList;
 import org.endeavour.enterprise.json.JsonMoveItems;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
-import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+
+import org.endeavourhealth.enterprise.core.database.models.ActiveitemEntity;
+import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
+import org.endeavourhealth.enterprise.core.database.models.ItemdependencyEntity;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
@@ -38,8 +39,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         LOG.trace("GettingLibraryItem for UUID {}", libraryItemUuid);
 
-        DbItem item = DbItem.retrieveLatestForUUid(libraryItemUuid);
-        String xml = item.getXmlContent();
+        ItemEntity item = ItemEntity.retrieveLatestForUUid(libraryItemUuid);
+        String xml = item.getXmlcontent();
 
         LibraryItem ret = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
@@ -78,17 +79,17 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         doc.getLibraryItem().add(libraryItem);
 
         //work out the item type (query, test etc.) from the content passed up
-        DefinitionItemType type = null;
+        Short type = null;
         if (query != null) {
-            type = DefinitionItemType.Query;
+            type = (short)DefinitionItemType.Query.getValue();
         } else if (dataSource != null) {
-            type = DefinitionItemType.DataSource;
+            type = (short)DefinitionItemType.DataSource.getValue();
         } else if (test != null) {
-            type = DefinitionItemType.Test;
+            type = (short)DefinitionItemType.Test.getValue();
         } else if (codeSet != null) {
-            type = DefinitionItemType.CodeSet;
+            type = (short)DefinitionItemType.CodeSet.getValue();
         } else if (listOutput != null) {
-            type = DefinitionItemType.ListOutput;
+            type = (short)DefinitionItemType.ListOutput.getValue();
         } else {
             //if we've been passed no proper content, we might just be wanting to rename an existing item,
             //so work out the type from what's on the DB already
@@ -96,8 +97,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 throw new BadRequestException("Can't save LibraryItem without some content (e.g. query, test etc.)");
             }
 
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(libraryItemUuid);
-            type = activeItem.getItemTypeId();
+            ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(libraryItemUuid);
+            type = activeItem.getItemtypeid();
             doc = null; //clear this, because we don't want to overwrite what's on the DB with an empty query doc
         }
 
@@ -107,7 +108,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             libraryItem.setUuid(libraryItemUuid.toString());
         }
 
-        super.saveItem(inserting, libraryItemUuid, orgUuid, userUuid, type, name, description, doc, folderUuid);
+        super.saveItem(inserting, libraryItemUuid, orgUuid, userUuid, type.intValue(), name, description, doc, folderUuid);
 
         //return the UUID of the libraryItem
         LibraryItem ret = new LibraryItem();
@@ -157,12 +158,12 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
-        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
-        List<DbItemDependency> dependentItems = DbItemDependency.retrieveForActiveItemType(activeItem, DependencyType.Uses);
+        ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(itemUuid);
+        List<ItemdependencyEntity> dependentItems = ItemdependencyEntity.retrieveForActiveItemType(activeItem, (short)DependencyType.Uses.getValue());
 
-        for (DbItemDependency dependentItem: dependentItems) {
-            UUID dependentItemUuid = dependentItem.getDependentItemUuid();
-            DbItem item = DbItem.retrieveLatestForUUid(dependentItemUuid);
+        for (ItemdependencyEntity dependentItem: dependentItems) {
+            UUID dependentItemUuid = dependentItem.getDependentitemuuid();
+            ItemEntity item = ItemEntity.retrieveLatestForUUid(dependentItemUuid);
 
             JsonFolderContent content = new JsonFolderContent(item, null);
             ret.addContent(content);

@@ -3,7 +3,7 @@
 
 	<!--AZURE settings-->
 	<database>
-		<url>jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise</url>
+		<url>jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise_Not_Required</url>
 		<username>devuser@mpydpvsu61</username>
 		<password>7oaG7FVsvK08sE9T5NEe</password>
 	</database>
@@ -28,7 +28,7 @@
 
 		<!--AIMES cookie-->
 		<!--<cookieDomain>37.48.245.69</cookieDomain>-->
-</webServer>
+	</webServer>
 
 <!--GMail settings-->
 	<email>

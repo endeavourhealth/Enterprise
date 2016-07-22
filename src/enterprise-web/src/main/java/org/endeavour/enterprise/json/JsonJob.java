@@ -1,9 +1,8 @@
 package org.endeavour.enterprise.json;
 
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.ProcessorState;
+import org.endeavourhealth.enterprise.core.database.models.JobEntity;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.Date;
 
 public final class JsonJob {
@@ -11,9 +10,9 @@ public final class JsonJob {
     private String status = null;
 
     public JsonJob() {}
-    public JsonJob(DbJob job) {
-        this.date = new Date(job.getStartDateTime().toEpochMilli());
-        this.status = job.getStatusId().toString();
+    public JsonJob(JobEntity job) {
+        this.date = new Date(job.getStartdatetime().getTime());
+        this.status = String.valueOf(ProcessorState.get(job.getStatusid()));
     }
 
     /**

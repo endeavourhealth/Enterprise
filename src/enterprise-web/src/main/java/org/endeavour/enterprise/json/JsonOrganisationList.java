@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.models.OrganisationEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public final class JsonOrganisationList {
         organisations.add(jsonOrg);
     }
 
-    public void add(DbOrganisation org, Boolean isAdmin) {
+    public void add(OrganisationEntity org, Boolean isAdmin) {
         JsonOrganisation jsonOrg = new JsonOrganisation(org, isAdmin);
         add(jsonOrg);
     }

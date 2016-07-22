@@ -4,8 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
-import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.models.EnduserEntity;
+import org.endeavourhealth.enterprise.core.database.models.OrganisationEntity;
 
 import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,18 +23,18 @@ public class TokenHelper {
     private static final String TOKEN_ORGANISATION = "org";
     private static final String TOKEN_HOST = "hst";
 
-    public static NewCookie createTokenAsCookie(String host, DbEndUser person, DbOrganisation org, boolean isAdmin, boolean isSuperUser) {
+    public static NewCookie createTokenAsCookie(String host, EnduserEntity person, OrganisationEntity org, boolean isAdmin, boolean isSuperUser) {
         String token = createToken(host, person, org, isAdmin, isSuperUser);
         return createCookie(token);
     }
 
-    private static String createToken(String host, DbEndUser person, DbOrganisation org, boolean isAdmin, boolean isSuperUser) {
+    private static String createToken(String host, EnduserEntity person, OrganisationEntity org, boolean isAdmin, boolean isSuperUser) {
         Map<String, Object> bodyParameterMap = new HashMap<>();
         bodyParameterMap.put(TOKEN_ISSUED_AT, Long.toString(Instant.now().getEpochSecond()));
 
         //when logging a user off, we create a token with a null person
         if (person != null) {
-            bodyParameterMap.put(TOKEN_USER, person.getEndUserUuid());
+            bodyParameterMap.put(TOKEN_USER, person.getEnduseruuid());
         }
 
         bodyParameterMap.put(TOKEN_HOST, host);
@@ -43,7 +43,7 @@ public class TokenHelper {
 
         //if the person has multiple orgs they can log on to, then we may pass in null until they select one
         if (org != null) {
-            bodyParameterMap.put(TOKEN_ORGANISATION, org.getOrganisationUuid());
+            bodyParameterMap.put(TOKEN_ORGANISATION, org.getOrganisationuuid());
         }
 
         JwtBuilder builder = Jwts.builder()

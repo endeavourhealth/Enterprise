@@ -1,7 +1,7 @@
 package org.endeavourhealth.enterprise.core.querydocument;
 
 import org.endeavourhealth.enterprise.core.XmlSerializer;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.ObjectFactory;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
@@ -17,14 +17,14 @@ public abstract class QueryDocumentSerializer {
     private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
     private static final String XSD = "QueryDocument.xsd";
 
-    public static LibraryItem readLibraryItemFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.deserializeFromString(LibraryItem.class, item.getXmlContent(), XSD);
+    public static LibraryItem readLibraryItemFromItem(ItemEntity item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+        return XmlSerializer.deserializeFromString(LibraryItem.class, item.getXmlcontent(), XSD);
     }
-    public static Report readReportFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.deserializeFromString(Report.class, item.getXmlContent(), XSD);
+    public static Report readReportFromItem(ItemEntity item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+        return XmlSerializer.deserializeFromString(Report.class, item.getXmlcontent(), XSD);
     }
-    public static QueryDocument readQueryDocumentFromItem(DbItem item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.deserializeFromString(QueryDocument.class, item.getXmlContent(), XSD);
+    public static QueryDocument readQueryDocumentFromItem(ItemEntity item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
+        return XmlSerializer.deserializeFromString(QueryDocument.class, item.getXmlcontent(), XSD);
     }
 
 

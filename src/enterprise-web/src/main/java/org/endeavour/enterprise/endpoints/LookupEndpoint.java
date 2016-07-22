@@ -2,9 +2,11 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.json.JsonSourceOrganisation;
 import org.endeavour.enterprise.json.JsonSourceOrganisationSet;
+import org.endeavourhealth.enterprise.core.database.DataManager;
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
-import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
-import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisationSet;
+
+import org.endeavourhealth.enterprise.core.database.models.SourceorganisationEntity;
+import org.endeavourhealth.enterprise.core.database.models.SourceorganisationsetEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,16 +34,16 @@ public final class LookupEndpoint extends AbstractEndpoint {
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        List<DbSourceOrganisationSet> sets = null;
+        List<SourceorganisationsetEntity> sets = null;
         if (searchTerm == null) {
-            sets = DbSourceOrganisationSet.retrieveAllSets(orgUuid);
+            sets = SourceorganisationsetEntity.retrieveAllSets(orgUuid);
         } else {
-            sets = DbSourceOrganisationSet.retrieveSets(orgUuid, searchTerm);
+            sets = SourceorganisationsetEntity.retrieveSets(orgUuid, searchTerm);
         }
 
         List<JsonSourceOrganisationSet> ret = new ArrayList<>();
 
-        for (DbSourceOrganisationSet set: sets) {
+        for (SourceorganisationsetEntity set: sets) {
             ret.add(new JsonSourceOrganisationSet(set));
         }
 
@@ -66,14 +68,14 @@ public final class LookupEndpoint extends AbstractEndpoint {
         LOG.trace("getOrganisationSetMembers for UUID {}", setUuidStr);
 
         UUID setUuid = UUID.fromString(setUuidStr);
-        DbSourceOrganisationSet set = DbSourceOrganisationSet.retrieveSetForUuid(setUuid);
+        SourceorganisationsetEntity set = SourceorganisationsetEntity.retrieveSetForUuid(setUuid);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        if (!set.getOrganisationUuid().equals(orgUuid)) {
+        if (!set.getOrganisationuuid().equals(orgUuid)) {
             throw new BadRequestException("Trying to get organisation set members for a different organisation");
         }
 
-        String odsCodeStr = set.getOdsCodes();
+        String odsCodeStr = set.getOdscodes();
         List<String> odsCodeList = new ArrayList<>();
         StringTokenizer st = new StringTokenizer(odsCodeStr, ODS_CODE_DELIMITER, false);
         while (st.hasMoreTokens()) {
@@ -83,8 +85,8 @@ public final class LookupEndpoint extends AbstractEndpoint {
 
         List<JsonSourceOrganisation> ret = new ArrayList<>();
 
-        List<DbSourceOrganisation> orgs = DbSourceOrganisation.retrieveForOdsCodes(odsCodeList);
-        for (DbSourceOrganisation org: orgs) {
+        List<SourceorganisationEntity> orgs = SourceorganisationEntity.retrieveForOdsCodes(odsCodeList);
+        for (SourceorganisationEntity org: orgs) {
             ret.add(new JsonSourceOrganisation(org));
         }
 
@@ -112,16 +114,16 @@ public final class LookupEndpoint extends AbstractEndpoint {
 
         LOG.trace("saveOrganisationSet UUID {} Name {}", uuid, name);
 
-        DbSourceOrganisationSet set = null;
+        SourceorganisationsetEntity set = null;
 
         if (uuid == null) {
             //creating a new set
-            set = new DbSourceOrganisationSet();
-            set.setOrganisationUuid(orgUuid);
+            set = new SourceorganisationsetEntity();
+            set.setOrganisationuuid(orgUuid);
         } else {
             //updating an existing
-            set = DbSourceOrganisationSet.retrieveSetForUuid(uuid);
-            if (!set.getOrganisationUuid().equals(orgUuid)) {
+            set = SourceorganisationsetEntity.retrieveSetForUuid(uuid);
+            if (!set.getOrganisationuuid().equals(orgUuid)) {
                 throw new BadRequestException("Trying to amend an organisation set for another organisation");
             }
         }
@@ -135,13 +137,14 @@ public final class LookupEndpoint extends AbstractEndpoint {
                 joiner.add(org.getOdsCode());
             }
             String odsCodeStr = joiner.toString();
-            set.setOdsCodes(odsCodeStr);
+            set.setOdscodes(odsCodeStr);
         }
 
-        set.writeToDb();
+        DataManager db = new DataManager();
+        db.saveOrganisationSet(set);
 
         //return the UUID to the client, so it known what was assigned
-        uuid = set.getSourceOrganisationSetUuid();
+        uuid = set.getSourceorganisationsetuuid();
         JsonSourceOrganisationSet ret = new JsonSourceOrganisationSet();
         ret.setUuid(uuid);
 
@@ -164,13 +167,13 @@ public final class LookupEndpoint extends AbstractEndpoint {
 
         LOG.trace("deleteOrganisationSet UUID {}", uuid);
 
-        DbSourceOrganisationSet set = DbSourceOrganisationSet.retrieveSetForUuid(uuid);
-        if (!set.getOrganisationUuid().equals(orgUuid)) {
+        SourceorganisationsetEntity set = SourceorganisationsetEntity.retrieveSetForUuid(uuid);
+        if (!set.getOrganisationuuid().equals(orgUuid)) {
             throw new BadRequestException("Organisation set " + uuid + " belongs to a different organisation");
         }
 
-        set.setSaveMode(TableSaveMode.DELETE);
-        set.writeToDb();
+        DataManager db = new DataManager();
+        db.deleteOrganisationSet(set);
 
         clearLogbackMarkers();
         return Response
@@ -188,16 +191,16 @@ public final class LookupEndpoint extends AbstractEndpoint {
         LOG.trace("searchOrganisations for searchTerm {}", searchTerm);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        List<DbSourceOrganisation> orgs = null;
+        List<SourceorganisationEntity> orgs = null;
         if (searchTerm == null) {
-            orgs = DbSourceOrganisation.retrieveAll(false);
+            orgs = SourceorganisationEntity.retrieveAll(false);
         } else {
-            orgs = DbSourceOrganisation.retrieveForSearch(searchTerm);
+            orgs = SourceorganisationEntity.retrieveForSearch(searchTerm);
         }
 
         List<JsonSourceOrganisation> ret = new ArrayList<>();
 
-        for (DbSourceOrganisation org: orgs) {
+        for (SourceorganisationEntity org: orgs) {
             ret.add(new JsonSourceOrganisation(org));
         }
 
@@ -218,7 +221,7 @@ public final class LookupEndpoint extends AbstractEndpoint {
     public Response getOrganisations(@Context SecurityContext sc, @QueryParam("odsCodes") String odsCodeStr) throws Exception {
         super.setLogbackMarkers(sc);
 
-        if (!getEndUserFromSession(sc).isSuperUser()) {
+        if (!getEndUserFromSession(sc).getIssuperuser()) {
             throw new BadRequestException();
         }
 
@@ -233,11 +236,11 @@ public final class LookupEndpoint extends AbstractEndpoint {
             odsCodeList.add(odsCode);
         }
 
-        List<DbSourceOrganisation> orgs = DbSourceOrganisation.retrieveForOdsCodes(odsCodeList);
+        List<SourceorganisationEntity> orgs = SourceorganisationEntity.retrieveForOdsCodes(odsCodeList);
 
         List<JsonSourceOrganisation> ret = new ArrayList<>();
 
-        for (DbSourceOrganisation org: orgs) {
+        for (SourceorganisationEntity org: orgs) {
             ret.add(new JsonSourceOrganisation(org));
         }
 

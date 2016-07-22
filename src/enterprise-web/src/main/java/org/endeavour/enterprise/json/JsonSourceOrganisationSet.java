@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisationSet;
+import org.endeavourhealth.enterprise.core.database.models.SourceorganisationsetEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,8 @@ public final class JsonSourceOrganisationSet implements Comparable {
 
     public JsonSourceOrganisationSet() {}
 
-    public JsonSourceOrganisationSet(DbSourceOrganisationSet set) {
-        this.uuid = set.getSourceOrganisationSetUuid();
+    public JsonSourceOrganisationSet(SourceorganisationsetEntity set) {
+        this.uuid = set.getSourceorganisationsetuuid();
         this.name = set.getName();
     }
 

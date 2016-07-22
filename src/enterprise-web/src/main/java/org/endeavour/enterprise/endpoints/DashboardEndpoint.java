@@ -9,13 +9,7 @@ import org.endeavour.enterprise.json.JsonProcessorStatus;
 import org.endeavour.enterprise.utility.MessagingQueueProvider;
 import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.*;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
-import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobProcessorResult;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
-import org.endeavourhealth.enterprise.core.database.execution.DbProcessorStatus;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +41,12 @@ public final class DashboardEndpoint extends AbstractEndpoint {
 
         List<JsonFolderContent> ret = new ArrayList<>();
 
-        List<DbActiveItem> activeItems = DatabaseManager.db().retrieveActiveItemRecentItems(userUuid, orgUuid, count);
-        for (DbActiveItem activeItem: activeItems) {
-            DbItem item = DbItem.retrieveForActiveItem(activeItem);
-            DbAudit audit = DbAudit.retrieveForUuid(item.getAuditUuid());
+        ActiveitemEntity aI = new ActiveitemEntity();
+        
+        List<ActiveitemEntity> activeItems = aI.retrieveActiveItemRecentItems(userUuid, orgUuid, count);
+        for (ActiveitemEntity activeItem: activeItems) {
+            ItemEntity item = ItemEntity.retrieveForActiveItem(activeItem);
+            AuditEntity audit = AuditEntity.retrieveForUuid(item.getAudituuid());
 
             JsonFolderContent content = new JsonFolderContent(activeItem, item, audit);
             ret.add(content);
@@ -77,16 +73,16 @@ public final class DashboardEndpoint extends AbstractEndpoint {
 
         List<JsonJobReport> ret = new ArrayList<>();
 
-        List<DbJobReport> jobReports = DbJobReport.retrieveRecent(orgUuid, count);
-        for (DbJobReport jobReport: jobReports) {
+        List<JobreportEntity> jobReports = JobreportEntity.retrieveRecent(orgUuid, count);
+        for (JobreportEntity jobReport: jobReports) {
 
-            DbJob job = DbJob.retrieveForUuid(jobReport.getJobUuid());
-            UUID itemUuid = jobReport.getReportUuid();
-            UUID auditUuid = jobReport.getAuditUuid();
-            DbItem item = DbItem.retrieveForUuidAndAudit(itemUuid, auditUuid);
+            JobEntity job = JobEntity.retrieveForUuid(jobReport.getJobuuid());
+            UUID itemUuid = jobReport.getReportuuid();
+            UUID auditUuid = jobReport.getAudituuid();
+            ItemEntity item = ItemEntity.retrieveForUuidAndAudit(itemUuid, auditUuid);
             String name = item.getTitle();
 
-            Date date = new Date(job.getStartDateTime().toEpochMilli());
+            Date date = new Date(job.getStartdatetime().getTime());
             ret.add(new JsonJobReport(name, date));
         }
 
@@ -109,8 +105,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
 
         List<JsonJob> ret = new ArrayList<>();
 
-        List<DbJob> jobs = DbJob.retrieveRecent(count);
-        for (DbJob job: jobs) {
+        List<JobEntity> jobs = JobEntity.retrieveRecent(count);
+        for (JobEntity job: jobs) {
             JsonJob jsonJob = new JsonJob(job);
             ret.add(jsonJob);
         }
@@ -131,11 +127,11 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     public Response testDatabase(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
 
-        if (!getEndUserFromSession(sc).isSuperUser()) {
+        if (!getEndUserFromSession(sc).getIssuperuser()) {
             throw new BadRequestException();
         }
 
-        DbJobProcessorResult.deleteAllResults();
+        JobprocessorresultEntity.deleteAllResults();
 
         LOG.trace("testDatabase");
 
@@ -158,11 +154,11 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         LOG.trace("getProcessorStatus");
 
         String desc = null;
-        DbProcessorStatus s = DbProcessorStatus.retrieveCurrentStatus();
+        ProcessorstatusEntity s = ProcessorstatusEntity.retrieveCurrentStatus();
         if (s == null) {
             desc = "Unknown";
         } else {
-            desc = s.getStateId().toString();
+            desc = String.valueOf(ProcessorState.get(s.getStateid()));
         }
         JsonProcessorStatus ret = new JsonProcessorStatus(desc);
 
@@ -185,7 +181,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         LOG.trace("startProcessor");
 
         MessagingQueueProvider.getInstance().startProcessor();
-        DbProcessorStatus.setCurrentStatus(ProcessorState.Starting);
+        ProcessorstatusEntity.setCurrentStatus((short)ProcessorState.Starting.getValue());
 
         clearLogbackMarkers();
 
@@ -205,7 +201,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
         LOG.trace("stopProcessor");
 
         MessagingQueueProvider.getInstance().stopProcessor();
-        DbProcessorStatus.setCurrentStatus(ProcessorState.Stopping);
+        ProcessorstatusEntity.setCurrentStatus((short)ProcessorState.Stopping.getValue());
 
         clearLogbackMarkers();
 

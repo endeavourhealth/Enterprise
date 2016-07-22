@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.models.OrganisationEntity;
 
 import java.util.UUID;
 
@@ -17,10 +17,10 @@ public final class JsonOrganisation {
     public JsonOrganisation() {
     }
 
-    public JsonOrganisation(DbOrganisation org, Boolean isAdmin) {
-        this.uuid = org.getOrganisationUuid();
+    public JsonOrganisation(OrganisationEntity org, Boolean isAdmin) {
+        this.uuid = org.getOrganisationuuid();
         this.name = org.getName();
-        this.nationalId = org.getNationalId();
+        this.nationalId = org.getNationalid();
         this.isAdmin = isAdmin;
 
         if (isAdmin != null) {

@@ -1,26 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-	<!--AZURE settings-->
 	<database>
-		<url>jdbc:jtds:sqlserver://mpydpvsu61.database.windows.net:1433/Endeavour_Enterprise_Not_Required</url>
-		<username>devuser@mpydpvsu61</username>
-		<password>7oaG7FVsvK08sE9T5NEe</password>
+		<url></url>
+		<username></username>
+		<password></password>
 	</database>
-
-	<!--AIMES SQL Settings-->
-	<!--<database>
-		<url>jdbc:jtds:sqlserver://10.11.87.68/Endeavour_Enterprise</url>
-		<username>Endeavour_Enterprise_ApplicationUser</username>
-		<password>TheQuickBrownFox1234%^&amp;*</password>
-	</database>-->
-
-	<!--local SQL Express settings-->
-	<!--<database>
-		<url>jdbc:jtds:sqlserver://127.0.0.1:1433/Endeavour_Enterprise;instance=SQLEXPRESS</url>
-		<username>Endeavour_Enterprise_ApplicationUser</username>
-		<password>TheQuickBrownFox1234%^&amp;*</password>
-	</database>-->
 
 	<webServer>
 		<!--local host cookie-->

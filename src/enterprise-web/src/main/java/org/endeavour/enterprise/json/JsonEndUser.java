@@ -1,9 +1,8 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
+import org.endeavourhealth.enterprise.core.database.models.EnduserEntity;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,13 +22,13 @@ public final class JsonEndUser {
     public JsonEndUser() {
     }
 
-    public JsonEndUser(DbEndUser endUser, Boolean isAdmin, Boolean mustChangePassword) {
-        this.uuid = endUser.getEndUserUuid();
+    public JsonEndUser(EnduserEntity endUser, Boolean isAdmin, Boolean mustChangePassword) {
+        this.uuid = endUser.getEnduseruuid();
         this.username = endUser.getEmail();
         this.title = endUser.getTitle();
         this.forename = endUser.getForename();
         this.surname = endUser.getSurname();
-        this.superUser = new Boolean(endUser.isSuperUser());
+        this.superUser = new Boolean(endUser.getIssuperuser());
         this.admin = isAdmin;
         this.mustChangePassword = mustChangePassword;
 

@@ -1,13 +1,16 @@
 package org.endeavour.enterprise.endpoints;
 
+import com.sun.deploy.net.HttpRequest;
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.framework.security.UserPrincipal;
 import org.endeavour.enterprise.framework.security.UserContext;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
-import org.endeavourhealth.enterprise.core.database.administration.DbOrganisation;
+import org.endeavourhealth.enterprise.core.database.models.EnduserEntity;
+import org.endeavourhealth.enterprise.core.database.models.OrganisationEntity;
 import org.slf4j.MDC;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import java.util.UUID;
@@ -18,6 +21,9 @@ public abstract class AbstractEndpoint {
 
     @Context
     protected SecurityContext securityContext;
+
+    @Context
+    protected HttpServletRequest request;
 
     /**
      * used to set LogBack to include the user UUID in all logging
@@ -33,9 +39,9 @@ public abstract class AbstractEndpoint {
     }
 
 
-    protected DbEndUser getEndUserFromSession(SecurityContext sc) throws Exception {
+    protected EnduserEntity getEndUserFromSession(SecurityContext sc) throws Exception {
         UUID uuid = getEndUserUuidFromToken(sc);
-        return DbEndUser.retrieveForUuid(uuid);
+        return EnduserEntity.retrieveForUuid(uuid);
     }
 
     protected UUID getEndUserUuidFromToken(SecurityContext sc) {
@@ -47,14 +53,13 @@ public abstract class AbstractEndpoint {
         return uc.getUserUuid();
     }
 
-    protected DbOrganisation getOrganisationFromSession(SecurityContext sc) throws Exception {
+    protected OrganisationEntity getOrganisationFromSession(SecurityContext sc) throws Exception {
         UUID uuid = getOrganisationUuidFromToken(sc);
-        return DbOrganisation.retrieveForUuid(uuid);
+        return OrganisationEntity.retrieveForUuid(uuid);
     }
 
     protected UUID getOrganisationUuidFromToken(SecurityContext sc) throws Exception {
-        UserPrincipal up = (UserPrincipal) sc.getUserPrincipal();
-        UserContext uc = up.getUserContext();
+        UserContext uc = getUserContext(sc);
 
         //an authenticated user MUST have a EndUser UUID, but they may not have an organisation selected yet
         UUID orgUuid = uc.getOrganisationUuid();
@@ -64,11 +69,22 @@ public abstract class AbstractEndpoint {
         return orgUuid;
     }
 
-    protected boolean isAdminFromSession(SecurityContext sc) throws Exception {
-        UserPrincipal up = (UserPrincipal) sc.getUserPrincipal();
-
-        UserContext uc = up.getUserContext();
+    protected boolean isAdminFromSecurityContext(SecurityContext sc) throws Exception {
+        UserContext uc = getUserContext(sc);
         return uc.isAdmin();
     }
+    protected boolean isSuperUserFromSecurityContext(SecurityContext sc) throws Exception {
+        UserContext uc = getUserContext(sc);
+        return uc.isSuperUser();
+    }
 
+    private UserContext getUserContext(SecurityContext sc) {
+        UserPrincipal up = (UserPrincipal) sc.getUserPrincipal();
+        return up.getUserContext();
+    }
+
+    protected String getRequestingHostFromSecurityContext(SecurityContext sc) {
+        UserContext uc = getUserContext(sc);
+        return uc.getHost();
+    }
 }

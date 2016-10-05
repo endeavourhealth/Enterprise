@@ -7,10 +7,8 @@ import org.endeavour.enterprise.utility.QueryDocumentReaderFindDependentUuids;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
-import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
-import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 
@@ -21,24 +19,24 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
 
     private static final int MAX_VALIDATION_ERRORS_FOR_DELETE = 5;
 
-    protected DbActiveItem retrieveActiveItem(UUID itemUuid, UUID orgUuid, DefinitionItemType itemTypeDesired) throws Exception {
+    protected ActiveitemEntity retrieveActiveItem(UUID itemUuid, UUID orgUuid, Short itemTypeDesired) throws Exception {
 
-        DbActiveItem activeItem = retrieveActiveItem(itemUuid, orgUuid);
+        ActiveitemEntity activeItem = retrieveActiveItem(itemUuid, orgUuid);
 
-        if (activeItem.getItemTypeId() != itemTypeDesired) {
-            throw new RuntimeException("Trying to retrieve a " + itemTypeDesired + " but item is a " + activeItem.getItemTypeId());
+        if (activeItem.getItemtypeid() != itemTypeDesired) {
+            throw new RuntimeException("Trying to retrieve a " + itemTypeDesired + " but item is a " + String.valueOf(activeItem.getItemtypeid()));
         }
         return activeItem;
     }
 
-    protected DbActiveItem retrieveActiveItem(UUID itemUuid, UUID orgUuid) throws Exception {
-        DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
+    protected ActiveitemEntity retrieveActiveItem(UUID itemUuid, UUID orgUuid) throws Exception {
+        ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(itemUuid);
 
         if (activeItem == null) {
             throw new BadRequestException("UUID does not exist");
         }
 
-        if (!activeItem.getOrganisationUuid().equals(orgUuid)) {
+        if (!activeItem.getOrganisationuuid().equals(orgUuid)) {
             throw new BadRequestException("Item for another organisation");
         }
 
@@ -46,12 +44,12 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     }
 
     protected JsonDeleteResponse deleteItem(UUID itemUuid, UUID orgUuid, UUID userUuid) throws Exception {
-        DbActiveItem activeItem = retrieveActiveItem(itemUuid, orgUuid);
-        DbItem item = DbItem.retrieveForActiveItem(activeItem);
+        ActiveitemEntity activeItem = retrieveActiveItem(itemUuid, orgUuid);
+        ItemEntity item = ItemEntity.retrieveForActiveItem(activeItem);
 
         //recursively build up the full list of items we want to delete
-        List<DbItem> itemsToDelete = new ArrayList<>();
-        List<DbActiveItem> activeItemsToDelete = new ArrayList<>();
+        List<ItemEntity> itemsToDelete = new ArrayList<>();
+        List<ActiveitemEntity> activeItemsToDelete = new ArrayList<>();
         findItemsToDelete(item, activeItem, itemsToDelete, activeItemsToDelete);
 
         JsonDeleteResponse ret = new JsonDeleteResponse();
@@ -65,66 +63,67 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
 
         //now do the deleting, building up a list of all entities to update, which is then done atomically
-        List<DbAbstractTable> toSave = new ArrayList<>();
+        AuditEntity audit = AuditEntity.factoryNow(userUuid, orgUuid);
+        UUID auditUuid = audit.getAudituuid();
 
-        DbAudit audit = DbAudit.factoryNow(userUuid, orgUuid);
-        toSave.add(audit);
-        UUID auditUuid = audit.getAuditUuid();
+        List<ItemEntity> iToDelete = new ArrayList<>();
+        List<ActiveitemEntity> aiToDelete = new ArrayList<>();
 
-        for (DbItem itemToDelete: itemsToDelete) {
-            itemToDelete.setAuditUuid(auditUuid);
-            itemToDelete.setDeleted(true);
-            itemToDelete.setSaveMode(TableSaveMode.INSERT); //remember to always force an insert for items
-            toSave.add(itemToDelete);
+        for (ItemEntity itemToDelete: itemsToDelete) {
+            itemToDelete.setAudituuid(auditUuid);
+            itemToDelete.setIsdeleted(true);
+            iToDelete.add(itemToDelete);
         }
 
-        for (DbActiveItem activeItemToDelete: activeItemsToDelete) {
-            activeItemToDelete.setAuditUuid(auditUuid);
-            activeItemToDelete.setDeleted(true);
-            toSave.add(activeItemToDelete);
+        for (ActiveitemEntity activeItemToDelete: activeItemsToDelete) {
+            activeItemToDelete.setAudituuid(auditUuid);
+            activeItemToDelete.setIsdeleted(true);
+            aiToDelete.add(activeItemToDelete);
         }
 
-        DatabaseManager.db().writeEntities(toSave);
+        DataManager db = new DataManager();
+        db.saveDeletedItems(audit, iToDelete, aiToDelete);
+
         return ret;
     }
 
 
-    private void findItemsToDelete(DbItem item, DbActiveItem activeItem, List<DbItem> itemsToDelete, List<DbActiveItem> activeItemsToDelete) throws Exception {
+    private void findItemsToDelete(ItemEntity item, ActiveitemEntity activeItem, List<ItemEntity> itemsToDelete, List<ActiveitemEntity> activeItemsToDelete) throws Exception {
 
         itemsToDelete.add(item);
         activeItemsToDelete.add(activeItem);
 
-        List<DbItemDependency> dependencies = DbItemDependency.retrieveForDependentItem(item.getItemUuid());
-        for (DbItemDependency dependency: dependencies) {
+        List<ItemdependencyEntity> dependencies = ItemdependencyEntity.retrieveForDependentItem(item.getItemuuid());
+        for (ItemdependencyEntity dependency: dependencies) {
 
             //only recurse for containing or child folder-type dependencies
-            if (dependency.getDependencyTypeId() == DependencyType.IsChildOf
-                    || dependency.getDependencyTypeId() == DependencyType.IsContainedWithin) {
-                DbActiveItem childActiveItem = DbActiveItem.retrieveForItemUuid(dependency.getItemUuid());
-                DbItem childItem = DbItem.retrieveForActiveItem(childActiveItem);
+            if (dependency.getDependencytypeid() == DependencyType.IsChildOf.getValue()
+                    || dependency.getDependencytypeid() == DependencyType.IsContainedWithin.getValue()) {
+                ActiveitemEntity childActiveItem = ActiveitemEntity.retrieveForItemUuid(dependency.getItemuuid());
+                ItemEntity childItem = ItemEntity.retrieveForActiveItem(childActiveItem);
                 findItemsToDelete(childItem, childActiveItem, itemsToDelete, activeItemsToDelete);
             }
         }
     }
 
-    private void validateDelete(List<DbItem> itemsToDelete, UUID orgUuid, JsonDeleteResponse response) throws Exception {
+    private void validateDelete(List<ItemEntity> itemsToDelete, UUID orgUuid, JsonDeleteResponse response) throws Exception {
         //create a hash of all our items being deleted
         HashSet<UUID> hsUuidsToDelete = new HashSet<>();
-        for (DbItem item: itemsToDelete) {
-            hsUuidsToDelete.add(item.getItemUuid());
+        for (ItemEntity item: itemsToDelete) {
+            hsUuidsToDelete.add(item.getItemuuid());
         }
 
         //see if there are any items USING something that we're trying to delete
         for (int i = 0; i < itemsToDelete.size(); i++) {
-            DbItem item = itemsToDelete.get(i);
-            UUID itemUuid = item.getItemUuid();
-            List<DbItemDependency> dependencies = DbItemDependency.retrieveForDependentItemType(itemUuid, DependencyType.Uses);
+            ItemEntity item = itemsToDelete.get(i);
+            UUID itemUuid = item.getItemuuid();
+            List<ItemdependencyEntity> dependencies = ItemdependencyEntity.retrieveForDependentItemType(itemUuid, (short)DependencyType.Uses.getValue());
             for (int j = 0; j < dependencies.size(); j++) {
-                DbItemDependency dependency = dependencies.get(i);
-                UUID parentItemUuid = dependency.getItemUuid();
+                ItemdependencyEntity dependency = dependencies.get(i);
+                UUID parentItemUuid = dependency.getItemuuid();
                 if (!hsUuidsToDelete.contains(parentItemUuid)) {
 
-                    DbItem usingItem = DbItem.retrieveLatestForUUid(parentItemUuid);
+                    ItemEntity usingItem = ItemEntity.retrieveLatestForUUid(parentItemUuid);
                     String err = "" + item.getTitle() + " is used by " + usingItem.getTitle();
                     response.addValidationFailure(err);
 
@@ -138,13 +137,13 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
     }
 
-    private static void validateItemTypeMatchesContainingFolder(boolean insert, DefinitionItemType itemType, UUID containingFolderUuid) throws Exception {
+    private static void validateItemTypeMatchesContainingFolder(boolean insert, Integer itemType, UUID containingFolderUuid) throws Exception {
 
         //if saving a new library item or report, it must have a containing folder item
         if (insert
                 && containingFolderUuid == null
-                && itemType != DefinitionItemType.ReportFolder
-                && itemType != DefinitionItemType.LibraryFolder) {
+                && itemType != DefinitionItemType.ReportFolder.getValue()
+                && itemType != DefinitionItemType.LibraryFolder.getValue()) {
             throw new BadRequestException("LibraryItems and Reports must have a containing folder UUID");
         }
 
@@ -153,20 +152,20 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             return;
         }
 
-        DbActiveItem containingFolderActiveItem = DbActiveItem.retrieveForItemUuid(containingFolderUuid);
-        DefinitionItemType containingFolderType = containingFolderActiveItem.getItemTypeId();
-        if (containingFolderType == DefinitionItemType.LibraryFolder) {
+        ActiveitemEntity containingFolderActiveItem = ActiveitemEntity.retrieveForItemUuid(containingFolderUuid);
+        Short containingFolderType = containingFolderActiveItem.getItemtypeid();
+        if (containingFolderType == DefinitionItemType.LibraryFolder.getValue()) {
             //library folders can only contain other library folders and queries etc.
-            if (itemType != DefinitionItemType.LibraryFolder
-                    && itemType != DefinitionItemType.CodeSet
-                    && itemType != DefinitionItemType.Query
-                    && itemType != DefinitionItemType.ListOutput) {
+            if (itemType != DefinitionItemType.LibraryFolder.getValue()
+                    && itemType != DefinitionItemType.CodeSet.getValue()
+                    && itemType != DefinitionItemType.Query.getValue()
+                    && itemType != DefinitionItemType.ListOutput.getValue()) {
                 throw new BadRequestException("Library folder UUID " + containingFolderUuid + " cannot contain a " + itemType);
             }
-        } else if (containingFolderType == DefinitionItemType.ReportFolder) {
+        } else if (containingFolderType == DefinitionItemType.ReportFolder.getValue()) {
             //report folders can only contain other report folders and reports
-            if (itemType != DefinitionItemType.ReportFolder
-                    && itemType != DefinitionItemType.Report) {
+            if (itemType != DefinitionItemType.ReportFolder.getValue()
+                    && itemType != DefinitionItemType.Report.getValue()) {
                 throw new BadRequestException("Library folder UUID " + containingFolderUuid + " cannot contain a " + itemType);
             }
         } else {
@@ -174,14 +173,14 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
     }
 
-    protected void saveItem(boolean insert, UUID itemUuid, UUID orgUuid, UUID userUuid, DefinitionItemType itemType,
+    protected void saveItem(boolean insert, UUID itemUuid, UUID orgUuid, UUID userUuid, Integer itemType,
                             String name, String description, QueryDocument queryDocument, UUID containingFolderUuid) throws Exception {
 
         //validate the containing folder type matches the itemType we're saving
         validateItemTypeMatchesContainingFolder(insert, itemType, containingFolderUuid);
 
-        DbActiveItem activeItem = null;
-        DbItem item = null;
+        ActiveitemEntity activeItem = null;
+        ItemEntity item = null;
 
         if (insert) {
             //if creating a NEW item, we need to validate we have the content we need
@@ -193,33 +192,31 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
                 description = "";
             }
             if (containingFolderUuid == null
-                    && itemType != DefinitionItemType.LibraryFolder
-                    && itemType != DefinitionItemType.ReportFolder) {
+                    && itemType != DefinitionItemType.LibraryFolder.getValue()
+                    && itemType != DefinitionItemType.ReportFolder.getValue()) {
                 throw new BadRequestException("Must specify a containing folder for new items");
             }
 
-            activeItem = new DbActiveItem();
-            activeItem.setOrganisationUuid(orgUuid);
-            activeItem.setItemUuid(itemUuid);
-            activeItem.setItemTypeId(itemType);
+            activeItem = new ActiveitemEntity();
+            activeItem.setActiveitemuuid(UUID.randomUUID());
+            activeItem.setOrganisationuuid(orgUuid);
+            activeItem.setItemuuid(itemUuid);
+            activeItem.setItemtypeid(itemType.shortValue());
 
-            item = new DbItem();
-            item.setItemUuid(itemUuid);
-            item.setXmlContent(""); //when creating folders, we don't store XML, so this needs to be non-null
+            item = new ItemEntity();
+            item.setItemuuid(itemUuid);
+            item.setXmlcontent(""); //when creating folders, we don't store XML, so this needs to be non-null
         } else {
-            activeItem = retrieveActiveItem(itemUuid, orgUuid, itemType);
-            item = DbItem.retrieveForActiveItem(activeItem);
+            activeItem = retrieveActiveItem(itemUuid, orgUuid, itemType.shortValue());
+            item = ItemEntity.retrieveForActiveItem(activeItem);
         }
 
-        UUID previousAuditUuid = activeItem.getAuditUuid();
+        UUID previousAuditUuid = activeItem.getAudituuid();
 
         //update the AuditUuid on both objects
-        DbAudit audit = DbAudit.factoryNow(userUuid, orgUuid);
-        activeItem.setAuditUuid(audit.getAuditUuid());
-        item.setAuditUuid(audit.getAuditUuid());
-
-        //force the insert every time, since we allow duplicate rows in the Item table for the same UUID
-        item.setSaveMode(TableSaveMode.INSERT);
+        AuditEntity audit = AuditEntity.factoryNow(userUuid, orgUuid);
+        activeItem.setAudituuid(audit.getAudituuid());
+        item.setAudituuid(audit.getAudituuid());
 
         if (name != null) {
             item.setTitle(name);
@@ -229,35 +226,38 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
         if (queryDocument != null) {
             String xmlContent = QueryDocumentSerializer.writeToXml(queryDocument);
-            item.setXmlContent(xmlContent);
+            item.setXmlcontent(xmlContent);
         }
 
-        //build up a list of entities to save, so they can all be inserted atomically
-        List<DbAbstractTable> toSave = new ArrayList<>();
-        toSave.add(audit);
-        toSave.add(item);
-        toSave.add(activeItem);
-
         //work out any UUIDs our new item is dependent on
+        List<ItemdependencyEntity> itemdependencyEntities = null;
+
         if (queryDocument != null) {
-            createUsingDependencies(queryDocument, activeItem, toSave);
-        } else if (item.getXmlContent().length() > 0) {
+            itemdependencyEntities = createUsingDependencies(queryDocument, activeItem);
+        } else if (item.getXmlcontent().length() > 0) {
             //if a new queryDocument wasn't provided, but the item already had one, we still need to recreate the "using" dependencies
-            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlContent());
-            createUsingDependencies(oldQueryDocument, activeItem, toSave);
+            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlcontent());
+            itemdependencyEntities = createUsingDependencies(oldQueryDocument, activeItem);
         }
 
         //work out the child/contains dependency
-        createFolderDependency(insert, itemType, item, previousAuditUuid, containingFolderUuid, toSave);
+        ItemdependencyEntity linkToParent = createFolderDependency(insert, itemType.shortValue(), item, previousAuditUuid, containingFolderUuid);
+        if (itemdependencyEntities == null)
+            itemdependencyEntities = new ArrayList<>();
+        itemdependencyEntities.add(linkToParent);
 
         //we can now commit to the DB
-        DatabaseManager.db().writeEntities(toSave);
+        DataManager db = new DataManager();
+        db.saveItems(audit, item, activeItem, itemdependencyEntities);
     }
+
 
     /**
      * when a libraryItem or report is saved, process the query document to find all UUIDs that it requires to be run
      */
-    private static void createUsingDependencies(QueryDocument queryDocument, DbActiveItem activeItem, List<DbAbstractTable> toSave) throws Exception {
+    private static List<ItemdependencyEntity> createUsingDependencies(QueryDocument queryDocument, ActiveitemEntity activeItem) throws Exception {
+
+        List<ItemdependencyEntity> dependencies = new ArrayList<>();
 
         //find all the UUIDs in the XML and then see if we need to create or delete dependencies
         QueryDocumentReaderFindDependentUuids reader = new QueryDocumentReaderFindDependentUuids(queryDocument);
@@ -267,56 +267,57 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         while (iter.hasNext()) {
             UUID uuidInDoc = iter.next();
 
-            DbItemDependency dependency = new DbItemDependency();
-            dependency.setItemUuid(activeItem.getItemUuid());
-            dependency.setAuditUuid(activeItem.getAuditUuid());
-            dependency.setDependentItemUuid(uuidInDoc);
-            dependency.setDependencyTypeId(DependencyType.Uses);
-            dependency.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
+            ItemdependencyEntity dependency = new ItemdependencyEntity();
+            dependency.setItemuuid(activeItem.getItemuuid());
+            dependency.setAudituuid(activeItem.getAudituuid());
+            dependency.setDependentitemuuid(uuidInDoc);
+            dependency.setDependencytypeid((short)DependencyType.Uses.getValue());
 
-            toSave.add(dependency);
+            dependencies.add(dependency);
         }
+
+        return dependencies;
     }
 
     /**
      * when a libraryItem, report or folder is saved, link it to the containing folder
      */
-    private static void createFolderDependency(boolean insert, DefinitionItemType itemType, DbItem item, UUID previousAuditUuid, UUID containingFolderUuid, List<DbAbstractTable> toSave) throws Exception {
+    private static ItemdependencyEntity createFolderDependency(boolean insert, Short itemType, ItemEntity item, UUID previousAuditUuid, UUID containingFolderUuid) throws Exception {
 
         //work out the dependency type, based on what item type we're saving
-        DependencyType dependencyType = null;
-        if (itemType == DefinitionItemType.LibraryFolder
-                || itemType == DefinitionItemType.ReportFolder) {
+        Integer dependencyType = null;
+        if (itemType == DefinitionItemType.LibraryFolder.getValue()
+                || itemType == DefinitionItemType.ReportFolder.getValue()) {
             //if we're saving a folder, we're working with "child of" dependencies
-            dependencyType = DependencyType.IsChildOf;
+            dependencyType = DependencyType.IsChildOf.getValue();
         } else {
             //if we're saving anything else, we're working with "contained within" dependencies
-            dependencyType = DependencyType.IsContainedWithin;
+            dependencyType = DependencyType.IsContainedWithin.getValue();
         }
 
         if (containingFolderUuid == null) {
 
             //if saving a new item without a folder, then return out as there's no dependency to create
             if (insert) {
-                return;
+                return null;
             }
 
             //if we're just renaming an item, then no folder UUID would have been supplied,
             //so find out the old folder UUID so we can maintain the relationship
-            List<DbItemDependency> oldFolderDependencies = DbItemDependency.retrieveForItemType(item.getItemUuid(), previousAuditUuid, dependencyType);
+            List<ItemdependencyEntity> oldFolderDependencies = ItemdependencyEntity.retrieveForItemType(item.getItemuuid(), previousAuditUuid, dependencyType.shortValue());
             if (!oldFolderDependencies.isEmpty()) {
-                DbItemDependency oldFolderDependency = oldFolderDependencies.get(0);
-                containingFolderUuid = oldFolderDependency.getDependentItemUuid();
+                ItemdependencyEntity oldFolderDependency = oldFolderDependencies.get(0);
+                containingFolderUuid = oldFolderDependency.getDependentitemuuid();
             }
         }
 
-        DbItemDependency linkToParent = new DbItemDependency();
-        linkToParent.setItemUuid(item.getItemUuid());
-        linkToParent.setAuditUuid(item.getAuditUuid());
-        linkToParent.setDependentItemUuid(containingFolderUuid);
-        linkToParent.setDependencyTypeId(dependencyType);
-        linkToParent.setSaveMode(TableSaveMode.INSERT); //since we've explicitly set all the primaryKey values, we need to set this
-        toSave.add(linkToParent);
+        ItemdependencyEntity linkToParent = new ItemdependencyEntity();
+        linkToParent.setItemuuid(item.getItemuuid());
+        linkToParent.setAudituuid(item.getAudituuid());
+        linkToParent.setDependentitemuuid(containingFolderUuid);
+        linkToParent.setDependencytypeid(dependencyType.shortValue());
+
+        return linkToParent;
     }
 
     protected UUID parseUuidFromStr(String uuidStr) {
@@ -333,43 +334,44 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         if (folderUuid == null) {
             throw new BadRequestException("No destination folder UUID supplied");
         }
-        DbActiveItem folderActiveItem = DbActiveItem.retrieveForItemUuid(folderUuid);
-        if (!folderActiveItem.getOrganisationUuid().equals(orgUuid)) {
+        ActiveitemEntity folderActiveItem = ActiveitemEntity.retrieveForItemUuid(folderUuid);
+        if (!folderActiveItem.getOrganisationuuid().equals(orgUuid)) {
             throw new BadRequestException("Cannot move items to folder owned by another organisation");
         }
 
-        List<DbAbstractTable> toSave = new ArrayList<>();
+        AuditEntity audit = AuditEntity.factoryNow(userUuid, orgUuid);
+        UUID auditUuid = audit.getAudituuid();
 
-        DbAudit audit = DbAudit.factoryNow(userUuid, orgUuid);
-        UUID auditUuid = audit.getAuditUuid();
-        toSave.add(audit);
+        List<ItemEntity> iToMove = new ArrayList<>();
+        List<ActiveitemEntity> aiToMove = new ArrayList<>();
+        List<ItemdependencyEntity> idToMove = new ArrayList<>();
 
         for (JsonMoveItem itemParameter: parameters.getItems()) {
             UUID itemUuid = itemParameter.getUuid();
 
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(itemUuid);
-            DbItem item = DbItem.retrieveForActiveItem(activeItem);
+            ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(itemUuid);
+            ItemEntity item = ItemEntity.retrieveForActiveItem(activeItem);
 
-            if (!activeItem.getOrganisationUuid().equals(orgUuid)) {
+            if (!activeItem.getOrganisationuuid().equals(orgUuid)) {
                 throw new BadRequestException("Cannot move items belonging to another organisation");
             }
 
-            item.setAuditUuid(auditUuid);
-            item.setSaveMode(TableSaveMode.INSERT); //force insert of new item
-            toSave.add(item);
+            item.setAudituuid(auditUuid);
+            iToMove.add(item);
 
-            UUID previousAuditUuid = activeItem.getAuditUuid();
-            activeItem.setAuditUuid(auditUuid);
-            toSave.add(activeItem);
+            UUID previousAuditUuid = activeItem.getAudituuid();
+            activeItem.setAudituuid(auditUuid);
+            aiToMove.add(activeItem);
 
             //"using" dependencies
-            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlContent());
-            createUsingDependencies(oldQueryDocument, activeItem, toSave);
+            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlcontent());
+            idToMove.addAll(createUsingDependencies(oldQueryDocument, activeItem));
 
             //folder dependecies
-            createFolderDependency(false, activeItem.getItemTypeId(), item, previousAuditUuid, folderUuid, toSave);
+            idToMove.add(createFolderDependency(false, activeItem.getItemtypeid(), item, previousAuditUuid, folderUuid));
         }
 
-        DatabaseManager.db().writeEntities(toSave);
+        DataManager db = new DataManager();
+        db.saveMovedItems(audit, iToMove, aiToMove, idToMove);
     }
 }

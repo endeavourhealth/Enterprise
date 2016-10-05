@@ -1,7 +1,8 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
+
+import org.endeavourhealth.enterprise.core.database.models.SourceorganisationEntity;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonSourceOrganisation implements Comparable {
@@ -10,8 +11,8 @@ public final class JsonSourceOrganisation implements Comparable {
 
     public JsonSourceOrganisation() {}
 
-    public JsonSourceOrganisation(DbSourceOrganisation org) {
-        this.odsCode = org.getOdsCode();
+    public JsonSourceOrganisation(SourceorganisationEntity org) {
+        this.odsCode = org.getOdscode();
         this.name = org.getName();
     }
 

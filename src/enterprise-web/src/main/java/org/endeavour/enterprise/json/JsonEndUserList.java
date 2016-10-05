@@ -1,9 +1,8 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
+import org.endeavourhealth.enterprise.core.database.models.EnduserEntity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public final class JsonEndUserList {
         throw new RuntimeException("Trying to add too many organisations to JsonOrganisationList");*/
     }
 
-    public void add(DbEndUser endUser, boolean isAdmin) {
+    public void add(EnduserEntity endUser, boolean isAdmin) {
         JsonEndUser jsonEndUser = new JsonEndUser(endUser, isAdmin, null);
         add(jsonEndUser);
     }

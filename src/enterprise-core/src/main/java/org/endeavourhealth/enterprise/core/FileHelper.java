@@ -29,9 +29,13 @@ public class FileHelper {
         }
     }
 
+    public static boolean pathNotExists(Path path) {
+        return Files.notExists(path);
+    }
+
     public static boolean pathNotExists(String path) {
         Path pathObject = Paths.get(path);
-        return Files.notExists(pathObject);
+        return pathNotExists(pathObject);
     }
 
     public static void createFolder(Path folder) throws IOException {

@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.controller.outputfiles;
 
+import org.endeavourhealth.enterprise.controller.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.controller.configuration.models.OutputFilesType;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobInventory;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobReportInfo;
@@ -16,21 +17,20 @@ import java.util.UUID;
 class FolderBuilder {
     private final JobInventory jobInventory;
     private final List<Folder> folders;
-    private final OutputFilesType configuration;
+    private final OutputFileContext context;
     private final UUID jobUuid;
     private final Instant startDateTime;
-    private Path temporaryJobFolder;
 
     public FolderBuilder(
             JobInventory jobInventory,
             List<Folder> folders,
-            OutputFilesType configuration,
+            OutputFileContext context,
             UUID jobUuid,
             Instant startDateTime) {
 
         this.jobInventory = jobInventory;
         this.folders = folders;
-        this.configuration = configuration;
+        this.context = context;
         this.jobUuid = jobUuid;
         this.startDateTime = startDateTime;
     }
@@ -89,30 +89,57 @@ class FolderBuilder {
 
     private void createFolders() throws Exception {
 
-        if (FileHelper.pathNotExists(configuration.getStreamingFolder()))
-            throw new Exception("Streaming folder does not exist: " + configuration.getStreamingFolder());
+        Path streamingFolder = getAndValidatePath(context.getOutputFileConfiguration().getStreamingFolder());
+        context.setJobStreamingFolder(streamingFolder.resolve(jobUuid.toString()));
+        FileHelper.createFolder(context.getJobStreamingFolder());
 
-        Path completeStreamingFolder = Paths.get(configuration.getStreamingFolder(), jobUuid.toString());
-        FileHelper.createFolder(completeStreamingFolder);
+        Path workingFolder = getAndValidatePath(context.getOutputFileConfiguration().getWorkingFolder());
+        context.setJobWorkingFolder(workingFolder.resolve(jobUuid.toString()));
+        FileHelper.createFolder(context.getJobWorkingFolder());
 
-        if (FileHelper.pathNotExists(configuration.getWorkingFolder()))
-            throw new Exception("Working folder does not exist: " + configuration.getWorkingFolder());
-
-        Path completeWorkingFolder = Paths.get(configuration.getWorkingFolder(), jobUuid.toString());
-        FileHelper.createFolder(completeWorkingFolder);
-
-        if (FileHelper.pathNotExists(configuration.getTargetFolder()))
-            throw new Exception("Target folder does not exist: " + configuration.getTargetFolder());
-
+        Path targetFolder = getAndValidatePath(context.getOutputFileConfiguration().getTargetFolder());
         String jobFolderName = NameHandler.calculateJobName(startDateTime);
+        context.setJobTargetFolder(targetFolder.resolve(jobFolderName));
+        FileHelper.createFolder(context.getJobTargetFolder());
+
         Path branchPath = Paths.get(jobFolderName);
-        Path workingFolder = Paths.get(configuration.getWorkingFolder());
-        temporaryJobFolder = workingFolder.resolve(branchPath);
-
-        FileHelper.createFolder(temporaryJobFolder);
-
-        addBranchPaths(workingFolder, branchPath, folders);
+        addBranchPaths(branchPath, folders);
         setFileInfo(folders);
+    }
+
+    private Path getAndValidatePath(String path) throws Exception {
+        Path pathObject = Paths.get(path);
+
+        if (FileHelper.pathNotExists(pathObject))
+            throw new Exception("Folder does not exist: " + pathObject.toString());
+
+        return pathObject;
+    }
+
+    private void addBranchPaths(Path parentBranch, List<Folder> folders) throws IOException {
+
+        for (Folder folder: folders) {
+            Path path = parentBranch.resolve(folder.getPreferredFolderName());
+            folder.setFolderPathBranch(path);
+
+            Path fullPath = context.getJobWorkingFolder().resolve(path);
+            FileHelper.createFolder(fullPath);
+
+            addBranchPaths(rootFolder, path, folder.getChildren());
+        }
+    }
+
+    private void calculatePreferredFolderNames() throws Exception {
+
+        calculatePreferredFolderNames(folders);
+    }
+
+    private void calculatePreferredFolderNames(List<Folder> folders) throws Exception {
+
+        for (Folder folder: folders) {
+            folder.setPreferredFolderName(jobInventory);
+            calculatePreferredFolderNames(folder.getChildren());
+        }
     }
 
     private void setFileInfo(List<Folder> folders) throws Exception {
@@ -133,46 +160,10 @@ class FolderBuilder {
             return;
 
         for (JobReportItemInfo item: items) {
-            if (item.getListReportInfo() != null)
-                setFileInfo(folder, item);
+            if (item.getListReportInfo() != null) {
+                item.getListReportInfo().setFolderBranch(folder.getFolderPathBranch());
+                item.getListReportInfo().setRootName(jobInventory.getItemName(item.getLibraryItemUuid()));
+            }
         }
-    }
-
-    private void setFileInfo(Folder folder, JobReportItemInfo item) throws Exception {
-        if (item.getListReportInfo() == null)
-            throw new Exception("JobReportItemInfo does not contain list report information");
-
-        item.getListReportInfo().setFolderBranch(folder.getFolderPathBranch());
-        item.getListReportInfo().setRootName(jobInventory.getItemName(item.getLibraryItemUuid()));
-    }
-
-    private void addBranchPaths(Path rootFolder, Path parentBranch, List<Folder> folders) throws IOException {
-
-        for (Folder folder: folders) {
-            Path path = parentBranch.resolve(folder.getPreferredFolderName());
-            folder.setFolderPathBranch(path);
-
-            Path fullPath = rootFolder.resolve(path);
-            FileHelper.createFolder(fullPath);
-
-            addBranchPaths(rootFolder, path, folder.getChildren());
-        }
-    }
-
-    private void calculatePreferredFolderNames() throws Exception {
-
-        calculatePreferredFolderNames(folders);
-    }
-
-    private void calculatePreferredFolderNames(List<Folder> folders) throws Exception {
-
-        for (Folder folder: folders) {
-            folder.setPreferredFolderName(jobInventory);
-            calculatePreferredFolderNames(folder.getChildren());
-        }
-    }
-
-    public Path getTemporaryJobFolder() {
-        return temporaryJobFolder;
     }
 }

@@ -2,14 +2,16 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.framework.exceptions.BadRequestException;
 import org.endeavour.enterprise.framework.security.PasswordHash;
+import org.endeavour.enterprise.framework.security.RequiresAdmin;
+import org.endeavour.enterprise.framework.security.RequiresSuperUser;
 import org.endeavour.enterprise.json.JsonEndUser;
 import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
 import org.endeavour.enterprise.email.EmailProvider;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
-import org.endeavourhealth.enterprise.core.database.administration.*;
+
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
+import org.endeavourhealth.enterprise.core.database.DataManager;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -35,12 +38,13 @@ public final class AdminEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/saveOrganisation")
+    @RequiresSuperUser
     public Response saveOrganisation(@Context SecurityContext sc, JsonOrganisation organisationParameters) throws Exception {
         super.setLogbackMarkers(sc);
 
         //validate our user is a super user
-        DbEndUser user = getEndUserFromSession(sc);
-        if (!user.isSuperUser()) {
+        EnduserEntity user = getEndUserFromSession(sc);
+        if (!user.getIssuperuser()) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
 
@@ -51,9 +55,9 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         LOG.trace("SavingOrganisation OrgUUID {}, Name {} ID {}", uuid, name, id);
 
-        DbOrganisation duplicate = DbOrganisation.retrieveOrganisationForNameNationalId(name, id);
+        OrganisationEntity duplicate = OrganisationEntity.retrieveOrganisationForNameNationalId(name, id);
 
-        DbOrganisation org = null;
+        OrganisationEntity org = null;
         boolean creteRootFolders = false;
 
         //if no UUID was passed, then we're creating a new org
@@ -63,14 +67,14 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 throw new BadRequestException("Organisation already exists with that name and ID");
             }
 
-            org = new DbOrganisation();
+            org = new OrganisationEntity();
             org.setName(name);
-            org.setNationalId(id);
+            org.setNationalid(id);
 
             //whenever we create an org, we'll want to create new root folders too
             creteRootFolders = true;
         } else {
-            org = DbOrganisation.retrieveForUuid(uuid);
+            org = OrganisationEntity.retrieveForUuid(uuid);
 
             //ensure we're not creating a new duplicate
             if (duplicate != null
@@ -79,16 +83,17 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
 
             org.setName(name);
-            org.setNationalId(id);
+            org.setNationalid(id);
         }
 
         //save to db
-        org.writeToDb();
+        DataManager db = new DataManager();
+        db.saveOrganisation(org);
 
         //if we've created new root folders, save them now
         if (creteRootFolders) {
             UUID userUuid = getEndUserUuidFromToken(sc);
-            UUID orgUuid = org.getOrganisationUuid();
+            UUID orgUuid = org.getOrganisationuuid();
 
             FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.ReportFolder);
             FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.LibraryFolder);
@@ -96,7 +101,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         //return the organisation UUID
         JsonOrganisation ret = new JsonOrganisation();
-        ret.setUuid(org.getOrganisationUuid());
+        ret.setUuid(org.getOrganisationuuid());
 
         clearLogbackMarkers();
 
@@ -139,34 +144,32 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         //if doing anything to a super user, verify the current user is a super-user
         if (isSuperUser.booleanValue()) {
-            DbEndUser user = getEndUserFromSession(sc);
-            if (!user.isSuperUser()) {
+            EnduserEntity user = getEndUserFromSession(sc);
+            if (!user.getIssuperuser()) {
                 throw new NotAuthorizedException("Non-super user cannot create or modify super users");
             }
         }
 
         //validate that the user is amending themselves or is an admin
-        DbEndUser userLoggedOn = getEndUserFromSession(sc);
+        EnduserEntity userLoggedOn = getEndUserFromSession(sc);
         if (uuid == null
-                || !userLoggedOn.getEndUserUuid().equals(uuid)) {
-            if (!isAdminFromSession(sc)) {
+                || !userLoggedOn.getEnduseruuid().equals(uuid)) {
+            if (!isAdminFromSecurityContext(sc)) {
                 throw new NotAuthorizedException("Must be an admin to create new users or amend others");
             }
         }
 
-        DbOrganisation org = getOrganisationFromSession(sc);
+        OrganisationEntity org = getOrganisationFromSession(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        List<DbAbstractTable> toSave = new ArrayList<>();
-
-        DbEndUser user = null;
-        DbOrganisationEndUserLink link = null;
+        EnduserEntity user = null;
+        OrganisationenduserlinkEntity link = null;
         Boolean createdNewPerson = null;
 
         //if the uuid is null, we're creating a new person
         if (uuid == null) {
             //see if we have a person for this email address, that the admin user couldn't see, which we can just use
-            user = DbEndUser.retrieveForEmail(email);
+            user = EnduserEntity.retrieveForEmail(email);
 
             if (isAdmin == null) {
                 isAdmin = Boolean.FALSE;
@@ -190,14 +193,14 @@ public final class AdminEndpoint extends AbstractEndpoint {
                     throw new BadRequestException("Cannot set blank surname");
                 }
 
-                user = new DbEndUser();
-                user.assignPrimaryUUid();
+                user = new EnduserEntity();
+                user.setEnduseruuid(UUID.randomUUID());
                 user.setEmail(email);
                 user.setTitle(title);
                 user.setForename(forename);
                 user.setSurname(surname);
-                user.setSuperUser(isSuperUser);
-                uuid = user.getEndUserUuid();
+                user.setIssuperuser(isSuperUser);
+                uuid = user.getEnduseruuid();
             }
             //if we're trying to create a new user, but they already exist at another org,
             //then we can just use that same user record and link it to the new organisation
@@ -211,8 +214,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 }
 
                 //validate the person isn't already a user at our org
-                uuid = user.getEndUserUuid();
-                link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
+                uuid = user.getEnduseruuid();
+                link = OrganisationenduserlinkEntity.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
                 if (link != null) {
                     throw new BadRequestException("User already is registered here");
                 }
@@ -220,27 +223,27 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
             //create the user/org link for non-superusers only, as superusers don't require them
             if (!isSuperUser.booleanValue()) {
-                link = new DbOrganisationEndUserLink();
-                link.setOrganisationUuid(orgUuid);
-                link.setEndUserUuid(uuid);
-                link.setAdmin(isAdmin);
+                link = new OrganisationenduserlinkEntity();
+                link.setOrganisationuuid(orgUuid);
+                link.setEnduseruuid(uuid);
+                link.setIsadmin(isAdmin);
             }
         }
         //if we have a uuid, we're updating an existing person
         else {
-            user = DbEndUser.retrieveForUuid(uuid);
+            user = EnduserEntity.retrieveForUuid(uuid);
 
             //if we're changing the email, validate that the email isn't already on the DB
             String existingEmail = user.getEmail();
             if (!existingEmail.equals(email)) {
-                DbEndUser duplicateEmail = DbEndUser.retrieveForEmail(email);
+                EnduserEntity duplicateEmail = EnduserEntity.retrieveForEmail(email);
                 if (duplicateEmail != null) {
                     throw new BadRequestException("New email address already in use");
                 }
             }
 
             //we can turn a super-user into a NON-super user, but don't allow going the other way
-            if (!user.isSuperUser()
+            if (!user.getIssuperuser()
                     && isSuperUser.booleanValue()) {
                 throw new BadRequestException("Cannot promote a user to super-user status");
             }
@@ -258,36 +261,36 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 user.setSurname(surname);
             }
 
-            user.setSuperUser(isSuperUser);
+            user.setIssuperuser(isSuperUser);
 
             //retrieve the link entity, as we may want to change the permissions on there
-            link = DbOrganisationEndUserLink.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
+            link = OrganisationenduserlinkEntity.retrieveForOrganisationEndUserNotExpired(orgUuid, uuid);
 
             //the link will be null if we're a super-user, so that's fine
             if (link != null && isAdmin != null) {
-                link.setAdmin(isAdmin);
+                link.setIsadmin(isAdmin);
             }
         }
 
-        toSave.add(user);
-
-        //if we created or changed a link, save it
-        if (link != null) {
-            toSave.add(link);
-        }
+        DataManager db = new DataManager();
+        db.saveUser(user);
 
         //if a password was supplied, then set or change the password
+        EnduserpwdEntity euP = null;
+
         if (password != null) {
-            changePassword(user, userLoggedOn, password, toSave);
+            euP = changePassword(user, userLoggedOn, password);
         }
 
         //if we just updated a person, then we don't want to generate any invite email
+        EnduseremailinviteEntity euInvite = null;
+
         if (createdNewPerson == null) {
             //do nothing
         }
         //if we created a new person, generate the invite email
         else if (createdNewPerson.booleanValue()) {
-            createAndSendInvite(user, org, toSave);
+            euInvite = createAndSendInvite(user, org);
         }
         //if we didn't create a new person, then we don't need them to verify and create
         //a password, but we still want to tell the person that they were given new access
@@ -297,7 +300,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
             }
         }
 
-        DatabaseManager.db().writeEntities(toSave);
+        db.saveUserEntities(euP, euInvite, link);
 
         //return the UUID of the person back to the client
         JsonEndUser ret = new JsonEndUser();
@@ -311,7 +314,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .build();
     }
 
-    private static void changePassword(DbEndUser user, DbEndUser loggedOnUser, String newPwd, List<DbAbstractTable> toSave) throws Exception {
+    private static EnduserpwdEntity changePassword(EnduserEntity user, EnduserEntity loggedOnUser, String newPwd) throws Exception {
 
         //validate the user is changing their own password or is an admin
         Boolean oneTimeUse = Boolean.FALSE;
@@ -322,54 +325,54 @@ public final class AdminEndpoint extends AbstractEndpoint {
         String hash = PasswordHash.createHash(newPwd);
 
         //retrieve the most recent password for the person
-        UUID uuid = user.getEndUserUuid();
-        DbEndUserPwd oldPwd = DbEndUserPwd.retrieveForEndUserNotExpired(uuid);
+        UUID uuid = user.getEnduseruuid();
+        EnduserpwdEntity oldPwd = EnduserpwdEntity.retrieveEndUserPwdForUserNotExpired(uuid);
 
         //create the new password entity
-        DbEndUserPwd p = new DbEndUserPwd();
-        p.setEndUserUuid(uuid);
-        p.setPwdHash(hash);
-        p.setOneTimeUse(oneTimeUse);
-        p.setFailedAttempts(new Integer(0));
-        toSave.add(p);
+        EnduserpwdEntity p = new EnduserpwdEntity();
+        p.setEnduseruuid(uuid);
+        p.setPwdhash(hash);
+        p.setIsonetimeuse(oneTimeUse);
+        p.setFailedattempts(new Integer(0));
 
         //expire the old password, if there was one
         if (oldPwd != null) {
-            oldPwd.setDtExpired(Instant.now());
-            toSave.add(oldPwd);
+            oldPwd.setDtexpired(Timestamp.from(Instant.now()));
         }
+
+        //save to db
+        DataManager db = new DataManager();
+        db.saveUserPassword(p, oldPwd);
+
+        return p;
     }
 
-    private static void createAndSendInvite(DbEndUser user, DbOrganisation org, List<DbAbstractTable> toSave) throws Exception {
-        UUID userUuid = user.getEndUserUuid();
+    private static EnduseremailinviteEntity createAndSendInvite(EnduserEntity user, OrganisationEntity org) throws Exception {
+        UUID userUuid = user.getEnduseruuid();
 
         //use a base64 encoded version of a random UUID
         String tokenUuid = UUID.randomUUID().toString();
         String token = Base64.getEncoder().encodeToString(tokenUuid.getBytes());
 
-        DbEndUserEmailInvite invite = new DbEndUserEmailInvite();
-        invite.setEndUserUuid(userUuid);
-        invite.setUniqueToken(token);
-        toSave.add(invite);
+        EnduseremailinviteEntity invite = new EnduseremailinviteEntity();
+        invite.setEnduseruuid(userUuid);
+        invite.setUniquetoken(token);
 
         //send the invite email before saving to the DB
         if (!EmailProvider.getInstance().sendInviteEmail(user, org, token)) {
             throw new InternalServerErrorException("Failed to send invitation email");
         }
+
+        return invite;
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/deleteUser")
+    @RequiresAdmin
     public Response deleteUser(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
         super.setLogbackMarkers(sc);
-
-        //first, verify the user is an admin
-        boolean isAdmin = super.isAdminFromSession(sc);
-        if (!isAdmin) {
-            throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
-        }
 
         //userParameters
         UUID userUuid = userParameters.getUuid();
@@ -385,12 +388,13 @@ public final class AdminEndpoint extends AbstractEndpoint {
         //at the current organisation as expired
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForEndUserNotExpired(userUuid);
+        List<OrganisationenduserlinkEntity> links = OrganisationenduserlinkEntity.retrieveForEndUserNotExpired(userUuid);
         for (int i = 0; i < links.size(); i++) {
-            DbOrganisationEndUserLink link = links.get(i);
-            if (link.getOrganisationUuid().equals(orgUuid)) {
-                link.setDtExpired(Instant.now());
-                link.writeToDb();
+            OrganisationenduserlinkEntity link = links.get(i);
+            if (link.getOrganisationuuid().equals(orgUuid)) {
+                link.setDtexpired(Timestamp.from(Instant.now()));
+                DataManager db = new DataManager();
+                db.deleteUser(link);
             }
         }
 
@@ -415,22 +419,22 @@ public final class AdminEndpoint extends AbstractEndpoint {
         JsonEndUserList ret = new JsonEndUserList();
 
         //retrieve all users at this organisation
-        List<DbOrganisationEndUserLink> links = DbOrganisationEndUserLink.retrieveForOrganisationNotExpired(orgUuid);
+        List<OrganisationenduserlinkEntity> links = OrganisationenduserlinkEntity.retrieveForOrganisationNotExpired(orgUuid);
         for (int i = 0; i < links.size(); i++) {
-            DbOrganisationEndUserLink link = links.get(i);
-            UUID endUserUuid = link.getEndUserUuid();
-            boolean isAdmin = link.isAdmin();
-            DbEndUser endUser = DbEndUser.retrieveForUuid(endUserUuid);
+            OrganisationenduserlinkEntity link = links.get(i);
+            UUID endUserUuid = link.getEnduseruuid();
+            boolean isAdmin = link.getIsadmin();
+            EnduserEntity endUser = EnduserEntity.retrieveForUuid(endUserUuid);
 
             ret.add(endUser, isAdmin);
         }
 
         //if we're a super-user then we should also include all other super-users in the result
-        DbEndUser user = getEndUserFromSession(sc);
-        if (user.isSuperUser()) {
-            List<DbEndUser> superUsers = DbEndUser.retrieveSuperUsers();
+        EnduserEntity user = getEndUserFromSession(sc);
+        if (user.getIssuperuser()) {
+            List<EnduserEntity> superUsers = EnduserEntity.retrieveSuperUsers();
             for (int i = 0; i < superUsers.size(); i++) {
-                DbEndUser superUser = superUsers.get(i);
+                EnduserEntity superUser = superUsers.get(i);
 
                 //super-users are always treated as admins
                 ret.add(superUser, true);
@@ -445,75 +449,39 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .build();
     }
 
-    /*private static void testSql() throws Exception {
 
-        int times = 100;
-        String uuid = "C8E02710-C380-454C-8776-45E4DD180825";
-
-        LOG.trace("Starting SQL literal test");
-        for (int i=0; i<times; i++) {
-            String sql = "SELECT * FROM Administration.EndUser WHERE EndUserUuid = '" + uuid + "'";
-
-            Connection conn = DatabaseManager.getConnection();
-            Statement s = conn.createStatement();
-            s.execute(sql);
-            ResultSet rs = s.getResultSet();
-            rs.close();
-            conn.close();
-        }
-        LOG.trace("Completed literal test");
-
-
-        LOG.trace("Starting SQL prepared statement test");
-        for (int i=0; i<times; i++) {
-            String sql = "SELECT * FROM Administration.EndUser WHERE EndUserUuid = ?";
-
-            Connection conn = DatabaseManager.getConnection();
-            PreparedStatement s = conn.prepareStatement(sql);
-            s.setString(1, uuid);
-            s.execute();
-            ResultSet rs = s.getResultSet();
-            rs.close();
-            conn.close();
-        }
-        LOG.trace("Completed prepared statement test");
-    }*/
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/resendInviteEmail")
+    @RequiresAdmin
     public Response resendInviteEmail(@Context SecurityContext sc, JsonEndUser userParameters) throws Exception {
         super.setLogbackMarkers(sc);
 
-        //first, verify the user is an admin
-        boolean isAdmin = super.isAdminFromSession(sc);
-        if (!isAdmin) {
-            throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
-        }
-
         //userParameters
         UUID userUuid = userParameters.getUuid();
-        DbEndUser user = DbEndUser.retrieveForUuid(userUuid);
+        EnduserEntity user = EnduserEntity.retrieveForUuid(userUuid);
 
         LOG.trace("ResendingInviteEmail UserUUID {}", userUuid);
 
         //retrieve any existing invite for this person and mark it as completed,
         //so clicking the link in the old email will no longer work
-        List<DbAbstractTable> toSave = new ArrayList<>();
+        List<EnduseremailinviteEntity> invitesToSave = new ArrayList<>();
 
-        List<DbEndUserEmailInvite> invites = DbEndUserEmailInvite.retrieveForEndUserNotCompleted(userUuid);
+        List<EnduseremailinviteEntity> invites = EnduseremailinviteEntity.retrieveForEndUserNotCompleted(userUuid);
         for (int i = 0; i < invites.size(); i++) {
-            DbEndUserEmailInvite invite = invites.get(i);
-            invite.setDtCompleted(Instant.now());
-            toSave.add(invite);
+            EnduseremailinviteEntity invite = invites.get(i);
+            invite.setDtcompleted(Timestamp.from(Instant.now()));
+            invitesToSave.add(invite);
         }
 
         //now generate a new invite and send it
-        DbOrganisation org = getOrganisationFromSession(sc);
-        createAndSendInvite(user, org, toSave);
+        OrganisationEntity org = getOrganisationFromSession(sc);
+        EnduseremailinviteEntity invite = createAndSendInvite(user, org);
 
-        DatabaseManager.db().writeEntities(toSave);
+        DataManager db = new DataManager();
+        db.saveUserInvites(invitesToSave, invite);
 
         clearLogbackMarkers();
 

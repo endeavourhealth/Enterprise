@@ -1,9 +1,8 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -25,8 +24,8 @@ public final class JsonFolder implements Comparable {
     public JsonFolder() {
     }
 
-    public JsonFolder(DbItem item, int contentCount, boolean hasChildren) {
-        this.uuid = item.getItemUuid();
+    public JsonFolder(ItemEntity item, int contentCount, boolean hasChildren) {
+        this.uuid = item.getItemuuid();
         this.folderName = item.getTitle();
 
         this.hasChildren = hasChildren;

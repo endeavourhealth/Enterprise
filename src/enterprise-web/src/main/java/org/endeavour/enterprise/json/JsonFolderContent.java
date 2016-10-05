@@ -1,13 +1,12 @@
 package org.endeavour.enterprise.json;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
-import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
+import org.endeavourhealth.enterprise.core.database.models.ActiveitemEntity;
+import org.endeavourhealth.enterprise.core.database.models.AuditEntity;
+import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 
-import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,22 +25,22 @@ public final class JsonFolderContent implements Comparable {
 
     }
 
-    public JsonFolderContent(DbActiveItem activeItem, DbItem item, DbAudit audit) {
+    public JsonFolderContent(ActiveitemEntity activeItem, ItemEntity item, AuditEntity audit) {
         this(item, audit);
-        setTypeEnum(activeItem.getItemTypeId());
+        setTypeEnum(activeItem.getItemtypeid());
     }
-    public JsonFolderContent(DbItem item, DbAudit audit) {
-        this.uuid = item.getItemUuid();
+    public JsonFolderContent(ItemEntity item, AuditEntity audit) {
+        this.uuid = item.getItemuuid();
         this.name = item.getTitle();
         this.description = item.getDescription();
 
         if (audit != null) {
-            this.lastModified = new Date(audit.getTimeStamp().toEpochMilli());
+            this.lastModified = new Date(audit.getTimestamp().getTime());
         }
     }
 
-    public void setTypeEnum(DefinitionItemType t) {
-        setType(t.getValue());
+    public void setTypeEnum(Short t) {
+        setType(t.intValue());
         setTypeDesc(t.toString());
     }
 

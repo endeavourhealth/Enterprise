@@ -2,10 +2,9 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.json.*;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.database.administration.DbEndUser;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.*;
+
+import org.endeavourhealth.enterprise.core.database.DataManager;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
@@ -20,6 +19,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,8 +42,8 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("GettingReport for UUID {}", reportUuid);
 
-        DbItem item = DbItem.retrieveLatestForUUid(reportUuid);
-        String xml = item.getXmlContent();
+        ItemEntity item = ItemEntity.retrieveLatestForUUid(reportUuid);
+        String xml = item.getXmlcontent();
 
         Report ret = QueryDocumentSerializer.readReportFromXml(xml);
 
@@ -87,7 +87,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
             report.setUuid(reportUuid.toString());
         }
 
-        super.saveItem(inserting, reportUuid, orgUuid, userUuid, DefinitionItemType.Report, name, description, doc, folderUuid);
+        super.saveItem(inserting, reportUuid, orgUuid, userUuid, DefinitionItemType.Report.getValue(), name, description, doc, folderUuid);
 
         //return the UUID of the query
         Report ret = new Report();
@@ -143,14 +143,16 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("ScheduilingReport UUID {}", reportUuid);
 
-        DbRequest request = new DbRequest();
-        request.setReportUuid(reportUuid);
-        request.setOrganisationUuid(orgUuid);
-        request.setEndUserUuid(userUuid);
-        request.setTimeStamp(Instant.now());
+        RequestEntity request = new RequestEntity();
+        request.setRequestuuid(UUID.randomUUID());
+        request.setReportuuid(reportUuid);
+        request.setOrganisationuuid(orgUuid);
+        request.setEnduseruuid(userUuid);
+        request.setTimestamp(Timestamp.from(Instant.now()));
         request.setParameters(parameterXml);
 
-        request.writeToDb();
+        DataManager db = new DataManager();
+        db.saveSchedule(request);
 
         clearLogbackMarkers();
 
@@ -172,38 +174,42 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("getPastSchedules for report UUID {} and count {}", reportUuid, count);
 
-        List<DbRequest> requests = DbRequest.retrieveForItem(orgUuid, reportUuid, count);
-        List<DbJobReport> jobReports = DbJobReport.retrieveForRequests(requests);
-        List<DbJob> jobs = DbJob.retrieveForJobReports(jobReports);
+        List<RequestEntity> requests = RequestEntity.retrieveForItem(orgUuid, reportUuid, count);
+        List<JobreportEntity> jobReports = JobreportEntity.retrieveForRequests(requests);
+        List<JobEntity> jobs = JobEntity.retrieveForJobReports(jobReports);
 
-        HashMap<UUID, DbJobReport> hmJobReportsByUuid = new HashMap<>();
-        for (DbJobReport jobReport: jobReports) {
-            hmJobReportsByUuid.put(jobReport.getJobReportUuid(), jobReport);
+        HashMap<UUID, JobreportEntity> hmJobReportsByUuid = new HashMap<>();
+        for (JobreportEntity jobReport: jobReports) {
+            hmJobReportsByUuid.put(jobReport.getJobreportuuid(), jobReport);
         }
 
-        HashMap<UUID, DbJob> hmJobsByUuid = new HashMap<>();
-        for (DbJob job: jobs) {
-            hmJobsByUuid.put(job.getJobUuid(), job);
+        HashMap<UUID, JobEntity> hmJobsByUuid = new HashMap<>();
+        for (JobEntity job: jobs) {
+            hmJobsByUuid.put(job.getJobuuid(), job);
         }
 
-        HashMap<UUID, DbEndUser> hmUsersByUuid = new HashMap<>();
-        List<DbEndUser> users = DbEndUser.retrieveForRequests(requests);
-        for (DbEndUser user: users) {
-            hmUsersByUuid.put(user.getEndUserUuid(), user);
+        HashMap<UUID, EnduserEntity> hmUsersByUuid = new HashMap<>();
+        List<EnduserEntity> users = EnduserEntity.retrieveForRequests(requests);
+        for (EnduserEntity user: users) {
+            hmUsersByUuid.put(user.getEnduseruuid(), user);
         }
 
         List<JsonReportRequest> ret = new ArrayList<>();
 
-        for (DbRequest request: requests) {
+        for (RequestEntity request: requests) {
 
-            DbJob job = null;
-            DbJobReport jobReport = hmJobReportsByUuid.get(request.getJobReportUuid());
+            String parameterXml = request.getParameters();
+            JobEntity job = null;
+
+            JobreportEntity jobReport = hmJobReportsByUuid.get(request.getJobreportuuid());
             if (jobReport != null) {
-                job = hmJobsByUuid.get(jobReport.getJobUuid());
+                parameterXml = jobReport.getParameters(); //if our request has been run, use the parameters of when it was run
+                job = hmJobsByUuid.get(jobReport.getJobuuid());
             }
-            DbEndUser user = hmUsersByUuid.get(request.getEndUserUuid());
 
-            ret.add(new JsonReportRequest(request, job, user));
+            EnduserEntity user = hmUsersByUuid.get(request.getEnduseruuid());
+
+            ret.add(new JsonReportRequest(request, job, user, parameterXml));
         }
 
         clearLogbackMarkers();
@@ -226,16 +232,16 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         LOG.trace("getScheduleResults for request UUID {}", requestUuid);
 
-        DbRequest request = DbRequest.retrieveForUuid(requestUuid);
-        UUID jobReportUuid = request.getJobReportUuid();
-        UUID reportUuid = request.getReportUuid();
+        RequestEntity request = RequestEntity.retrieveForUuid(requestUuid);
+        UUID jobReportUuid = request.getJobreportuuid();
+        UUID reportUuid = request.getReportuuid();
         String parameters = request.getParameters();
 
         if (jobReportUuid == null) {
             throw new BadRequestException("Schedule not run yet");
         }
 
-        if (!request.getOrganisationUuid().equals(orgUuid)) {
+        if (!request.getOrganisationuuid().equals(orgUuid)) {
             throw new BadRequestException("Requesting a schedule at another organisation");
         }
 
@@ -243,36 +249,36 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         Integer populationCount = null;
         HashMap<UUID, Integer> hmResultsByQuery = new HashMap<>();
 
-        DbJobReport jobReport = DbJobReport.retrieveForUuid(jobReportUuid);
+        JobreportEntity jobReport = JobreportEntity.retrieveForUuid(jobReportUuid);
         if (organisationOdsCode == null) {
-            populationCount = jobReport.getPopulationCount();
+            populationCount = jobReport.getPopulationcount();
         } else {
-            DbJobReportOrganisation jobReportOrganisation = DbJobReportOrganisation.retrieveForJobReportAndOdsCode(jobReport, organisationOdsCode);
-            populationCount = jobReportOrganisation.getPopulationCount();
+            JobreportorganisationEntity jobReportOrganisation = JobreportorganisationEntity.retrieveForJobReportAndOdsCode(jobReport, organisationOdsCode);
+            populationCount = jobReportOrganisation.getPopulationcount();
         }
 
-        List<DbJobReportItem> jobReportItems = DbJobReportItem.retrieveForJobReport(jobReport.getJobReportUuid());
-        for (DbJobReportItem jobReportItem: jobReportItems) {
+        List<JobreportitemEntity> jobReportItems = JobreportitemEntity.retrieveForJobReport(jobReport.getJobreportuuid());
+        for (JobreportitemEntity jobReportItem: jobReportItems) {
 
             if (organisationOdsCode == null) {
-                hmResultsByQuery.put(jobReportItem.getItemUuid(), jobReportItem.getResultCount());
+                hmResultsByQuery.put(jobReportItem.getItemuuid(), jobReportItem.getResultcount());
             } else {
-                DbJobReportItemOrganisation jobReportItemOrganisation = DbJobReportItemOrganisation.retrieveForJobReportItemAndOdsCode(jobReportItem, organisationOdsCode);
+                JobreportitemorganisationEntity jobReportItemOrganisation = JobreportitemorganisationEntity.retrieveForJobReportItemAndOdsCode(jobReportItem, organisationOdsCode);
                 if (jobReportItemOrganisation != null) { //this may be null if the reportItem is a listOutput
-                    hmResultsByQuery.put(jobReportItem.getItemUuid(), jobReportItemOrganisation.getResultCount());
+                    hmResultsByQuery.put(jobReportItem.getItemuuid(), jobReportItemOrganisation.getResultcount());
                 }
 
             }
         }
 
-        //retrieve the DbItem for the report, so we can work out the report query hierarchy
-        UUID auditUuid = jobReport.getAuditUuid();
-        DbItem reportItemObj = DbItem.retrieveForUuidAndAudit(reportUuid, auditUuid);
-        String xml = reportItemObj.getXmlContent();
+        //retrieve the ItemEntity for the report, so we can work out the report query hierarchy
+        UUID auditUuid = jobReport.getAudituuid();
+        ItemEntity reportItemObj = ItemEntity.retrieveForUuidAndAudit(reportUuid, auditUuid);
+        String xml = reportItemObj.getXmlcontent();
         Report report = QueryDocumentSerializer.readReportFromXml(xml);
 
         //we'll need the all the child queries in the report, so get them in as few DB hits as possile
-        HashMap<UUID, DbItem> hmItemsByUuid = getItemsForReport(report);
+        HashMap<UUID, ItemEntity> hmItemsByUuid = getItemsForReport(report);
 
         List<ReportItem> reportItems = report.getReportItem();
         JsonQueryResult dummyResult = new JsonQueryResult();
@@ -302,22 +308,22 @@ public final class ReportEndpoint extends AbstractItemEndpoint
             uuids.add(queryUuid);
         }
     }
-    private static HashMap<UUID, DbItem> getItemsForReport(Report report) throws Exception {
+    private static HashMap<UUID, ItemEntity> getItemsForReport(Report report) throws Exception {
         List<UUID> itemUuids = new ArrayList<>();
         getQueryUuids(report.getReportItem(), itemUuids);
 
-        HashMap<UUID, DbItem> ret = new HashMap<>();
+        HashMap<UUID, ItemEntity> ret = new HashMap<>();
 
-        List<DbItem> items = DbItem.retrieveLatestForUuids(itemUuids);
-        for (DbItem item: items) {
-            ret.put(item.getItemUuid(), item);
+        List<ItemEntity> items = ItemEntity.retrieveLatestForUuids(itemUuids);
+        for (ItemEntity item: items) {
+            ret.put(item.getItemuuid(), item);
         }
 
         return ret;
     }
 
     private static void populateReportResults(JsonQueryResult parent, HashMap<UUID, Integer> hmResultsByItem,
-                                              HashMap<UUID, DbItem> hmItemsByUuid, List<ReportItem> reportItems, Integer parentResult) {
+                                              HashMap<UUID, ItemEntity> hmItemsByUuid, List<ReportItem> reportItems, Integer parentResult) {
         for (ReportItem reportItem: reportItems) {
             String queryUuidStr = reportItem.getQueryLibraryItemUuid();
             if (queryUuidStr == null || queryUuidStr.isEmpty()) {
@@ -326,7 +332,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
             UUID queryUuid = UUID.fromString(queryUuidStr);
             Integer queryResult = hmResultsByItem.get(queryUuid);
-            DbItem item = hmItemsByUuid.get(queryUuid);
+            ItemEntity item = hmItemsByUuid.get(queryUuid);
 
             JsonQueryResult result = new JsonQueryResult(item, queryResult, parentResult);
             parent.addChildReult(result);

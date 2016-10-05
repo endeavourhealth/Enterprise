@@ -5,7 +5,7 @@ import org.endeavour.enterprise.framework.config.ConfigSerializer;
 import org.endeavour.enterprise.framework.config.models.*;
 import org.endeavour.enterprise.framework.security.SecurityConfig;
 import org.endeavour.enterprise.utility.MessagingQueueProvider;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
+import org.endeavourhealth.enterprise.core.database.PersistenceManager;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -17,14 +17,9 @@ public final class Startup implements ServletContextListener {
 
         Config config = ConfigSerializer.getConfig();
 
-        //set up our DB
         String url = config.getDatabase().getUrl();
         String username = config.getDatabase().getUsername();
         String password = config.getDatabase().getPassword();
-        DatabaseManager.getInstance().setConnectionProperties(url, username, password);
-
-        //tell our database manager to set up logging to db
-        DatabaseManager.getInstance().registerLogbackDbAppender();
 
         //domain for our cookies
         WebServer ws = config.getWebServer();
@@ -54,7 +49,7 @@ public final class Startup implements ServletContextListener {
     }
 
     public void contextDestroyed(ServletContextEvent contextEvent) {
-        DatabaseManager.getInstance().deregisterLogbackDbAppender();
+        PersistenceManager.INSTANCE.close();
     }
 
 

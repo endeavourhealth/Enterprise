@@ -9,7 +9,7 @@
   </appender>
 
 
-<!-- appender for log file-->
+  <!-- appender for log file-->
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>EnterpriseWebServer.log</file>
     <encoder>
@@ -25,5 +25,5 @@
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
     <!--DB appender is added programmatically-->
-</root>
+  </root>
 </configuration>

@@ -74,6 +74,9 @@ module app.query {
 				$scope.queryName = "";
 				$scope.queryDescription = "";
 				$scope.disableRuleProps = false;
+				$scope.zoomPercent = "100%";
+
+				$scope.zoomNumber = 100;
 
 				$scope.nextRuleID = 1;
 
@@ -200,6 +203,20 @@ module app.query {
 					logger.error('Query not saved');
 					$window.history.back();
 					this.toggleCancelChanges();
+				};
+
+				$scope.zoomIn = function () {
+					$scope.zoomNumber=$scope.zoomNumber+10;
+					if ($scope.zoomNumber>100)
+						$scope.zoomNumber = 100;
+					$scope.zoomPercent = $scope.zoomNumber.toString()+"%";
+				};
+
+				$scope.zoomOut = function () {
+					$scope.zoomNumber=$scope.zoomNumber-10;
+					if ($scope.zoomNumber<50)
+						$scope.zoomNumber = 50;
+					$scope.zoomPercent = $scope.zoomNumber.toString()+"%";
 				};
 
 				//

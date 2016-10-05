@@ -1,7 +1,6 @@
 package org.endeavourhealth.enterprise.core.lookups;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
+import org.endeavourhealth.enterprise.core.database.models.SourceorganisationEntity;
 
 import java.util.*;
 
@@ -19,11 +18,11 @@ public abstract class SourceOrganisationUpdater {
         }
 
         //update records already on the DB
-        List<DbSourceOrganisation> dbSourcesOrgs = DbSourceOrganisation.retrieveAll(true);
-        List<DbSourceOrganisation> toSave = new ArrayList<>();
+        List<SourceorganisationEntity> dbSourcesOrgs = SourceorganisationEntity.retrieveAll(true);
+        List<SourceorganisationEntity> toSave = new ArrayList<>();
 
-        for (DbSourceOrganisation dbSourceOrg: dbSourcesOrgs) {
-            String odsCode = dbSourceOrg.getOdsCode();
+        for (SourceorganisationEntity dbSourceOrg: dbSourcesOrgs) {
+            String odsCode = dbSourceOrg.getOdscode();
             SourceOrganisation sourceOrganisation = hm.remove(odsCode);
 
             if (applyNewData(dbSourceOrg, sourceOrganisation)) {
@@ -38,29 +37,29 @@ public abstract class SourceOrganisationUpdater {
             String odsCode = entry.getKey();
             SourceOrganisation sourceOrganisation = entry.getValue();
 
-            DbSourceOrganisation dbSourceOrg = new DbSourceOrganisation();
-            dbSourceOrg.setOdsCode(odsCode);
+            SourceorganisationEntity dbSourceOrg = new SourceorganisationEntity();
+            dbSourceOrg.setOdscode(odsCode);
             applyNewData(dbSourceOrg, sourceOrganisation);
             toSave.add(dbSourceOrg);
         }
 
-        DatabaseManager.db().writeEntities(toSave);
+        //DatabaseManager.db().writeEntities(toSave);
     }
 
-    private static boolean applyNewData(DbSourceOrganisation db, SourceOrganisation sourceOrganisation) {
+    private static boolean applyNewData(SourceorganisationEntity db, SourceOrganisation sourceOrganisation) {
         boolean changed = false;
 
         if (sourceOrganisation == null) {
 
-            if (db.isReferencedByData()) {
-                db.setReferencedByData(false);
+            if (db.getIsreferencedbydata()) {
+                db.setIsreferencedbydata(false);
                 changed = true;
             }
 
         } else {
 
-            if (!db.isReferencedByData()) {
-                db.setReferencedByData(true);
+            if (!db.getIsreferencedbydata()) {
+                db.setIsreferencedbydata(true);
                 changed = true;
             }
 

@@ -25,18 +25,44 @@ public class AuthenticationFilterFeature implements DynamicFeature
         }
 
         if ((!usePackageFilter) || (resourceInfo.getResourceClass().getName().startsWith(packageName))) {
-            if (!containsUnsecuredAnnotation(resourceInfo.getResourceMethod().getAnnotations())) {
-                AuthenticationFilter authenticationFilter = new AuthenticationFilter(false, false);
-                featureContext.register(authenticationFilter);
+
+            Class filterClass = getFilterClass(resourceInfo.getResourceMethod().getAnnotations());
+            if (filterClass != null) {
+                featureContext.register(filterClass);
             }
+
+            /*if (!containsUnsecuredAnnotation(resourceInfo.getResourceMethod().getAnnotations())) {
+
+                featureContext.register(AbstractAuthenticationFilter.class);
+            }*/
         }
     }
 
-    private static boolean containsUnsecuredAnnotation(Annotation[] annotations) {
+    private static Class getFilterClass(Annotation[] annotations) {
+
+        //default is the "user" filter
+        Class ret = UserAuthenticationFilter.class;
+
+        for (Annotation annotation : annotations) {
+            Class clz = annotation.annotationType();
+            if (clz.equals(Unsecured.class)) {
+                //if we have the unsecured annotation, then we don't want to apply a filter at all
+                ret = null;
+            } else if (clz.equals(RequiresSuperUser.class)) {
+                ret = SuperUserAuthenticationFilter.class;
+            } else if (clz.equals(RequiresAdmin.class)) {
+                ret = AdminAuthenticationFilter.class;
+            }
+        }
+
+        return ret;
+    }
+
+    /*private static boolean containsUnsecuredAnnotation(Annotation[] annotations) {
         for (Annotation annotation : annotations)
             if (annotation.annotationType().equals(Unsecured.class))
                 return true;
 
         return false;
-    }
+    }*/
 }

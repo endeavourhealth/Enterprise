@@ -11,8 +11,6 @@ angular.module('app', [
 		'ui.bootstrap',
 		'ngIdle',
 		'ui.tree',
-		'ngDragDrop',
-		'angular-uuid-generator',
 
 		'app.core',
 		'app.blocks',

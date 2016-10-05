@@ -8,3 +8,5 @@ target/
 uiDesigner.xml
 workspace.xml
 vcs.xml
+.idea
+classes/

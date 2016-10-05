@@ -109,6 +109,9 @@ module app.reports {
 			vm.reportService.getReportSchedules(item.uuid, 5)
 				.then(function(result) {
 					vm.selectedReportSchedules = result;
+				})
+				.catch(function(error) {
+					vm.logger.error('Error loading report schedules', error, 'Get schedules');
 				});
 		}
 
@@ -119,6 +122,9 @@ module app.reports {
 			vm.reportService.getScheduleResults(schedule.uuid)
 				.then(function(results) {
 					vm.selectedScheduleResults = results;
+				})
+				.catch(function(error) {
+					vm.logger.error('Error schedule results', error, 'Get schedule results');
 				});
 		}
 

@@ -14,9 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Created by Drew on 22/03/2016.
- */
 public abstract class ConfigSerializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigSerializer.class);

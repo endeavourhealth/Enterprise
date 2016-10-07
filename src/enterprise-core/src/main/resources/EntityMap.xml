@@ -5,6 +5,14 @@
 		<resultSetIndex>1</resultSetIndex>
 		<cardinality>single</cardinality>
 		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>PSEUDO_ID</logicalName>
+			<displayName>Pseudo Identifier</displayName>
+			<index>3</index>
+			<availability>output</availability>
+			<logicalDataType>string</logicalDataType>
+		</field>
+		<!--
 		<organisationOdsFieldIndex>2</organisationOdsFieldIndex>
 		<field>
 			<logicalName>ORGANISATION_ODS</logicalName>
@@ -13,6 +21,7 @@
 			<availability>search output</availability>
 			<logicalDataType>organisationODS</logicalDataType>
 		</field>
+		-->
 		<field>
 			<logicalName>DOB</logicalName>
 			<displayName>Date Of Birth</displayName>
@@ -20,28 +29,32 @@
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>
+		<!--Age-->
 		<field>
-			<logicalName>AGE</logicalName>
-			<displayName>Age</displayName>
-			<index>4</index>
-			<availability>search output</availability>
-			<logicalDataType>float</logicalDataType>
-		</field>
-		<field>
-			<logicalName>SEX</logicalName>
-			<displayName>Sex</displayName>
+			<logicalName>GENDER</logicalName>
+			<displayName>Gender</displayName>
 			<index>5</index>
 			<availability>search output</availability>
 			<logicalDataType>dataValues</logicalDataType>
 			<dataValues>
 				<logicalValue>MALE</logicalValue>
-				<physicalValue>M</physicalValue>
+				<physicalValue>0</physicalValue>
 				<displayName>Male</displayName>
 			</dataValues>
 			<dataValues>
 				<logicalValue>FEMALE</logicalValue>
-				<physicalValue>F</physicalValue>
+				<physicalValue>1</physicalValue>
 				<displayName>Female</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>OTHER</logicalValue>
+				<physicalValue>2</physicalValue>
+				<displayName>Other</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>UNKNOWN</logicalValue>
+				<physicalValue>3</physicalValue>
+				<displayName>Unknown</displayName>
 			</dataValues>
 		</field>
 		<field>
@@ -51,6 +64,199 @@
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>
+		<field>
+			<logicalName>REGISTRATION_END_DATE</logicalName>
+			<displayName>Registration End Date</displayName>
+			<index>6</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!-- Registration type -->
+		<!-- Usual GP-->
+		<field>
+			<logicalName>YEAR_OF_DEATH</logicalName>
+			<displayName>Year of Death</displayName>
+			<index>6</index>
+			<availability>search output</availability>
+			<logicalDataType>integer</logicalDataType>
+		</field>
+	</entity>
+	<entity>
+		<logicalName>ALLERGY_INTOLERANCE</logicalName>
+		<displayName>Allergy/Intolerance</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<!--Practitioner-->
+	</entity>
+	<entity>
+		<logicalName>CONDITION</logicalName>
+		<displayName>Condition</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<!--Is Review (boolean or lookup?-->
+		<!--Practitioner-->
+	</entity>
+	<entity>
+		<logicalName>DIAGNOSTIC_ORDER</logicalName>
+		<displayName>Diagnostic Order</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<!--Practitioner-->
+	</entity>
+	<entity>
+		<logicalName>DIAGNOSTIC_REPORT</logicalName>
+		<displayName>Diagnostic Report</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<!--Practitioner-->
+	</entity>
+	<entity>
+		<logicalName>FAMILY_MEMBER_HISTORY</logicalName>
+		<displayName>Family Member History</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<!--Practitioner-->
+	</entity>
+	<entity>
+		<logicalName>IMMUNISATION</logicalName>
+		<displayName>Immunisation</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<!--Practitioner-->
+	</entity>
+	<entity>
+		<logicalName>MEDICATION_ORDER</logicalName>
+		<displayName>Medication Order</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+			<!--Needs to be DM&D code-->
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<field>
+			<logicalName>ESTIMATED_COST</logicalName>
+			<displayName>Estimated Cost</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>float</logicalDataType>
+		</field>
+		<!--Practitioner-->
 	</entity>
 	<entity>
 		<logicalName>OBSERVATION</logicalName>
@@ -65,22 +271,15 @@
 			<availability>search output</availability>
 			<logicalDataType>code</logicalDataType>
 		</field>
-<!--
-		<field>
-			<logicalName>TERM</logicalName>
-			<displayName>Term</displayName>
-			<index>3</index>
-			<availability>output</availability>
-			<logicalDataType>string</logicalDataType>
-		</field>
--->
+		<!--Code Term-->
 		<field>
 			<logicalName>EFFECTIVE_DATE</logicalName>
-			<displayName>Date</displayName>
+			<displayName>Clinical Effective Date</displayName>
 			<index>3</index>
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>
+		<!--Date precision?-->
 		<field>
 			<logicalName>VALUE</logicalName>
 			<displayName>Value</displayName>
@@ -88,33 +287,118 @@
 			<availability>search output</availability>
 			<logicalDataType>float</logicalDataType>
 		</field>
+		<field>
+			<logicalName>UNITS</logicalName>
+			<displayName>Units</displayName>
+			<index>4</index>
+			<availability>output</availability>
+			<logicalDataType>string</logicalDataType>
+		</field>
+		<!--Practitioner-->
 	</entity>
 	<entity>
-		<logicalName>MEDICATION_ISSUE</logicalName>
-		<displayName>Medication Issue</displayName>
-		<resultSetIndex>3</resultSetIndex>
+		<logicalName>PROCEDURE</logicalName>
+		<displayName>Procedure</displayName>
+		<resultSetIndex>2</resultSetIndex>
 		<cardinality>multiple</cardinality>
 		<populationFieldIndex>1</populationFieldIndex>
-		<!--<field>
+		<field>
 			<logicalName>CODE</logicalName>
 			<displayName>Code</displayName>
 			<index>2</index>
 			<availability>search output</availability>
 			<logicalDataType>code</logicalDataType>
 		</field>
+		<!--Code Term-->
 		<field>
-			<logicalName>TERM</logicalName>
-			<displayName>Term</displayName>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
 			<index>3</index>
-			<availability>output</availability>
-			<logicalDataType>string</logicalDataType>
-		</field>-->
-		<field>
-			<logicalName>EFFECTIVEDATE</logicalName>
-			<displayName>Date</displayName>
-			<index>4</index>
 			<availability>search output</availability>
-			<logicalDataType>datetime</logicalDataType>
+			<logicalDataType>date</logicalDataType>
 		</field>
+		<!--Date precision?-->
+		<!--Practitioner-->
+	</entity>
+	<entity>
+		<logicalName>PROCEDURE_REQUEST</logicalName>
+		<displayName>Procedure Request</displayName>
+		<resultSetIndex>2</resultSetIndex>
+		<cardinality>multiple</cardinality>
+		<populationFieldIndex>1</populationFieldIndex>
+		<field>
+			<logicalName>CODE</logicalName>
+			<displayName>Code</displayName>
+			<index>2</index>
+			<availability>search output</availability>
+			<logicalDataType>code</logicalDataType>
+		</field>
+		<!--Code Term-->
+		<field>
+			<logicalName>EFFECTIVE_DATE</logicalName>
+			<displayName>Clinical Effective Date</displayName>
+			<index>3</index>
+			<availability>search output</availability>
+			<logicalDataType>date</logicalDataType>
+		</field>
+		<!--Date precision?-->
+		<field>
+			<logicalName>STATUS</logicalName>
+			<displayName>Status</displayName>
+			<index>5</index>
+			<availability>search output</availability>
+			<logicalDataType>dataValues</logicalDataType>
+			<dataValues>
+				<logicalValue>ABORTED</logicalValue>
+				<physicalValue>9</physicalValue>
+				<displayName>Aborted</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>ACCEPTED</logicalValue>
+				<physicalValue>4</physicalValue>
+				<displayName>Accepted</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>COMPLETED</logicalValue>
+				<physicalValue>6</physicalValue>
+				<displayName>Completed</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>DRAFT</logicalValue>
+				<physicalValue>1</physicalValue>
+				<displayName>Draft</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>IN PROGRESS</logicalValue>
+				<physicalValue>5</physicalValue>
+				<displayName>In Progress</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>PROPOSED</logicalValue>
+				<physicalValue>0</physicalValue>
+				<displayName>Proposed</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>RECEIVED</logicalValue>
+				<physicalValue>3</physicalValue>
+				<displayName>Received</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>REJECTED</logicalValue>
+				<physicalValue>8</physicalValue>
+				<displayName>Rejected</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>REQUESTED</logicalValue>
+				<physicalValue>2</physicalValue>
+				<displayName>Requested</displayName>
+			</dataValues>
+			<dataValues>
+				<logicalValue>SUSPENDED</logicalValue>
+				<physicalValue>7</physicalValue>
+				<displayName>Suspended</displayName>
+			</dataValues>
+		</field>
+		<!--Practitioner-->
 	</entity>
 </entityMap>

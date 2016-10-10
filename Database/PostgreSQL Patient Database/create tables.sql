@@ -23,6 +23,7 @@ DROP TABLE IF EXISTS appointment_status;
 DROP TABLE IF EXISTS procedure_request_status;
 DROP TABLE IF EXISTS medication_statement_authorisation_type;
 DROP TABLE IF EXISTS patient_gender;
+DROP TABLE IF EXISTS registration_type;
 
 -- Table: date_precision
 
@@ -128,6 +129,29 @@ INSERT INTO patient_gender (id, value) VALUES (1, 'Female');
 INSERT INTO patient_gender (id, value) VALUES (2, 'Other');
 INSERT INTO patient_gender (id, value) VALUES (3, 'Unknown');
 
+-- Table: registration_type
+
+CREATE TABLE registration_type
+(
+  id smallint NOT NULL,
+  code character varying(10) NOT NULL,
+  description character varying(30) NOT NULL,
+  CONSTRAINT pk_registration_type PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.registration_type
+  OWNER TO postgres;
+
+INSERT INTO registration_type (id, code, description) VALUES (0, 'E', 'Emergency');
+INSERT INTO registration_type (id, code, description) VALUES (1, 'IN', 'Immediately Necessary');
+INSERT INTO registration_type (id, code, description) VALUES (2, 'R', 'Regular/GMS');
+INSERT INTO registration_type (id, code, description) VALUES (3, 'T', 'Temporary');
+INSERT INTO registration_type (id, code, description) VALUES (4, 'P', 'Private');
+INSERT INTO registration_type (id, code, description) VALUES (5, 'O', 'Other');
+INSERT INTO registration_type (id, code, description) VALUES (6, 'D', 'Dummy/Synthetic');
+
 -- Table: organization
 
 CREATE TABLE organization
@@ -227,10 +251,11 @@ CREATE UNIQUE INDEX schedule_id
   USING btree
   (id);
 
+-- Table: public.patient
 
--- Table: patient
+-- DROP TABLE public.patient;
 
-CREATE TABLE patient
+CREATE TABLE public.patient
 (
   id integer NOT NULL,
   organization_id integer NOT NULL,
@@ -240,33 +265,34 @@ CREATE TABLE patient
   date_registered date NOT NULL,
   date_registered_end date,
   usual_gp_practitioner_id integer,
-  registration_type_code character varying(50) NOT NULL,
-  registration_type_desc character varying(255) NOT NULL,
   pseudo_id character varying(255) NOT NULL,
+  registration_type_id smallint NOT NULL,
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
       REFERENCES public.organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_patient_patient_gender_id FOREIGN KEY (patient_gender_id)
       REFERENCES public.patient_gender (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_patient_registration_type_id FOREIGN KEY (registration_type_id)
+      REFERENCES public.registration_type (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE patient
+ALTER TABLE public.patient
   OWNER TO postgres;
 
--- Index: patient_id
+-- Index: public.patient_id
 
--- DROP INDEX patient_id;
+-- DROP INDEX public.patient_id;
 
 CREATE UNIQUE INDEX patient_id
-  ON patient
+  ON public.patient
   USING btree
   (id);
-ALTER TABLE patient CLUSTER ON patient_id;
-
+ALTER TABLE public.patient CLUSTER ON patient_id;  
 
 -- Table: appointment
 

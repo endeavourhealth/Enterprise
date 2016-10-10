@@ -4,6 +4,8 @@ select top 1 @JobUuid = j.JobUuid
 from [Execution].[Job] as j
 order by j.StartDateTime desc
 
+--------------------------------------------------
+
 select *
 from [Execution].[Job] as j
 left join Execution.Status as s on s.StatusId = j.StatusId

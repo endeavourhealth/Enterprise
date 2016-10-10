@@ -43,8 +43,17 @@
 	</xs:complexType>
 	<xs:complexType name="outputFilesType">
 		<xs:sequence>
-			<xs:element name="temporaryFolder" type="xs:string"/>
-			<xs:element name="rootFolder" type="xs:string"/>
+			<xs:element name="ftpConnection" type="ftpConnection" minOccurs="0"/>
+			<xs:element name="streamingFolder" type="xs:string"/>
+			<xs:element name="workingFolder" type="xs:string"/>
+			<xs:element name="targetFolder" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ftpConnection">
+		<xs:sequence>
+			<xs:element name="host" type="xs:string"/>
+			<xs:element name="username" type="xs:string"/>
+			<xs:element name="password" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

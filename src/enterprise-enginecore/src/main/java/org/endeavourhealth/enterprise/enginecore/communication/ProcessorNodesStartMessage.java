@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.enginecore.communication;
 
 import com.rabbitmq.client.AMQP;
+import org.endeavourhealth.enterprise.core.FtpWrapper;
 import org.endeavourhealth.enterprise.core.JsonSerializer;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 import org.endeavourhealth.enterprise.core.queuing.Message;
@@ -27,6 +28,8 @@ public class ProcessorNodesStartMessage {
         private DatabaseConnectionDetails coreDatabaseConnectionDetails;
         private DatabaseConnectionDetails careRecordDatabaseConnectionDetails;
         private String controllerQueueName;
+        private FtpWrapper.FtpConnectionDetails ftpConnectionDetails;
+        private String streamingFolder;
 
         public UUID getJobUuid() {
             return jobUuid;
@@ -67,6 +70,22 @@ public class ProcessorNodesStartMessage {
         public void setControllerQueueName(String controllerQueueName) {
             this.controllerQueueName = controllerQueueName;
         }
+
+        public String getStreamingFolder() {
+            return streamingFolder;
+        }
+
+        public void setStreamingFolder(String streamingFolder) {
+            this.streamingFolder = streamingFolder;
+        }
+
+        public FtpWrapper.FtpConnectionDetails getFtpConnectionDetails() {
+            return ftpConnectionDetails;
+        }
+
+        public void setFtpConnectionDetails(FtpWrapper.FtpConnectionDetails ftpConnectionDetails) {
+            this.ftpConnectionDetails = ftpConnectionDetails;
+        }
     }
 
     private ProcessorNodesStartMessage(Message message) {
@@ -94,9 +113,6 @@ public class ProcessorNodesStartMessage {
     }
 
     public static boolean isTypeOf(Message message) {
-        if (type.equals(message.getProperties().getType()))
-            return true;
-        else
-            return false;
+        return type.equals(message.getProperties().getType());
     }
 }

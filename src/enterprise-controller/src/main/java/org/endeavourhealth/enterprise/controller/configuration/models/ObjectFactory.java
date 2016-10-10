@@ -58,6 +58,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link FtpConnection }
+     * 
+     */
+    public FtpConnection createFtpConnection() {
+        return new FtpConnection();
+    }
+
+    /**
      * Create an instance of {@link Debugging }
      * 
      */

@@ -68,7 +68,50 @@ declare @Query varchar(max) = '<?xml version="1.0" encoding="UTF-8"?>
 	</query>
 </libraryItem>';
 
-declare @ListReport varchar(max) = '';
+declare @ListReport varchar(max) = '<?xml version="1.0" encoding="UTF-8"?>
+<libraryItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="H:\Code\Enterprise\src\enterprise-core\src\main\resources\QueryDocument.xsd">
+	<uuid>C73656B8-3854-447B-82B7-C8A6C5E248A8</uuid>
+	<name>Test List Report</name>
+	<folderUuid>FD9309C2-9D7E-4152-84CD-D934B7D81579</folderUuid>
+	<listReport>
+		<group>
+			<fieldBased>
+				<dataSource>
+					<entity>PATIENT</entity>
+				</dataSource>
+				<fieldOutput>
+					<field>ORGANISATION_ODS</field>
+					<heading>Organisation</heading>
+				</fieldOutput>
+				<fieldOutput>
+					<field>DOB</field>
+					<heading>Date of Birth</heading>
+				</fieldOutput>
+			</fieldBased>
+		</group>
+		<group>
+			<heading>Heading 1</heading>
+			<fieldBased>
+				<dataSource>
+					<entity>OBSERVATION</entity>
+				</dataSource>
+				<fieldOutput>
+					<field>CODE</field>
+					<heading>Snomed</heading>
+				</fieldOutput>
+				<fieldOutput>
+					<field>EFFECTIVE_DATE</field>
+					<heading>Effective date</heading>
+				</fieldOutput>
+				<fieldOutput>
+					<field>VALUE</field>
+					<heading>Value</heading>
+				</fieldOutput>
+			</fieldBased>
+		</group>
+	</listReport>
+</libraryItem>
+';
 
 declare @Report varchar(max) = '<?xml version="1.0" encoding="UTF-8"?>
 <report xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="H:\Code\Enterprise\src\enterprise-core\src\main\resources\QueryDocument.xsd">

@@ -75,7 +75,9 @@ class ResultProcessor {
 
         for (DbJobReportItem dbJobReportItem: dbJobReportItems) {
             JobReportItemResult jobReportItemResult = getJobReportItemResult(dbJobReportItem.getJobReportItemUuid(), jobReportResult.getJobReportItemResult());
-            processJobReportItem(dbJobReportItem, jobReportItemResult);
+
+            if (jobReportItemResult != null)
+                processJobReportItem(dbJobReportItem, jobReportItemResult);
         }
     }
 
@@ -133,7 +135,9 @@ class ResultProcessor {
                 return jobReportItemResult;
         }
 
-        throw new Exception("Missing JobReportItemUuid: " + jobReportItemUuid);
+        return null;
+        //If it's a listrepor then this won't be in there.
+        //throw new Exception("Missing JobReportItemUuid: " + jobReportItemUuid);
     }
 
     private void validateExpectedProcessors(Set<UUID> expectedProcessorNodes) throws Exception {

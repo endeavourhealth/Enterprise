@@ -65,10 +65,23 @@ public class CompiledEntityDataSource implements ICompiledDataSource {
         finalRows.clear();
         dataEntity = executionContext.getDataContainer().getDataEntities().get(entityId);
 
-        processFilters();
-        processRestriction();
+
+        if (CollectionUtils.isNotEmpty(filters))
+            processFilters();
+
+        if (compiledRestriction != null)
+            processRestriction();
+
+        if (CollectionUtils.isEmpty(filters) && compiledRestriction == null)
+            addAllRows();
 
         //finally have a list of row ids.
+    }
+
+    private void addAllRows() {
+        for (int rowId = 0; rowId < dataEntity.getSize(); rowId++) {
+            finalRows.add(rowId);
+        }
     }
 
     @Override
@@ -87,10 +100,6 @@ public class CompiledEntityDataSource implements ICompiledDataSource {
     }
 
     private void processFilters() {
-
-        if (CollectionUtils.isEmpty(filters))
-            return;
-
         for (int rowId = 0; rowId < dataEntity.getSize(); rowId++) {
             for (int f = 0; f < filters.size(); f++) {
                 if (filters.get(f).test(dataEntity, rowId))
@@ -100,9 +109,6 @@ public class CompiledEntityDataSource implements ICompiledDataSource {
     }
 
     private void processRestriction() {
-        if (compiledRestriction == null)
-            return;
-
         List<Integer> orderedIds = compiledRestriction.process();
         finalRows.clear();
         finalRows.addAll(orderedIds);

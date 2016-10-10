@@ -4,6 +4,8 @@ import org.endeavourhealth.enterprise.engine.EngineApi;
 import org.endeavourhealth.enterprise.engine.Processor;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
 class EngineProcessorPool {
 
@@ -11,7 +13,7 @@ class EngineProcessorPool {
     private final ArrayDeque<Processor> queue = new ArrayDeque<>();
     private final EngineApi engineApi;
     private final int maximumProcessorsAllowed;
-    private int itemsCreated;
+    private final List<Processor> allItemsCreated = new ArrayList<>();
 
     public EngineProcessorPool(EngineApi engineApi, int maximumProcessorsAllowed) {
 
@@ -29,12 +31,14 @@ class EngineProcessorPool {
 
     private Processor createProcessor() throws Exception {
 
-        itemsCreated++;
+        Processor processor = engineApi.createProcessor();
 
-        if (itemsCreated > maximumProcessorsAllowed)
+        allItemsCreated.add(processor);
+
+        if (allItemsCreated.size() > maximumProcessorsAllowed)
             throw new Exception("Exceeded maximum number of processor objects created");  //If it hits this then the items are not being recycled
 
-        return engineApi.createProcessor();
+        return processor;
     }
 
     public void recycle(Processor resource) {
@@ -48,5 +52,9 @@ class EngineProcessorPool {
 
     private synchronized void pushItem(Processor resource) {
         queue.push(resource);
+    }
+
+    public List<Processor> getAllProcessors() {
+        return allItemsCreated;
     }
 }

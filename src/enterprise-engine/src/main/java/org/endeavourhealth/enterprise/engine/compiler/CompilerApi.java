@@ -5,7 +5,7 @@ import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
 import org.endeavourhealth.enterprise.engine.compiled.*;
-import org.endeavourhealth.enterprise.enginecore.InvalidQueryDocumentException;
+import org.endeavourhealth.enterprise.engine.compiled.listreports.CompiledListReport;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 
 import java.util.List;
@@ -15,6 +15,7 @@ public class CompilerApi {
     private final QueryCompiler queryCompiler = new QueryCompiler();
     private final DataSourceCompiler dataSourceCompiler = new DataSourceCompiler();
     private final TestCompiler testCompiler = new TestCompiler();
+    private final ListReportCompiler listReportCompiler = new ListReportCompiler();
 
     private final CompilerContext compilerContext;
     private final CompiledLibrary compiledLibrary = new CompiledLibrary();
@@ -33,7 +34,7 @@ public class CompilerApi {
         compileDataSources();
         compileTests();
         compileQueries();
-        //compileListReports();
+        compileListReports();
     }
 
     private void compileDataSources() throws Exception {
@@ -44,7 +45,7 @@ public class CompilerApi {
                     ICompiledDataSource compiledDataSource = dataSourceCompiler.compile(libraryItem.getDataSource(), compilerContext);
                     compiledLibrary.add(libraryItem, compiledDataSource);
                 } catch (Exception e) {
-                    throw new UnableToCompileExpection("Could not compiled DataSource: " + libraryItem.getUuid(), e);
+                    throw new UnableToCompileExpection("Could not compile DataSource: " + libraryItem.getUuid(), e);
                 }
             }
         }
@@ -58,7 +59,7 @@ public class CompilerApi {
                     ICompiledTest compiledTest = testCompiler.compile(libraryItem.getTest(), compilerContext);
                     compiledLibrary.add(libraryItem, compiledTest);
                 } catch (Exception e) {
-                    throw new UnableToCompileExpection("Could not compiled Test: " + libraryItem.getUuid(), e);
+                    throw new UnableToCompileExpection("Could not compile Test: " + libraryItem.getUuid(), e);
                 }
             }
         }
@@ -73,11 +74,27 @@ public class CompilerApi {
                     CompiledQuery compiledQuery = queryCompiler.compile(compilerContext, libraryItem.getQuery());
                     compiledLibrary.add(libraryItem, compiledQuery);
                 } catch (Exception e) {
-                    throw new UnableToCompileExpection("Could not compiled Query: " + libraryItem.getUuid(), e);
+                    throw new UnableToCompileExpection("Could not compile Query: " + libraryItem.getUuid(), e);
                 }
             }
         }
     }
+
+    private void compileListReports() throws UnableToCompileExpection {
+
+        for (LibraryItem libraryItem : requiredLibraryItems) {
+
+            if (libraryItem.getListReport() != null) {
+                try {
+                    CompiledListReport compiled = listReportCompiler.compile(compilerContext, libraryItem.getListReport());
+                    compiledLibrary.add(libraryItem, compiled);
+                } catch (Exception e) {
+                    throw new UnableToCompileExpection("Could not compile ListReport: " + libraryItem.getUuid(), e);
+                }
+            }
+        }
+    }
+
 
     public CompiledReport compile(DbJobReport jobReport, RequestParameters parameters) throws UnableToCompileExpection {
         return reportCompiler.compile(jobReport, parameters, compilerContext);

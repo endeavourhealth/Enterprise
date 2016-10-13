@@ -1,9 +1,10 @@
--- Table: organization
+
 
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;
 DROP TABLE IF EXISTS allergy_intolerance;
 DROP TABLE IF EXISTS condition;
+DROP TABLE IF EXISTS specimen;
 DROP TABLE IF EXISTS diagnostic_order;
 DROP TABLE IF EXISTS diagnostic_report;
 DROP TABLE IF EXISTS family_member_history;
@@ -259,7 +260,7 @@ CREATE TABLE public.patient
 (
   id integer NOT NULL,
   organization_id integer NOT NULL,
-  date_of_birth date NOT NULL,
+  year_of_birth integer NOT NULL,
   year_of_death integer,
   patient_gender_id smallint NOT NULL,
   date_registered date NOT NULL,
@@ -523,6 +524,60 @@ CREATE INDEX condition_patient_id
   USING btree
   (patient_id);
 ALTER TABLE condition CLUSTER ON condition_patient_id;
+
+
+-- Table: specimen
+
+CREATE TABLE specimen
+(
+  id integer NOT NULL,
+  organization_id integer NOT NULL,
+  patient_id integer NOT NULL,
+  encounter_id integer,
+  practitioner_id integer,
+  clinical_effective_date date,
+  date_precision_id smallint,
+  snomed_concept_id bigint,
+  CONSTRAINT pk_specimen_id PRIMARY KEY (id),
+  CONSTRAINT fk_specimen_encounter_id FOREIGN KEY (encounter_id)
+      REFERENCES encounter (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_specimen_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
+      REFERENCES patient (id, organization_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_specimen_practitioner_id FOREIGN KEY (practitioner_id)
+      REFERENCES practitioner (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_specimen_date_precision FOREIGN KEY (date_precision_id)
+      REFERENCES public.date_precision (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION            
+      
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE specimen
+  OWNER TO postgres;
+
+-- Index: specimen_id
+
+-- DROP INDEX specimen_id;
+
+CREATE UNIQUE INDEX specimen_id
+  ON specimen
+  USING btree
+  (id);
+
+-- Index: specimen_patient_id
+
+-- DROP INDEX specimen_patient_id;
+
+CREATE INDEX specimen_patient_id
+  ON specimen
+  USING btree
+  (patient_id);
+ALTER TABLE specimen CLUSTER ON specimen_patient_id;
+
 
 -- Table: diagnostic_order
 
@@ -1015,9 +1070,11 @@ CREATE INDEX procedure_request_patient_id
   (patient_id);
 ALTER TABLE procedure_request CLUSTER ON procedure_request_patient_id;
 
--- Table: referral_request
+-- Table: public.referral_request
 
-CREATE TABLE referral_request
+-- DROP TABLE public.referral_request;
+
+CREATE TABLE public.referral_request
 (
   id integer NOT NULL,
   organization_id integer NOT NULL,
@@ -1027,48 +1084,57 @@ CREATE TABLE referral_request
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  requester_organization_id integer,
   recipient_organization_id integer NOT NULL,
   priority character varying(50),
   service_requested character varying(255),
   mode character varying(50),
   outgoing_referral boolean,
   CONSTRAINT pk_referral_request_id PRIMARY KEY (id),
-  CONSTRAINT fk_referral_request_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_referral_request_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_referral_request_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_date_precision FOREIGN KEY (date_precision_id)
       REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION                  
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_referral_request_encounter_id FOREIGN KEY (encounter_id)
+      REFERENCES public.encounter (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_referral_request_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
+      REFERENCES public.patient (id, organization_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_referral_request_practitioner_id FOREIGN KEY (practitioner_id)
+      REFERENCES public.practitioner (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_referral_request_recipient_organization_id FOREIGN KEY (recipient_organization_id)
+      REFERENCES public.organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_referral_request_requester_organization_id FOREIGN KEY (requester_organization_id)
+      REFERENCES public.organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE referral_request
+ALTER TABLE public.referral_request
   OWNER TO postgres;
 
--- Index: referral_request_id
+-- Index: public.referral_request_id
 
--- DROP INDEX referral_request_id;
+-- DROP INDEX public.referral_request_id;
 
 CREATE UNIQUE INDEX referral_request_id
-  ON referral_request
+  ON public.referral_request
   USING btree
   (id);
 
--- Index: referral_request_patient_id
+-- Index: public.referral_request_patient_id
 
--- DROP INDEX referral_request_patient_id;
+-- DROP INDEX public.referral_request_patient_id;
 
 CREATE INDEX referral_request_patient_id
-  ON referral_request
+  ON public.referral_request
   USING btree
   (patient_id);
-ALTER TABLE referral_request CLUSTER ON referral_request_patient_id;
+ALTER TABLE public.referral_request CLUSTER ON referral_request_patient_id;
+
+
 
 

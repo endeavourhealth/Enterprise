@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.json.*;
+import org.endeavourhealth.core.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 
 import org.endeavourhealth.enterprise.core.database.DataManager;
@@ -63,7 +64,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         UUID reportUuid = parseUuidFromStr(report.getUuid());
         String name = report.getName();
@@ -110,7 +111,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
 
         UUID reportUuid = parseUuidFromStr(reportParameters.getUuid());
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         LOG.trace("DeletingReport UUID {}", reportUuid);
 
@@ -132,7 +133,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         UUID reportUuid = parseUuidFromStr(requestParameters.getReportUuid());
         String parameterXml = RequestParametersSerializer.writeToXml(requestParameters);
@@ -353,7 +354,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         LOG.trace("moveReports");
 

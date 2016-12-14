@@ -2,6 +2,7 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.json.JsonSourceOrganisation;
 import org.endeavour.enterprise.json.JsonSourceOrganisationSet;
+import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.database.DataManager;
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
 
@@ -221,7 +222,7 @@ public final class LookupEndpoint extends AbstractEndpoint {
     public Response getOrganisations(@Context SecurityContext sc, @QueryParam("odsCodes") String odsCodeStr) throws Exception {
         super.setLogbackMarkers(sc);
 
-        if (!getEndUserFromSession(sc).getIssuperuser()) {
+        if (!getEndUserFromSession(sc).getIsSuperUser()) {
             throw new BadRequestException();
         }
 

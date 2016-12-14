@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.entitymap.EntityMapHelper;
 import org.endeavourhealth.enterprise.core.entitymap.models.EntityMap;
 import org.slf4j.Logger;

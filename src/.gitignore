@@ -10,3 +10,4 @@ workspace.xml
 vcs.xml
 .idea
 classes/
+node_modules

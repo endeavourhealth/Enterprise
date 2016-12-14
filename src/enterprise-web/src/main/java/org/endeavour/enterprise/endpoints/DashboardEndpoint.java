@@ -7,6 +7,8 @@ import org.endeavour.enterprise.json.JsonJob;
 import org.endeavour.enterprise.json.JsonJobReport;
 import org.endeavour.enterprise.json.JsonProcessorStatus;
 import org.endeavour.enterprise.utility.MessagingQueueProvider;
+import org.endeavourhealth.core.security.SecurityUtils;
+import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.*;
 import org.endeavourhealth.enterprise.core.database.models.*;
@@ -34,7 +36,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     public Response getRecentDocuments(@Context SecurityContext sc, @QueryParam("count") int count) throws Exception {
         super.setLogbackMarkers(sc);
 
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         LOG.trace("getRecentDocuments {}", count);
@@ -127,9 +129,9 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     public Response testDatabase(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);
 
-        if (!getEndUserFromSession(sc).getIssuperuser()) {
-            throw new BadRequestException();
-        }
+//        if (!getEndUserFromSession(sc).getIssuperuser()) {
+//            throw new BadRequestException();
+//        }
 
         JobprocessorresultEntity.deleteAllResults();
 

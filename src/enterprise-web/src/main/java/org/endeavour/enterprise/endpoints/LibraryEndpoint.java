@@ -4,6 +4,7 @@ import org.endeavour.enterprise.json.JsonDeleteResponse;
 import org.endeavour.enterprise.json.JsonFolderContent;
 import org.endeavour.enterprise.json.JsonFolderContentsList;
 import org.endeavour.enterprise.json.JsonMoveItems;
+import org.endeavourhealth.core.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
@@ -60,7 +61,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         UUID libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
         String name = libraryItem.getName();
@@ -131,7 +132,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         UUID libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         LOG.trace("DeletingLibraryItem UUID {}", libraryItemUuid);
 
@@ -185,7 +186,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         LOG.trace("moveLibraryItems");
 

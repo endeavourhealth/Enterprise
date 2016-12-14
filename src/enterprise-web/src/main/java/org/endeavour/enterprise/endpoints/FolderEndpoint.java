@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.json.*;
+import org.endeavourhealth.core.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
@@ -36,7 +37,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         UUID parentUuid = folderParameters.getParentFolderUuid();
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         //work out the ItemType, either from the parameters passed up or from our parent folder
         //if the folder type wasn't specified, see if we can derive it from our parent
@@ -116,7 +117,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = getEndUserUuidFromToken(sc);
+        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
 
         UUID folderUuid = folderParameters.getUuid();
 
@@ -170,7 +171,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
             //if we don't have a top-level folder, for some reason, re-create it
             if (items.size() == 0) {
-                UUID userUuid = getEndUserUuidFromToken(sc);
+                UUID userUuid = SecurityUtils.getCurrentUserId(sc);
                 FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, itemType);
 
                 //then re-run the select

@@ -9,6 +9,10 @@ import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
 import org.endeavour.enterprise.email.EmailProvider;
 
+import org.endeavourhealth.core.data.admin.models.EndUser;
+import org.endeavourhealth.core.data.admin.models.Organisation;
+import org.endeavourhealth.core.security.SecurityUtils;
+import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.database.DataManager;
 import org.endeavourhealth.enterprise.core.database.models.*;
@@ -33,7 +37,7 @@ import java.util.UUID;
 @Path("/admin")
 public final class AdminEndpoint extends AbstractEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(AdminEndpoint.class);
-
+/*
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -43,8 +47,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         super.setLogbackMarkers(sc);
 
         //validate our user is a super user
-        EnduserEntity user = getEndUserFromSession(sc);
-        if (!user.getIssuperuser()) {
+        EndUser user = getEndUserFromSession(sc);
+        if (!user.getIsSuperUser()) {
             throw new org.endeavour.enterprise.framework.exceptions.NotAuthorizedException();
         }
 
@@ -92,7 +96,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         //if we've created new root folders, save them now
         if (creteRootFolders) {
-            UUID userUuid = getEndUserUuidFromToken(sc);
+            UUID userUuid = SecurityUtils.getCurrentUserId(sc);
             UUID orgUuid = org.getOrganisationuuid();
 
             FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, DefinitionItemType.ReportFolder);
@@ -110,6 +114,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .entity(ret)
                 .build();
     }
+
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -144,22 +149,22 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         //if doing anything to a super user, verify the current user is a super-user
         if (isSuperUser.booleanValue()) {
-            EnduserEntity user = getEndUserFromSession(sc);
-            if (!user.getIssuperuser()) {
+            EndUser user = getEndUserFromSession(sc);
+            if (!user.getIsSuperUser()) {
                 throw new NotAuthorizedException("Non-super user cannot create or modify super users");
             }
         }
 
         //validate that the user is amending themselves or is an admin
-        EnduserEntity userLoggedOn = getEndUserFromSession(sc);
+        EndUser userLoggedOn = getEndUserFromSession(sc);
         if (uuid == null
-                || !userLoggedOn.getEnduseruuid().equals(uuid)) {
-            if (!isAdminFromSecurityContext(sc)) {
+                || !userLoggedOn.getId().equals(uuid)) {
+            if (!isAdminFromSession(sc)) {
                 throw new NotAuthorizedException("Must be an admin to create new users or amend others");
             }
         }
 
-        OrganisationEntity org = getOrganisationFromSession(sc);
+        Organisation org = getOrganisationFromSession(sc);
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
         EnduserEntity user = null;
@@ -314,7 +319,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .build();
     }
 
-    private static EnduserpwdEntity changePassword(EnduserEntity user, EnduserEntity loggedOnUser, String newPwd) throws Exception {
+    private static EnduserpwdEntity changePassword(EndUser user, EndUser loggedOnUser, String newPwd) throws Exception {
 
         //validate the user is changing their own password or is an admin
         Boolean oneTimeUse = Boolean.FALSE;
@@ -325,7 +330,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         String hash = PasswordHash.createHash(newPwd);
 
         //retrieve the most recent password for the person
-        UUID uuid = user.getEnduseruuid();
+        UUID uuid = user.getId();
         EnduserpwdEntity oldPwd = EnduserpwdEntity.retrieveEndUserPwdForUserNotExpired(uuid);
 
         //create the new password entity
@@ -379,7 +384,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
 
         LOG.trace("DeletingUser UserUUID {}", userUuid);
 
-        UUID currentUserUuid = getEndUserUuidFromToken(sc);
+        UUID currentUserUuid = SecurityUtils.getCurrentUserId(sc);
         if (userUuid.equals(currentUserUuid)) {
             throw new BadRequestException("Cannot delete your own account");
         }
@@ -405,7 +410,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .ok()
                 .build();
     }
-
+*/
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -430,8 +435,8 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
 
         //if we're a super-user then we should also include all other super-users in the result
-        EnduserEntity user = getEndUserFromSession(sc);
-        if (user.getIssuperuser()) {
+        EndUser user = getEndUserFromSession(sc);
+        if (user.getIsSuperUser()) {
             List<EnduserEntity> superUsers = EnduserEntity.retrieveSuperUsers();
             for (int i = 0; i < superUsers.size(); i++) {
                 EnduserEntity superUser = superUsers.get(i);
@@ -449,7 +454,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .build();
     }
 
-
+/*
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -477,7 +482,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
 
         //now generate a new invite and send it
-        OrganisationEntity org = getOrganisationFromSession(sc);
+        Organisation org = getOrganisationFromSession(sc);
         EnduseremailinviteEntity invite = createAndSendInvite(user, org);
 
         DataManager db = new DataManager();
@@ -489,6 +494,7 @@ public final class AdminEndpoint extends AbstractEndpoint {
                 .ok()
                 .build();
     }
+*/
 
 
 }

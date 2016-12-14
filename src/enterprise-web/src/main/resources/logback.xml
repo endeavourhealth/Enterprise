@@ -17,13 +17,22 @@
     </encoder>
   </appender>
 
+  <!--================================-->
+  <!--logging settings for development-->
+  <!--================================-->
 
+  <!-- only want ERRORs from these packages -->
+  <logger name="ch.qos.logback" level="ERROR"/>
+  <logger name="com.mchange" level="ERROR"/>
+  <logger name="com.datastax" level="ERROR"/>
+
+  <!-- enable TRACE logging for Endeavour code -->
   <logger name="org.endeavour.enterprise" level="TRACE"/>
-  <logger name="com.mchange" level="INFO"/>  <!--not interested in logback debug logging -->
 
-  <root level="debug">
+  <!-- only log to stdout with INFO level -->
+  <root level="INFO">
     <appender-ref ref="STDOUT" />
-    <appender-ref ref="FILE" />
+    <!--<appender-ref ref="FILE" />-->
     <!--DB appender is added programmatically-->
   </root>
 </configuration>

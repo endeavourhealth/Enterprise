@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+
+    <persistence-unit name="NewPersistenceUnit">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>org.endeavourhealth.enterprise.core.database.models.ActiveitemEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.JobEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.JobcontentEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.JobprocessorresultEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.JobreportEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.JobreportitemEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.JobreportitemorganisationEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.JobreportorganisationEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.ProcessorstatusEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.RequestEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.StatusEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.EnduserEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.EnduseremailinviteEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.EnduserpwdEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.OrganisationEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.OrganisationenduserlinkEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.AuditEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.DependencytypeEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.ItemEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.ItemdependencyEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.ItemtypeEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.SourceorganisationEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.SourceorganisationsetEntity</class>
+        <properties>
+            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/Endeavour_Enterprise"/>
+            <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
+            <property name="hibernate.connection.username" value="postgres"/>
+            <property name="hibernate.connection.password" value="Taz123"/>
+            <property name="hibernate.archive.autodetection" value="class"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hbm2ddl.auto" value="update"/>
+        </properties>
+    </persistence-unit>
+</persistence>

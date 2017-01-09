@@ -256,7 +256,7 @@ CREATE UNIQUE INDEX schedule_id
 
 -- DROP TABLE public.patient;
 
-CREATE TABLE public.patient
+CREATE TABLE patient
 (
   id integer NOT NULL,
   organization_id integer NOT NULL,
@@ -268,6 +268,7 @@ CREATE TABLE public.patient
   usual_gp_practitioner_id integer,
   pseudo_id character varying(255) NOT NULL,
   registration_type_id smallint NOT NULL,
+  nhs_number character varying(255),
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
       REFERENCES public.organization (id) MATCH SIMPLE
@@ -432,6 +433,7 @@ CREATE TABLE allergy_intolerance
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  original_code character varying(20),
   CONSTRAINT pk_allergy_intolerance_id PRIMARY KEY (id),
   CONSTRAINT fk_allergy_intolerance_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -485,6 +487,7 @@ CREATE TABLE condition
   date_precision_id smallint,
   snomed_concept_id bigint,
   is_review boolean NOT NULL,
+  original_code character varying(20),
   CONSTRAINT pk_condition_id PRIMARY KEY (id),
   CONSTRAINT fk_condition_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -538,6 +541,7 @@ CREATE TABLE specimen
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  original_code character varying(20),
   CONSTRAINT pk_specimen_id PRIMARY KEY (id),
   CONSTRAINT fk_specimen_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -591,6 +595,7 @@ CREATE TABLE diagnostic_order
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  original_code character varying(20),
   CONSTRAINT pk_diagnostic_order_id PRIMARY KEY (id),
   CONSTRAINT fk_diagnostic_order_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -644,6 +649,7 @@ CREATE TABLE diagnostic_report
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  original_code character varying(20),
   CONSTRAINT pk_diagnostic_report_id PRIMARY KEY (id),
   CONSTRAINT fk_diagnostic_report_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -698,6 +704,7 @@ CREATE TABLE family_member_history
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  original_code character varying(20),
   CONSTRAINT pk_family_member_history_id PRIMARY KEY (id),
   CONSTRAINT fk_family_member_history_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -750,6 +757,7 @@ CREATE TABLE immunization
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  original_code character varying(20),
   CONSTRAINT pk_immunization_id PRIMARY KEY (id),
   CONSTRAINT fk_immunization_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -924,6 +932,7 @@ CREATE TABLE observation
   snomed_concept_id bigint,
   value real,
   units character varying(50),
+  original_code character varying(20),
   CONSTRAINT pk_observation_id PRIMARY KEY (id),
   CONSTRAINT fk_observation_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -976,6 +985,7 @@ CREATE TABLE procedure
   clinical_effective_date date,
   date_precision_id smallint,
   snomed_concept_id bigint,
+  original_code character varying(20),
   CONSTRAINT pk_procedure_id PRIMARY KEY (id),
   CONSTRAINT fk_procedure_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -1028,6 +1038,7 @@ CREATE TABLE procedure_request
   date_precision_id smallint,
   snomed_concept_id bigint,
   procedure_request_status_id smallint,
+  original_code character varying(20),
   CONSTRAINT pk_procedure_request_id PRIMARY KEY (id),
   CONSTRAINT fk_procedure_request_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -1090,6 +1101,7 @@ CREATE TABLE public.referral_request
   service_requested character varying(255),
   mode character varying(50),
   outgoing_referral boolean,
+  original_code character varying(20),
   CONSTRAINT pk_referral_request_id PRIMARY KEY (id),
   CONSTRAINT fk_referral_request_date_precision FOREIGN KEY (date_precision_id)
       REFERENCES public.date_precision (id) MATCH SIMPLE

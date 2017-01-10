@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS procedure_request;
 DROP TABLE IF EXISTS referral_request;
 DROP TABLE IF EXISTS encounter;
 DROP TABLE IF EXISTS appointment;
+DROP TABLE IF EXISTS episode_of_care;
 DROP TABLE IF EXISTS patient;
 DROP TABLE IF EXISTS schedule;
 DROP TABLE IF EXISTS practitioner;
@@ -263,11 +264,7 @@ CREATE TABLE patient
   year_of_birth integer NOT NULL,
   year_of_death integer,
   patient_gender_id smallint NOT NULL,
-  date_registered date NOT NULL,
-  date_registered_end date,
-  usual_gp_practitioner_id integer,
   pseudo_id character varying(255) NOT NULL,
-  registration_type_id smallint NOT NULL,
   nhs_number character varying(255),
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
@@ -275,10 +272,8 @@ CREATE TABLE patient
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_patient_patient_gender_id FOREIGN KEY (patient_gender_id)
       REFERENCES public.patient_gender (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_patient_registration_type_id FOREIGN KEY (registration_type_id)
-      REFERENCES public.registration_type (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
+
 )
 WITH (
   OIDS=FALSE
@@ -295,6 +290,45 @@ CREATE UNIQUE INDEX patient_id
   USING btree
   (id);
 ALTER TABLE public.patient CLUSTER ON patient_id;  
+
+-- Table: public.episode_of_care
+
+-- DROP TABLE public.episode_of_care;
+
+CREATE TABLE public.episode_of_care
+(
+  id integer NOT NULL,
+  organization_id integer NOT NULL,
+  patient_id integer NOT NULL,
+  registration_type_id smallint NOT NULL,
+  date_registered date NOT NULL,
+  date_registered_end date,
+  usual_gp_practitioner_id integer,
+  CONSTRAINT pk_episode_of_care_id PRIMARY KEY (id),
+  CONSTRAINT fk_episode_of_care_patient_id_organisation_id FOREIGN KEY (patient_id, organization_id)
+      REFERENCES public.patient (id, organization_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_episode_of_care_practitioner_id FOREIGN KEY (usual_gp_practitioner_id)
+      REFERENCES public.practitioner (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_episode_of_care_registration_type_id FOREIGN KEY (registration_type_id)
+      REFERENCES public.registration_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.episode_of_care
+  OWNER TO postgres;
+
+-- Index: episode_of_care_id
+
+-- DROP INDEX episode_of_care_id;
+
+CREATE UNIQUE INDEX episode_of_care_id
+  ON episode_of_care
+  USING btree
+  (id);
 
 -- Table: appointment
 

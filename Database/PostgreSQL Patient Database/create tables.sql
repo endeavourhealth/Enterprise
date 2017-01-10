@@ -301,7 +301,7 @@ CREATE TABLE public.episode_of_care
   organization_id integer NOT NULL,
   patient_id integer NOT NULL,
   registration_type_id smallint NOT NULL,
-  date_registered date NOT NULL,
+  date_registered date,
   date_registered_end date,
   usual_gp_practitioner_id integer,
   CONSTRAINT pk_episode_of_care_id PRIMARY KEY (id),

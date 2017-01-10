@@ -811,7 +811,7 @@ CREATE TABLE medication_statement
   date_precision_id smallint,
   dmd_id bigint,
   is_active boolean NOT NULL,
-  cancellation_clinical_effective_date date,
+  cancellation_date date,
   dose character varying(255) NOT NULL,
   quantity_value real,
   quantity_unit character varying(255),

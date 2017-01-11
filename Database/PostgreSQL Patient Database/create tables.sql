@@ -1130,7 +1130,7 @@ CREATE TABLE public.referral_request
   date_precision_id smallint,
   snomed_concept_id bigint,
   requester_organization_id integer,
-  recipient_organization_id integer NOT NULL,
+  recipient_organization_id integer,
   priority character varying(50),
   service_requested character varying(255),
   mode character varying(50),

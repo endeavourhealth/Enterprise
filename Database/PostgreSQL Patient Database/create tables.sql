@@ -69,7 +69,7 @@ INSERT INTO appointment_status (id, value) VALUES (5, 'Cancelled');
 INSERT INTO appointment_status (id, value) VALUES (6, 'No Show');
 
 -- Table: procedure_request_status
-/*
+
 CREATE TABLE procedure_request_status
 (
   id smallint NOT NULL,
@@ -92,7 +92,6 @@ INSERT INTO procedure_request_status (id, value) VALUES (6, 'Completed');
 INSERT INTO procedure_request_status (id, value) VALUES (7, 'Suspended');
 INSERT INTO procedure_request_status (id, value) VALUES (8, 'Rejected');
 INSERT INTO procedure_request_status (id, value) VALUES (9, 'Aborted');
-*/
 
 -- Table: public.medication_statement_authorisation_type
 
@@ -981,7 +980,7 @@ CREATE TABLE observation
   value real,
   units character varying(50),
   original_code character varying(20),
-  is_problem boolean,
+  is_problem boolean NOT NULL,
   original_term character varying(1000),
   CONSTRAINT pk_observation_id PRIMARY KEY (id),
   CONSTRAINT fk_observation_encounter_id FOREIGN KEY (encounter_id)
@@ -1078,7 +1077,7 @@ ALTER TABLE procedure CLUSTER ON procedure_patient_id;
 
 
 -- Table: procedure_request
-/*
+
 CREATE TABLE procedure_request
 (
   id integer NOT NULL,
@@ -1091,6 +1090,7 @@ CREATE TABLE procedure_request
   snomed_concept_id bigint,
   procedure_request_status_id smallint,
   original_code character varying(20),
+  original_term character varying(1000),
   CONSTRAINT pk_procedure_request_id PRIMARY KEY (id),
   CONSTRAINT fk_procedure_request_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -1132,7 +1132,6 @@ CREATE INDEX procedure_request_patient_id
   USING btree
   (patient_id);
 ALTER TABLE procedure_request CLUSTER ON procedure_request_patient_id;
-*/
 
 
 -- Table: public.referral_request

@@ -69,7 +69,7 @@ INSERT INTO appointment_status (id, value) VALUES (5, 'Cancelled');
 INSERT INTO appointment_status (id, value) VALUES (6, 'No Show');
 
 -- Table: procedure_request_status
-
+/*
 CREATE TABLE procedure_request_status
 (
   id smallint NOT NULL,
@@ -92,6 +92,7 @@ INSERT INTO procedure_request_status (id, value) VALUES (6, 'Completed');
 INSERT INTO procedure_request_status (id, value) VALUES (7, 'Suspended');
 INSERT INTO procedure_request_status (id, value) VALUES (8, 'Rejected');
 INSERT INTO procedure_request_status (id, value) VALUES (9, 'Aborted');
+*/
 
 -- Table: public.medication_statement_authorisation_type
 
@@ -203,10 +204,11 @@ CREATE TABLE practitioner
   name character varying(1024) NOT NULL,
   role_code character varying(50),
   role_desc character varying(255),
-  CONSTRAINT pk_practitioner_id PRIMARY KEY (id),
-  CONSTRAINT fk_practitioner_organization_id FOREIGN KEY (organization_id)
+  CONSTRAINT pk_practitioner_id PRIMARY KEY (id)
+  --bad data prevents us enforcing this constraint
+  /*CONSTRAINT fk_practitioner_organization_id FOREIGN KEY (organization_id)
       REFERENCES organization (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION*/
 )
 WITH (
   OIDS=FALSE
@@ -261,11 +263,14 @@ CREATE TABLE patient
 (
   id integer NOT NULL,
   organization_id integer NOT NULL,
-  year_of_birth integer NOT NULL,
-  year_of_death integer,
+  --year_of_birth integer NOT NULL,
+  --year_of_death integer,
   patient_gender_id smallint NOT NULL,
   pseudo_id character varying(255) NOT NULL,
   nhs_number character varying(255),
+  date_of_birth date NOT NULL,
+  date_of_death date,
+  postcode character varying(20),
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
       REFERENCES public.organization (id) MATCH SIMPLE
@@ -398,6 +403,9 @@ CREATE TABLE encounter
   appointment_id integer,
   clinical_effective_date date,
   date_precision_id smallint,
+  snomed_concept_id bigint,
+  original_code character varying(20),
+  original_term character varying(1000),
   CONSTRAINT pk_encounter_id PRIMARY KEY (id),
   CONSTRAINT fk_encounter_appointment_id FOREIGN KEY (appointment_id)
       REFERENCES appointment (id) MATCH SIMPLE
@@ -468,6 +476,7 @@ CREATE TABLE allergy_intolerance
   date_precision_id smallint,
   snomed_concept_id bigint,
   original_code character varying(20),
+  original_term character varying(1000),
   CONSTRAINT pk_allergy_intolerance_id PRIMARY KEY (id),
   CONSTRAINT fk_allergy_intolerance_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -509,7 +518,7 @@ ALTER TABLE allergy_intolerance CLUSTER ON allergy_intolerance_patient_id;
 
 
 -- Table: condition
-
+/*
 CREATE TABLE condition
 (
   id integer NOT NULL,
@@ -561,10 +570,10 @@ CREATE INDEX condition_patient_id
   USING btree
   (patient_id);
 ALTER TABLE condition CLUSTER ON condition_patient_id;
-
+*/
 
 -- Table: specimen
-
+/*
 CREATE TABLE specimen
 (
   id integer NOT NULL,
@@ -615,10 +624,10 @@ CREATE INDEX specimen_patient_id
   USING btree
   (patient_id);
 ALTER TABLE specimen CLUSTER ON specimen_patient_id;
-
+*/
 
 -- Table: diagnostic_order
-
+/*
 CREATE TABLE diagnostic_order
 (
   id integer NOT NULL,
@@ -669,10 +678,10 @@ CREATE INDEX diagnostic_order_patient_id
   USING btree
   (patient_id);
 ALTER TABLE diagnostic_order CLUSTER ON diagnostic_order_patient_id;
-
+*/
 
 -- Table: diagnostic_report
-
+/*
 CREATE TABLE diagnostic_report
 (
   id integer NOT NULL,
@@ -723,11 +732,11 @@ CREATE INDEX diagnostic_report_patient_id
   USING btree
   (patient_id);
 ALTER TABLE diagnostic_report CLUSTER ON diagnostic_report_patient_id;
-
+*/
 
 
 -- Table: family_member_history
-
+/*
 CREATE TABLE family_member_history
 (
   id integer NOT NULL,
@@ -778,9 +787,11 @@ CREATE INDEX family_member_history_patient_id
   USING btree
   (patient_id);
 ALTER TABLE family_member_history CLUSTER ON family_member_history_patient_id;
+*/
+
 
 -- Table: immunization
-
+/*
 CREATE TABLE immunization
 (
   id integer NOT NULL,
@@ -830,6 +841,7 @@ CREATE INDEX immunization_patient_id
   USING btree
   (patient_id);
 ALTER TABLE immunization CLUSTER ON immunization_patient_id;
+*/
 
 
 -- Table: medication_statement
@@ -850,6 +862,7 @@ CREATE TABLE medication_statement
   quantity_value real,
   quantity_unit character varying(255),
   medication_statement_authorisation_type_id smallint NOT NULL,
+  original_term character varying(1000),
   CONSTRAINT pk_medication_statement_id PRIMARY KEY (id),
   CONSTRAINT fk_medication_statement_date_precision FOREIGN KEY (date_precision_id)
       REFERENCES public.date_precision (id) MATCH SIMPLE
@@ -910,6 +923,7 @@ CREATE TABLE medication_order
   duration_days integer NOT NULL,
   estimated_cost real,
   medication_statement_id integer NOT NULL,
+  original_term character varying(1000),
   CONSTRAINT pk_medication_order_id PRIMARY KEY (id),
   CONSTRAINT fk_medication_order_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -967,6 +981,8 @@ CREATE TABLE observation
   value real,
   units character varying(50),
   original_code character varying(20),
+  is_problem boolean,
+  original_term character varying(1000),
   CONSTRAINT pk_observation_id PRIMARY KEY (id),
   CONSTRAINT fk_observation_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -1008,7 +1024,7 @@ ALTER TABLE observation CLUSTER ON observation_patient_id;
 
 
 -- Table: procedure
-
+/*
 CREATE TABLE procedure
 (
   id integer NOT NULL,
@@ -1058,9 +1074,11 @@ CREATE INDEX procedure_patient_id
   USING btree
   (patient_id);
 ALTER TABLE procedure CLUSTER ON procedure_patient_id;
+*/
+
 
 -- Table: procedure_request
-
+/*
 CREATE TABLE procedure_request
 (
   id integer NOT NULL,
@@ -1114,6 +1132,8 @@ CREATE INDEX procedure_request_patient_id
   USING btree
   (patient_id);
 ALTER TABLE procedure_request CLUSTER ON procedure_request_patient_id;
+*/
+
 
 -- Table: public.referral_request
 
@@ -1136,6 +1156,7 @@ CREATE TABLE public.referral_request
   mode character varying(50),
   outgoing_referral boolean,
   original_code character varying(20),
+  original_term character varying(1000),
   CONSTRAINT pk_referral_request_id PRIMARY KEY (id),
   CONSTRAINT fk_referral_request_date_precision FOREIGN KEY (date_precision_id)
       REFERENCES public.date_precision (id) MATCH SIMPLE

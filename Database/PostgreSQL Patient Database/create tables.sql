@@ -194,35 +194,37 @@ CREATE UNIQUE INDEX organization_id
   USING btree
   (id);
 
--- Table: practitioner
+-- Table: public.practitioner
 
-CREATE TABLE practitioner
+-- DROP TABLE public.practitioner;
+
+CREATE TABLE public.practitioner
 (
   id integer NOT NULL,
   organization_id integer NOT NULL,
   name character varying(1024) NOT NULL,
   role_code character varying(50),
   role_desc character varying(255),
-  CONSTRAINT pk_practitioner_id PRIMARY KEY (id)
-  --bad data prevents us enforcing this constraint
-  /*CONSTRAINT fk_practitioner_organization_id FOREIGN KEY (organization_id)
-      REFERENCES organization (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION*/
+  CONSTRAINT pk_practitioner_id PRIMARY KEY (id),
+  CONSTRAINT fk_practitioner_organisation_id FOREIGN KEY (organization_id)
+      REFERENCES public.organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE practitioner
+ALTER TABLE public.practitioner
   OWNER TO postgres;
 
--- Index: practitioner_id
+-- Index: public.practitioner_id
 
--- DROP INDEX practitioner_id;
+-- DROP INDEX public.practitioner_id;
 
 CREATE UNIQUE INDEX practitioner_id
-  ON practitioner
+  ON public.practitioner
   USING btree
   (id);
+
 
 -- Table: schedule
 

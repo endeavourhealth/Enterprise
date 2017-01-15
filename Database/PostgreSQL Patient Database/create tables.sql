@@ -165,10 +165,7 @@ CREATE TABLE organization
   type_desc character varying(255),
   postcode character varying(10),
   parent_organization_id integer,
-  CONSTRAINT pk_organization_id PRIMARY KEY (id),
-  CONSTRAINT fk_organization_parent_organization_id FOREIGN KEY (parent_organization_id)
-      REFERENCES public.organization (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+  CONSTRAINT pk_organization_id PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
@@ -859,7 +856,7 @@ CREATE TABLE medication_statement
   dmd_id bigint,
   is_active boolean NOT NULL,
   cancellation_date date,
-  dose character varying(255),
+  dose character varying(1000),
   quantity_value real,
   quantity_unit character varying(255),
   medication_statement_authorisation_type_id smallint NOT NULL,
@@ -918,12 +915,12 @@ CREATE TABLE medication_order
   clinical_effective_date date,
   date_precision_id smallint,
   dmd_id bigint,
-  dose character varying(255),
+  dose character varying(1000),
   quantity_value real,
   quantity_unit character varying(255),
   duration_days integer NOT NULL,
   estimated_cost real,
-  medication_statement_id integer NOT NULL,
+  medication_statement_id integer,
   original_term character varying(1000),
   CONSTRAINT pk_medication_order_id PRIMARY KEY (id),
   CONSTRAINT fk_medication_order_encounter_id FOREIGN KEY (encounter_id)

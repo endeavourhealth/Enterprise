@@ -359,9 +359,6 @@ CREATE TABLE appointment
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_appointment_practitioner_id FOREIGN KEY (practitioner_id)
       REFERENCES public.practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_appointment_schedule_id FOREIGN KEY (schedule_id)
-      REFERENCES public.schedule (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (

@@ -23,6 +23,8 @@ DROP TABLE IF EXISTS enterprise_data.organization;
 DROP TABLE IF EXISTS enterprise_data.date_precision;
 DROP TABLE IF EXISTS enterprise_data.appointment_status;
 DROP TABLE IF EXISTS enterprise_data.procedure_request_status;
+DROP TABLE IF EXISTS enterprise_data.referral_request_priority;
+DROP TABLE IF EXISTS enterprise_data.referral_request_type;
 DROP TABLE IF EXISTS enterprise_data.medication_statement_authorisation_type;
 DROP TABLE IF EXISTS enterprise_data.patient_gender;
 DROP TABLE IF EXISTS enterprise_data.registration_type;
@@ -78,13 +80,44 @@ INSERT INTO procedure_request_status (id, value) VALUES (7, 'Suspended');
 INSERT INTO procedure_request_status (id, value) VALUES (8, 'Rejected');
 INSERT INTO procedure_request_status (id, value) VALUES (9, 'Aborted');
 
+
+-- Table: referral_priority
+
+CREATE TABLE referral_request_priority
+(
+  id smallint NOT NULL,
+  value character varying(50) NOT NULL,
+  CONSTRAINT pk_referral_request_priority_id PRIMARY KEY (id)
+);
+
+INSERT INTO referral_request_priority (id, value) VALUES (0, 'Routine');
+INSERT INTO referral_request_priority (id, value) VALUES (1, 'Urgent');
+INSERT INTO referral_request_priority (id, value) VALUES (2, 'Two Week Wait');
+
+-- Table: referral_request_type
+
+CREATE TABLE referral_request_type
+(
+  id smallint NOT NULL,
+  value character varying(50) NOT NULL,
+  CONSTRAINT pk_referral_request_type_id PRIMARY KEY (id)
+);
+
+INSERT INTO referral_request_type (id, value) VALUES (0, 'Unknown');
+INSERT INTO referral_request_type (id, value) VALUES (1, 'Assessment');
+INSERT INTO referral_request_type (id, value) VALUES (2, 'Investigation');
+INSERT INTO referral_request_type (id, value) VALUES (3, 'Management advice');
+INSERT INTO referral_request_type (id, value) VALUES (4, 'Patient reassurance');
+INSERT INTO referral_request_type (id, value) VALUES (5, 'Self referral');
+INSERT INTO referral_request_type (id, value) VALUES (6, 'Treatment');
+
 -- Table: medication_statement_authorisation_type
 
 CREATE TABLE medication_statement_authorisation_type
 (
   id smallint NOT NULL,
   value character varying(50) NOT NULL,
-  CONSTRAINT pk_medication_statement_authorisation_type PRIMARY KEY (id)
+  CONSTRAINT pk_medication_statement_authorisation_type_id PRIMARY KEY (id)
 );
 
 INSERT INTO medication_statement_authorisation_type (id, value) VALUES (0, 'Acute');
@@ -98,7 +131,7 @@ CREATE TABLE patient_gender
 (
   id smallint NOT NULL,
   value character varying(10) NOT NULL,
-  CONSTRAINT pk_patient_gender PRIMARY KEY (id)
+  CONSTRAINT pk_patient_gender_id PRIMARY KEY (id)
 );
 
 INSERT INTO patient_gender (id, value) VALUES (0, 'Male');
@@ -113,7 +146,7 @@ CREATE TABLE registration_type
   id smallint NOT NULL,
   code character varying(10) NOT NULL,
   description character varying(30) NOT NULL,
-  CONSTRAINT pk_registration_type PRIMARY KEY (id)
+  CONSTRAINT pk_registration_type_id PRIMARY KEY (id)
 );
 
 INSERT INTO registration_type (id, code, description) VALUES (0, 'E', 'Emergency');
@@ -1024,8 +1057,8 @@ CREATE TABLE referral_request
   snomed_concept_id bigint,
   requester_organization_id integer,
   recipient_organization_id integer,
-  priority character varying(50),
-  service_requested character varying(255),
+  priority_id smallint,
+  type_id smallint,
   mode character varying(50),
   outgoing_referral boolean,
   original_code character varying(20),
@@ -1048,7 +1081,13 @@ CREATE TABLE referral_request
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_requester_organization_id FOREIGN KEY (requester_organization_id)
       REFERENCES organization (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_referral_request_type_id FOREIGN KEY (type_id)
+      REFERENCES referral_request_type (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_referral_request_priority_id FOREIGN KEY (priority_id)
+      REFERENCES referral_request_priority (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION 
 );
 
 -- Index: referral_request_id

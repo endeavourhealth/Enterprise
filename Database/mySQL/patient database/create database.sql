@@ -1,4 +1,4 @@
 
---DROP DATABASE enterprise_data;
+-- DROP DATABASE enterprise_data;
 
 CREATE DATABASE enterprise_data;

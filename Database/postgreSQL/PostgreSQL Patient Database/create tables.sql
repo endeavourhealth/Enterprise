@@ -306,7 +306,7 @@ CREATE TABLE patient
   --year_of_birth integer NOT NULL,
   --year_of_death integer,
   patient_gender_id smallint NOT NULL,
-  pseudo_id character varying(255) NOT NULL,
+  pseudo_id character varying(255),
   nhs_number character varying(255),
   date_of_birth date NOT NULL,
   date_of_death date,

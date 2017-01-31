@@ -8,32 +8,29 @@
 		<field>
 			<logicalName>PSEUDO_ID</logicalName>
 			<displayName>Pseudo Identifier</displayName>
-			<index>3</index>
+			<index>8</index>
 			<availability>output</availability>
 			<logicalDataType>string</logicalDataType>
 		</field>
-		<!--
 		<organisationOdsFieldIndex>2</organisationOdsFieldIndex>
 		<field>
-			<logicalName>ORGANISATION_ODS</logicalName>
-			<displayName>Organisation ODS Code</displayName>
+			<logicalName>ORGANISATION_ID</logicalName>
+			<displayName>Organisation ID</displayName>
+			<index>1</index>
+			<availability>search output</availability>
+			<logicalDataType>integer</logicalDataType>
+		</field>
+		<field>
+			<logicalName>YEAR_OF_BIRTH</logicalName>
+			<displayName>Year Of Birth</displayName>
 			<index>2</index>
 			<availability>search output</availability>
-			<logicalDataType>organisationODS</logicalDataType>
+			<logicalDataType>integer</logicalDataType>
 		</field>
-		-->
-		<field>
-			<logicalName>DOB</logicalName>
-			<displayName>Date Of Birth</displayName>
-			<index>3</index>
-			<availability>search output</availability>
-			<logicalDataType>date</logicalDataType>
-		</field>
-		<!--Age-->
 		<field>
 			<logicalName>GENDER</logicalName>
 			<displayName>Gender</displayName>
-			<index>5</index>
+			<index>4</index>
 			<availability>search output</availability>
 			<logicalDataType>dataValues</logicalDataType>
 			<dataValues>
@@ -60,7 +57,7 @@
 		<field>
 			<logicalName>REGISTRATION_DATE</logicalName>
 			<displayName>Registration Date</displayName>
-			<index>6</index>
+			<index>5</index>
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>
@@ -71,12 +68,10 @@
 			<availability>search output</availability>
 			<logicalDataType>date</logicalDataType>
 		</field>
-		<!-- Registration type -->
-		<!-- Usual GP-->
 		<field>
 			<logicalName>YEAR_OF_DEATH</logicalName>
 			<displayName>Year of Death</displayName>
-			<index>6</index>
+			<index>3</index>
 			<availability>search output</availability>
 			<logicalDataType>integer</logicalDataType>
 		</field>

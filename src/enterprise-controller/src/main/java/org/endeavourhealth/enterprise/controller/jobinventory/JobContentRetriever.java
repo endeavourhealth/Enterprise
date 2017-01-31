@@ -2,9 +2,7 @@ package org.endeavourhealth.enterprise.controller.jobinventory;
 
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
-import org.endeavourhealth.enterprise.core.database.definition.DbItemDependency;
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+import org.endeavourhealth.enterprise.core.database.models.*;
 
 import java.util.*;
 
@@ -13,12 +11,12 @@ class JobContentRetriever {
     private final Map<UUID, UUID> libraryItemToAuditMap = new HashMap<>();
     private final Set<UUID> listReportItems = new HashSet<>();
 
-    public JobContentRetriever(List<DbRequest> requests) throws Exception {
+    public JobContentRetriever(List<RequestEntity> requests) throws Exception {
 
-        for (DbRequest request: requests) {
-            DbActiveItem activeItem = DbActiveItem.retrieveForItemUuid(request.getReportUuid());
+        for (RequestEntity request: requests) {
+            ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(request.getReportuuid());
 
-            recursivelyAddItems(activeItem, request.getOrganisationUuid());
+            recursivelyAddItems(activeItem, request.getOrganisationuuid());
         }
     }
 
@@ -34,36 +32,33 @@ class JobContentRetriever {
         return libraryItemToAuditMap.get(libraryItemUuid);
     }
 
-    private void recursivelyAddItems(DbActiveItem activeItem, UUID organisationUuid) throws Exception {
+    private void recursivelyAddItems(ActiveitemEntity activeItem, UUID organisationUuid) throws Exception {
 
         addItem(activeItem, organisationUuid);
 
-        List<DbItemDependency> itemDependencies = DbItemDependency.retrieveForActiveItem(activeItem);
+        List<ItemdependencyEntity> itemDependencies = ItemdependencyEntity.retrieveForActiveItem(activeItem);
 
-        for (DbItemDependency itemDependency: itemDependencies) {
+        for (ItemdependencyEntity itemDependency: itemDependencies) {
 
-            if (itemDependency.getDependencyTypeId() == DependencyType.Uses || itemDependency.getDependencyTypeId() == DependencyType.IsChildOf) {
-                DbActiveItem childActiveItem = DbActiveItem.retrieveForItemUuid(itemDependency.getDependentItemUuid());
+            if (itemDependency.getDependencytypeid() == DependencyType.Uses.getValue() || itemDependency.getDependencytypeid() == DependencyType.IsChildOf.getValue()) {
+                ActiveitemEntity childActiveItem = ActiveitemEntity.retrieveForItemUuid(itemDependency.getDependentitemuuid());
                 recursivelyAddItems(childActiveItem, organisationUuid);
             }
         }
     }
 
-    private void addItem(DbActiveItem activeItem, UUID requestOrganisationUuid) throws Exception {
+    private void addItem(ActiveitemEntity activeItem, UUID requestOrganisationUuid) throws Exception {
 
-        if (!requestOrganisationUuid.equals(activeItem.getOrganisationUuid()))
-            throw new Exception("Execution request for item not owned by organisation.  Org: " + requestOrganisationUuid.toString() + " ItemUuid: " + activeItem.getOrganisationUuid().toString());
+        if (!requestOrganisationUuid.equals(activeItem.getOrganisationuuid()))
+            throw new Exception("Execution request for item not owned by organisation.  Org: " + requestOrganisationUuid.toString() + " ItemUuid: " + activeItem.getOrganisationuuid().toString());
 
-        if (libraryItemToAuditMap.containsKey(activeItem.getItemUuid()))
+        if (libraryItemToAuditMap.containsKey(activeItem.getItemuuid()))
             return;
 
-        if (invalidItemType(activeItem.getItemTypeId()))
-            throw new Exception("Item type not supported.  Item UUID: " + activeItem.getItemUuid() + " Type: " + activeItem.getItemTypeId().name());
+        if (activeItem.getItemtypeid() == DefinitionItemType.ListOutput.getValue())
+            listReportItems.add(activeItem.getItemuuid());
 
-        if (activeItem.getItemTypeId() == DefinitionItemType.ListOutput)
-            listReportItems.add(activeItem.getItemUuid());
-
-        libraryItemToAuditMap.put(activeItem.getItemUuid(), activeItem.getAuditUuid());
+        libraryItemToAuditMap.put(activeItem.getItemuuid(), activeItem.getAudituuid());
     }
 
     private boolean invalidItemType(DefinitionItemType itemType) {

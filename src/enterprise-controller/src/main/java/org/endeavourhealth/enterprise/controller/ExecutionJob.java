@@ -2,10 +2,12 @@ package org.endeavourhealth.enterprise.controller;
 
 import org.endeavourhealth.enterprise.controller.configuration.models.Configuration;
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
+import org.endeavourhealth.enterprise.controller.configuration.models.OutputFilesType;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobInventory;
 import org.endeavourhealth.enterprise.controller.outputfiles.OutputFileApi;
+import org.endeavourhealth.enterprise.controller.outputfiles.OutputFileContext;
 import org.endeavourhealth.enterprise.core.ProcessorState;
-import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.queuing.controller.ControllerQueueProcessorNodeCompleteMessage;
 import org.endeavourhealth.enterprise.core.queuing.controller.ControllerQueueProcessorNodeStartedMessage;
 import org.endeavourhealth.enterprise.core.queuing.controller.ControllerQueueWorkItemCompleteMessage;
@@ -51,7 +53,7 @@ class ExecutionJob {
         logger.debug("Starting job: " + executionUuid);
 
         clearPreviousJobs();
-        List<DbRequest> itemRequests = getItemRequests();
+        List<RequestEntity> itemRequests = getItemRequests();
 
         if (itemRequests.isEmpty()) {
             executionTablesWrapper.createJobAsFinished(ExecutionStatus.NoJobRequests);
@@ -70,7 +72,7 @@ class ExecutionJob {
         jobInventory.initialise(itemRequests);
         prepareJobReportParameters();
         resultProcessor = new ResultProcessor(getExecutionUuid(), jobInventory.getJobReportInfoList());
-        prepareOutputFiles();
+        //prepareOutputFiles();
         prepareExecutionTables();
         createAndPopulateWorkerQueue();
         startProcessorNodes();
@@ -79,7 +81,10 @@ class ExecutionJob {
     }
 
     private void prepareOutputFiles() throws Exception {
-        outputFileApi = new OutputFileApi(configuration.getOutputFiles(), jobInventory, getExecutionUuid(), startDateTime);
+
+        OutputFileContext context = null;
+
+        outputFileApi = new OutputFileApi(configuration.getOutputFiles(), jobInventory, getExecutionUuid(), startDateTime, context);
         outputFileApi.prepareFiles();
     }
 
@@ -117,8 +122,8 @@ class ExecutionJob {
         executionTablesWrapper.setPrimaryTableStatistics(primaryTableStats);
     }
 
-    private List<DbRequest> getItemRequests() throws Exception {
-        return DbRequest.retrieveAllPending();
+    private List<RequestEntity> getItemRequests() throws Exception {
+        return RequestEntity.retrieveAllPending();
     }
 
     private void prepareExecutionTables() throws Exception {

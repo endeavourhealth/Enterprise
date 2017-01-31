@@ -2,10 +2,8 @@ package org.endeavourhealth.enterprise.controller;
 
 import org.endeavourhealth.enterprise.controller.jobinventory.JobReportInfo;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
-import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentHelper;
 import org.endeavourhealth.enterprise.enginecore.resultcounts.ResultCountMerger;
 import org.endeavourhealth.enterprise.enginecore.resultcounts.ResultCountsHelper;
@@ -22,7 +20,7 @@ class ResultProcessor {
     private final Map<UUID, Set<String>> jobReportUuidToOrganisations = new HashMap<>();
     private final Map<UUID, ResultCounts> processorToResult = new HashMap<>();
     private ResultCounts finalResultCounts;
-    private List<DbAbstractTable> toSave;
+    private List<Object> toSave;
 
     public ResultProcessor(UUID jobUuid, List<JobReportInfo> jobReportInfoList) {
         this.jobUuid = jobUuid;
@@ -39,13 +37,13 @@ class ResultProcessor {
 
         toSave = new ArrayList<>();
 
-        List<DbJobReport> jobReports = DbJobReport.retrieveForJob(jobUuid);
+        List<JobreportEntity> jobReports = JobreportEntity.retrieveForJob(jobUuid);
 
-        for (DbJobReport jobReport: jobReports) {
+        for (JobreportEntity jobReport: jobReports) {
             processJobReport(jobReport);
         }
 
-        DatabaseManager.db().writeEntities(toSave);
+        //DatabaseManager.db().writeEntities(toSave); TODO
         toSave = null;
     }
 
@@ -60,45 +58,42 @@ class ResultProcessor {
         finalResultCounts = merger.getResult();
     }
 
-    private void processJobReport(DbJobReport jobReport) throws Exception {
+    private void processJobReport(JobreportEntity jobReport) throws Exception {
 
-        JobReportResult jobReportResult = getResultForJobReport(jobReport.getJobReportUuid());
+        JobReportResult jobReportResult = getResultForJobReport(jobReport.getJobreportuuid());
 
-        jobReport.setPopulationCount(ResultCountsHelper.calculateTotal(jobReportResult.getOrganisationResult()));
-        jobReport.setStatusId(ExecutionStatus.Succeeded);
-        jobReport.setSaveMode(TableSaveMode.UPDATE);
+        jobReport.setPopulationcount(ResultCountsHelper.calculateTotal(jobReportResult.getOrganisationResult()));
+        jobReport.setStatusid((short)ExecutionStatus.Succeeded.getValue());
         toSave.add(jobReport);
 
-        addOrganisationBreakdownToJobReport(jobReport.getJobReportUuid(), jobReportResult.getOrganisationResult());
+        addOrganisationBreakdownToJobReport(jobReport.getJobreportuuid(), jobReportResult.getOrganisationResult());
 
-        List<DbJobReportItem> dbJobReportItems = DbJobReportItem.retrieveForJobReport(jobReport.getJobReportUuid());
+        List<JobreportitemEntity> JobreportEntityItems = JobreportitemEntity.retrieveForJobReport(jobReport.getJobreportuuid());
 
-        for (DbJobReportItem dbJobReportItem: dbJobReportItems) {
-            JobReportItemResult jobReportItemResult = getJobReportItemResult(dbJobReportItem.getJobReportItemUuid(), jobReportResult.getJobReportItemResult());
+        for (JobreportitemEntity JobreportEntityItem: JobreportEntityItems) {
+            JobReportItemResult jobReportItemResult = getJobReportItemResult(JobreportEntityItem.getJobreportitemuuid(), jobReportResult.getJobReportItemResult());
 
             if (jobReportItemResult != null)
-                processJobReportItem(dbJobReportItem, jobReportItemResult);
+                processJobReportItem(JobreportEntityItem, jobReportItemResult);
         }
     }
 
-    private void processJobReportItem(DbJobReportItem dbJobReportItem, JobReportItemResult jobReportItemResult) {
+    private void processJobReportItem(JobreportitemEntity JobreportEntityItem, JobReportItemResult jobReportItemResult) {
 
-        dbJobReportItem.setResultCount(ResultCountsHelper.calculateTotal(jobReportItemResult.getOrganisationResult()));
-        dbJobReportItem.setSaveMode(TableSaveMode.UPDATE);
-        toSave.add(dbJobReportItem);
+        JobreportEntityItem.setResultcount(ResultCountsHelper.calculateTotal(jobReportItemResult.getOrganisationResult()));
+        toSave.add(JobreportEntityItem);
 
-        addOrganisationBreakdownToJobReportItem(dbJobReportItem.getJobReportItemUuid(), jobReportItemResult.getOrganisationResult());
+        addOrganisationBreakdownToJobReportItem(JobreportEntityItem.getJobreportitemuuid(), jobReportItemResult.getOrganisationResult());
     }
 
     private void addOrganisationBreakdownToJobReportItem(UUID jobReportItemUuid, List<OrganisationResult> organisationResultList) {
 
         for (OrganisationResult organisationResult: organisationResultList) {
 
-            DbJobReportItemOrganisation jobReportItemOrganisation = new DbJobReportItemOrganisation();
-            jobReportItemOrganisation.setJobReportItemUuid(jobReportItemUuid);
-            jobReportItemOrganisation.setOrganisationOdsCode(organisationResult.getOdsCode());
-            jobReportItemOrganisation.setResultCount(organisationResult.getResultCount());
-            jobReportItemOrganisation.setSaveMode(TableSaveMode.INSERT);
+            JobreportitemorganisationEntity jobReportItemOrganisation = new JobreportitemorganisationEntity();
+            jobReportItemOrganisation.setJobreportitemuuid(jobReportItemUuid);
+            jobReportItemOrganisation.setOrganisationodscode(organisationResult.getOdsCode());
+            jobReportItemOrganisation.setResultcount(organisationResult.getResultCount());
             toSave.add(jobReportItemOrganisation);
         }
     }
@@ -107,11 +102,10 @@ class ResultProcessor {
 
         for (OrganisationResult organisationResult: organisationResultList) {
 
-            DbJobReportOrganisation jobReportOrganisation = new DbJobReportOrganisation();
-            jobReportOrganisation.setJobReportUuid(jobReportUuid);
-            jobReportOrganisation.setOrganisationOdsCode(organisationResult.getOdsCode());
-            jobReportOrganisation.setPopulationCount(organisationResult.getResultCount());
-            jobReportOrganisation.setSaveMode(TableSaveMode.INSERT);
+            JobreportorganisationEntity jobReportOrganisation = new JobreportorganisationEntity();
+            jobReportOrganisation.setJobreportuuid(jobReportUuid);
+            jobReportOrganisation.setOrganisationodscode(organisationResult.getOdsCode());
+            jobReportOrganisation.setPopulationcount(organisationResult.getResultCount());
             toSave.add(jobReportOrganisation);
         }
     }
@@ -148,13 +142,13 @@ class ResultProcessor {
     }
 
     private void populateProcessorToResult() throws Exception {
-        List<DbJobProcessorResult> processorResults = DbJobProcessorResult.retrieveForJob(jobUuid);
+        List<JobprocessorresultEntity> processorResults = JobprocessorresultEntity.retrieveForJob(jobUuid);
 
-        for (DbJobProcessorResult processorResult: processorResults) {
+        for (JobprocessorresultEntity processorResult: processorResults) {
 
-            String xml = processorResult.getResultXml();
+            String xml = processorResult.getResultxml();
             ResultCounts count = ResultCountsHelper.deserializeFromString(xml);
-            processorToResult.put(processorResult.getProcessorUuid(), count);
+            processorToResult.put(processorResult.getProcessoruuid(), count);
         }
     }
 }

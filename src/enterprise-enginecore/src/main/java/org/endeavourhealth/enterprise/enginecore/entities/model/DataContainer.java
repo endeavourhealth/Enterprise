@@ -9,7 +9,7 @@ One patient's record will be stored in a datacontainer
 public class DataContainer {
     private List<DataEntity> entities = new ArrayList<>();
     private long id;
-    private String organisationOds;
+    private Integer organisationId;
 
     public List<DataEntity> getDataEntities() {
         return entities;
@@ -23,11 +23,11 @@ public class DataContainer {
         this.id = id;
     }
 
-    public String getOrganisationOds() {
-        return organisationOds;
+    public Integer getOrganisationId() {
+        return organisationId;
     }
 
-    public void setOrganisationOds(String organisationOds) {
-        this.organisationOds = organisationOds;
+    public void setOrganisationId(Integer organisationId) {
+        this.organisationId = organisationId;
     }
 }

@@ -5,7 +5,6 @@ import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
-import org.endeavourhealth.enterprise.engine.compiler.FieldCompilerTest;
 import org.endeavourhealth.enterprise.engine.compiler.FieldTestCompiler;
 import org.endeavourhealth.enterprise.engine.compiled.fieldTests.ICompiledFieldTest;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;

@@ -3,7 +3,7 @@ package org.endeavourhealth.enterprise.controller;
 import org.endeavourhealth.enterprise.controller.configuration.models.DatabaseConnection;
 import org.endeavourhealth.enterprise.controller.configuration.models.MessageQueuing;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
-import org.endeavourhealth.enterprise.core.database.execution.DbJob;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +35,12 @@ class PreviousJobCleanup {
     private static void markExistingJobsAsFailed() throws Exception {
 
         //retrieve Jobs where status is Executing (should only be ONE in reality, if jobs are always completed before another created)
-        List<DbJob> jobs = DbJob.retrieveForStatus(ExecutionStatus.Executing);
+        List<JobEntity> jobs = JobEntity.retrieveForStatus((short)ExecutionStatus.Executing.getValue());
 
-        for (DbJob job: jobs) {
-            job.markAsFinished(ExecutionStatus.Failed);
-            job.writeToDb();
-            logger.error("Marking previous job as failed: " + job.getJobUuid().toString());
+        for (JobEntity job: jobs) {
+            job.markAsFinished((short)ExecutionStatus.Failed.getValue());
+            //job.writeToDb(); TODO
+            logger.error("Marking previous job as failed: " + job.getJobuuid().toString());
         }
     }
 }

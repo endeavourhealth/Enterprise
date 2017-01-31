@@ -50,7 +50,7 @@ class DataSourceRetriever {
 
             logger.trace("Getting records " + from + " to " + to);
             statistics.patientRetrievalStarted();
-            Map<Long, DataContainer> dataContainerMap = careRecordDal.getRecords(from, to);
+            Map<Integer, DataContainer> dataContainerMap = careRecordDal.getRecords(from, to);
 
             if (dataContainerMap.isEmpty()) {
                 statistics.patientRetrievalStopped(0);

@@ -1,6 +1,5 @@
 package org.endeavourhealth.enterprise.processornode;
 
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
 import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodeQueue;
 import org.endeavourhealth.enterprise.enginecore.communication.ProcessorNodesStartMessage;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
@@ -57,8 +56,6 @@ class ProcessorNodeMain implements AutoCloseable, ProcessorNodeQueue.IProcessorN
                 executionController = null;
             }
 
-            initialiseDatabaseManager(startMessage.getCoreDatabaseConnectionDetails());
-
             executionController = new ExecutionController(processorNodeUuid, configuration, startMessage);
 
             executionController.start();
@@ -93,13 +90,7 @@ class ProcessorNodeMain implements AutoCloseable, ProcessorNodeQueue.IProcessorN
         }
     }
 
-    private void initialiseDatabaseManager(DatabaseConnectionDetails coreConnectionDetails) {
 
-        DatabaseManager.getInstance().setConnectionProperties(
-                coreConnectionDetails.getUrl(),
-                coreConnectionDetails.getUsername(),
-                coreConnectionDetails.getPassword());
-    }
 
     @Override
     public void close() throws Exception {

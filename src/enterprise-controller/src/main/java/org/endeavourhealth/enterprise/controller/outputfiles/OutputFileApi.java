@@ -15,6 +15,7 @@ import java.util.UUID;
 public class OutputFileApi {
 
     private final OutputFilesType configuration;
+    private final OutputFileContext context;
     private final JobInventory jobInventory;
     private final UUID jobUuid;
     private final Instant startDateTime;
@@ -27,12 +28,14 @@ public class OutputFileApi {
             OutputFilesType configuration,
             JobInventory jobInventory,
             UUID jobUuid,
-            Instant startDateTime) throws Exception {
+            Instant startDateTime,
+            OutputFileContext context) throws Exception {
 
         this.configuration = configuration;
         this.jobInventory = jobInventory;
         this.jobUuid = jobUuid;
         this.startDateTime = startDateTime;
+        this.context = context;
     }
 
     public void prepareFiles() throws Exception {
@@ -53,10 +56,10 @@ public class OutputFileApi {
 
     private void populateFolders() throws Exception {
 
-        FolderBuilder folderBuilder = new FolderBuilder(jobInventory, folders, configuration, jobUuid, startDateTime);
+        FolderBuilder folderBuilder = new FolderBuilder(jobInventory, folders, context, jobUuid, startDateTime);
         folderBuilder.build();
 
-        temporaryJobFolder = folderBuilder.getTemporaryJobFolder();
+        //temporaryJobFolder = folderBuilder.getTemporaryJobFolder(); TODO
     }
 
     private boolean noFiles() {

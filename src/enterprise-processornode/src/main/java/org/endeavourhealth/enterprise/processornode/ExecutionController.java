@@ -1,9 +1,7 @@
 package org.endeavourhealth.enterprise.processornode;
 
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobProcessorResult;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.entitymap.EntityMapHelper;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.queuing.controller.*;
@@ -97,8 +95,8 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
 
     private EngineApi createEngineApi(EntityMapWrapper.EntityMap entityMap) throws Exception {
 
-        List<DbJobReport> jobReports = DbJobReport.retrieveForJob(getJobUuid());
-        List<LibraryItem> libraryItems = DbItem.retrieveLibraryItemsForJob(getJobUuid());
+        List<JobreportEntity> jobReports = JobreportEntity.retrieveForJob(getJobUuid());
+        List<LibraryItem> libraryItems = ItemEntity.retrieveLibraryItemsForJob(getJobUuid());
 
         EngineApi engineApi = new EngineApi(entityMap, jobReports, libraryItems);
         engineApi.initialise();
@@ -214,12 +212,11 @@ class ExecutionController implements ProcessorThreadPoolExecutor.IBatchComplete,
     }
 
     private void saveResultsToTemporaryBlob(ResultCounts results) throws Exception {
-        DbJobProcessorResult processorResult = new DbJobProcessorResult();
-        processorResult.setJobUuid(getJobUuid());
-        processorResult.setProcessorUuid(processorNodeUuid);
-        processorResult.setResultXml(ResultCountsHelper.serialise(results));
-        processorResult.setSaveMode(TableSaveMode.INSERT);
-        processorResult.writeToDb();
+        JobprocessorresultEntity processorResult = new JobprocessorresultEntity();
+        processorResult.setJobuuid(getJobUuid());
+        processorResult.setProcessoruuid(processorNodeUuid);
+        processorResult.setResultxml(ResultCountsHelper.serialise(results));
+        //processorResult.writeToDb(); TODO
     }
 
     @Override

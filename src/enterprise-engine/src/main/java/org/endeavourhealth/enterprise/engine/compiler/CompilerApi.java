@@ -1,6 +1,6 @@
 package org.endeavourhealth.enterprise.engine.compiler;
 
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
@@ -96,7 +96,7 @@ public class CompilerApi {
     }
 
 
-    public CompiledReport compile(DbJobReport jobReport, RequestParameters parameters) throws UnableToCompileExpection {
+    public CompiledReport compile(JobreportEntity jobReport, RequestParameters parameters) throws UnableToCompileExpection {
         return reportCompiler.compile(jobReport, parameters, compilerContext);
     }
 

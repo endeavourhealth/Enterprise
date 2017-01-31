@@ -66,7 +66,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             throw new BadRequestException("Must specify folder type");
         }
 
-        LOG.trace("SavingFolder FolderUUID {}, FolderName {} FolderType {} ParentUUID {} ItemType {}", folderUuid, folderName, folderType, parentUuid, itemType);
+        LOG.trace(String.format("SavingFolder FolderUUID %s, FolderName %s FolderType %s ParentUUID %s ItemType %s", folderUuid, folderName, folderType, parentUuid, itemType));
 
         //before letting our superclass do the normal item saving,
         //validate that we're not making a folder a child of itself
@@ -161,7 +161,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         UUID orgUuid = getOrganisationUuidFromToken(sc);
 
-        LOG.trace("GettingFolders under parent UUID {} and folderType {}, which is itemType {}", parentUuidStr, folderType, itemType);
+        LOG.trace(String.format("GettingFolders under parent UUID %s and folderType %s, which is itemType %s", parentUuidStr, folderType, itemType));
 
         List<ItemEntity> items = null;
 
@@ -195,7 +195,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             int childFolders = ActiveitemEntity.retrieveCountDependencies(itemUuid, (short)DependencyType.IsChildOf.getValue());
             int contentCount = ActiveitemEntity.retrieveCountDependencies(itemUuid, (short)DependencyType.IsContainedWithin.getValue());
 
-            LOG.trace("Child folder {}, UUID {} has {} child folders and {} contents", item.getTitle(), item.getItemuuid(), childFolders, contentCount);
+            LOG.trace(String.format("Child folder %s, UUID %s has %s child folders and %s contents", item.getTitle(), item.getItemuuid(), childFolders, contentCount));
 
             JsonFolder folder = new JsonFolder(item, contentCount, childFolders > 0);
             ret.add(folder);

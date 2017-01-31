@@ -71,7 +71,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint
         String description = report.getDescription();
         UUID folderUuid = parseUuidFromStr(report.getFolderUuid());
 
-        LOG.trace("SavingReport UUID {}, Name {} FolderUuid", reportUuid, name, folderUuid);
+        LOG.trace(String.format("SavingReport UUID %s, Name %s FolderUuid %s", reportUuid, name, folderUuid));
 
         QueryDocument doc = new QueryDocument();
         doc.getReport().add(report);

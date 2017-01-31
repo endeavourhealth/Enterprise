@@ -74,7 +74,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         CodeSet codeSet = libraryItem.getCodeSet();
         ListReport listOutput = libraryItem.getListReport();
 
-        LOG.trace("SavingLibraryItem UUID {}, Name {} FolderUuid", libraryItemUuid, name, folderUuid);
+        LOG.trace(String.format("SavingLibraryItem UUID %s, Name %s FolderUuid %s", libraryItemUuid, name, folderUuid));
 
         QueryDocument doc = new QueryDocument();
         doc.getLibraryItem().add(libraryItem);

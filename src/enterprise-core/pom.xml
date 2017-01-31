@@ -83,6 +83,11 @@
         </dependency>
         <!-- End JAX-RS -->
 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
+        </dependency>
 
         <!-- Keycloak -->
         <dependency>

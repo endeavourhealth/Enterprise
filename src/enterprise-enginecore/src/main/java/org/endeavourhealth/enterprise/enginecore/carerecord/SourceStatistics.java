@@ -1,25 +1,25 @@
 package org.endeavourhealth.enterprise.enginecore.carerecord;
 
 public class SourceStatistics {
-    private final int recordCount;
-    private final long minimumId;
-    private final long maximumId;
+    private final long recordCount;
+    private final int minimumId;
+    private final int maximumId;
 
-    public SourceStatistics(int recordCount, long minimumId, long maximumId) {
+    public SourceStatistics(long recordCount, int minimumId, int maximumId) {
         this.recordCount = recordCount;
         this.minimumId = minimumId;
         this.maximumId = maximumId;
     }
 
-    public final int getRecordCount() {
+    public final long getRecordCount() {
         return recordCount;
     }
 
-    public final long getMinimumId() {
+    public final int getMinimumId() {
         return minimumId;
     }
 
-    public final long getMaximumId() {
+    public final int getMaximumId() {
         return maximumId;
     }
 }

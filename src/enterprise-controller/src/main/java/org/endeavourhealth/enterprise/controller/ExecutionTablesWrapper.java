@@ -3,13 +3,11 @@ package org.endeavourhealth.enterprise.controller;
 import org.apache.commons.collections4.CollectionUtils;
 import org.endeavourhealth.enterprise.controller.jobinventory.*;
 import org.endeavourhealth.enterprise.core.ExecutionStatus;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.DbAbstractTable;
 import org.endeavourhealth.enterprise.core.database.TableSaveMode;
-import org.endeavourhealth.enterprise.core.database.definition.DbAudit;
-import org.endeavourhealth.enterprise.core.database.execution.*;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.enginecore.carerecord.SourceStatistics;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 
@@ -17,7 +15,7 @@ class ExecutionTablesWrapper {
 
     private final UUID jobUuid;
     private final Instant startDateTime;
-    private DbJob dbJob;
+    private JobEntity dbJob;
     private SourceStatistics primaryTableStatistics;
     private JobInventory inventory;
 
@@ -30,7 +28,7 @@ class ExecutionTablesWrapper {
     public void prepareExecutionTables(JobInventory inventory) throws Exception {
         this.inventory = inventory;
 
-        List<DbAbstractTable> toSave = new ArrayList<>();
+        /*List<Object> toSave = new ArrayList<>();
 
         dbJob = createJobAsStarted();
         toSave.add(dbJob);
@@ -45,12 +43,12 @@ class ExecutionTablesWrapper {
             prepareJobReportItemTable(jobReportInfo, toSave, inventory);
         }
 
-        DatabaseManager.db().writeEntities(toSave);
+        DatabaseManager.db().writeEntities(toSave);*/
     }
 
     private void prepareJobReportItemTable(
             JobReportInfo jobReportInfo,
-            List<DbAbstractTable> toSave,
+            List<Object> toSave,
             JobInventory inventory
     ) throws Exception {
 
@@ -63,17 +61,16 @@ class ExecutionTablesWrapper {
             UUID jobReportUuid,
             JobReportItemInfo jobReportItemInfo,
             UUID parentUuid,
-            List<DbAbstractTable> toSave,
+            List<Object> toSave,
             JobInventory inventory) {
 
-        DbJobReportItem dbJobReportItem = new DbJobReportItem();
-        dbJobReportItem.setSaveMode(TableSaveMode.INSERT);
+        JobreportitemEntity dbJobReportItem = new JobreportitemEntity();
 
-        dbJobReportItem.setAuditUuid(inventory.getItemsAuditUuid(jobReportItemInfo.getLibraryItemUuid()));
-        dbJobReportItem.setJobReportUuid(jobReportUuid);
-        dbJobReportItem.setParentJobReportItemUuid(parentUuid);
-        dbJobReportItem.setItemUuid(jobReportItemInfo.getLibraryItemUuid());
-        dbJobReportItem.setJobReportItemUuid(jobReportItemInfo.getJobReportItemUuid());
+        dbJobReportItem.setAudituuid(inventory.getItemsAuditUuid(jobReportItemInfo.getLibraryItemUuid()));
+        dbJobReportItem.setJobreportuuid(jobReportUuid);
+        dbJobReportItem.setJobreportitemuuid(parentUuid);
+        dbJobReportItem.setItemuuid(jobReportItemInfo.getLibraryItemUuid());
+        dbJobReportItem.setJobreportitemuuid(jobReportItemInfo.getJobReportItemUuid());
         toSave.add(dbJobReportItem);
 
         if (CollectionUtils.isNotEmpty(jobReportItemInfo.getChildren())) {
@@ -83,105 +80,98 @@ class ExecutionTablesWrapper {
         }
     }
 
-    private void prepareJobContentTable(JobInventory jobInventory, List<DbAbstractTable> toSave) {
+    private void prepareJobContentTable(JobInventory jobInventory, List<Object> toSave) {
 
         for (UUID itemUuid: jobInventory.getAllItemsUsed()) {
 
-            DbJobContent jobContent = new DbJobContent();
-            jobContent.setJobUuid(jobUuid);
-            jobContent.setItemUuid(itemUuid);
-            jobContent.setAuditUuid(jobInventory.getItemsAuditUuid(itemUuid));
-            jobContent.setSaveMode(TableSaveMode.INSERT); //because the primary keys have been explicitly set, we need to force insert mode
+            JobcontentEntity jobContent = new JobcontentEntity();
+            jobContent.setJobuuid(jobUuid);
+            jobContent.setItemuuid(itemUuid);
+            jobContent.setAudituuid(jobInventory.getItemsAuditUuid(itemUuid));
             toSave.add(jobContent);
         }
     }
 
-    private DbJobReport createJobReport(JobReportInfo jobReportInfo, UUID auditUuid) throws Exception {
+    private JobreportEntity createJobReport(JobReportInfo jobReportInfo, UUID auditUuid) throws Exception {
 
-        DbJobReport jobReport = new DbJobReport();
-        jobReport.setJobReportUuid(jobReportInfo.getJobReportUuid());
-        jobReport.setSaveMode(TableSaveMode.INSERT);
+        JobreportEntity jobReport = new JobreportEntity();
+        jobReport.setJobreportuuid(jobReportInfo.getJobReportUuid());
 
-        jobReport.setJobUuid(jobUuid);
-        jobReport.setReportUuid(jobReportInfo.getReportUuid());
-        jobReport.setAuditUuid(auditUuid);
-        jobReport.setOrganisationUuid(jobReportInfo.getRequest().getOrganisationUuid());
-        jobReport.setEndUserUuid(jobReportInfo.getRequest().getEndUserUuid());
+        jobReport.setJobuuid(jobUuid);
+        jobReport.setReportuuid(jobReportInfo.getReportUuid());
+        jobReport.setAudituuid(auditUuid);
+        jobReport.setOrganisationuuid(jobReportInfo.getRequest().getOrganisationuuid());
+        jobReport.setEnduseruuid(jobReportInfo.getRequest().getEnduseruuid());
         jobReport.setParameters(jobReportInfo.getParametersAsString());
-        jobReport.setStatusId(ExecutionStatus.Executing);
+        jobReport.setStatusid((short)ExecutionStatus.Executing.getValue());
 
         return jobReport;
     }
 
-    private DbJob createJobAsStarted() throws Exception {
-        DbJob job = new DbJob();
-        job.setSaveMode(TableSaveMode.INSERT);
+    private JobEntity createJobAsStarted() throws Exception {
+        JobEntity job = new JobEntity();
 
-        job.setJobUuid(jobUuid);
-        job.setStatusId(ExecutionStatus.Executing);
-        job.setStartDateTime(startDateTime);
-        job.setBaselineAuditUuid(getLatestAuditUuid());
-        job.setPatientsInDatabase(primaryTableStatistics.getRecordCount());
+        job.setJobuuid(jobUuid);
+        job.setStatusid((short)ExecutionStatus.Executing.getValue());
+        job.setStartdatetime(Timestamp.from(startDateTime));
+        job.setBaselineaudituuid(getLatestAuditUuid());
+        //job.setPatientsindatabase(primaryTableStatistics.getRecordCount());
 
         return job;
     }
 
     private UUID getLatestAuditUuid() throws Exception {
-        DbAudit latestAudit = DbAudit.retrieveLatest();
+        AuditEntity latestAudit = AuditEntity.retrieveLatest();
 
         if (latestAudit == null)
             return null;
         else
-            return latestAudit.getAuditUuid();
+            return latestAudit.getAudituuid();
     }
 
     public void createJobAsFinished(ExecutionStatus executionStatus) throws Exception {
-        DbJob job = new DbJob();
-        job.setSaveMode(TableSaveMode.INSERT);
+        JobEntity job = new JobEntity();
 
-        job.setJobUuid(jobUuid);
-        job.setStatusId(executionStatus);
-        job.setStartDateTime(startDateTime);
-        job.setEndDateTime(Instant.now());
-        job.setBaselineAuditUuid(getLatestAuditUuid());
+        job.setJobuuid(jobUuid);
+        job.setStatusid((short)executionStatus.getValue());
+        job.setStartdatetime(Timestamp.from(startDateTime));
+        job.setEnddatetime(Timestamp.from(Instant.now()));
+        job.setBaselineaudituuid(getLatestAuditUuid());
 
-        if (primaryTableStatistics != null)
-            job.setPatientsInDatabase(primaryTableStatistics.getRecordCount());
+        //if (primaryTableStatistics != null)
+            //job.setPatientsInDatabase(primaryTableStatistics.getRecordCount());
 
-        job.writeToDb();
+        //job.writeToDb(); TODO
     }
 
     public void markJobAsSuccessful(boolean shouldUpdateRequestTable) throws Exception {
 
-        List<DbAbstractTable> toSave = new ArrayList<>();
+        List<Object> toSave = new ArrayList<>();
 
-        dbJob.setSaveMode(TableSaveMode.UPDATE);
-        dbJob.markAsFinished(ExecutionStatus.Succeeded);
-        dbJob.setEndDateTime(Instant.now());
+        dbJob.markAsFinished((short)ExecutionStatus.Succeeded.getValue());
+        dbJob.setEnddatetime(Timestamp.from(Instant.now()));
 
         toSave.add(dbJob);
 
         if (shouldUpdateRequestTable)
             updateRequestTable(toSave);
 
-        DatabaseManager.db().writeEntities(toSave);
+        //DatabaseManager.db().writeEntities(toSave); TODO
     }
 
-    private void updateRequestTable(List<DbAbstractTable> toSave) throws Exception {
+    private void updateRequestTable(List<Object> toSave) throws Exception {
         for (JobReportInfo jobReportInfo: inventory.getJobReportInfoList()) {
 
-            DbRequest request = DbRequest.retrieveForUuid(jobReportInfo.getRequest().getRequestUuid());  //get it again in case we override some values by accident
-            request.setJobReportUuid(jobReportInfo.getJobReportUuid());
-            request.setSaveMode(TableSaveMode.UPDATE);
+            RequestEntity request = RequestEntity.retrieveForUuid(jobReportInfo.getRequest().getRequestuuid());  //get it again in case we override some values by accident
+            request.setJobreportuuid(jobReportInfo.getJobReportUuid());
             toSave.add(request);
         }
     }
 
     public void markJobAsFailed() throws Exception {
-        dbJob.setSaveMode(TableSaveMode.UPDATE);
-        dbJob.markAsFinished(ExecutionStatus.Failed);
+        dbJob.markAsFinished((short)ExecutionStatus.Failed.getValue());
 
-        dbJob.writeToDb();
+        //dbJob.writeToDb(); TODO
     }
 
     public void setPrimaryTableStatistics(SourceStatistics primaryTableStatistics) {

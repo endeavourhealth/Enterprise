@@ -17,7 +17,7 @@ public class ResultCounter {
         }
     }
 
-    public void recordResult(String organisationIdentifier) {
+    public void recordResult(Integer organisationIdentifier) {
         organisationCounter.get(organisationIdentifier).incrementAndGet();
     }
 

@@ -1,6 +1,9 @@
 package org.endeavourhealth.enterprise.enginecore.carerecord;
 
-import net.sourceforge.jtds.jdbc.JtdsResultSet;
+import org.endeavourhealth.enterprise.core.database.PersistenceManager;
+import org.endeavourhealth.enterprise.core.database.models.ActiveitemEntity;
+import org.endeavourhealth.enterprise.core.database.models.AuditEntity;
+import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.entitymap.models.LogicalDataType;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseConnectionDetails;
 import org.endeavourhealth.enterprise.enginecore.database.DatabaseHelper;
@@ -10,6 +13,7 @@ import org.endeavourhealth.enterprise.enginecore.entities.model.DataField;
 import org.endeavourhealth.enterprise.enginecore.entitymap.EntityMapWrapper;
 import org.endeavourhealth.enterprise.core.entitymap.models.Field;
 
+import javax.persistence.EntityManager;
 import javax.xml.stream.events.EndElement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,67 +42,51 @@ public class CareRecordDal {
     public static SourceStatistics calculateTableStatistics(
             DatabaseConnectionDetails connectionDetails) throws SQLException, ClassNotFoundException {
 
-        String sql = "exec EndeavourEnterprise.GetStatistics;";
+        String where = "select count(*), min(id), max(id) from PatientEntity";
 
-        try (
-                Connection con = DatabaseHelper.getConnection(connectionDetails);
-                Statement statement = con.createStatement();
-        ) {
-            try (JtdsResultSet rs = (JtdsResultSet)statement.executeQuery(sql)) {
-                rs.next();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-                SourceStatistics stats = new SourceStatistics(
-                    rs.getInt(1),
-                    rs.getInt(2),
-                    rs.getInt(3)
-                );
+        Object[] stats = (Object[])entityManager.createQuery(where)
+                .getSingleResult();
 
-                return stats;
-            }
-        }
+        SourceStatistics stats2 = new SourceStatistics((Long)stats[0],(int)stats[1],(int)stats[2]);
+
+        entityManager.close();
+
+        return stats2;
+
     }
 
-    public Map<Long, DataContainer> getRecords(
+    public Map<Integer, DataContainer> getRecords(
             long minimumId,
             long maximumId) throws Exception {
 
-        String sql = "exec EndeavourEnterprise.GetRecords ?, ?";
+        String where = "select * from PatientEntity where id >= :MinimumId and id <= :MaximumId;";
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+
+        /*List<PatientEntity> patients = entityManager.createQuery(where, PatientEntity.class)
+                .setParameter("MinimumId", minimumId)
+                .setParameter("MaximumId", maximumId)
+                .getResultList();*/
+
         int resultSetIndex = 0;
-        Map<Long, DataContainer> dataContainerDictionary = new HashMap<>();
+        Map<Integer, DataContainer> dataContainerDictionary = new HashMap<>();
 
-        try (
-                Connection con = DatabaseHelper.getConnection(careRecordConnectionDetails);
-                PreparedStatement ps = con.prepareStatement(sql)
-        ) {
-            ps.setEscapeProcessing(true);
-            ps.setLong(1, minimumId);
-            ps.setLong(2, maximumId);
+        /*for (PatientEntity patient: patients) {
+            processPatientResultSet(patient, dataContainerDictionary);
+        }*/
 
-            ps.execute();
-            boolean hasResults = ps.getMoreResults();
-
-            while (hasResults) {
-                resultSetIndex++;
-
-                try (JtdsResultSet rs = (JtdsResultSet) ps.getResultSet()) {
-                    processResultSet(rs, resultSetIndex, dataContainerDictionary);
-                }
-
-                hasResults = ps.getMoreResults();
-            }
-
-            ps.close();
-        }
+        entityManager.close();
 
         return dataContainerDictionary;
     }
 
-    private void processResultSet(
-            JtdsResultSet rs,
-            int resultSetIndex,
-            Map<Long, DataContainer> dataContainerDictionary) throws Exception {
+    /*private void processPatientResultSet(
+            PatientEntity patient,
+            Map<Integer, DataContainer> dataContainerDictionary) throws Exception {
 
-        int entityIndex = entityMapWrapper.getEntityIndexByResultSetIndex(resultSetIndex);
+        int entityIndex = entityMapWrapper.getEntityIndexByResultSetIndex(1);
         EntityMapWrapper.Entity entity = entityMapWrapper.getEntity(entityIndex);
         int populationFieldIndex = entity.getSource().getPopulationFieldIndex();
         Integer organisationOdsFieldIndex = null;
@@ -111,39 +99,43 @@ public class CareRecordDal {
 
         DataContainer dataContainer = null;
 
-        while (rs.next()) {
-            Long populationId = rs.getLong(populationFieldIndex);
+        Integer populationId = patient.getId();
 
-            if (dataContainer == null || dataContainer.getId() != populationId) {
+        if (dataContainer == null || dataContainer.getId() != populationId) {
 
-                if (dataContainerDictionary.containsKey(populationId))
-                    dataContainer = dataContainerDictionary.get(populationId);
-                else {
-                    dataContainer = dataContainerPool.acquire();
-                    dataContainer.setId(populationId);
+            if (dataContainerDictionary.containsKey(populationId))
+                dataContainer = dataContainerDictionary.get(populationId);
+            else {
+                dataContainer = dataContainerPool.acquire();
+                dataContainer.setId(populationId);
 
-                    if (organisationOdsFieldIndex != null)
-                        dataContainer.setOrganisationOds(rs.getString(organisationOdsFieldIndex));
+                if (organisationOdsFieldIndex != null)
+                    dataContainer.setOrganisationId(patient.getOrganizationId());
 
-                    dataContainerDictionary.put(populationId, dataContainer);
-                }
-            }
-
-            List<DataField> fields = dataContainer.getDataEntities().get(entityIndex).getFields();
-
-            for (int i = 0; i < entityMapFieldCount; i++) {
-
-                Field field = entityMapFields.get(i);
-
-                if (field.getLogicalDataType() == LogicalDataType.DATE)
-                    fields.get(i).add(rs.getDate(field.getIndex()).toLocalDate());
-                else if (field.getLogicalDataType() == LogicalDataType.FLOAT)
-                    fields.get(i).add(rs.getFloat(field.getIndex()));
-                else if (field.getLogicalDataType() == LogicalDataType.DATA_VALUES)
-                    fields.get(i).add(rs.getString(field.getIndex()));
-                else
-                    fields.get(i).add(rs.getObject(field.getIndex()));
+                dataContainerDictionary.put(populationId, dataContainer);
             }
         }
-    }
+
+        List<DataField> fields = dataContainer.getDataEntities().get(entityIndex).getFields();
+
+        for (int i = 0; i < entityMapFieldCount; i++) {
+
+            Field field = entityMapFields.get(i);
+
+            if (field.getLogicalName() == "PSEUDO_ID")
+                fields.get(i).add(patient.getPseudoId());
+            else if (field.getLogicalName() == "ORGANISATION_ID")
+                fields.get(i).add(patient.getOrganizationId());
+            else if (field.getLogicalName() == "YEAR_OF_BIRTH")
+                fields.get(i).add(patient.getYearOfBirth());
+            else if (field.getLogicalName() == "GENDER")
+                fields.get(i).add(patient.getPatientGenderId());
+            else if (field.getLogicalName() == "REGISTRATION_DATE")
+                fields.get(i).add(patient.getDateRegistered());
+            else if (field.getLogicalName() == "REGISTRATION_END_DATE")
+                fields.get(i).add(patient.getDateRegisteredEnd());
+            else if (field.getLogicalName() == "YEAR_OF_DEATH")
+                fields.get(i).add(patient.getYearOfDeath());
+        }
+    }*/
 }

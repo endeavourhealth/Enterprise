@@ -3,7 +3,7 @@ package org.endeavourhealth.enterprise.controller;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.enterprise.controller.jobinventory.JobReportInfo;
-import org.endeavourhealth.enterprise.core.database.lookups.DbSourceOrganisation;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 
@@ -50,19 +50,19 @@ class JobReportParameterBuilder {
 
     private void populateWithAllOrganisations(List<String> requestParametersOrganisation) throws Exception {
 
-        List<DbSourceOrganisation> all = DbSourceOrganisation.retrieveAll(false);
+        List<SourceorganisationEntity> all = SourceorganisationEntity.retrieveAll(false);
 
         if (CollectionUtils.isEmpty(all))
             throw new Exception("No active organisations");
 
         Set<String> targetSet = new HashSet<>();
 
-        for (DbSourceOrganisation source: all) {
+        for (SourceorganisationEntity source: all) {
 
-            if (StringUtils.isEmpty(source.getOdsCode()))
+            if (StringUtils.isEmpty(source.getOdscode()))
                 throw new Exception("Empty ODS code");
 
-            targetSet.add(source.getOdsCode());
+            targetSet.add(source.getOdscode());
         }
 
         requestParametersOrganisation.addAll(targetSet);

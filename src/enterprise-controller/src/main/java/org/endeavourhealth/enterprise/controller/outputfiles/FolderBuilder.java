@@ -125,7 +125,7 @@ class FolderBuilder {
             Path fullPath = context.getJobWorkingFolder().resolve(path);
             FileHelper.createFolder(fullPath);
 
-            addBranchPaths(rootFolder, path, folder.getChildren());
+            addBranchPaths(path, folder.getChildren());
         }
     }
 

@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.controller.jobinventory;
 
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+
+import org.endeavourhealth.enterprise.core.database.models.RequestEntity;
 import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 
@@ -13,17 +14,17 @@ public class JobReportInfo {
     private final UUID jobReportUuid = UUID.randomUUID();
     private final String reportName;
     private final List<JobReportItemInfo> children = new ArrayList<>();
-    private final DbRequest request;
+    private final RequestEntity request;
     private Set<String> organisations;
     private RequestParameters requestParameters;
 
-    public JobReportInfo(DbRequest request, String reportName) {
+    public JobReportInfo(RequestEntity request, String reportName) {
         this.request = request;
         this.reportName = reportName;
     }
 
     public UUID getReportUuid() {
-        return request.getReportUuid();
+        return request.getReportuuid();
     }
 
     public UUID getJobReportUuid() {
@@ -34,7 +35,7 @@ public class JobReportInfo {
         return children;
     }
 
-    public DbRequest getRequest() {
+    public RequestEntity getRequest() {
         return request;
     }
 

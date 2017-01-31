@@ -1,7 +1,7 @@
 package org.endeavourhealth.enterprise.engine;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.requestParameters.RequestParametersSerializer;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
@@ -22,14 +22,14 @@ public class EngineApi {
 
     private final EntityMapWrapper.EntityMap entityMap;
     private final List<LibraryItem> requiredLibraryItems;
-    private final List<DbJobReport> jobReports;
+    private final List<JobreportEntity> jobReports;
 
     private List<Request> executionRequests = new ArrayList<>();
     private CompiledLibrary compiledLibrary;
 
     public EngineApi(
             EntityMapWrapper.EntityMap entityMap,
-            List<DbJobReport> jobReports,
+            List<JobreportEntity> jobReports,
             List<LibraryItem> requiredLibraryItems) {
 
         this.entityMap = entityMap;
@@ -46,16 +46,16 @@ public class EngineApi {
         compilerApi.compiledAllLibraryItems(requiredLibraryItems);
         compiledLibrary = compilerApi.getCompiledLibrary();
 
-        for (DbJobReport jobReport: jobReports) {
+        for (JobreportEntity jobReport: jobReports) {
 
             RequestParameters parameters = RequestParametersSerializer.readFromJobReport(jobReport);
 
             if (parameters.getBaselineDate() == null)
-                throw new Exception("Request parameters do not have a baseline date.  JobReportUUID: " + jobReport.getJobReportUuid());
+                throw new Exception("Request parameters do not have a baseline date.  JobReportUUID: " + jobReport.getJobreportuuid());
 
             CompiledReport compiledReport = compilerApi.compile(jobReport, parameters);
 
-            Request request = new Request(jobReport.getJobReportUuid(), compiledReport, parameters);
+            Request request = new Request(jobReport.getJobreportuuid(), compiledReport, parameters);
             executionRequests.add(request);
         }
     }

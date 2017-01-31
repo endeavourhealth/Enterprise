@@ -50,10 +50,10 @@ public class CompiledReport {
 
     public void execute(ExecutionContext context) throws Exception {
 
-        if (!allowedOrganisations.contains(context.getDataContainer().getOrganisationOds()))
+        if (!allowedOrganisations.contains(context.getDataContainer().getOrganisationId()))
             return;
 
-        reportLevelResults.recordResult(context.getDataContainer().getOrganisationOds());
+        reportLevelResults.recordResult(context.getDataContainer().getOrganisationId());
 
         executeQueryList(rootQueries, context);
         executeReportList(rootListReports, context);
@@ -66,7 +66,7 @@ public class CompiledReport {
         for (CompiledReportQuery query: queries) {
             if (context.getQueryResult(query.getQueryUuid())) {
 
-                jobReportItemResults.get(query.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationOds());
+                jobReportItemResults.get(query.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationId());
 
                 executeQueryList(query.childQueries, context);
                 executeReportList(query.childListReports, context);
@@ -76,7 +76,7 @@ public class CompiledReport {
 
     private void executeReportList(List<CompiledReportListReport> listReports, ExecutionContext context) throws Exception {
         for (CompiledReportListReport report: listReports) {
-            jobReportItemResults.get(report.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationOds());
+            jobReportItemResults.get(report.getJobReportItemUuid()).recordResult(context.getDataContainer().getOrganisationId());
             report.execute(context);
         }
     }

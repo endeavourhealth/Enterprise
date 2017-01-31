@@ -1,8 +1,8 @@
 package org.endeavourhealth.enterprise.engine.compiler;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReport;
-import org.endeavourhealth.enterprise.core.database.execution.DbJobReportItem;
+import org.endeavourhealth.enterprise.core.database.models.*;
+import org.endeavourhealth.enterprise.core.database.models.JobreportEntity;
 import org.endeavourhealth.enterprise.core.requestParameters.models.RequestParameters;
 import org.endeavourhealth.enterprise.engine.UnableToCompileExpection;
 import org.endeavourhealth.enterprise.engine.compiled.CompiledReport;
@@ -12,13 +12,13 @@ import java.util.*;
 class ReportCompiler {
 
     public CompiledReport compile(
-            DbJobReport jobReport,
+            JobreportEntity jobReport,
             RequestParameters parameters,
             CompilerContext compilerContext) throws UnableToCompileExpection {
 
         try {
 
-            List<DbJobReportItem> jobReportItemList = DbJobReportItem.retrieveForJobReport(jobReport.getJobReportUuid());
+            List<JobreportitemEntity> jobReportItemList = JobreportitemEntity.retrieveForJobReport(jobReport.getJobreportuuid());
 
             List<CompiledReport.CompiledReportQuery> rootQueries = new ArrayList<>();
             List<CompiledReport.CompiledReportListReport> rootListReports = new ArrayList<>();
@@ -30,7 +30,7 @@ class ReportCompiler {
             return new CompiledReport(allowedOrganisations, rootQueries, rootListReports);
 
         } catch (Exception e) {
-            throw new UnableToCompileExpection("JobReportUuid: " + jobReport.getReportUuid(), e);
+            throw new UnableToCompileExpection("JobReportUuid: " + jobReport.getReportuuid(), e);
         }
     }
 
@@ -46,26 +46,26 @@ class ReportCompiler {
     private void populateChildren(
             CompilerContext compilerContext,
             UUID parentJobReportItemUuid,
-            List<DbJobReportItem> jobReportItemList,
+            List<JobreportitemEntity> jobReportItemList,
             List<CompiledReport.CompiledReportQuery> childQueries,
             List<CompiledReport.CompiledReportListReport> childListReports
             ) throws Exception {
 
-        List<DbJobReportItem> rootItems = getChildren(jobReportItemList, parentJobReportItemUuid);
+        List<JobreportitemEntity> rootItems = getChildren(jobReportItemList, parentJobReportItemUuid);
 
-        for (DbJobReportItem dbJobReportItem: rootItems) {
-            UUID itemUuid = dbJobReportItem.getItemUuid();
+        for (JobreportitemEntity dbJobReportItem: rootItems) {
+            UUID itemUuid = dbJobReportItem.getItemuuid();
 
             if (compilerContext.getCompiledLibrary().isItemOfTypeQuery(itemUuid)) {
 
-                CompiledReport.CompiledReportQuery compiledReportQuery = new CompiledReport.CompiledReportQuery(itemUuid, dbJobReportItem.getJobReportItemUuid());
+                CompiledReport.CompiledReportQuery compiledReportQuery = new CompiledReport.CompiledReportQuery(itemUuid, dbJobReportItem.getJobreportitemuuid());
 
                 childQueries.add(compiledReportQuery);
 
-                populateChildren(compilerContext, dbJobReportItem.getJobReportItemUuid(), jobReportItemList, compiledReportQuery.getChildQueries(), compiledReportQuery.getChildListReports());
+                populateChildren(compilerContext, dbJobReportItem.getJobreportitemuuid(), jobReportItemList, compiledReportQuery.getChildQueries(), compiledReportQuery.getChildListReports());
 
             } else if (compilerContext.getCompiledLibrary().isItemOfTypeListReport(itemUuid)) {
-                CompiledReport.CompiledReportListReport compiledReportListReport = new CompiledReport.CompiledReportListReport(dbJobReportItem.getItemUuid(), dbJobReportItem.getJobReportItemUuid());
+                CompiledReport.CompiledReportListReport compiledReportListReport = new CompiledReport.CompiledReportListReport(dbJobReportItem.getItemuuid(), dbJobReportItem.getJobreportitemuuid());
 
                 childListReports.add(compiledReportListReport);
             } else {
@@ -74,13 +74,13 @@ class ReportCompiler {
         }
     }
 
-    private List<DbJobReportItem> getChildren(List<DbJobReportItem> jobReportItemList, UUID parentUuid) {
-        List<DbJobReportItem> jobReportItems = new ArrayList<>();
+    private List<JobreportitemEntity> getChildren(List<JobreportitemEntity> jobReportItemList, UUID parentUuid) {
+        List<JobreportitemEntity> jobReportItems = new ArrayList<>();
 
-        for (DbJobReportItem item: jobReportItemList) {
-            if (item.getParentJobReportItemUuid() == null && parentUuid == null)
+        for (JobreportitemEntity item: jobReportItemList) {
+            if (item.getParentjobreportitemuuid() == null && parentUuid == null)
                 jobReportItems.add(item);
-            else if (item.getParentJobReportItemUuid() != null && parentUuid != null && item.getParentJobReportItemUuid().equals(parentUuid))
+            else if (item.getParentjobreportitemuuid() != null && parentUuid != null && item.getParentjobreportitemuuid().equals(parentUuid))
                 jobReportItems.add(item);
         }
 

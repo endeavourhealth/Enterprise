@@ -2,9 +2,7 @@ package org.endeavourhealth.enterprise.controller.jobinventory;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.endeavourhealth.enterprise.core.database.definition.DbActiveItem;
-import org.endeavourhealth.enterprise.core.database.definition.DbItem;
-import org.endeavourhealth.enterprise.core.database.execution.DbRequest;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.Report;
 import org.endeavourhealth.enterprise.core.querydocument.models.ReportItem;
@@ -14,17 +12,17 @@ import java.util.*;
 
 class RequestProcessor {
 
-    public static JobReportInfo createJobReportInfo(DbRequest request, JobContentRetriever jobContentRetriever) throws Exception {
+    public static JobReportInfo createJobReportInfo(RequestEntity request, JobContentRetriever jobContentRetriever) throws Exception {
 
         try {
 
-            DbItem dbItem = DbItem.retrieveForUuidAndAudit(request.getReportUuid(), jobContentRetriever.getAuditUuid(request.getReportUuid()));
+            ItemEntity dbItem = ItemEntity.retrieveForUuidAndAudit(request.getReportuuid(), jobContentRetriever.getAuditUuid(request.getReportuuid()));
 
-            String itemXml = dbItem.getXmlContent();
+            String itemXml = dbItem.getXmlcontent();
             Report report = QueryDocumentSerializer.readReportFromXml(itemXml);
 
             if (CollectionUtils.isEmpty(report.getReportItem()))
-                throw new InvalidQueryDocumentException(request.getReportUuid(), "No ReportItems");
+                throw new InvalidQueryDocumentException(request.getReportuuid(), "No ReportItems");
 
             JobReportInfo jobReportInfo = new JobReportInfo(request, report.getName());
 
@@ -34,7 +32,7 @@ class RequestProcessor {
             return jobReportInfo;
 
         } catch (Exception e) {
-            throw new Exception("Error processing report: " + request.getReportUuid());
+            throw new Exception("Error processing report: " + request.getReportuuid());
         }
     }
 

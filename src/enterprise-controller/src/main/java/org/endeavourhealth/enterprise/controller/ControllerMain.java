@@ -4,8 +4,7 @@ import org.endeavourhealth.enterprise.controller.configuration.models.Configurat
 import org.endeavourhealth.enterprise.controller.configuration.ConfigurationAPI;
 import org.endeavourhealth.enterprise.core.JsonSerializer;
 import org.endeavourhealth.enterprise.core.ProcessorState;
-import org.endeavourhealth.enterprise.core.database.DatabaseManager;
-import org.endeavourhealth.enterprise.core.database.execution.DbProcessorStatus;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.queuing.controller.*;
 import org.endeavourhealth.enterprise.core.queuing.QueueConnectionProperties;
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
     public void start() throws Exception {
 
         loadConfiguration();
-        initialiseDatabaseManager();
         initialiseLogback();
 
         logger.info("Application starting");
@@ -37,15 +35,7 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
     }
 
     private void initialiseLogback() {
-        DatabaseManager.getInstance().registerLogbackDbAppender();
-    }
-
-    private void initialiseDatabaseManager() {
-
-        DatabaseManager.getInstance().setConnectionProperties(
-                configuration.getCoreDatabase().getUrl(),
-                configuration.getCoreDatabase().getUsername(),
-                configuration.getCoreDatabase().getPassword());
+        //DatabaseManager.getInstance().registerLogbackDbAppender();
     }
 
     private void loadConfiguration() throws Exception {
@@ -126,7 +116,7 @@ class ControllerMain implements AutoCloseable, ControllerQueue.IControllerQueueM
     private void setProcessorStatus(ProcessorState state) {
 
         try {
-            DbProcessorStatus.setCurrentStatus(ProcessorState.Idle);
+            ProcessorstatusEntity.setCurrentStatus((short)ProcessorState.Idle.getValue());
         } catch (Exception e) {
             logger.error("Error while setting processor status" , e);
         }

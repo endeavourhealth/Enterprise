@@ -8,18 +8,18 @@
     <artifactId>enterprise-web</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
+    <parent>
+        <groupId>org.endeavourhealth</groupId>
+        <artifactId>enterprise</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.github.endeavourhealth.Common</groupId>
             <artifactId>eds-ui-core</artifactId>
-            <version>1.60</version>
+            <version>${eds-common.version}</version>
         </dependency>
 
         <dependency>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
+            <version>${javax.ws.rs-api.version}</version>
         </dependency>
         <!-- End JAX-RS -->
 

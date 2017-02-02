@@ -8,24 +8,31 @@
     <artifactId>enterprise-controller</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <parent>
+        <groupId>org.endeavourhealth</groupId>
+        <artifactId>enterprise</artifactId>
+        <version>${enterprise.version}</version>
+        <relativePath>../</relativePath>
+    </parent>
+
     <dependencies>
 
         <dependency>
             <groupId>org.endeavourhealth</groupId>
             <artifactId>enterprise-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${enterprise.version}</version>
         </dependency>
         <dependency>
             <groupId>org.endeavourhealth</groupId>
             <artifactId>enterprise-enginecore</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${enterprise.version}</version>
         </dependency>
 
         <!-- JAX-RS -->
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
+            <version>${javax.ws.rs-api.version}</version>
         </dependency>
         <!-- End JAX-RS -->
 
@@ -33,7 +40,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.3</version>
+            <version>${logback-classic.version}</version>
         </dependency>
         <!-- End logback -->
 
@@ -41,7 +48,7 @@
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.2.1</version>
+            <version>${quartz.version}</version>
         </dependency>
         <!-- End Quartz Scheduler-->
 
@@ -54,9 +61,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>

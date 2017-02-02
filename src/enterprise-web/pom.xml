@@ -6,12 +6,12 @@
 
     <groupId>org.endeavourhealth</groupId>
     <artifactId>enterprise-web</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${enterprise.version}</version>
 
     <parent>
         <groupId>org.endeavourhealth</groupId>
         <artifactId>enterprise</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${enterprise.version}</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.endeavourhealth</groupId>
             <artifactId>enterprise-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${enterprise.version}</version>
         </dependency>
 
         <!-- JAX-RS -->
@@ -36,47 +36,19 @@
         </dependency>
         <!-- End JAX-RS -->
 
-        <!-- Jersey -->
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>2.22.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-common</artifactId>
-            <version>2.22.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>2.22.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.22.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.22.1</version>
-        </dependency>
-        <!-- End Jersey -->
-
         <!-- JSON Web Token -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
-            <version>0.6.0</version>
+            <version>${jwt.version}</version>
         </dependency>
         <!-- End JSON Web Token -->
 
         <!-- Java servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
             <scope>provided</scope>  <!--Tomcat has its own servlet jar, so we don't want to include it-->
         </dependency>
         <!-- End Java servlet -->
@@ -85,12 +57,12 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>javax.mail-api</artifactId>
-            <version>1.5.5</version>
+            <version>${javax.mail.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.5.5</version>
+            <version>${javax.mail.version}</version>
         </dependency>
         <!-- End JavaMail -->
 
@@ -98,13 +70,13 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-tomcat8-adapter</artifactId>
-            <version>2.0.0.Final</version>
+            <version>${keycloak.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
-            <version>2.0.0.Final</version>
+            <version>${keycloak.version}</version>
             <exclusions>
                 <!-- exclude common jars included in Tomcat lib directory, but
                      include them below as provided dependencies-->
@@ -121,25 +93,25 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <!-- provided in the Tomcat lib directory -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-common</artifactId>
-            <version>2.0.0.Final</version>
+            <version>${keycloak.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
-            <version>2.0.0.Final</version>
+            <version>${keycloak.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-authz-client</artifactId>
-            <version>2.0.0.Final</version>
+            <version>${keycloak.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- End Keycloak -->
@@ -151,9 +123,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -163,7 +163,7 @@ CREATE TABLE organization
 (
   id integer NOT NULL,
   ods_code character varying(50),
-  name character varying(255) NOT NULL,
+  name character varying(255),
   type_code character varying(50),
   type_desc character varying(255),
   postcode character varying(10),

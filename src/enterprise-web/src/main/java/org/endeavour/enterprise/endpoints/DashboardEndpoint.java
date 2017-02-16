@@ -7,7 +7,7 @@ import org.endeavour.enterprise.json.JsonJob;
 import org.endeavour.enterprise.json.JsonJobReport;
 import org.endeavour.enterprise.json.JsonProcessorStatus;
 import org.endeavour.enterprise.utility.MessagingQueueProvider;
-import org.endeavourhealth.core.security.SecurityUtils;
+import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.ProcessorState;
 import org.endeavourhealth.enterprise.core.database.*;

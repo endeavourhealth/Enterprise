@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavour.enterprise.json.*;
-import org.endeavourhealth.core.security.SecurityUtils;
+import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 

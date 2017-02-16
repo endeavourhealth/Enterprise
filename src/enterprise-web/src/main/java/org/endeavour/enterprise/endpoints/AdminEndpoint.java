@@ -9,9 +9,9 @@ import org.endeavour.enterprise.json.JsonEndUserList;
 import org.endeavour.enterprise.json.JsonOrganisation;
 import org.endeavour.enterprise.email.EmailProvider;
 
-import org.endeavourhealth.core.data.admin.models.EndUser;
+import org.endeavourhealth.common.security.models.EndUser;
 import org.endeavourhealth.core.data.admin.models.Organisation;
-import org.endeavourhealth.core.security.SecurityUtils;
+import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.database.DataManager;
@@ -435,16 +435,16 @@ public final class AdminEndpoint extends AbstractEndpoint {
         }
 
         //if we're a super-user then we should also include all other super-users in the result
-        EndUser user = getEndUserFromSession(sc);
-        if (user.getIsSuperUser()) {
-            List<EnduserEntity> superUsers = EnduserEntity.retrieveSuperUsers();
-            for (int i = 0; i < superUsers.size(); i++) {
-                EnduserEntity superUser = superUsers.get(i);
-
-                //super-users are always treated as admins
-                ret.add(superUser, true);
-            }
-        }
+//        EndUser user = getEndUserFromSession(sc);
+//        if (user.getIsSuperUser()) {
+//            List<EnduserEntity> superUsers = EnduserEntity.retrieveSuperUsers();
+//            for (int i = 0; i < superUsers.size(); i++) {
+//                EnduserEntity superUser = superUsers.get(i);
+//
+//                //super-users are always treated as admins
+//                ret.add(superUser, true);
+//            }
+//        }
 
         clearLogbackMarkers();
 

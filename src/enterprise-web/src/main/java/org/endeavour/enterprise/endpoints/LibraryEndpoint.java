@@ -4,7 +4,7 @@ import org.endeavour.enterprise.json.JsonDeleteResponse;
 import org.endeavour.enterprise.json.JsonFolderContent;
 import org.endeavour.enterprise.json.JsonFolderContentsList;
 import org.endeavour.enterprise.json.JsonMoveItems;
-import org.endeavourhealth.core.security.SecurityUtils;
+import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 

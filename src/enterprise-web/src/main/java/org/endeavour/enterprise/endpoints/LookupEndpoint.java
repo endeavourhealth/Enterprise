@@ -222,9 +222,9 @@ public final class LookupEndpoint extends AbstractEndpoint {
     public Response getOrganisations(@Context SecurityContext sc, @QueryParam("odsCodes") String odsCodeStr) throws Exception {
         super.setLogbackMarkers(sc);
 
-        if (!getEndUserFromSession(sc).getIsSuperUser()) {
-            throw new BadRequestException();
-        }
+//        if (!getEndUserFromSession(sc).getIsSuperUser()) {
+//            throw new BadRequestException();
+//        }
 
         LOG.trace("getOrganisations for odsCodes {}", odsCodeStr);
 

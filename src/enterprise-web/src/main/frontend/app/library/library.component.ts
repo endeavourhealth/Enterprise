@@ -8,6 +8,7 @@ import {ItemSummaryList} from "./models/ItemSummaryList";
 import {FolderNode} from "../folder/models/FolderNode";
 import {FolderItem} from "./models/FolderItem";
 import {LibraryItem} from "./models/LibraryItem";
+import {ActionItem} from "../folder/models/ActionItem";
 
 @Component({
 	template : require('./library.html')
@@ -48,23 +49,31 @@ export class LibraryComponent {
 				});
 	}
 
-	actionItem(uuid: string, type: ItemType, action: string) {
-		// Type 8 == Protocol!?!?!?
+	actionItem(actionItemProp : ActionItem) {
 		this.saveState();
-		switch (type) {
+		switch (actionItemProp.type) {
 			case ItemType.Query:
-				this.$state.go('app.queryEdit', {itemUuid: uuid, itemAction: action});
+				this.$state.go('app.queryEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
 				break;
 			case ItemType.ListOutput:
-				this.$state.go('app.listOutputEdit', {itemUuid: uuid, itemAction: action});
+				this.$state.go('app.listOutputEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
 				break;
 			case ItemType.CodeSet:
-				this.$state.go('app.codeSetEdit', {itemUuid: uuid, itemAction: action});
+				this.$state.go('app.codeSetEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
 				break;
 			default:
-				this.logger.error('Invalid item type', type, 'Item ' + action);
+				this.logger.error('Invalid item type', actionItemProp.type, 'Item ' + actionItemProp.action);
 				break;
 		}
+	}
+
+	actionItemEdit(uuid : string, type : ItemType, action : string) {
+		var actionItemProp : ActionItem = {
+			uuid : uuid,
+			type : type,
+			action : action
+		}
+		this.actionItem(actionItemProp);
 	}
 
 	deleteItem(item: FolderItem) {

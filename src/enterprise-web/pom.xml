@@ -82,19 +82,6 @@
         </dependency>
         <!-- End Java servlet -->
 
-        <!-- JavaMail -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>${javax.mail.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>${javax.mail.version}</version>
-        </dependency>
-        <!-- End JavaMail -->
-
         <!-- Keycloak -->
         <dependency>
             <groupId>org.keycloak</groupId>

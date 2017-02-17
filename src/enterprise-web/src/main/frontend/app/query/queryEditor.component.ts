@@ -12,7 +12,6 @@ import {MessageBoxDialog} from "../dialogs/messageBox/messageBox.dialog";
 import {StartingRules} from "./models/StartingRules";
 import {Query} from "./models/Query";
 import {LibraryItem} from "../library/models/LibraryItem";
-import {AdminService} from "../admin/admin.service";
 import {ExpressionType} from "../expressions/models/ExpressionType";
 import {QuerySelection} from "./models/QuerySelection";
 import {Test} from "../tests/models/Test";
@@ -45,8 +44,7 @@ export class QueryEditComponent {
 							private transition: Transition,
 							private $modal: NgbModal,
 							private state: StateService,
-							private libraryService: LibraryService,
-							private adminService: AdminService) {
+							private libraryService: LibraryService) {
 		this.queryName = "";
 		this.queryDescription = "";
 		this.disableRuleProps = false;
@@ -195,7 +193,6 @@ export class QueryEditComponent {
 		let vm = this;
 		MessageBoxDialog.open(vm.$modal, 'Cancel Changes', 'Are you sure you want to cancel the editing of this query (changes will not be saved) ?', 'Yes', 'No')
 			.result.then(function () {
-			vm.adminService.clearPendingChanges();
 			vm.logger.error('Query not saved');
 			vm.state.go(vm.transition.from());
 		});
@@ -225,12 +222,13 @@ export class QueryEditComponent {
 
 		if (this.nextRuleID === 1) { // Add to new Query
 
-			if (mode === 1 || mode === 3) { // Rule or Expression
+			if (mode == 1 || mode == 3) { // Rule or Expression
+
 				this.createStartRule(-162, 25);
 
 				this.createNewRule(194, 5);
 			}
-			else if (mode === 2) { // Query as a Rule
+			else if (mode == 2) { // Query as a Rule
 				let querySelection: QuerySelection;
 				let vm = this;
 				QueryPickerDialog.open(this.$modal, querySelection)
@@ -435,10 +433,10 @@ export class QueryEditComponent {
 
 					vm.chartViewModel.addRule(newStartRuleDataModel);
 
-					vm.adminService.clearPendingChanges();
 					vm.logger.success('Query saved successfully', libraryItem, 'Saved');
 
 					if (close) {
+
 						vm.state.go(vm.transition.from());
 					}
 				},

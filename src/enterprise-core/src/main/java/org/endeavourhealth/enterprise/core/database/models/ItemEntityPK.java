@@ -3,33 +3,32 @@ package org.endeavourhealth.enterprise.core.database.models;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
- * Created by darren on 08/07/16.
+ * Created by darren on 14/02/17.
  */
 public class ItemEntityPK implements Serializable {
-    private UUID itemuuid;
-    private UUID audituuid;
+    private String itemUuid;
+    private String auditUuid;
 
-    @Column(name = "itemuuid")
+    @Column(name = "ItemUuid", nullable = false, length = 36)
     @Id
-    public UUID getItemuuid() {
-        return itemuuid;
+    public String getItemUuid() {
+        return itemUuid;
     }
 
-    public void setItemuuid(UUID itemuuid) {
-        this.itemuuid = itemuuid;
+    public void setItemUuid(String itemUuid) {
+        this.itemUuid = itemUuid;
     }
 
-    @Column(name = "audituuid")
+    @Column(name = "AuditUuid", nullable = false, length = 36)
     @Id
-    public UUID getAudituuid() {
-        return audituuid;
+    public String getAuditUuid() {
+        return auditUuid;
     }
 
-    public void setAudituuid(UUID audituuid) {
-        this.audituuid = audituuid;
+    public void setAuditUuid(String auditUuid) {
+        this.auditUuid = auditUuid;
     }
 
     @Override
@@ -39,16 +38,16 @@ public class ItemEntityPK implements Serializable {
 
         ItemEntityPK that = (ItemEntityPK) o;
 
-        if (itemuuid != null ? !itemuuid.equals(that.itemuuid) : that.itemuuid != null) return false;
-        if (audituuid != null ? !audituuid.equals(that.audituuid) : that.audituuid != null) return false;
+        if (itemUuid != null ? !itemUuid.equals(that.itemUuid) : that.itemUuid != null) return false;
+        if (auditUuid != null ? !auditUuid.equals(that.auditUuid) : that.auditUuid != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = itemuuid != null ? itemuuid.hashCode() : 0;
-        result = 31 * result + (audituuid != null ? audituuid.hashCode() : 0);
+        int result = itemUuid != null ? itemUuid.hashCode() : 0;
+        result = 31 * result + (auditUuid != null ? auditUuid.hashCode() : 0);
         return result;
     }
 }

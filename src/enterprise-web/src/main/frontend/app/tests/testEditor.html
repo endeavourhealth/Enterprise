@@ -11,15 +11,15 @@
 <div class="modal-body">
 
 	<ngb-tabset active="active">
-		<ngb-tab id="0" title="Resource Filters & Restrictions">
+		<ngb-tab id="0" title="Filters & Restrictions">
 			<template ngbTabContent>
 				<br/>
 				<form role="form">
 					<div class='row'>
 						<div class="col-xs-6">
 							<div class="form-group">
-								<label>FHIR Resource</label>
-								<select class="form-control" [(ngModel)]="ruleDatasource" (ngModelChange)="resourceChange(ruleDatasource)" (disabled)="editMode" name="dataSource">
+								<label>Data Source</label>
+								<select class="form-control" [(ngModel)]="ruleDatasource" (ngModelChange)="dataSourceChange(ruleDatasource)" (disabled)="editMode" name="dataSource">
 									<option *ngFor="let datasource of datasources" value="{{datasource}}">{{datasource}}</option>
 								</select>
 							</div>

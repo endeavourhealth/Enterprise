@@ -13,7 +13,7 @@ public final class JsonQueryResult {
 
     private String name = null;
     private String description = null;
-    private UUID uuid = null;
+    private String uuid = null;
     private Integer resultCount = null;
     private String percentageOfParent = null;
     private List<JsonQueryResult> childQueries = null;
@@ -23,7 +23,7 @@ public final class JsonQueryResult {
     public JsonQueryResult(ItemEntity item, Integer resultCount, Integer parentCount) {
         this.name = item.getTitle();
         this.description = item.getDescription();
-        this.uuid = item.getItemuuid();
+        this.uuid = item.getItemUuid();
         this.resultCount = resultCount;
 
         if (resultCount != null && parentCount != null) {
@@ -74,11 +74,11 @@ public final class JsonQueryResult {
         this.resultCount = resultCount;
     }
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 

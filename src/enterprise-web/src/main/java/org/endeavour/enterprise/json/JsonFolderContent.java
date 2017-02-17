@@ -1,18 +1,16 @@
 package org.endeavour.enterprise.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.endeavourhealth.enterprise.core.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.database.models.ActiveitemEntity;
+import org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.AuditEntity;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonFolderContent implements Comparable {
-    private UUID uuid = null;
+    private String uuid = null;
     private Integer type = null;
     private String typeDesc = null;
     private String name = null;
@@ -25,17 +23,17 @@ public final class JsonFolderContent implements Comparable {
 
     }
 
-    public JsonFolderContent(ActiveitemEntity activeItem, ItemEntity item, AuditEntity audit) {
+    public JsonFolderContent(ActiveItemEntity activeItem, ItemEntity item, AuditEntity audit) {
         this(item, audit);
-        setTypeEnum(activeItem.getItemtypeid());
+        setTypeEnum(activeItem.getItemTypeId());
     }
     public JsonFolderContent(ItemEntity item, AuditEntity audit) {
-        this.uuid = item.getItemuuid();
+        this.uuid = item.getItemUuid();
         this.name = item.getTitle();
         this.description = item.getDescription();
 
         if (audit != null) {
-            this.lastModified = new Date(audit.getTimestamp().getTime());
+            this.lastModified = new Date(audit.getTimeStamp().getTime());
         }
     }
 
@@ -48,11 +46,11 @@ public final class JsonFolderContent implements Comparable {
     /**
      * gets/sets
      */
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 

@@ -5,7 +5,6 @@ import {Component} from "@angular/core";
 import {Transition, StateService} from "ui-router-ng2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {LibraryItem} from "../library/models/LibraryItem";
-import {AdminService} from "../admin/admin.service";
 import {CodingService} from "../coding/coding.service";
 
 @Component({
@@ -19,7 +18,6 @@ export class CodeSetEditComponent {
 		protected libraryService : LibraryService,
 		protected logger : LoggerService,
 		protected $modal : NgbModal,
-		protected adminService : AdminService,
 		protected state : StateService,
 		protected transition : Transition,
 		protected codingService : CodingService) {
@@ -98,7 +96,6 @@ export class CodeSetEditComponent {
 			.subscribe(
 				(libraryItem) => {
 					vm.libraryItem.uuid = libraryItem.uuid;
-					vm.adminService.clearPendingChanges();
 					vm.logger.success('Item saved', vm.libraryItem, 'Saved');
 					if (close) {
 						vm.state.go(vm.transition.from());
@@ -109,7 +106,6 @@ export class CodeSetEditComponent {
 	}
 
 	close() {
-		this.adminService.clearPendingChanges();
 		this.state.go(this.transition.from());
 	}
 }

@@ -8,9 +8,9 @@ import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
-import org.endeavourhealth.enterprise.core.database.models.ActiveitemEntity;
+import org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity;
+import org.endeavourhealth.enterprise.core.database.models.ItemDependencyEntity;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
-import org.endeavourhealth.enterprise.core.database.models.ItemdependencyEntity;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
@@ -36,12 +36,12 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     public Response getLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
         super.setLogbackMarkers(sc);
 
-        UUID libraryItemUuid = UUID.fromString(uuidStr);
+        String libraryItemUuid = uuidStr;
 
         LOG.trace("GettingLibraryItem for UUID {}", libraryItemUuid);
 
         ItemEntity item = ItemEntity.retrieveLatestForUUid(libraryItemUuid);
-        String xml = item.getXmlcontent();
+        String xml = item.getXmlContent();
 
         LibraryItem ret = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
@@ -60,13 +60,13 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     public Response saveLibraryItem(@Context SecurityContext sc, LibraryItem libraryItem) throws Exception {
         super.setLogbackMarkers(sc);
 
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
+        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
 
-        UUID libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
+        String libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
         String name = libraryItem.getName();
         String description = libraryItem.getDescription();
-        UUID folderUuid = parseUuidFromStr(libraryItem.getFolderUuid());
+        String folderUuid = parseUuidFromStr(libraryItem.getFolderUuid());
 
         Query query = libraryItem.getQuery();
         DataSource dataSource = libraryItem.getDataSource();
@@ -98,14 +98,14 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 throw new BadRequestException("Can't save LibraryItem without some content (e.g. query, test etc.)");
             }
 
-            ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(libraryItemUuid);
-            type = activeItem.getItemtypeid();
+            ActiveItemEntity activeItem = ActiveItemEntity.retrieveForItemUuid(libraryItemUuid);
+            type = activeItem.getItemTypeId();
             doc = null; //clear this, because we don't want to overwrite what's on the DB with an empty query doc
         }
 
         boolean inserting = libraryItemUuid == null;
         if (inserting) {
-            libraryItemUuid = UUID.randomUUID();
+            libraryItemUuid = UUID.randomUUID().toString();
             libraryItem.setUuid(libraryItemUuid.toString());
         }
 
@@ -130,10 +130,10 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     public Response deleteLibraryItem(@Context SecurityContext sc, LibraryItem libraryItem) throws Exception {
         super.setLogbackMarkers(sc);
 
-        UUID libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
-
+        String libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
+        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
+        
         LOG.trace("DeletingLibraryItem UUID {}", libraryItemUuid);
 
         JsonDeleteResponse ret = deleteItem(libraryItemUuid, orgUuid, userUuid);
@@ -153,17 +153,17 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     public Response getContentNamesForReportLibraryItem(@Context SecurityContext sc, @QueryParam("uuid") String uuidStr) throws Exception {
         super.setLogbackMarkers(sc);
 
-        UUID itemUuid = UUID.fromString(uuidStr);
+        String itemUuid = uuidStr;
 
         LOG.trace("getContentNamesforReportLibraryItem for UUID {}", itemUuid);
 
         JsonFolderContentsList ret = new JsonFolderContentsList();
 
-        ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(itemUuid);
-        List<ItemdependencyEntity> dependentItems = ItemdependencyEntity.retrieveForActiveItemType(activeItem, (short)DependencyType.Uses.getValue());
+        ActiveItemEntity activeItem = ActiveItemEntity.retrieveForItemUuid(itemUuid);
+        List<ItemDependencyEntity> dependentItems = ItemDependencyEntity.retrieveForActiveItemType(activeItem, (short)DependencyType.Uses.getValue());
 
-        for (ItemdependencyEntity dependentItem: dependentItems) {
-            UUID dependentItemUuid = dependentItem.getDependentitemuuid();
+        for (ItemDependencyEntity dependentItem: dependentItems) {
+            String dependentItemUuid = dependentItem.getDependentItemUuid();
             ItemEntity item = ItemEntity.retrieveLatestForUUid(dependentItemUuid);
 
             JsonFolderContent content = new JsonFolderContent(item, null);
@@ -185,8 +185,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     public Response moveLibraryItems(@Context SecurityContext sc, JsonMoveItems parameters) throws Exception {
         super.setLogbackMarkers(sc);
 
-        UUID orgUuid = getOrganisationUuidFromToken(sc);
-        UUID userUuid = SecurityUtils.getCurrentUserId(sc);
+        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
 
         LOG.trace("moveLibraryItems");
 

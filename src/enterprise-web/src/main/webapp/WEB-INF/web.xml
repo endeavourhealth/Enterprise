@@ -82,6 +82,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+
     <!-- ============================================ -->
     <!-- JEE security settings - Keycloak integration -->
     <!-- ============================================ -->
@@ -102,6 +103,18 @@
             <role-name>eds_user</role-name>
         </auth-constraint>
     </security-constraint>
+
+    <!-- API docs require an admin user -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>api-docs</web-resource-name>
+            <url-pattern>/api-docs/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>eds_user</role-name>
+        </auth-constraint>
+    </security-constraint>
+
 
     <!-- use Keycloak authentication valve installed in the container -->
     <login-config>

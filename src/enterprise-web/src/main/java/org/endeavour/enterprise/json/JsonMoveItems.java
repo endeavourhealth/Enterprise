@@ -4,17 +4,17 @@ import java.util.List;
 import java.util.UUID;
 
 public final class JsonMoveItems {
-    private UUID destinationFolder = null;
+    private String destinationFolder = null;
     private List<JsonMoveItem> items = null;
 
     /**
      * gets/sets
      */
-    public UUID getDestinationFolder() {
+    public String getDestinationFolder() {
         return destinationFolder;
     }
 
-    public void setDestinationFolder(UUID destinationFolder) {
+    public void setDestinationFolder(String destinationFolder) {
         this.destinationFolder = destinationFolder;
     }
 

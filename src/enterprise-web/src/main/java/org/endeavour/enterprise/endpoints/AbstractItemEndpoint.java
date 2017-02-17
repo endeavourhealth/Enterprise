@@ -20,37 +20,37 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
 
     private static final int MAX_VALIDATION_ERRORS_FOR_DELETE = 5;
 
-    protected ActiveitemEntity retrieveActiveItem(UUID itemUuid, UUID orgUuid, Short itemTypeDesired) throws Exception {
+    protected ActiveItemEntity retrieveActiveItem(String itemUuid, String orgUuid, Short itemTypeDesired) throws Exception {
 
-        ActiveitemEntity activeItem = retrieveActiveItem(itemUuid, orgUuid);
+        ActiveItemEntity activeItem = retrieveActiveItem(itemUuid, orgUuid);
 
-        if (activeItem.getItemtypeid() != itemTypeDesired) {
-            throw new RuntimeException("Trying to retrieve a " + itemTypeDesired + " but item is a " + String.valueOf(activeItem.getItemtypeid()));
+        if (activeItem.getItemTypeId() != itemTypeDesired) {
+            throw new RuntimeException("Trying to retrieve a " + itemTypeDesired + " but item is a " + String.valueOf(activeItem.getItemTypeId()));
         }
         return activeItem;
     }
 
-    protected ActiveitemEntity retrieveActiveItem(UUID itemUuid, UUID orgUuid) throws Exception {
-        ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(itemUuid);
+    protected ActiveItemEntity retrieveActiveItem(String itemUuid, String orgUuid) throws Exception {
+        ActiveItemEntity activeItem = ActiveItemEntity.retrieveForItemUuid(itemUuid);
 
         if (activeItem == null) {
             throw new BadRequestException("UUID does not exist");
         }
 
-        if (!activeItem.getOrganisationuuid().equals(orgUuid)) {
+        if (!activeItem.getOrganisationUuid().equals(orgUuid)) {
             throw new BadRequestException("Item for another organisation");
         }
 
         return activeItem;
     }
 
-    protected JsonDeleteResponse deleteItem(UUID itemUuid, UUID orgUuid, UUID userUuid) throws Exception {
-        ActiveitemEntity activeItem = retrieveActiveItem(itemUuid, orgUuid);
+    protected JsonDeleteResponse deleteItem(String itemUuid, String orgUuid, String userUuid) throws Exception {
+        ActiveItemEntity activeItem = retrieveActiveItem(itemUuid, orgUuid);
         ItemEntity item = ItemEntity.retrieveForActiveItem(activeItem);
 
         //recursively build up the full list of items we want to delete
         List<ItemEntity> itemsToDelete = new ArrayList<>();
-        List<ActiveitemEntity> activeItemsToDelete = new ArrayList<>();
+        List<ActiveItemEntity> activeItemsToDelete = new ArrayList<>();
         findItemsToDelete(item, activeItem, itemsToDelete, activeItemsToDelete);
 
         JsonDeleteResponse ret = new JsonDeleteResponse();
@@ -65,20 +65,20 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
 
         //now do the deleting, building up a list of all entities to update, which is then done atomically
         AuditEntity audit = AuditEntity.factoryNow(userUuid, orgUuid);
-        UUID auditUuid = audit.getAudituuid();
+        String auditUuid = audit.getAuditUuid();
 
         List<ItemEntity> iToDelete = new ArrayList<>();
-        List<ActiveitemEntity> aiToDelete = new ArrayList<>();
+        List<ActiveItemEntity> aiToDelete = new ArrayList<>();
 
         for (ItemEntity itemToDelete: itemsToDelete) {
-            itemToDelete.setAudituuid(auditUuid);
-            itemToDelete.setIsdeleted(true);
+            itemToDelete.setAuditUuid(auditUuid);
+            itemToDelete.setIsDeleted((byte)1);
             iToDelete.add(itemToDelete);
         }
 
-        for (ActiveitemEntity activeItemToDelete: activeItemsToDelete) {
-            activeItemToDelete.setAudituuid(auditUuid);
-            activeItemToDelete.setIsdeleted(true);
+        for (ActiveItemEntity activeItemToDelete: activeItemsToDelete) {
+            activeItemToDelete.setAuditUuid(auditUuid);
+            activeItemToDelete.setIsDeleted((byte)1);
             aiToDelete.add(activeItemToDelete);
         }
 
@@ -89,39 +89,39 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     }
 
 
-    private void findItemsToDelete(ItemEntity item, ActiveitemEntity activeItem, List<ItemEntity> itemsToDelete, List<ActiveitemEntity> activeItemsToDelete) throws Exception {
+    private void findItemsToDelete(ItemEntity item, ActiveItemEntity activeItem, List<ItemEntity> itemsToDelete, List<ActiveItemEntity> activeItemsToDelete) throws Exception {
 
         itemsToDelete.add(item);
         activeItemsToDelete.add(activeItem);
 
-        List<ItemdependencyEntity> dependencies = ItemdependencyEntity.retrieveForDependentItem(item.getItemuuid());
-        for (ItemdependencyEntity dependency: dependencies) {
+        List<ItemDependencyEntity> dependencies = ItemDependencyEntity.retrieveForDependentItem(item.getItemUuid());
+        for (ItemDependencyEntity dependency: dependencies) {
 
             //only recurse for containing or child folder-type dependencies
-            if (dependency.getDependencytypeid() == DependencyType.IsChildOf.getValue()
-                    || dependency.getDependencytypeid() == DependencyType.IsContainedWithin.getValue()) {
-                ActiveitemEntity childActiveItem = ActiveitemEntity.retrieveForItemUuid(dependency.getItemuuid());
+            if (dependency.getDependencyTypeId() == DependencyType.IsChildOf.getValue()
+                    || dependency.getDependencyTypeId() == DependencyType.IsContainedWithin.getValue()) {
+                ActiveItemEntity childActiveItem = ActiveItemEntity.retrieveForItemUuid(dependency.getItemUuid());
                 ItemEntity childItem = ItemEntity.retrieveForActiveItem(childActiveItem);
                 findItemsToDelete(childItem, childActiveItem, itemsToDelete, activeItemsToDelete);
             }
         }
     }
 
-    private void validateDelete(List<ItemEntity> itemsToDelete, UUID orgUuid, JsonDeleteResponse response) throws Exception {
+    private void validateDelete(List<ItemEntity> itemsToDelete, String orgUuid, JsonDeleteResponse response) throws Exception {
         //create a hash of all our items being deleted
-        HashSet<UUID> hsUuidsToDelete = new HashSet<>();
+        HashSet<String> hsUuidsToDelete = new HashSet<>();
         for (ItemEntity item: itemsToDelete) {
-            hsUuidsToDelete.add(item.getItemuuid());
+            hsUuidsToDelete.add(item.getItemUuid());
         }
 
         //see if there are any items USING something that we're trying to delete
         for (int i = 0; i < itemsToDelete.size(); i++) {
             ItemEntity item = itemsToDelete.get(i);
-            UUID itemUuid = item.getItemuuid();
-            List<ItemdependencyEntity> dependencies = ItemdependencyEntity.retrieveForDependentItemType(itemUuid, (short)DependencyType.Uses.getValue());
+            String itemUuid = item.getItemUuid();
+            List<ItemDependencyEntity> dependencies = ItemDependencyEntity.retrieveForDependentItemType(itemUuid, (short)DependencyType.Uses.getValue());
             for (int j = 0; j < dependencies.size(); j++) {
-                ItemdependencyEntity dependency = dependencies.get(i);
-                UUID parentItemUuid = dependency.getItemuuid();
+                ItemDependencyEntity dependency = dependencies.get(i);
+                String parentItemUuid = dependency.getItemUuid();
                 if (!hsUuidsToDelete.contains(parentItemUuid)) {
 
                     ItemEntity usingItem = ItemEntity.retrieveLatestForUUid(parentItemUuid);
@@ -138,7 +138,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
     }
 
-    private static void validateItemTypeMatchesContainingFolder(boolean insert, Integer itemType, UUID containingFolderUuid) throws Exception {
+    private static void validateItemTypeMatchesContainingFolder(boolean insert, Integer itemType, String containingFolderUuid) throws Exception {
 
         //if saving a new library item or report, it must have a containing folder item
         if (insert
@@ -153,8 +153,8 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             return;
         }
 
-        ActiveitemEntity containingFolderActiveItem = ActiveitemEntity.retrieveForItemUuid(containingFolderUuid);
-        Short containingFolderType = containingFolderActiveItem.getItemtypeid();
+        ActiveItemEntity containingFolderActiveItem = ActiveItemEntity.retrieveForItemUuid(containingFolderUuid);
+        Short containingFolderType = containingFolderActiveItem.getItemTypeId();
         if (containingFolderType == DefinitionItemType.LibraryFolder.getValue()) {
             //library folders can only contain other library folders and queries etc.
             if (itemType != DefinitionItemType.LibraryFolder.getValue()
@@ -174,13 +174,13 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
     }
 
-    protected void saveItem(boolean insert, UUID itemUuid, UUID orgUuid, UUID userUuid, Integer itemType,
-                            String name, String description, QueryDocument queryDocument, UUID containingFolderUuid) throws Exception {
+    protected void saveItem(boolean insert, String itemUuid, String orgUuid, String userUuid, Integer itemType,
+                            String name, String description, QueryDocument queryDocument, String containingFolderUuid) throws Exception {
 
         //validate the containing folder type matches the itemType we're saving
         validateItemTypeMatchesContainingFolder(insert, itemType, containingFolderUuid);
 
-        ActiveitemEntity activeItem = null;
+        ActiveItemEntity activeItem = null;
         ItemEntity item = null;
 
         if (insert) {
@@ -198,26 +198,26 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
                 throw new BadRequestException("Must specify a containing folder for new items");
             }
 
-            activeItem = new ActiveitemEntity();
-            activeItem.setActiveitemuuid(UUID.randomUUID());
-            activeItem.setOrganisationuuid(orgUuid);
-            activeItem.setItemuuid(itemUuid);
-            activeItem.setItemtypeid(itemType.shortValue());
+            activeItem = new ActiveItemEntity();
+            activeItem.setActiveItemUuid(UUID.randomUUID().toString());
+            activeItem.setOrganisationUuid(orgUuid);
+            activeItem.setItemUuid(itemUuid);
+            activeItem.setItemTypeId(itemType.shortValue());
 
             item = new ItemEntity();
-            item.setItemuuid(itemUuid);
-            item.setXmlcontent(""); //when creating folders, we don't store XML, so this needs to be non-null
+            item.setItemUuid(itemUuid);
+            item.setXmlContent(""); //when creating folders, we don't store XML, so this needs to be non-null
         } else {
             activeItem = retrieveActiveItem(itemUuid, orgUuid, itemType.shortValue());
             item = ItemEntity.retrieveForActiveItem(activeItem);
         }
 
-        UUID previousAuditUuid = activeItem.getAudituuid();
+        String previousAuditUuid = activeItem.getAuditUuid();
 
         //update the AuditUuid on both objects
         AuditEntity audit = AuditEntity.factoryNow(userUuid, orgUuid);
-        activeItem.setAudituuid(audit.getAudituuid());
-        item.setAudituuid(audit.getAudituuid());
+        activeItem.setAuditUuid(audit.getAuditUuid());
+        item.setAuditUuid(audit.getAuditUuid());
 
         if (name != null) {
             item.setTitle(name);
@@ -227,22 +227,22 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         }
         if (queryDocument != null) {
             String xmlContent = QueryDocumentSerializer.writeToXml(queryDocument);
-            item.setXmlcontent(xmlContent);
+            item.setXmlContent(xmlContent);
         }
 
         //work out any UUIDs our new item is dependent on
-        List<ItemdependencyEntity> itemdependencyEntities = null;
+        List<ItemDependencyEntity> itemdependencyEntities = null;
 
         if (queryDocument != null) {
             itemdependencyEntities = createUsingDependencies(queryDocument, activeItem);
-        } else if (item.getXmlcontent().length() > 0) {
+        } else if (item.getXmlContent().length() > 0) {
             //if a new queryDocument wasn't provided, but the item already had one, we still need to recreate the "using" dependencies
-            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlcontent());
+            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlContent());
             itemdependencyEntities = createUsingDependencies(oldQueryDocument, activeItem);
         }
 
         //work out the child/contains dependency
-        ItemdependencyEntity linkToParent = createFolderDependency(insert, itemType.shortValue(), item, previousAuditUuid, containingFolderUuid);
+        ItemDependencyEntity linkToParent = createFolderDependency(insert, itemType.shortValue(), item, previousAuditUuid, containingFolderUuid);
         if (itemdependencyEntities == null)
             itemdependencyEntities = new ArrayList<>();
         itemdependencyEntities.add(linkToParent);
@@ -256,23 +256,23 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     /**
      * when a libraryItem or report is saved, process the query document to find all UUIDs that it requires to be run
      */
-    private static List<ItemdependencyEntity> createUsingDependencies(QueryDocument queryDocument, ActiveitemEntity activeItem) throws Exception {
+    private static List<ItemDependencyEntity> createUsingDependencies(QueryDocument queryDocument, ActiveItemEntity activeItem) throws Exception {
 
-        List<ItemdependencyEntity> dependencies = new ArrayList<>();
+        List<ItemDependencyEntity> dependencies = new ArrayList<>();
 
         //find all the UUIDs in the XML and then see if we need to create or delete dependencies
         QueryDocumentReaderFindDependentUuids reader = new QueryDocumentReaderFindDependentUuids(queryDocument);
-        HashSet<UUID> uuidsInDoc = reader.findUuids();
+        HashSet<String> uuidsInDoc = reader.findUuids();
 
-        Iterator<UUID> iter = uuidsInDoc.iterator();
+        Iterator<String> iter = uuidsInDoc.iterator();
         while (iter.hasNext()) {
-            UUID uuidInDoc = iter.next();
+            String uuidInDoc = iter.next();
 
-            ItemdependencyEntity dependency = new ItemdependencyEntity();
-            dependency.setItemuuid(activeItem.getItemuuid());
-            dependency.setAudituuid(activeItem.getAudituuid());
-            dependency.setDependentitemuuid(uuidInDoc);
-            dependency.setDependencytypeid((short)DependencyType.Uses.getValue());
+            ItemDependencyEntity dependency = new ItemDependencyEntity();
+            dependency.setItemUuid(activeItem.getItemUuid());
+            dependency.setAuditUuid(activeItem.getAuditUuid());
+            dependency.setDependentItemUuid(uuidInDoc);
+            dependency.setDependencyTypeId((short)DependencyType.Uses.getValue());
 
             dependencies.add(dependency);
         }
@@ -283,7 +283,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
     /**
      * when a libraryItem, report or folder is saved, link it to the containing folder
      */
-    private static ItemdependencyEntity createFolderDependency(boolean insert, Short itemType, ItemEntity item, UUID previousAuditUuid, UUID containingFolderUuid) throws Exception {
+    private static ItemDependencyEntity createFolderDependency(boolean insert, Short itemType, ItemEntity item, String previousAuditUuid, String containingFolderUuid) throws Exception {
 
         //work out the dependency type, based on what item type we're saving
         Integer dependencyType = null;
@@ -305,71 +305,71 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
 
             //if we're just renaming an item, then no folder UUID would have been supplied,
             //so find out the old folder UUID so we can maintain the relationship
-            List<ItemdependencyEntity> oldFolderDependencies = ItemdependencyEntity.retrieveForItemType(item.getItemuuid(), previousAuditUuid, dependencyType.shortValue());
+            List<ItemDependencyEntity> oldFolderDependencies = ItemDependencyEntity.retrieveForItemType(item.getItemUuid(), previousAuditUuid, dependencyType.shortValue());
             if (!oldFolderDependencies.isEmpty()) {
-                ItemdependencyEntity oldFolderDependency = oldFolderDependencies.get(0);
-                containingFolderUuid = oldFolderDependency.getDependentitemuuid();
+                ItemDependencyEntity oldFolderDependency = oldFolderDependencies.get(0);
+                containingFolderUuid = oldFolderDependency.getDependentItemUuid();
             }
         }
 
-        ItemdependencyEntity linkToParent = new ItemdependencyEntity();
-        linkToParent.setItemuuid(item.getItemuuid());
-        linkToParent.setAudituuid(item.getAudituuid());
-        linkToParent.setDependentitemuuid(containingFolderUuid);
-        linkToParent.setDependencytypeid(dependencyType.shortValue());
+        ItemDependencyEntity linkToParent = new ItemDependencyEntity();
+        linkToParent.setItemUuid(item.getItemUuid());
+        linkToParent.setAuditUuid(item.getAuditUuid());
+        linkToParent.setDependentItemUuid(containingFolderUuid);
+        linkToParent.setDependencyTypeId(dependencyType.shortValue());
 
         return linkToParent;
     }
 
-    protected UUID parseUuidFromStr(String uuidStr) {
+    protected String parseUuidFromStr(String uuidStr) {
         if (uuidStr == null || uuidStr.isEmpty()) {
             return null;
         } else {
-            return UUID.fromString(uuidStr);
+            return uuidStr;
         }
     }
 
-    protected void moveItems(UUID userUuid, UUID orgUuid, JsonMoveItems parameters) throws Exception {
+    protected void moveItems(String userUuid, String orgUuid, JsonMoveItems parameters) throws Exception {
 
-        UUID folderUuid = parameters.getDestinationFolder();
+        String folderUuid = parameters.getDestinationFolder();
         if (folderUuid == null) {
             throw new BadRequestException("No destination folder UUID supplied");
         }
-        ActiveitemEntity folderActiveItem = ActiveitemEntity.retrieveForItemUuid(folderUuid);
-        if (!folderActiveItem.getOrganisationuuid().equals(orgUuid)) {
+        ActiveItemEntity folderActiveItem = ActiveItemEntity.retrieveForItemUuid(folderUuid);
+        if (!folderActiveItem.getOrganisationUuid().equals(orgUuid)) {
             throw new BadRequestException("Cannot move items to folder owned by another organisation");
         }
 
         AuditEntity audit = AuditEntity.factoryNow(userUuid, orgUuid);
-        UUID auditUuid = audit.getAudituuid();
+        String auditUuid = audit.getAuditUuid();
 
         List<ItemEntity> iToMove = new ArrayList<>();
-        List<ActiveitemEntity> aiToMove = new ArrayList<>();
-        List<ItemdependencyEntity> idToMove = new ArrayList<>();
+        List<ActiveItemEntity> aiToMove = new ArrayList<>();
+        List<ItemDependencyEntity> idToMove = new ArrayList<>();
 
         for (JsonMoveItem itemParameter: parameters.getItems()) {
-            UUID itemUuid = itemParameter.getUuid();
+            String itemUuid = itemParameter.getUuid();
 
-            ActiveitemEntity activeItem = ActiveitemEntity.retrieveForItemUuid(itemUuid);
+            ActiveItemEntity activeItem = ActiveItemEntity.retrieveForItemUuid(itemUuid);
             ItemEntity item = ItemEntity.retrieveForActiveItem(activeItem);
 
-            if (!activeItem.getOrganisationuuid().equals(orgUuid)) {
+            if (!activeItem.getOrganisationUuid().equals(orgUuid)) {
                 throw new BadRequestException("Cannot move items belonging to another organisation");
             }
 
-            item.setAudituuid(auditUuid);
+            item.setAuditUuid(auditUuid);
             iToMove.add(item);
 
-            UUID previousAuditUuid = activeItem.getAudituuid();
-            activeItem.setAudituuid(auditUuid);
+            String previousAuditUuid = activeItem.getAuditUuid();
+            activeItem.setAuditUuid(auditUuid);
             aiToMove.add(activeItem);
 
             //"using" dependencies
-            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlcontent());
+            QueryDocument oldQueryDocument = QueryDocumentSerializer.readQueryDocumentFromXml(item.getXmlContent());
             idToMove.addAll(createUsingDependencies(oldQueryDocument, activeItem));
 
             //folder dependecies
-            idToMove.add(createFolderDependency(false, activeItem.getItemtypeid(), item, previousAuditUuid, folderUuid));
+            idToMove.add(createFolderDependency(false, activeItem.getItemTypeId(), item, previousAuditUuid, folderUuid));
         }
 
         DataManager db = new DataManager();

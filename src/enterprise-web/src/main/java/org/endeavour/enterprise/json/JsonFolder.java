@@ -14,10 +14,10 @@ public final class JsonFolder implements Comparable {
     public static final int FOLDER_TYPE_LIBRARY = 1;
     public static final int FOLDER_TYPE_REPORTS = 2;
 
-    private UUID uuid = null;
+    private String uuid = null;
     private String folderName = null;
     private Integer folderType = null;
-    private UUID parentFolderUuid = null;
+    private String parentFolderUuid = null;
     private Boolean hasChildren = null;
     private Integer contentCount = null;
 
@@ -25,7 +25,7 @@ public final class JsonFolder implements Comparable {
     }
 
     public JsonFolder(ItemEntity item, int contentCount, boolean hasChildren) {
-        this.uuid = item.getItemuuid();
+        this.uuid = item.getItemUuid();
         this.folderName = item.getTitle();
 
         this.hasChildren = hasChildren;
@@ -50,11 +50,11 @@ public final class JsonFolder implements Comparable {
     /**
      * gets/sets
      */
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
@@ -74,11 +74,11 @@ public final class JsonFolder implements Comparable {
         this.folderType = folderType;
     }
 
-    public UUID getParentFolderUuid() {
+    public String getParentFolderUuid() {
         return parentFolderUuid;
     }
 
-    public void setParentFolderUuid(UUID parentUuid) {
+    public void setParentFolderUuid(String parentUuid) {
         this.parentFolderUuid = parentUuid;
     }
 

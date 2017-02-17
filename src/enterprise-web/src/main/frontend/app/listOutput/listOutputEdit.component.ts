@@ -5,7 +5,6 @@ import {ListReportGroup} from "./models/ListReportGroup";
 import {FieldOutput} from "./models/FieldOutput";
 import {Field} from "./models/Field";
 import {EntityMap} from "./models/EntityMap";
-import {AdminService} from "../admin/admin.service";
 import {LoggerService} from "../common/logger.service";
 import {LibraryService} from "../library/library.service";
 import {DataSource} from "../tests/models/DataSource";
@@ -28,7 +27,6 @@ export class ListOutputEditComponent {
 		protected libraryService : LibraryService,
 		protected logger : LoggerService,
 		protected $modal : NgbModal,
-		protected adminService : AdminService,
 		protected $state : StateService,
 		protected transition : Transition) {
 
@@ -72,7 +70,7 @@ export class ListOutputEditComponent {
 				}
 
 				vm.loadDataSourceAvailableFieldList();
-				vm.adminService.setPendingChanges();
+
 		});
 	}
 
@@ -183,7 +181,6 @@ export class ListOutputEditComponent {
 			.subscribe(
 				(libraryItem: LibraryItem) => {
 					vm.libraryItem.uuid = libraryItem.uuid;
-					vm.adminService.clearPendingChanges();
 					vm.logger.success('Item saved', vm.libraryItem, 'Saved');
 					if (close) {
 						vm.$state.go(vm.transition.from());
@@ -194,6 +191,6 @@ export class ListOutputEditComponent {
 	}
 
 	close() {
-		this.adminService.clearPendingChanges();
+
 		this.$state.go(this.transition.from());
 	}}

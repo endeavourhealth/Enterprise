@@ -1,60 +1,58 @@
 package org.endeavourhealth.enterprise.core.database.models;
 
 import org.endeavourhealth.enterprise.core.database.PersistenceManager;
-import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
- * Created by darren on 08/07/16.
+ * Created by darren on 14/02/17.
  */
 @Entity
-@Table(name = "item", schema = "\"Definition\"", catalog = "Endeavour_Enterprise")
+@Table(name = "Item", schema = "enterprise_admin", catalog = "")
 @IdClass(ItemEntityPK.class)
 public class ItemEntity {
-    private UUID itemuuid;
-    private UUID audituuid;
-    private String xmlcontent;
+    private String itemUuid;
+    private String auditUuid;
+    private String xmlContent;
     private String title;
     private String description;
-    private boolean isdeleted;
+    private byte isDeleted;
 
     @Id
-    @Column(name = "itemuuid")
-    public UUID getItemuuid() {
-        return itemuuid;
+    @Column(name = "ItemUuid", nullable = false, length = 36)
+    public String getItemUuid() {
+        return itemUuid;
     }
 
-    public void setItemuuid(UUID itemuuid) {
-        this.itemuuid = itemuuid;
+    public void setItemUuid(String itemUuid) {
+        this.itemUuid = itemUuid;
     }
 
     @Id
-    @Column(name = "audituuid")
-    public UUID getAudituuid() {
-        return audituuid;
+    @Column(name = "AuditUuid", nullable = false, length = 36)
+    public String getAuditUuid() {
+        return auditUuid;
     }
 
-    public void setAudituuid(UUID audituuid) {
-        this.audituuid = audituuid;
+    public void setAuditUuid(String auditUuid) {
+        this.auditUuid = auditUuid;
     }
 
     @Basic
-    @Column(name = "xmlcontent")
-    public String getXmlcontent() {
-        return xmlcontent;
+    @Column(name = "XmlContent", nullable = false, length = -1)
+    public String getXmlContent() {
+        return xmlContent;
     }
 
-    public void setXmlcontent(String xmlcontent) {
-        this.xmlcontent = xmlcontent;
+    public void setXmlContent(String xmlContent) {
+        this.xmlContent = xmlContent;
     }
 
     @Basic
-    @Column(name = "title")
+    @Column(name = "Title", nullable = false, length = 255)
     public String getTitle() {
         return title;
     }
@@ -64,7 +62,7 @@ public class ItemEntity {
     }
 
     @Basic
-    @Column(name = "description")
+    @Column(name = "Description", nullable = false, length = -1)
     public String getDescription() {
         return description;
     }
@@ -73,12 +71,14 @@ public class ItemEntity {
         this.description = description;
     }
 
-    public boolean getIsdeleted() {
-        return isdeleted;
+    @Basic
+    @Column(name = "IsDeleted", nullable = false)
+    public byte getIsDeleted() {
+        return isDeleted;
     }
 
-    public void setIsdeleted(boolean isdeleted) {
-        this.isdeleted = isdeleted;
+    public void setIsDeleted(byte isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     @Override
@@ -88,9 +88,10 @@ public class ItemEntity {
 
         ItemEntity that = (ItemEntity) o;
 
-        if (itemuuid != null ? !itemuuid.equals(that.itemuuid) : that.itemuuid != null) return false;
-        if (audituuid != null ? !audituuid.equals(that.audituuid) : that.audituuid != null) return false;
-        if (xmlcontent != null ? !xmlcontent.equals(that.xmlcontent) : that.xmlcontent != null) return false;
+        if (isDeleted != that.isDeleted) return false;
+        if (itemUuid != null ? !itemUuid.equals(that.itemUuid) : that.itemUuid != null) return false;
+        if (auditUuid != null ? !auditUuid.equals(that.auditUuid) : that.auditUuid != null) return false;
+        if (xmlContent != null ? !xmlContent.equals(that.xmlContent) : that.xmlContent != null) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
 
@@ -99,31 +100,32 @@ public class ItemEntity {
 
     @Override
     public int hashCode() {
-        int result = itemuuid != null ? itemuuid.hashCode() : 0;
-        result = 31 * result + (audituuid != null ? audituuid.hashCode() : 0);
-        result = 31 * result + (xmlcontent != null ? xmlcontent.hashCode() : 0);
+        int result = itemUuid != null ? itemUuid.hashCode() : 0;
+        result = 31 * result + (auditUuid != null ? auditUuid.hashCode() : 0);
+        result = 31 * result + (xmlContent != null ? xmlContent.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (int) isDeleted;
         return result;
     }
 
     public static ItemEntity factoryNew(String title, AuditEntity audit) {
         ItemEntity ret = new ItemEntity();
-        ret.setAudituuid(audit.getAudituuid());
+        ret.setAuditUuid(audit.getAuditUuid());
         ret.setTitle(title);
         return ret;
     }
 
-    public static ItemEntity retrieveLatestForUUid(UUID itemuuid) throws Exception {
-        String where = "SELECT e from ItemEntity e INNER JOIN ActiveitemEntity a"
-                + " ON a.itemuuid = e.itemuuid"
-                + " AND a.audituuid = e.audituuid"
-                + " WHERE a.itemuuid = :itemuuid";
+    public static ItemEntity retrieveLatestForUUid(String itemUuid) throws Exception {
+        String where = "SELECT e from ItemEntity e INNER JOIN ActiveItemEntity a"
+                + " ON a.itemUuid = e.itemUuid"
+                + " AND a.auditUuid = e.auditUuid"
+                + " WHERE a.itemUuid = :itemUuid";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
         ItemEntity ent = entityManager.createQuery(where, ItemEntity.class)
-                .setParameter("itemuuid", itemuuid)
+                .setParameter("itemUuid", itemUuid)
                 .getSingleResult();
 
         entityManager.close();
@@ -133,16 +135,16 @@ public class ItemEntity {
 
     }
 
-    public static ItemEntity retrieveForUuidAndAudit(UUID itemuuid, UUID audituuid) throws Exception {
+    public static ItemEntity retrieveForUuidAndAudit(String itemUuid, String auditUuid) throws Exception {
         String where = "from ItemEntity"
-                + " WHERE audituuid = :audituuid"
-                + " AND itemuuid = :itemuuid";
+                + " WHERE auditUuid = :auditUuid"
+                + " AND itemUuid = :itemUuid";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
         ItemEntity ent = entityManager.createQuery(where, ItemEntity.class)
-                .setParameter("audituuid", audituuid)
-                .setParameter("itemuuid", itemuuid)
+                .setParameter("auditUuid", auditUuid)
+                .setParameter("itemUuid", itemUuid)
                 .getSingleResult();
 
         entityManager.close();
@@ -151,16 +153,16 @@ public class ItemEntity {
         return ent;
     }
 
-    public static ItemEntity retrieveForActiveItem(ActiveitemEntity activeItem) throws Exception {
+    public static ItemEntity retrieveForActiveItem(ActiveItemEntity activeItem) throws Exception {
         String where = "from ItemEntity"
-                + " WHERE audituuid = :audituuid"
-                + " AND itemuuid = :itemuuid";
+                + " WHERE auditUuid = :auditUuid"
+                + " AND itemUuid = :itemUuid";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
         ItemEntity ent = entityManager.createQuery(where, ItemEntity.class)
-                .setParameter("audituuid", activeItem.getAudituuid())
-                .setParameter("itemuuid", activeItem.getItemuuid())
+                .setParameter("auditUuid", activeItem.getAuditUuid())
+                .setParameter("itemUuid", activeItem.getItemUuid())
                 .getSingleResult();
 
         entityManager.close();
@@ -170,27 +172,27 @@ public class ItemEntity {
     }
 
 
-    public static List<ItemEntity> retrieveDependentItems(UUID dependentitemuuid, Short dependencytypeid) throws Exception {
+    public static List<ItemEntity> retrieveDependentItems(String dependentItemUuid, Short dependencyTypeId) throws Exception {
         String where = "SELECT i from ItemEntity i"
-                + " INNER JOIN ActiveitemEntity a"
-                + " ON a.itemuuid = i.itemuuid"
-                + " AND a.audituuid = i.audituuid"
-                + " AND a.isdeleted = 'false'"
-                + " INNER JOIN ItemdependencyEntity d"
-                + " ON d.itemuuid = i.itemuuid"
-                + " AND a.audituuid = i.audituuid"
-                + " AND d.dependentitemuuid = :dependentitemuuid"
-                + " AND d.dependencytypeid = :dependencytypeid"
-                + " INNER JOIN ActiveitemEntity ad"
-                + " ON ad.itemuuid = d.itemuuid"
-                + " AND ad.audituuid = d.audituuid"
-                + " AND ad.isdeleted = 'false'";
+                + " INNER JOIN ActiveItemEntity a"
+                + " ON a.itemUuid = i.itemUuid"
+                + " AND a.auditUuid = i.auditUuid"
+                + " AND a.isDeleted = 0"
+                + " INNER JOIN ItemDependencyEntity d"
+                + " ON d.itemUuid = i.itemUuid"
+                + " AND a.auditUuid = i.auditUuid"
+                + " AND d.dependentItemUuid = :dependentItemUuid"
+                + " AND d.dependencyTypeId = :dependencyTypeId"
+                + " INNER JOIN ActiveItemEntity ad"
+                + " ON ad.itemUuid = d.itemUuid"
+                + " AND ad.auditUuid = d.auditUuid"
+                + " AND ad.isDeleted = 0";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
         List<ItemEntity> ent = entityManager.createQuery(where, ItemEntity.class)
-                .setParameter("dependentitemuuid", dependentitemuuid)
-                .setParameter("dependencytypeid", dependencytypeid)
+                .setParameter("dependentItemUuid", dependentItemUuid)
+                .setParameter("dependencyTypeId", dependencyTypeId)
                 .getResultList();
 
         entityManager.close();
@@ -200,26 +202,26 @@ public class ItemEntity {
 
     }
 
-    public static List<ItemEntity> retrieveNonDependentItems(UUID organisationuuid, Short dependencytypeid, Short itemtypeid) throws Exception {
+    public static List<ItemEntity> retrieveNonDependentItems(String organisationUuid, Short dependencyTypeId, Short itemTypeId) throws Exception {
         String where = "SELECT i from ItemEntity i"
-                + " INNER JOIN ActiveitemEntity a"
-                + " ON a.itemuuid = i.itemuuid"
-                + " AND a.audituuid = i.audituuid"
-                + " AND a.itemtypeid = :itemtypeid"
-                + " AND a.organisationuuid = :organisationuuid"
-                + " AND a.isdeleted = 'false'"
+                + " INNER JOIN ActiveItemEntity a"
+                + " ON a.itemUuid = i.itemUuid"
+                + " AND a.auditUuid = i.auditUuid"
+                + " AND a.itemTypeId = :itemTypeId"
+                + " AND a.organisationUuid = :organisationUuid"
+                + " AND a.isDeleted = 0"
                 + " WHERE NOT EXISTS ("
-                + "SELECT 1 FROM ItemdependencyEntity d"
-                + " WHERE d.itemuuid = i.itemuuid"
-                + " AND d.audituuid = i.audituuid"
-                + " AND d.dependencytypeid = :dependencytypeid"
+                + "SELECT 1 FROM ItemDependencyEntity d"
+                + " WHERE d.itemUuid = i.itemUuid"
+                + " AND d.auditUuid = i.auditUuid"
+                + " AND d.dependencyTypeId = :dependencyTypeId"
                 + ")";
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
         List<ItemEntity> ent = entityManager.createQuery(where, ItemEntity.class)
-                .setParameter("itemtypeid", itemtypeid)
-                .setParameter("organisationuuid", organisationuuid)
-                .setParameter("dependencytypeid", dependencytypeid)
+                .setParameter("itemTypeId", itemTypeId)
+                .setParameter("organisationUuid", organisationUuid)
+                .setParameter("dependencyTypeId", dependencyTypeId)
                 .getResultList();
 
         entityManager.close();
@@ -228,25 +230,25 @@ public class ItemEntity {
         return ent;
     }
 
-    public static List<ItemEntity> retrieveForActiveItems(List<ActiveitemEntity> activeItems) throws Exception {
+    public static List<ItemEntity> retrieveForActiveItems(List<ActiveItemEntity> activeItems) throws Exception {
         if (activeItems.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<UUID> parameters = new ArrayList<>();
+        List<String> parameters = new ArrayList<>();
 
         StringBuilder sb = new StringBuilder();
         sb.append("from ItemEntity WHERE ");
 
         for (int i=0; i<activeItems.size(); i++) {
-            ActiveitemEntity activeItem = activeItems.get(i);
-            UUID itemUuid = activeItem.getItemuuid();
-            UUID auditUuid = activeItem.getAudituuid();
+            ActiveItemEntity activeItem = activeItems.get(i);
+            String itemUuid = activeItem.getItemUuid();
+            String auditUuid = activeItem.getAuditUuid();
 
             if (i > 0){
                 sb.append(" OR ");
             }
-            sb.append("(itemuuid = '"+itemUuid+"' AND audituuid = '"+auditUuid+"')");
+            sb.append("(itemUuid = '"+itemUuid+"' AND auditUuid = '"+auditUuid+"')");
 
         }
         String where = sb.toString();
@@ -262,16 +264,16 @@ public class ItemEntity {
         return ent;
     }
 
-    public static List<ItemEntity> retrieveLatestForUuids(List<UUID> itemUuids) throws Exception {
+    public static List<ItemEntity> retrieveLatestForUuids(List<String> itemUuids) throws Exception {
         if (itemUuids.isEmpty()) {
             return new ArrayList<>();
         }
 
         String where = "SELECT i from ItemEntity i"
-                + " INNER JOIN ActiveitemEntity a"
-                + " ON a.itemuuid = i.itemuuid"
-                + " AND a.audituuid = i.audituuid"
-                + " AND i.itemuuid IN :itemUuids";
+                + " INNER JOIN ActiveItemEntity a"
+                + " ON a.itemUuid = i.itemUuid"
+                + " AND a.auditUuid = i.auditUuid"
+                + " AND i.itemUuid IN :itemUuids";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
@@ -285,38 +287,6 @@ public class ItemEntity {
         return ent;
     }
 
-    public static List<LibraryItem> retrieveLibraryItemsForJob(UUID jobuuid) throws Exception {
 
-        String where = "SELECT i from ItemEntity i"
-                + " INNER JOIN JobcontentEntity c"
-                + " ON c.itemuuid = i.itemuuid"
-                + " AND c.audituuid = i.audituuid"
-                + " AND c.jobuuid = :jobuuid";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-
-        List<ItemEntity> sourceItems = entityManager.createQuery(where, ItemEntity.class)
-                .setParameter("jobuuid", jobuuid)
-                .getResultList();
-
-        entityManager.close();
-
-        List<LibraryItem> libraryItems = new ArrayList<>();
-
-        for (ItemEntity item: sourceItems) {
-
-            UUID itemUuid = item.getItemuuid();
-            String xml = item.getXmlcontent();
-            LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
-
-            UUID libraryItemUuid = UUID.fromString(libraryItem.getUuid());
-
-            if (!itemUuid.equals(libraryItemUuid))
-                throw new Exception("Database item UUID does not match LibraryItem content: " + itemUuid);
-
-            libraryItems.add(libraryItem);
-        }
-
-        return libraryItems;
-    }
 }

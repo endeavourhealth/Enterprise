@@ -18,13 +18,13 @@ public abstract class QueryDocumentSerializer {
     private static final String XSD = "QueryDocument.xsd";
 
     public static LibraryItem readLibraryItemFromItem(ItemEntity item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.deserializeFromString(LibraryItem.class, item.getXmlcontent(), XSD);
+        return XmlSerializer.deserializeFromString(LibraryItem.class, item.getXmlContent(), XSD);
     }
     public static Report readReportFromItem(ItemEntity item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.deserializeFromString(Report.class, item.getXmlcontent(), XSD);
+        return XmlSerializer.deserializeFromString(Report.class, item.getXmlContent(), XSD);
     }
     public static QueryDocument readQueryDocumentFromItem(ItemEntity item) throws ParserConfigurationException, JAXBException, IOException, SAXException {
-        return XmlSerializer.deserializeFromString(QueryDocument.class, item.getXmlcontent(), XSD);
+        return XmlSerializer.deserializeFromString(QueryDocument.class, item.getXmlContent(), XSD);
     }
 
 

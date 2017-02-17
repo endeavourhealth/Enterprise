@@ -10,65 +10,54 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by darren on 08/07/16.
+ * Created by darren on 14/02/17.
  */
 @Entity
-@Table(name = "audit", schema = "\"Definition\"", catalog = "Endeavour_Enterprise")
+@Table(name = "Audit", schema = "enterprise_admin", catalog = "")
 public class AuditEntity {
-    private UUID audituuid;
-    private UUID enduseruuid;
-    private Timestamp timestamp;
-    private Integer auditversion;
-    private UUID organisationuuid;
+    private String auditUuid;
+    private String endUserUuid;
+    private Timestamp timeStamp;
+    private String organisationUuid;
 
     @Id
-    @Column(name = "audituuid")
-    public UUID getAudituuid() {
-        return audituuid;
+    @Column(name = "AuditUuid", nullable = false, length = 36)
+    public String getAuditUuid() {
+        return auditUuid;
     }
 
-    public void setAudituuid(UUID audituuid) {
-        this.audituuid = audituuid;
-    }
-
-    @Basic
-    @Column(name = "enduseruuid")
-    public UUID getEnduseruuid() {
-        return enduseruuid;
-    }
-
-    public void setEnduseruuid(UUID enduseruuid) {
-        this.enduseruuid = enduseruuid;
+    public void setAuditUuid(String auditUuid) {
+        this.auditUuid = auditUuid;
     }
 
     @Basic
-    @Column(name = "timestamp")
-    public Timestamp getTimestamp() {
-        return timestamp;
+    @Column(name = "EndUserUuid", nullable = false, length = 36)
+    public String getEndUserUuid() {
+        return endUserUuid;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    @Basic
-    @Column(name = "auditversion")
-    public Integer getAuditversion() {
-        return auditversion;
-    }
-
-    public void setAuditversion(Integer auditversion) {
-        this.auditversion = auditversion;
+    public void setEndUserUuid(String endUserUuid) {
+        this.endUserUuid = endUserUuid;
     }
 
     @Basic
-    @Column(name = "organisationuuid")
-    public UUID getOrganisationuuid() {
-        return organisationuuid;
+    @Column(name = "TimeStamp", nullable = false)
+    public Timestamp getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setOrganisationuuid(UUID organisationuuid) {
-        this.organisationuuid = organisationuuid;
+    public void setTimeStamp(Timestamp timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    @Basic
+    @Column(name = "OrganisationUuid", nullable = false, length = 36)
+    public String getOrganisationUuid() {
+        return organisationUuid;
+    }
+
+    public void setOrganisationUuid(String organisationUuid) {
+        this.organisationUuid = organisationUuid;
     }
 
     @Override
@@ -78,11 +67,10 @@ public class AuditEntity {
 
         AuditEntity that = (AuditEntity) o;
 
-        if (audituuid != null ? !audituuid.equals(that.audituuid) : that.audituuid != null) return false;
-        if (enduseruuid != null ? !enduseruuid.equals(that.enduseruuid) : that.enduseruuid != null) return false;
-        if (timestamp != null ? !timestamp.equals(that.timestamp) : that.timestamp != null) return false;
-        if (auditversion != null ? !auditversion.equals(that.auditversion) : that.auditversion != null) return false;
-        if (organisationuuid != null ? !organisationuuid.equals(that.organisationuuid) : that.organisationuuid != null)
+        if (auditUuid != null ? !auditUuid.equals(that.auditUuid) : that.auditUuid != null) return false;
+        if (endUserUuid != null ? !endUserUuid.equals(that.endUserUuid) : that.endUserUuid != null) return false;
+        if (timeStamp != null ? !timeStamp.equals(that.timeStamp) : that.timeStamp != null) return false;
+        if (organisationUuid != null ? !organisationUuid.equals(that.organisationUuid) : that.organisationUuid != null)
             return false;
 
         return true;
@@ -90,40 +78,38 @@ public class AuditEntity {
 
     @Override
     public int hashCode() {
-        int result = audituuid != null ? audituuid.hashCode() : 0;
-        result = 31 * result + (enduseruuid != null ? enduseruuid.hashCode() : 0);
-        result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
-        result = 31 * result + (auditversion != null ? auditversion.hashCode() : 0);
-        result = 31 * result + (organisationuuid != null ? organisationuuid.hashCode() : 0);
+        int result = auditUuid != null ? auditUuid.hashCode() : 0;
+        result = 31 * result + (endUserUuid != null ? endUserUuid.hashCode() : 0);
+        result = 31 * result + (timeStamp != null ? timeStamp.hashCode() : 0);
+        result = 31 * result + (organisationUuid != null ? organisationUuid.hashCode() : 0);
         return result;
     }
 
-    public static AuditEntity factoryNow(UUID endUserUuid, UUID organisationUuid) {
+    public static AuditEntity factoryNow(String endUserUuid, String organisationUuid) {
         AuditEntity ret = new AuditEntity();
-        ret.setAudituuid(UUID.randomUUID()); //always explicitly set a new UUID as we'll always want to use it
+        ret.setAuditUuid(UUID.randomUUID().toString()); //always explicitly set a new UUID as we'll always want to use it
         //ret.setSaveMode(TableSaveMode.INSERT);
-        ret.setEnduseruuid(endUserUuid);
-        ret.setTimestamp(Timestamp.from(Instant.now()));
-        ret.setOrganisationuuid(organisationUuid);
-        ret.setAuditversion(1);
+        ret.setEndUserUuid(endUserUuid);
+        ret.setTimeStamp(Timestamp.from(Instant.now()));
+        ret.setOrganisationUuid(organisationUuid);
         return ret;
     }
 
     public static final String SELECT_QUERY_UUID_LIST =
-            "from AuditEntity where audituuid IN :audituuid";
+            "from AuditEntity where auditUuid IN :auditUuid";
 
     public static final String SELECT_QUERY_FOR_UUID =
-            "from AuditEntity where audituuid = :audituuid";
+            "from AuditEntity where auditUuid = :auditUuid";
 
     public static final String SELECT_QUERY_FOR_LATEST =
-            "from AuditEntity where auditversion = "
-                    + "(SELECT MAX(auditversion)"
+            "from AuditEntity where TimeStamp = "
+                    + "(SELECT MAX(TimeStamp)"
                     + " FROM AuditEntity)";
 
-    public static List<AuditEntity> retrieveForActiveItems(List<ActiveitemEntity> activeItems) throws Exception {
-        List<UUID> uuids = new ArrayList<>();
-        for (ActiveitemEntity activeItem: activeItems) {
-            uuids.add(activeItem.getAudituuid());
+    public static List<AuditEntity> retrieveForActiveItems(List<ActiveItemEntity> activeItems) throws Exception {
+        List<String> uuids = new ArrayList<>();
+        for (ActiveItemEntity activeItem: activeItems) {
+            uuids.add(activeItem.getAuditUuid());
         }
         if (uuids.isEmpty()) {
             return new ArrayList<>();
@@ -131,7 +117,7 @@ public class AuditEntity {
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-        List<AuditEntity> ent = entityManager.createQuery(SELECT_QUERY_UUID_LIST, AuditEntity.class).setParameter("audituuid", uuids).getResultList();
+        List<AuditEntity> ent = entityManager.createQuery(SELECT_QUERY_UUID_LIST, AuditEntity.class).setParameter("auditUuid", uuids).getResultList();
 
         entityManager.close();
         //PersistenceManager.INSTANCE.close();
@@ -139,10 +125,10 @@ public class AuditEntity {
         return ent;
     }
 
-    public static AuditEntity retrieveForUuid(UUID audituuid) throws Exception {
+    public static AuditEntity retrieveForUuid(String auditUuid) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-        AuditEntity ent = entityManager.createQuery(SELECT_QUERY_FOR_UUID, AuditEntity.class).setParameter("audituuid", audituuid).getSingleResult();
+        AuditEntity ent = entityManager.createQuery(SELECT_QUERY_FOR_UUID, AuditEntity.class).setParameter("auditUuid", auditUuid).getSingleResult();
 
         entityManager.close();
         //PersistenceManager.INSTANCE.close();
@@ -162,12 +148,12 @@ public class AuditEntity {
 
     }
 
-    public List<AuditEntity> retrieveAuditsForUuids(List<UUID> uuids) throws Exception {
+    public List<AuditEntity> retrieveAuditsForUuids(List<String> uuids) throws Exception {
         if (uuids.isEmpty()) {
             return new ArrayList<AuditEntity>();
         }
 
-        String where = "from AuditEntity WHERE audituuid IN :uuids";
+        String where = "from AuditEntity WHERE auditUuid IN :uuids";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 

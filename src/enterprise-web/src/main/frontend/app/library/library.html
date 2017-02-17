@@ -38,7 +38,7 @@
 									<tbody>
 										<tr class="hover-box show-child-on-hover" *ngFor="let item of getContents()">
 											<td>
-												<a style="cursor: pointer" (click)="actionItem(item.uuid, item.type, 'edit')">{{item.name}}</a>
+												<a style="cursor: pointer" (click)="actionItemEdit(item.uuid, item.type, 'edit')">{{item.name}}</a>
 												<span class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{item.description}}" *ngIf="item.description"></span>
 											</td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>

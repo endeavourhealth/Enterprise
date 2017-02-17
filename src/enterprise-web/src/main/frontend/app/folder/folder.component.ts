@@ -1,5 +1,6 @@
 import {LoggerService} from "../common/logger.service";
 import {FolderNode} from "./models/FolderNode";
+import {ActionItem} from "./models/ActionItem";
 import {Folder} from "./models/Folder";
 import {FolderService} from "./folder.service";
 import {InputBoxDialog} from "../dialogs/inputBox/inputBox.dialog";
@@ -22,6 +23,7 @@ export class FolderComponent implements OnInit {
 	@Input() showMenu = false;
 	@Output() selectionChange = new EventEmitter();
 	@Output() itemActioned = new EventEmitter();
+
 	@ViewChild(TreeComponent) tree: TreeComponent;
 
 	public onSelected : Function;
@@ -44,6 +46,7 @@ export class FolderComponent implements OnInit {
 			isExpandedField : 'isExpanded',
 			getChildren : (node) => { this.getChildren(node) }
 		};
+
 	}
 
 	ngOnInit() {
@@ -131,7 +134,14 @@ export class FolderComponent implements OnInit {
 	actionItem(uuid : string, type : ItemType, action : string) {
 		var vm = this;
 		vm.saveState();
-		vm.itemActioned.emit({uuid : uuid, type : type, action : action});
+
+		var actionItemProp : ActionItem = {
+			uuid : uuid,
+			type : type,
+			action : action
+		}
+
+		vm.itemActioned.emit(actionItemProp);
 	}
 
 	addChildFolder(node : TreeNode) {

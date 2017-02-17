@@ -9,13 +9,13 @@ import java.util.UUID;
 
 public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDocumentReader {
 
-    private HashSet<UUID> uuids = new HashSet<UUID>();
+    private HashSet<String> uuids = new HashSet<String>();
 
     public QueryDocumentReaderFindDependentUuids(QueryDocument doc) {
         super(doc);
     }
 
-    public HashSet<UUID> findUuids()
+    public HashSet<String> findUuids()
     {
         super.processQueryDocument();
 
@@ -24,7 +24,7 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
 
     private void addUuid(String uuid) {
         if (uuid != null && !uuid.isEmpty()) {
-            uuids.add(UUID.fromString(uuid));
+            uuids.add(uuid);
         }
     }
 

@@ -53,10 +53,6 @@
 
     <modules>
         <module>enterprise-core</module>
-        <module>enterprise-enginecore</module>
-        <module>enterprise-controller</module>
-        <module>enterprise-engine</module>
-        <module>enterprise-processornode</module>
         <module>enterprise-web</module>
     </modules>
 

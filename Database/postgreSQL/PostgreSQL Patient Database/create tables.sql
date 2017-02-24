@@ -134,6 +134,11 @@ INSERT INTO referral_request_type (id, value) VALUES (3, 'Management advice');
 INSERT INTO referral_request_type (id, value) VALUES (4, 'Patient reassurance');
 INSERT INTO referral_request_type (id, value) VALUES (5, 'Self referral');
 INSERT INTO referral_request_type (id, value) VALUES (6, 'Treatment');
+INSERT INTO referral_request_type (id, value) VALUES (7, 'Outpatient');
+INSERT INTO referral_request_type (id, value) VALUES (8, 'Performance of a procedure / operation');
+INSERT INTO referral_request_type (id, value) VALUES (9, 'Community Care');
+INSERT INTO referral_request_type (id, value) VALUES (10, 'Admission');
+INSERT INTO referral_request_type (id, value) VALUES (11, 'Day Care');
 
 -- Table: public.medication_statement_authorisation_type
 
@@ -299,18 +304,19 @@ CREATE UNIQUE INDEX schedule_id
 
 -- DROP TABLE public.patient;
 
-CREATE TABLE patient
+CREATE TABLE public.patient
 (
   id integer NOT NULL,
   organization_id integer NOT NULL,
-  --year_of_birth integer NOT NULL,
-  --year_of_death integer,
   patient_gender_id smallint NOT NULL,
   pseudo_id character varying(255),
   nhs_number character varying(255),
   date_of_birth date NOT NULL,
   date_of_death date,
   postcode character varying(20),
+  lsoa_code character varying(50),
+  lsoa_name character varying(255),
+  townsend_score real,
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
       REFERENCES public.organization (id) MATCH SIMPLE
@@ -318,7 +324,6 @@ CREATE TABLE patient
   CONSTRAINT fk_patient_patient_gender_id FOREIGN KEY (patient_gender_id)
       REFERENCES public.patient_gender (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
-
 )
 WITH (
   OIDS=FALSE

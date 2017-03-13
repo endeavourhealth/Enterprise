@@ -93,6 +93,7 @@ CREATE TABLE referral_request_priority
 INSERT INTO referral_request_priority (id, value) VALUES (0, 'Routine');
 INSERT INTO referral_request_priority (id, value) VALUES (1, 'Urgent');
 INSERT INTO referral_request_priority (id, value) VALUES (2, 'Two Week Wait');
+INSERT INTO referral_request_priority (id, value) VALUES (3, 'Soon');
 
 -- Table: referral_request_type
 

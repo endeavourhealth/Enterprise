@@ -318,9 +318,7 @@ CREATE TABLE patient
   postcode character varying(20),
   household_id bigint,
   lsoa_code character varying(50),
-  lsoa_name character varying(255),
   msoa_code character varying(50),
-  msoa_name character varying(255),
   townsend_score real,
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)

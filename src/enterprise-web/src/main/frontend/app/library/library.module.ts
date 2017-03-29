@@ -6,13 +6,16 @@ import {ItemTypeIdToStringPipe, ItemTypeIdToIconPipe} from "./ItemType.pipes";
 import {LibraryComponent} from "./library.component";
 import {LibraryService} from "./library.service";
 import {FolderModule} from "../folder/folder.module";
+import {ReportsModule} from "../reports/reports.module";
+import {ReportService} from "../reports/report.service";
+
 
 @NgModule({
 	imports : [
 		BrowserModule,
 		FormsModule,
 		NgbModule,
-
+		ReportsModule,
 		FolderModule,
 
 		],
@@ -28,6 +31,7 @@ import {FolderModule} from "../folder/folder.module";
 	],
 	providers : [
 		LibraryService,
+		ReportService
 	]
 })
 export class LibraryModule {}

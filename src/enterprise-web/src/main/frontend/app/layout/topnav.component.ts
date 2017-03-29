@@ -15,20 +15,13 @@ export class TopnavComponent {
 
 	getCurrentUser() {
 		this.currentUser = this.securityService.getCurrentUser();
-		//vm.updateRole(vm.currentUser.currentUserInRoleUuid);
 	}
 
-	updateRole(userInRoleUuid : string) {
-		/*var vm = this;
-		 var matches = $.grep(vm.currentUser.userInRoles, function (e) {
-		 return e.userInRoleUuid === userInRoleUuid;
-		 });
-		 if (matches.length === 1) {
-		 vm.securityService.switchUserInRole(userInRoleUuid)
-		 .then(function(data) {
-		 vm.currentUser.currentUserInRoleUuid = userInRoleUuid;
-		 vm.selectedRole = matches[0];
-		 });
-		 }*/
+	navigateUserAccount() {
+		window.location.href = "eds-user-manager/#/app/users/userManagerUserView";
 	}
+
+	logout() {
+		this.securityService.logout();
+	};
 }

@@ -4,352 +4,305 @@ import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {CodePickerDialog} from "../coding/codePicker.dialog";
 import {Test} from "./models/Test";
 import {CodeSetValue} from "../codeSet/models/CodeSetValue";
-import {IsAny} from "./models/IsAny";
-import {DataSource} from "./models/DataSource";
+import {DataType} from "../codeSet/models/DataType";
 import {Concept} from "../coding/models/Concept";
 import {Restriction} from "../expressions/models/Restriction";
 import {ValueTo} from "./models/ValueTo";
-import {FieldTest} from "./models/FieldTest";
+import {Filter} from "./models/Filter";
 import {CodeSet} from "../codeSet/models/CodeSet";
 import {ValueFrom} from "./models/ValueFrom";
 import {ValueSet} from "./models/ValueSet";
 import {CodingService} from "../coding/coding.service";
+import {QueryPickerDialog} from "../query/queryPicker.dialog";
+import {QuerySelection} from "../query/models/QuerySelection";
+import {LibraryService} from "../library/library.service";
+import {LoggerService} from "../common/logger.service";
+import {LibraryItem} from "../library/models/LibraryItem";
 
 @Component({
 	selector: 'ngbd-modal-content',
-	template: require('./testEditor.html')
+	template: require('./testEditor.html'),
+	entryComponents : [
+		QueryPickerDialog
+	]
 })
 export class TestEditDialog implements OnInit{
-	public static open(modalService: NgbModal, test : Test, dataSourceOnly : boolean) {
+	public static open(modalService: NgbModal, test : Test, type : any, rules : any) {
 		const modalRef = modalService.open(TestEditDialog, { backdrop : "static", size : "lg"});
 		modalRef.componentInstance.resultData = test;
-		modalRef.componentInstance.dataSourceOnly = dataSourceOnly;
+		modalRef.componentInstance.type = type;
+		modalRef.componentInstance.rules = rules;
 
 		return modalRef;
 	}
 
 	@Input() resultData : any;
-	@Input() dataSourceOnly : boolean = false;
+	@Input() type : any;
+	@Input() rules = <any>[];
 
+	showConceptResults : boolean = false;
 	title : string;
-	viewFieldTest : boolean = false;
-	codeEditor : boolean = false;
+
+	testType : string = "";
+	testRuleId : string;
+	testValueFrom : string;
+	testValueTo : string;
+	testDateFromRuleId : string;
+	testDateToRuleId : string;
+
 	dateEditor : boolean = false;
-	dobEditor : boolean = false;
-	valueEditor : boolean = false;
-	valueSetEditor : boolean = false;
-	sexEditor : boolean = false;
-	valueField : string;
-	valueSetField : string;
-	dateLabel : string;
-	dobLabel : string;
-	sexLabel : string;
-	fieldTestCodeEditor : boolean = false;
-	fieldTestDateEditor : boolean = false;
-	fieldTestDobEditor : boolean = false;
-	fieldTestValueEditor : boolean = false;
-	fieldTestValueSetEditor : boolean = false;
-	fieldTestSexEditor : boolean = false;
-	fieldTestValueField : string;
-	fieldTestValueSetField : string;
-	fieldTestDateLabel : string;
-	fieldTestDobLabel : string;
-	fieldTestSexLabel : string;
-	addRestriction : boolean = false;
-	showRestriction : boolean = false;
-	addFilter : boolean = false;
-	ruleDatasource : string;
-	filterDateFrom : Date;
-	filterDateTo : Date;
+	problemEditor : boolean = false;
+	problem : boolean;
+	activeEditor : boolean = false;
+	active : boolean;
+	authTypeEditor : boolean = false;
+	acute : boolean;
+	repeat : boolean;
+	repeatDispensing : boolean;
+	automatic : boolean;
+	datetype: String;
+	filterDateFrom : String;
+	filterDateTo : String;
 	filterDateFromRelativeValue : String;
 	filterDateToRelativeValue : String;
 	filterDateFromRelativePeriod : String;
 	filterDateToRelativePeriod : String;
-	datetype: String;
-	dobdatetype: String;
-	fieldTestDatetype: String;
-	fieldTestDobdatetype: String;
-	filterDOBFrom : Date;
-	filterDOBTo : Date;
-	filterDOBFromRelativeValue : String;
-	filterDOBToRelativeValue : String;
-	filterDOBFromRelativePeriod : String;
-	filterDOBToRelativePeriod : String;
-	filterValueSet : string;
-	filterValueFrom : string;
-	filterValueTo : string;
-	filterSex : string;
-
-	fieldTestDateFrom : Date;
-	fieldTestDateTo : Date;
-	fieldTestDateFromRelativeValue : String;
-	fieldTestDateToRelativeValue : String;
-	fieldTestDateFromRelativePeriod : String;
-	fieldTestDateToRelativePeriod : String;
-	fieldTestDOBFrom : Date;
-	fieldTestDOBTo : Date;
-	fieldTestDOBFromRelativeValue : String;
-	fieldTestDOBToRelativeValue : String;
-	fieldTestDOBFromRelativePeriod : String;
-	fieldTestDOBToRelativePeriod : String;
-	fieldTestValueFrom : string;
-	fieldTestValueTo : string;
-	fieldTestValueSet : string;
-	fieldTestSex : string;
-
-	restrictionFieldName: string;
-	restrictionOrderDirection: string;
+	restriction: string;
 	restrictionCount: string = "1";
-	codeFilter : boolean = false;
-	dateFilter : boolean = false;
-	valueFilter : boolean = false;
-	dobFilter : boolean = false;
-	sexFilter : boolean = false;
-	ageFilter : boolean = false;
-	regFilter : boolean = false;
-	nhsFilter : boolean = false;
 	disableRestrictionCount : boolean = false;
-
 	editMode : boolean = false;
-
+	showRestriction : boolean = false;
 	codeSelection : CodeSetValue[] = [];
-	fieldTestCodeSelection : CodeSetValue[] = [];
-	termCache : any;
 
-	datasources = ['',
-		'PATIENT',
-		'OBSERVATION',
-		'MEDICATION_ISSUE'];
+	restrictions = ['','LATEST','EARLIEST','HIGHEST','LOWEST'];
+	periods = ['','DAY','WEEK','MONTH','YEAR'];
 
-	sortorders = ['','ASCENDING','DESCENDING'];
-	fields = ['','EFFECTIVE_DATE','TIMESTAMP','VALUE'];
-	genders = ['','MALE','FEMALE','UNKNOWN'];
-	periods = ['','WEEK','MONTH','YEAR'];
+	libraryItem : LibraryItem;
 
 	constructor(
 		protected $modal : NgbModal,
 		protected activeModal : NgbActiveModal,
-		private codingService : CodingService) {
+		private codingService : CodingService,
+		protected libraryService : LibraryService,
+		protected logger : LoggerService) {
 	}
 
 	ngOnInit(): void {
 
-
-		this.termCache = {};
-
-		var ds : DataSource = {
-			entity: "",
-			dataSourceUuid: null,
-			calculation: null,
+		var newTest : Test = {
+			testRuleId: "",
 			filter: [],
 			restriction: null
 		};
 
-		var isAny : IsAny = {}
-
-		var newTest : Test = {
-			dataSource: ds,
-			dataSourceUuid: null,
-			isAny: isAny,
-			fieldTest: []
+		let rule = {
+			value: "0",
+			displayName: "Baseline Date"
 		};
+		this.rules.push(rule);
 
-		if (!this.resultData||!this.resultData.dataSource)
+		if (!this.resultData||!this.resultData.filter)
 			this.resultData = newTest;
 		else
 			this.initialiseEditMode(this.resultData);
 
-		if (!this.dataSourceOnly) {
-			this.viewFieldTest = true;
+		if (this.type=="1")
+			this.title = "Feature Editor";
+		else if (this.type=="3")
 			this.title = "Test Editor";
-			this.disableRestrictionCount = true;
-		}
-		else {
-			this.title = "Data Source Editor";
-			this.viewFieldTest = false;
-			this.disableRestrictionCount = false;
-		}
+
+		this.disableRestrictionCount = true;
+
 	}
 
 	initialiseEditMode(resultData : Test) {
 		var vm = this;
 
-		vm.ruleDatasource = resultData.dataSource.entity;
-		this.dataSourceChange(resultData.dataSource.entity);
-
 		vm.editMode = true;
 
-		if (resultData.dataSource.filter === null) {
-			resultData.dataSource.filter = [];
+		if (vm.type=="3")
+			vm.testRuleId = vm.resultData.testRuleId;
+
+		if (resultData.filter === null) {
+			resultData.filter = [];
 		}
 
-		if (!vm.dataSourceOnly) {
-			if (resultData.fieldTest === null) {
-				resultData.fieldTest = [];
-			}
-		}
-
-		for (var i = 0; i < resultData.dataSource.filter.length; ++i) {
-			var filter = resultData.dataSource.filter[i];
+		for (var f = 0; f < resultData.filter.length; ++f) {
+			var filter = resultData.filter[f];
 			var field = filter.field;
 
-			this.showFilter(field);
-
 			switch(field) {
-				case "CODE":
+				case "CONCEPT":
 					vm.codeSelection = filter.codeSet.codeSetValue;
-					break;
-				case "DOB":
-					if (filter.valueFrom) {
-						if (filter.valueFrom.absoluteUnit) {
-							vm.filterDOBFrom = new Date(filter.valueFrom.constant);
-							vm.dobdatetype = "dobabsolute";
-						}
-						else if (filter.valueFrom.relativeUnit) {
-							vm.filterDOBFromRelativeValue = filter.valueFrom.constant;
-							vm.filterDOBFromRelativePeriod = filter.valueFrom.relativeUnit;
-							vm.dobdatetype = "dobrelative";
-						}
+					vm.showConceptResults = true;
+					if (filter.codeSet.codeSetValue[0].baseType=="Observation"||
+						filter.codeSet.codeSetValue[0].baseType=="Medication Statement"||
+						filter.codeSet.codeSetValue[0].baseType=="Medication Order"||
+						filter.codeSet.codeSetValue[0].baseType=="Referral"||
+						filter.codeSet.codeSetValue[0].baseType=="Allergy"||
+						filter.codeSet.codeSetValue[0].baseType=="Encounter")
+						vm.dateEditor = true;
+					if (filter.codeSet.codeSetValue[0].baseType=="Observation")
+						vm.problemEditor = true;
+					if (filter.codeSet.codeSetValue[0].baseType=="Medication Statement") {
+						vm.activeEditor = true;
+						vm.authTypeEditor = true;
 					}
-					if (filter.valueTo) {
-						if (filter.valueTo.absoluteUnit) {
-							vm.filterDOBTo = new Date(filter.valueTo.constant);
-							vm.dobdatetype = "dobabsolute";
-						}
-						else if (filter.valueTo.relativeUnit) {
-							vm.filterDOBToRelativeValue = filter.valueTo.constant;
-							vm.filterDOBToRelativePeriod = filter.valueTo.relativeUnit;
-							vm.dobdatetype = "dobrelative";
-						}
-					}
+					if (vm.type=="3")
+						vm.testType="concept";
 					break;
 				case "EFFECTIVE_DATE":
-				case "REGISTRATION_DATE":
 					if (filter.valueFrom) {
 						if (filter.valueFrom.absoluteUnit) {
-							vm.filterDateFrom = new Date(filter.valueFrom.constant);
+							vm.filterDateFrom = filter.valueFrom.constant;
 							vm.datetype = "absolute";
 						}
 						else if (filter.valueFrom.relativeUnit) {
 							vm.filterDateFromRelativeValue = filter.valueFrom.constant;
 							vm.filterDateFromRelativePeriod = filter.valueFrom.relativeUnit;
 							vm.datetype = "relative";
+							vm.testDateFromRuleId = filter.valueFrom.testRuleId;
 						}
 					}
 					if (filter.valueTo) {
 						if (filter.valueTo.absoluteUnit) {
-							vm.filterDateTo = new Date(filter.valueTo.constant);
+							vm.filterDateTo = filter.valueTo.constant;
 							vm.datetype = "absolute";
 						}
 						else if (filter.valueTo.relativeUnit) {
 							vm.filterDateToRelativeValue = filter.valueTo.constant;
 							vm.filterDateToRelativePeriod = filter.valueTo.relativeUnit;
 							vm.datetype = "relative";
+							vm.testDateToRuleId = filter.valueTo.testRuleId;
 						}
 					}
+					if (vm.type=="3")
+						vm.testType="date";
 					break;
 				case "VALUE":
-				case "AGE":
 					if (filter.valueFrom)
-						vm.filterValueFrom = filter.valueFrom.constant;
+						vm.testValueFrom = filter.valueFrom.constant;
 					if (filter.valueTo)
-						vm.filterValueTo = filter.valueTo.constant;
+						vm.testValueTo = filter.valueTo.constant;
+					if (vm.type=="3")
+						vm.testType="value";
 					break;
-				case "SEX":
-					if (filter.valueSet)
-						vm.filterSex = filter.valueSet.value[0];
+				case "OBSERVATION_PROBLEM":
+					for (var i = 0, len = filter.valueSet.value.length; i < len; i++) {
+						if (filter.valueSet.value[i]=="PROBLEM")
+							vm.problem = true;
+					}
 					break;
-				default:
-			}
-		}
-
-		if (!vm.dataSourceOnly) {
-			for (var i = 0; i < resultData.fieldTest.length; ++i) {
-				var fieldTest = resultData.fieldTest[i];
-				var field = fieldTest.field;
-
-				this.showFieldTest(field);
-
-				switch(field) {
-					case "CODE":
-						vm.fieldTestCodeSelection = fieldTest.codeSet.codeSetValue;
-						break;
-					case "DOB":
-						if (fieldTest.valueFrom) {
-							if (fieldTest.valueFrom.absoluteUnit) {
-								vm.fieldTestDOBFrom = new Date(fieldTest.valueFrom.constant);
-								vm.fieldTestDobdatetype = "fieldtestdobabsolute";
-							}
-							else if (fieldTest.valueFrom.relativeUnit) {
-								vm.fieldTestDOBFromRelativeValue = fieldTest.valueFrom.constant;
-								vm.fieldTestDOBFromRelativePeriod = fieldTest.valueFrom.relativeUnit;
-								vm.fieldTestDobdatetype = "fieldtestdobrelative";
-							}
-						}
-						if (fieldTest.valueTo) {
-							if (fieldTest.valueTo.absoluteUnit) {
-								vm.fieldTestDOBTo = new Date(fieldTest.valueTo.constant);
-								vm.fieldTestDobdatetype = "fieldtestdobabsolute";
-							}
-							else if (fieldTest.valueTo.relativeUnit) {
-								vm.fieldTestDOBToRelativeValue = fieldTest.valueTo.constant;
-								vm.fieldTestDOBToRelativePeriod = fieldTest.valueTo.relativeUnit;
-								vm.fieldTestDobdatetype = "fieldtestdobrelative";
-							}
-						}
-						break;
-					case "EFFECTIVE_DATE":
-					case "REGISTRATION_DATE":
-						if (fieldTest.valueFrom) {
-							if (fieldTest.valueFrom.absoluteUnit) {
-								vm.fieldTestDateFrom = new Date(fieldTest.valueFrom.constant);
-								vm.fieldTestDatetype = "fieldtestabsolute";
-							}
-							else if (fieldTest.valueFrom.relativeUnit) {
-								vm.fieldTestDateFromRelativeValue = fieldTest.valueFrom.constant;
-								vm.fieldTestDateFromRelativePeriod = fieldTest.valueFrom.relativeUnit;
-								vm.fieldTestDatetype = "fieldtestrelative";
-							}
-						}
-						if (fieldTest.valueTo) {
-							if (fieldTest.valueTo.absoluteUnit) {
-								vm.fieldTestDateTo = new Date(fieldTest.valueTo.constant);
-								vm.fieldTestDatetype = "fieldtestabsolute";
-							}
-							else if (fieldTest.valueTo.relativeUnit) {
-								vm.fieldTestDateToRelativeValue = fieldTest.valueTo.constant;
-								vm.fieldTestDateToRelativePeriod = fieldTest.valueTo.relativeUnit;
-								vm.fieldTestDatetype = "fieldtestrelative";
-							}
-						}
-						break;
-					case "VALUE":
-					case "AGE":
-						if (fieldTest.valueFrom)
-							vm.fieldTestValueFrom = fieldTest.valueFrom.constant;
-						if (fieldTest.valueTo)
-							vm.fieldTestValueTo = fieldTest.valueTo.constant;
-						break;
-					case "SEX":
-						if (fieldTest.valueSet)
-							vm.fieldTestSex = fieldTest.valueSet.value[0];
-						break;
-					default:
-				}
+				case "MEDICATION_STATUS":
+					for (var i = 0, len = filter.valueSet.value.length; i < len; i++) {
+						if (filter.valueSet.value[i]=="ACTIVE")
+							vm.active = true;
+					}
+					break;
+				case "MEDICATION_TYPE":
+					for (var i = 0, len = filter.valueSet.value.length; i < len; i++) {
+						if (filter.valueSet.value[i]=="ACUTE")
+							vm.acute = true;
+						else if (filter.valueSet.value[i]=="REPEAT")
+							vm.repeat = true;
+						else if (filter.valueSet.value[i]=="REPEAT_DISPENSING")
+							vm.repeatDispensing = true;
+						else if (filter.valueSet.value[i]=="AUTOMATIC")
+							vm.automatic = true;
+					}
+					break;
 			}
 
 		}
 
-		if (resultData.dataSource.restriction) {
+		if (resultData.restriction) {
 			vm.showRestriction = true;
-			vm.restrictionFieldName = resultData.dataSource.restriction.fieldName;
-			vm.restrictionOrderDirection = resultData.dataSource.restriction.orderDirection;
+			vm.restriction = resultData.restriction.restriction;
+			vm.restrictionCount = resultData.restriction.count;
 		}
 
 	}
 
+	getRuleName(ruleId : any) {
+		var vm = this;
+		for (var i = 0, len = vm.rules.length; i < len; i++) {
+			if (vm.rules[i].value == ruleId) {
+				return vm.rules[i].displayName;
+			}
+		}
+		return null;
+	}
+
 	formatDate(inputDate : Date) {
 		return this.zeroFill(inputDate.getDate(),2)  + "-" + this.zeroFill((inputDate.getMonth()+1),2) + "-" + inputDate.getFullYear();
+	}
+
+	showCodeSetPicker() {
+		let querySelection: QuerySelection;
+		let vm = this;
+		QueryPickerDialog.open(this.$modal, querySelection)
+			.result.then(function (resultData: QuerySelection) {
+
+			vm.libraryService.getLibraryItem(resultData.id)
+				.subscribe(
+					(libraryItem) => {
+						vm.libraryItem = libraryItem;
+
+						if (vm.codeSelection.length>0) {
+							for (var i = 0; i < vm.resultData.filter.length; ++i) {
+								var flt = vm.resultData.filter[i];
+
+								if (flt.field=="CONCEPT")
+									vm.resultData.filter.splice(i, 1);
+							}
+						}
+
+						vm.codeSelection = libraryItem.codeSet.codeSetValue;
+
+						var codeSet : CodeSet = {
+							codingSystem : "ENDEAVOUR",
+							codeSetValue : libraryItem.codeSet.codeSetValue
+						}
+
+						var filter: Filter = {
+							field: "CONCEPT",
+							valueFrom: null,
+							valueTo: null,
+							codeSet: null,
+							valueSet: null,
+							codeSetLibraryItemUuid: null,
+							negate: false
+						};
+
+						filter.codeSet = codeSet;
+
+						vm.resultData.filter.push(filter);
+
+						vm.showConceptResults = true;
+
+						if (libraryItem.codeSet.codeSetValue[0].baseType=="Observation"||
+							libraryItem.codeSet.codeSetValue[0].baseType=="Medication Statement"||
+							libraryItem.codeSet.codeSetValue[0].baseType=="Medication Order"||
+							libraryItem.codeSet.codeSetValue[0].baseType=="Referral"||
+							libraryItem.codeSet.codeSetValue[0].baseType=="Allergy"||
+							libraryItem.codeSet.codeSetValue[0].baseType=="Encounter")
+							vm.dateEditor = true;
+
+						if (libraryItem.codeSet.codeSetValue[0].baseType=="Observation")
+							vm.problemEditor = true;
+
+
+						if (libraryItem.codeSet.codeSetValue[0].baseType=="Medication Statement") {
+							vm.activeEditor = true;
+							vm.authTypeEditor = true;
+						}
+					}
+
+				);
+
+
+
+		});
 	}
 
 	showCodePicker() {
@@ -359,11 +312,11 @@ export class TestEditDialog implements OnInit{
 			.result.then(function(resultData : CodeSetValue[]){
 
 			if (vm.codeSelection.length>0) {
-				for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-					var filter = vm.resultData.dataSource.filter[i];
+				for (var i = 0; i < vm.resultData.filter.length; ++i) {
+					var flt = vm.resultData.filter[i];
 
-					if (filter.field=="CODE")
-						vm.resultData.dataSource.filter.splice(i, 1);
+					if (flt.field=="CONCEPT")
+						vm.resultData.filter.splice(i, 1);
 				}
 			}
 
@@ -374,452 +327,72 @@ export class TestEditDialog implements OnInit{
 			}
 
 			var codeSet : CodeSet = {
-				codingSystem : "SNOMED_CT",
+				codingSystem : "ENDEAVOUR",
 				codeSetValue : resultData
 			}
 
-			var fieldTest : FieldTest = {
-				field: "CODE",
+			var filter: Filter = {
+				field: "CONCEPT",
 				valueFrom: null,
 				valueTo: null,
-				valueRange: null,
-				valueEqualTo: null,
 				codeSet: null,
 				valueSet: null,
 				codeSetLibraryItemUuid: null,
 				negate: false
 			};
 
-			fieldTest.codeSet = codeSet;
+			filter.codeSet = codeSet;
 
-			vm.resultData.dataSource.filter.push(fieldTest);
+			vm.resultData.filter.push(filter);
+
+			vm.showConceptResults = true;
+
+			if (resultData[0].baseType=="Observation"||
+				resultData[0].baseType=="Medication Statement"||
+				resultData[0].baseType=="Medication Order"||
+				resultData[0].baseType=="Referral"||
+				resultData[0].baseType=="Allergy"||
+				resultData[0].baseType=="Encounter")
+				vm.dateEditor = true;
+
+			if (resultData[0].baseType=="Observation")
+				vm.problemEditor = true;
+
+			if (resultData[0].baseType=="Medication Statement") {
+				vm.activeEditor = true;
+				vm.authTypeEditor = true;
+			}
+
 		});
 	}
 
 	removeFilter(filter: any) {
 		var vm = this;
 
-		for (var i = vm.resultData.dataSource.filter.length-1; i >= 0; --i) {
-			var f = vm.resultData.dataSource.filter[i];
+		for (var i = vm.resultData.filter.length-1; i >= 0; --i) {
+			var f = vm.resultData.filter[i];
 
 			switch(filter) {
-				case "code":
-					if (f.field=="CODE") {
-						vm.codeEditor = false;
-						vm.resultData.dataSource.filter.splice(i, 1);
-					}
-					break;
-				case "dob":
-					if (f.field=="DOB") {
-						vm.dobEditor = false;
-						vm.resultData.dataSource.filter.splice(i, 1);
-					}
-					break;
-				case "sex":
-					if (f.field=="SEX") {
-						vm.sexEditor = false;
-						vm.resultData.dataSource.filter.splice(i, 1);
-					}
-					break;
 				case "date":
-					if (f.field=="EFFECTIVE_DATE"||f.field=="REGISTRATION_DATE") {
+					if (f.field=="EFFECTIVE_DATE") {
+						vm.testType = "";
 						vm.dateEditor = false;
-						vm.resultData.dataSource.filter.splice(i, 1);
+						vm.resultData.filter.splice(i, 1);
+						vm.datetype = "";
 					}
 					break;
 				case "value":
-					if (f.field=="VALUE"||f.field=="AGE") {
-						vm.valueEditor = false;
-						vm.resultData.dataSource.filter.splice(i, 1);
+					if (f.field=="VALUE") {
+						vm.testType = "";
+						vm.resultData.filter.splice(i, 1);
 					}
 					break;
 				case "restriction":
 					vm.showRestriction = false;
-					vm.resultData.dataSource.restriction = null;
+					vm.resultData.restriction = null;
 					break;
-
 			}
-
-
 		}
-
-	}
-
-	removeFieldTest(filter: any) {
-		var vm = this;
-
-		for (var i = vm.resultData.fieldTest.length-1; i >= 0; --i) {
-			var f = vm.resultData.fieldTest[i];
-
-			switch(filter) {
-				case "code":
-					if (f.field=="CODE") {
-						vm.fieldTestCodeEditor = false;
-						vm.resultData.fieldTest.splice(i, 1);
-					}
-					break;
-				case "dob":
-					if (f.field=="DOB") {
-						vm.fieldTestDobEditor = false;
-						vm.resultData.fieldTest.splice(i, 1);
-					}
-					break;
-				case "sex":
-					if (f.field=="SEX") {
-						vm.fieldTestSexEditor = false;
-						vm.resultData.fieldTest.splice(i, 1);
-					}
-					break;
-				case "date":
-					if (f.field=="EFFECTIVE_DATE"||f.field=="REGISTRATION_DATE") {
-						vm.fieldTestDateEditor = false;
-						vm.resultData.fieldTest.splice(i, 1);
-					}
-					break;
-				case "value":
-					if (f.field=="VALUE"||f.field=="AGE") {
-						vm.fieldTestValueEditor = false;
-						vm.resultData.fieldTest.splice(i, 1);
-					}
-					break;
-
-
-			}
-
-
-		}
-
-	}
-
-	showFieldTestCodePicker() {
-		var vm = this;
-
-		CodePickerDialog.open(this.$modal, vm.fieldTestCodeSelection)
-			.result.then(function(resultData : CodeSetValue[]){
-
-			if (vm.fieldTestCodeSelection.length>0) {
-				for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-					var fTest = vm.resultData.fieldTest[i];
-
-					if (fTest.field=="CODE")
-						vm.resultData.fieldTest.splice(i, 1);
-				}
-			}
-
-			vm.fieldTestCodeSelection = resultData;
-
-			var codeSet : CodeSet = {
-				codingSystem : "SNOMED_CT",
-				codeSetValue : resultData
-			}
-
-			var fieldTest : FieldTest = {
-				field: "CODE",
-				valueFrom: null,
-				valueTo: null,
-				valueRange: null,
-				valueEqualTo: null,
-				codeSet: null,
-				valueSet: null,
-				codeSetLibraryItemUuid: null,
-				negate: false
-			};
-
-			fieldTest.codeSet = codeSet;
-
-			vm.resultData.fieldTest.push(fieldTest);
-		});
-	}
-
-	dataSourceChange(value : any) {
-		var vm = this;
-
-		this.resultData.dataSource.entity = value;
-
-		vm.codeEditor = false;
-		vm.dateEditor = false;
-		vm.dobEditor = false;
-		vm.valueEditor = false;
-		vm.sexEditor = false;
-		vm.fieldTestCodeEditor = false;
-		vm.fieldTestDateEditor = false;
-		vm.fieldTestDobEditor = false;
-		vm.fieldTestValueEditor = false;
-		vm.fieldTestSexEditor = false;
-		vm.addRestriction = true;
-		vm.showRestriction = false;
-		vm.addFilter = true;
-		vm.codeFilter = false;
-		vm.dateFilter = false;
-		vm.valueFilter = false;
-		vm.dobFilter = false;
-		vm.sexFilter = false;
-		vm.ageFilter = false;
-		vm.regFilter = false;
-		vm.viewFieldTest = true;
-
-		switch(value) {
-			case "OBSERVATION":
-				vm.codeFilter = true;
-				vm.dateFilter = true;
-				vm.valueFilter = true;
-				break;
-			case "MEDICATION_ISSUE":
-				vm.codeFilter = true;
-				vm.dateFilter = true;
-				break;
-			case "PATIENT":
-				vm.dobFilter = true;
-				vm.sexFilter = true;
-				vm.ageFilter = true;
-				vm.regFilter = true;
-				break;
-			default:
-		}
-	};
-
-	showFilter(value : any) {
-		var vm = this;
-
-		switch(value) {
-			case "CODE":
-				vm.codeEditor = true;
-				break;
-			case "DOB":
-				vm.dobEditor = true;
-				vm.dobLabel = value;
-				break;
-			case "EFFECTIVE_DATE":
-			case "REGISTRATION_DATE":
-				vm.dateEditor = true;
-				vm.dateLabel = value;
-				break;
-			case "VALUE":
-			case "AGE":
-				vm.valueEditor = true;
-				vm.valueField = value;
-				break;
-			case "SEX":
-				vm.sexEditor = true;
-				vm.sexLabel = value;
-				break;
-			default:
-		}
-	}
-
-	showFieldTest(value : any) {
-		var vm = this;
-
-		switch(value) {
-			case "CODE":
-				vm.fieldTestCodeEditor = true;
-				break;
-			case "DOB":
-				vm.fieldTestDobEditor = true;
-				vm.fieldTestDobLabel = value;
-				break;
-			case "EFFECTIVE_DATE":
-			case "REGISTRATION_DATE":
-				vm.fieldTestDateEditor = true;
-				vm.fieldTestDateLabel = value;
-				break;
-			case "VALUE":
-			case "AGE":
-				vm.fieldTestValueEditor = true;
-				vm.fieldTestValueField = value;
-				break;
-			case "SEX":
-				vm.fieldTestSexEditor = true;
-				vm.fieldTestSexLabel = value;
-				break;
-			default:
-		}
-	}
-
-	filterDateFromChange(value : any, dateField : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var datestring : string = "";
-
-		if (value!="" && value!=null)
-			datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
-
-		var valueFrom : ValueFrom = {
-			constant: datestring,
-			parameter: null,
-			absoluteUnit: "DATE",
-			relativeUnit: null,
-			operator: "GREATER_THAN_OR_EQUAL_TO"
-		}
-
-		var fieldTest : FieldTest = {
-			field: dateField,
-			valueFrom: valueFrom,
-			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: null,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-			var filter = vm.resultData.dataSource.filter[i];
-
-			if (filter.field==dateField && filter.valueFrom && value!="" && value!=null) {
-				foundEntry = true;
-				filter.valueFrom = valueFrom;
-				break;
-			}
-			else if (filter.field==dateField && filter.valueFrom && (value=="" || value==null))
-				vm.resultData.dataSource.filter.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.dataSource.filter.push(fieldTest);
-	}
-
-	filterRelativeDateFromChange(value : any, period : any, dateField : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var valueFrom : ValueFrom = {
-			constant: value,
-			parameter: null,
-			absoluteUnit: null,
-			relativeUnit: period,
-			operator: "GREATER_THAN_OR_EQUAL_TO"
-		}
-
-		var fieldTest : FieldTest = {
-			field: dateField,
-			valueFrom: valueFrom,
-			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: null,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-			var filter = vm.resultData.dataSource.filter[i];
-
-			if (filter.field==dateField && filter.valueFrom && value!="" && value!=null) {
-				foundEntry = true;
-				filter.valueFrom = valueFrom;
-				break;
-			}
-			else if (filter.field==dateField && filter.valueFrom && (value=="" || value==null))
-				vm.resultData.dataSource.filter.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.dataSource.filter.push(fieldTest);
-	}
-
-	filterDateToChange(value : any, dateField : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var datestring : string = "";
-
-		if (value!="" && value!=null)
-			datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
-
-		var valueTo : ValueTo = {
-			constant: datestring,
-			parameter: null,
-			absoluteUnit: "DATE",
-			relativeUnit: null,
-			operator: "LESS_THAN_OR_EQUAL_TO"
-		}
-
-		var fieldTest : FieldTest = {
-			field: dateField,
-			valueFrom: null,
-			valueTo: valueTo,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: null,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-			var filter = vm.resultData.dataSource.filter[i];
-
-			if (filter.field==dateField && filter.valueTo && value!="" && value!=null) {
-				foundEntry = true;
-				filter.valueTo = valueTo;
-				break;
-			}
-			else if (filter.field==dateField && filter.valueTo && (value=="" || value==null))
-				vm.resultData.dataSource.filter.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.dataSource.filter.push(fieldTest);
-	}
-
-	filterRelativeDateToChange(value : any, period : any, dateField : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var valueTo : ValueTo = {
-			constant: value,
-			parameter: null,
-			absoluteUnit: null,
-			relativeUnit: period,
-			operator: "LESS_THAN_OR_EQUAL_TO"
-		}
-
-		var fieldTest : FieldTest = {
-			field: dateField,
-			valueFrom: null,
-			valueTo: valueTo,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: null,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-			var filter = vm.resultData.dataSource.filter[i];
-
-			if (filter.field==dateField && filter.valueTo && value!="" && value!=null) {
-				foundEntry = true;
-				filter.valueTo = valueTo;
-				break;
-			}
-			else if (filter.field==dateField && filter.valueTo && (value=="" || value==null))
-				vm.resultData.dataSource.filter.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.dataSource.filter.push(fieldTest);
 	}
 
 	zeroFill( number : any, width : any ) {
@@ -831,49 +404,7 @@ export class TestEditDialog implements OnInit{
 		return number + ""; // always return a string
 	}
 
-	filterValueChange(value : any, valueField : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var valueSet : ValueSet = {
-			value: []
-		}
-
-		valueSet.value.push(value);
-
-		var fieldTest : FieldTest = {
-			field: valueField,
-			valueFrom: null,
-			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: valueSet,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-			var filter = vm.resultData.dataSource.filter[i];
-
-			if (filter.field==valueField && filter.valueSet && value!="") {
-				foundEntry = true;
-				filter.valueSet = valueSet;
-				break;
-			}
-			else if (filter.field==valueField && filter.valueSet && value=="")
-				vm.resultData.dataSource.filter.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="")
-			vm.resultData.dataSource.filter.push(fieldTest);
-	}
-
-	filterValueFromChange(value : any) {
+	testValueFromChange(value : any) {
 		var vm = this;
 
 		if (!value)
@@ -881,18 +412,16 @@ export class TestEditDialog implements OnInit{
 
 		var valueFrom : ValueFrom = {
 			constant: value,
-			parameter: null,
+			testRuleId : "",
 			absoluteUnit: "NUMERIC",
 			relativeUnit: null,
 			operator: "GREATER_THAN_OR_EQUAL_TO"
 		}
 
-		var fieldTest : FieldTest = {
-			field: vm.valueField,
+		var filter: Filter = {
+			field: "VALUE",
 			valueFrom: valueFrom,
 			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
 			codeSet: null,
 			valueSet: null,
 			codeSetLibraryItemUuid: null,
@@ -901,23 +430,23 @@ export class TestEditDialog implements OnInit{
 
 		var foundEntry : boolean = false;
 
-		for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-			var filter = vm.resultData.dataSource.filter[i];
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
 
-			if (filter.field==vm.valueField && filter.valueFrom && value!="") {
+			if (flt.field=="VALUE" && flt.valueFrom && value!="") {
 				foundEntry = true;
 				filter.valueFrom = valueFrom;
 				break;
 			}
-			else if (filter.field==vm.valueField && filter.valueFrom && value=="")
-				vm.resultData.dataSource.filter.splice(i, 1);
+			else if (flt.field=="VALUE" && flt.valueFrom && value=="")
+				vm.resultData.filter.splice(i, 1);
 		}
 
 		if (!foundEntry && value!="")
-			vm.resultData.dataSource.filter.push(fieldTest);
+			vm.resultData.filter.push(filter);
 	}
 
-	filterValueToChange(value : any) {
+	testValueToChange(value : any) {
 		var vm = this;
 
 		if (!value)
@@ -925,18 +454,16 @@ export class TestEditDialog implements OnInit{
 
 		var valueTo : ValueTo = {
 			constant: value,
-			parameter: null,
+			testRuleId : "",
 			absoluteUnit: "NUMERIC",
 			relativeUnit: null,
 			operator: "LESS_THAN_OR_EQUAL_TO"
 		}
 
-		var fieldTest : FieldTest = {
-			field: vm.valueField,
+		var filter: Filter = {
+			field: "VALUE",
 			valueFrom: null,
 			valueTo: valueTo,
-			valueRange: null,
-			valueEqualTo: null,
 			codeSet: null,
 			valueSet: null,
 			codeSetLibraryItemUuid: null,
@@ -945,355 +472,233 @@ export class TestEditDialog implements OnInit{
 
 		var foundEntry : boolean = false;
 
-		for (var i = 0; i < vm.resultData.dataSource.filter.length; ++i) {
-			var filter = vm.resultData.dataSource.filter[i];
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
 
-			if (filter.field==vm.valueField && filter.valueTo && value!="") {
+			if (flt.field=="VALUE" && flt.valueTo && value!="") {
 				foundEntry = true;
 				filter.valueTo = valueTo;
 				break;
 			}
-			else if (filter.field==vm.valueField && filter.valueTo && value=="")
-				vm.resultData.dataSource.filter.splice(i, 1);
+			else if (flt.field=="VALUE" && flt.valueTo && value=="")
+				vm.resultData.filter.splice(i, 1);
 		}
 
 		if (!foundEntry && value!="")
-			vm.resultData.dataSource.filter.push(fieldTest);
+			vm.resultData.filter.push(filter);
 
 	}
 
-	fieldTestDateFromChange(value : any, dateField : any) {
+	filterDateFromChange(value : any) {
 		var vm = this;
 
 		if (!value)
 			value="";
 
-		var datestring : string = "";
-
-		if (value!="" && value!=null)
-			datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
+		var datestring : string = value;
+		var dateField : string = "EFFECTIVE_DATE";
 
 		var valueFrom : ValueFrom = {
 			constant: datestring,
-			parameter: null,
+			testRuleId : "",
 			absoluteUnit: "DATE",
 			relativeUnit: null,
 			operator: "GREATER_THAN_OR_EQUAL_TO"
 		}
 
-		var fieldTest : FieldTest = {
+		var filter: Filter = {
 			field: dateField,
 			valueFrom: valueFrom,
 			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
 			codeSet: null,
 			valueSet: null,
 			codeSetLibraryItemUuid: null,
 			negate: false
 		};
 
-		var foundEntry : boolean = false;
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
 
-		for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-			var ftest = vm.resultData.fieldTest[i];
-
-			if (ftest.field==dateField && ftest.valueFrom && value!="" && value!=null) {
-				foundEntry = true;
-				ftest.valueFrom = valueFrom;
-				break;
-			}
-			else if (ftest.field==dateField && ftest.valueFrom && (value=="" || value==null))
-				vm.resultData.fieldTest.splice(i, 1);
+			if (flt.field==dateField && flt.valueFrom)
+				vm.resultData.filter.splice(i, 1);
 		}
 
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.fieldTest.push(fieldTest);
+		if (value!="") {
+			vm.resultData.filter.push(filter);
+		}
+
 	}
 
-	fieldTestRelativeDateFromChange(value : any, period : any, dateField : any) {
+	filterRelativeDateFromChange(value : any, period : any, testDateFromRuleId : any) {
 		var vm = this;
 
 		if (!value)
 			value="";
 
+		var dateField : string = "EFFECTIVE_DATE";
+
 		var valueFrom : ValueFrom = {
 			constant: value,
-			parameter: null,
+			testRuleId : testDateFromRuleId,
 			absoluteUnit: null,
 			relativeUnit: period,
 			operator: "GREATER_THAN_OR_EQUAL_TO"
 		}
 
-		var fieldTest : FieldTest = {
+		var filter: Filter = {
 			field: dateField,
 			valueFrom: valueFrom,
 			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
 			codeSet: null,
 			valueSet: null,
 			codeSetLibraryItemUuid: null,
 			negate: false
 		};
 
-		var foundEntry : boolean = false;
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
 
-		for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-			var ftest = vm.resultData.fieldTest[i];
-
-			if (ftest.field==dateField && ftest.valueFrom && value!="" && value!=null) {
-				foundEntry = true;
-				ftest.valueFrom = valueFrom;
-				break;
-			}
-			else if (ftest.field==dateField && ftest.valueFrom && (value=="" || value==null))
-				vm.resultData.fieldTest.splice(i, 1);
+			if (flt.field==dateField && flt.valueFrom)
+				vm.resultData.filter.splice(i, 1);
 		}
 
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.fieldTest.push(fieldTest);
+		if (value!="") {
+			vm.resultData.filter.push(filter);
+		}
+
 	}
 
-	fieldTestDateToChange(value : any, dateField : any) {
+	filterDateToChange(value : any) {
 		var vm = this;
 
 		if (!value)
 			value="";
 
-		var datestring : string = "";
+		var datestring : string = value;
 
-		if (value!="" && value!=null)
-			datestring = value.getFullYear()  + "-" + this.zeroFill((value.getMonth()+1),2) + "-" + this.zeroFill(value.getDate(),2);
+		var dateField : string = "EFFECTIVE_DATE";
 
 		var valueTo : ValueTo = {
 			constant: datestring,
-			parameter: null,
+			testRuleId : "",
 			absoluteUnit: "DATE",
 			relativeUnit: null,
 			operator: "LESS_THAN_OR_EQUAL_TO"
 		}
 
-		var fieldTest : FieldTest = {
+		var filter: Filter = {
 			field: dateField,
 			valueFrom: null,
 			valueTo: valueTo,
-			valueRange: null,
-			valueEqualTo: null,
 			codeSet: null,
 			valueSet: null,
 			codeSetLibraryItemUuid: null,
 			negate: false
 		};
 
-		var foundEntry : boolean = false;
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
 
-		for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-			var ftest = vm.resultData.fieldTest[i];
-
-			if (ftest.field==dateField && ftest.valueTo && value!="" && value!=null) {
-				foundEntry = true;
-				ftest.valueTo = valueTo;
-				break;
-			}
-			else if (ftest.field==dateField && ftest.valueTo && (value=="" || value==null))
-				vm.resultData.fieldTest.splice(i, 1);
+			if (flt.field==dateField && flt.valueTo)
+				vm.resultData.filter.splice(i, 1);
 		}
 
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.fieldTest.push(fieldTest);
+		if (value!="") {
+			vm.resultData.filter.push(filter);
+		}
+
 	}
 
-	fieldTestRelativeDateToChange(value : any, period : any, dateField : any) {
+	filterRelativeDateToChange(value : any, period : any, testDateToRuleId : any) {
 		var vm = this;
 
 		if (!value)
 			value="";
 
+		var dateField : string = "EFFECTIVE_DATE";
+
 		var valueTo : ValueTo = {
 			constant: value,
-			parameter: null,
+			testRuleId : testDateToRuleId,
 			absoluteUnit: null,
 			relativeUnit: period,
 			operator: "LESS_THAN_OR_EQUAL_TO"
 		}
 
-		var fieldTest : FieldTest = {
+		var filter: Filter = {
 			field: dateField,
 			valueFrom: null,
 			valueTo: valueTo,
-			valueRange: null,
-			valueEqualTo: null,
 			codeSet: null,
 			valueSet: null,
 			codeSetLibraryItemUuid: null,
 			negate: false
 		};
 
-		var foundEntry : boolean = false;
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
 
-		for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-			var ftest = vm.resultData.fieldTest[i];
-
-			if (ftest.field==dateField && ftest.valueTo && value!="" && value!=null) {
-				foundEntry = true;
-				ftest.valueTo = valueTo;
-				break;
-			}
-			else if (ftest.field==dateField && ftest.valueTo && (value=="" || value==null))
-				vm.resultData.fieldTest.splice(i, 1);
+			if (flt.field==dateField && flt.valueTo)
+				vm.resultData.filter.splice(i, 1);
 		}
 
-		if (!foundEntry && value!="" && value!=null)
-			vm.resultData.fieldTest.push(fieldTest);
-	}
-
-	fieldTestValueChange(value : any, valueField : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var valueSet : ValueSet = {
-			value: []
+		if (value!="") {
+			vm.resultData.filter.push(filter);
 		}
-
-		valueSet.value.push(value);
-
-		var fieldTest : FieldTest = {
-			field: valueField,
-			valueFrom: null,
-			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: valueSet,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-			var ftest = vm.resultData.fieldTest[i];
-
-			if (ftest.field==valueField && ftest.valueSet && value!="") {
-				foundEntry = true;
-				ftest.valueSet = valueSet;
-				break;
-			}
-			else if (ftest.field==valueField && ftest.valueSet && value=="")
-				vm.resultData.fieldTest.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="")
-			vm.resultData.fieldTest.push(fieldTest);
-	}
-
-	fieldTestValueFromChange(value : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var valueFrom : ValueFrom = {
-			constant: value,
-			parameter: null,
-			absoluteUnit: "NUMERIC",
-			relativeUnit: null,
-			operator: "GREATER_THAN_OR_EQUAL_TO"
-		}
-
-		var fieldTest : FieldTest = {
-			field: vm.fieldTestValueField,
-			valueFrom: valueFrom,
-			valueTo: null,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: null,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-			var ftest = vm.resultData.fieldTest[i];
-
-			if (ftest.field==vm.fieldTestValueField && ftest.valueFrom && value!="") {
-				foundEntry = true;
-				ftest.valueFrom = valueFrom;
-				break;
-			}
-			else if (ftest.field==vm.fieldTestValueField && ftest.valueFrom && value=="")
-				vm.resultData.fieldTest.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="")
-			vm.resultData.fieldTest.push(fieldTest);
-	}
-
-	fieldTestValueToChange(value : any) {
-		var vm = this;
-
-		if (!value)
-			value="";
-
-		var valueTo : ValueTo = {
-			constant: value,
-			parameter: null,
-			absoluteUnit: "NUMERIC",
-			relativeUnit: null,
-			operator: "LESS_THAN_OR_EQUAL_TO"
-		}
-
-		var fieldTest : FieldTest = {
-			field: vm.fieldTestValueField,
-			valueFrom: null,
-			valueTo: valueTo,
-			valueRange: null,
-			valueEqualTo: null,
-			codeSet: null,
-			valueSet: null,
-			codeSetLibraryItemUuid: null,
-			negate: false
-		};
-
-		var foundEntry : boolean = false;
-
-		for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-			var ftest = vm.resultData.fieldTest[i];
-
-			if (ftest.field==vm.fieldTestValueField && ftest.valueTo && value!="") {
-				foundEntry = true;
-				ftest.valueTo = valueTo;
-				break;
-			}
-			else if (ftest.field==vm.fieldTestValueField && ftest.valueTo && value=="")
-				vm.resultData.fieldTest.splice(i, 1);
-		}
-
-		if (!foundEntry && value!="")
-			vm.resultData.fieldTest.push(fieldTest);
 
 	}
 
 	restrictionChange(value : any) {
 		var vm = this;
 
-		if (!value || vm.restrictionFieldName=="" || vm.restrictionOrderDirection=="") {
-			vm.resultData.dataSource.restriction = null;
+		if (!value || vm.restriction=="") {
+			vm.resultData.restriction = null;
 			return;
 		}
 
 		var restriction : Restriction = {
-			fieldName: vm.restrictionFieldName,
-			orderDirection: vm.restrictionOrderDirection,
-			count: Number(vm.restrictionCount)
+			restriction: vm.restriction,
+			count: vm.restrictionCount
 		};
 
-		vm.resultData.dataSource.restriction = restriction;
+		vm.resultData.restriction = restriction;
+	}
+
+	problemChange(e) {
+		var vm = this;
+
+		vm.problem = e.target.checked;
+
+	}
+
+	activeChange(e) {
+		var vm = this;
+
+		vm.active = e.target.checked;
+	}
+
+	acuteChange(e) {
+		var vm = this;
+
+		vm.acute = e.target.checked;
+	}
+
+	repeatChange(e) {
+		var vm = this;
+
+		vm.repeat = e.target.checked;
+	}
+
+	repeatDispensingChange(e) {
+		var vm = this;
+
+		vm.repeatDispensing = e.target.checked;
+	}
+
+	automaticChange(e) {
+		var vm = this;
+
+		vm.automatic = e.target.checked;
 	}
 
 	toggleRestriction() {
@@ -1305,53 +710,107 @@ export class TestEditDialog implements OnInit{
 	save() {
 		var vm = this;
 
-		if (!vm.dataSourceOnly) {
-			for (var i = 0; i < vm.resultData.fieldTest.length; ++i) {
-				var ft = vm.resultData.fieldTest[i];
-				if (ft.field=="CODE") {
-					if (ft.codeSet.codeSetValue.length==0) {
-						vm.resultData.fieldTest.splice(i, 1);
-					}
-				}
-			}
-
-			if (vm.resultData.fieldTest.length>0)
-				vm.resultData.isAny = null;
-			else
-				vm.resultData.isAny = {};
+		if (vm.datetype == 'absolute') {
+			vm.filterDateFromChange(vm.filterDateFrom);
+			vm.filterDateToChange(vm.filterDateTo);
+		} else if (vm.datetype == 'relative') {
+			vm.filterRelativeDateFromChange(vm.filterDateFromRelativeValue, vm.filterDateFromRelativePeriod, vm.testDateFromRuleId)
+			vm.filterRelativeDateToChange(vm.filterDateToRelativeValue, vm.filterDateToRelativePeriod, vm.testDateToRuleId)
 		}
+
+		console.log(vm.resultData);
+
+		vm.removeAttributes("OBSERVATION_PROBLEM");
+		vm.removeAttributes("MEDICATION_STATUS");
+		vm.removeAttributes("MEDICATION_TYPE");
+
+		if (vm.problem)
+			vm.filterValueChange(["PROBLEM"],"OBSERVATION_PROBLEM");
+
+		if (vm.active)
+			vm.filterValueChange(["ACTIVE"],"MEDICATION_STATUS");
+
+		let medTypes = <any>[];
+
+		if (vm.acute)
+			medTypes.push("ACUTE");
+		if (vm.repeat)
+			medTypes.push("REPEAT");
+		if (vm.repeatDispensing)
+			medTypes.push("REPEAT_DISPENSING");
+		if (vm.automatic)
+			medTypes.push("AUTOMATIC");
+
+		if (medTypes.length>0)
+			vm.filterValueChange(medTypes,"MEDICATION_TYPE");
+
+		if (vm.type=="3")
+			vm.resultData.testRuleId = vm.testRuleId;
+		else
+			vm.resultData.testRuleId = "";
 
 		this.ok();
 	}
 
-	termShorten(term : string) {
-		term = term.replace(' (disorder)','');
-		term = term.replace(' (observable entity)','');
-		term = term.replace(' (finding)','');
-		return term;
+	removeAttributes(filter: any) {
+		var vm = this;
+
+		for (var i = vm.resultData.filter.length-1; i >= 0; --i) {
+			var f = vm.resultData.filter[i];
+
+			if (f.field==filter) {
+				vm.resultData.filter.splice(i, 1);
+			}
+		}
 	}
 
-	getTerm(code : string) : string {
+	filterValueChange(values : any[], valueField : any) {
 		var vm = this;
-		var term = vm.termCache[code];
-		if (term) { return term; }
-		vm.termCache[code] = 'Loading...';
 
-		vm.codingService.getPreferredTerm(code)
-			.subscribe(
-				(concept : Concept) => vm.termCache[code] = vm.termShorten(concept.preferredTerm)
-			);
+		var valueSet : ValueSet = {
+			value: []
+		}
 
-		return vm.termCache[code];
+		var value = "";
+
+		for (var i = values.length-1; i >= 0; --i) {
+			value = values[i];
+			valueSet.value.push(value);
+		}
+
+		var filter : Filter = {
+			field: valueField,
+			valueFrom: null,
+			valueTo: null,
+			codeSet: null,
+			valueSet: valueSet,
+			codeSetLibraryItemUuid: null,
+			negate: false
+		};
+
+		var foundEntry : boolean = false;
+
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
+
+			if (flt.field==valueField && flt.valueSet && value!="") {
+				foundEntry = true;
+				filter.valueSet = valueSet;
+				break;
+			}
+			else if (flt.field==valueField && flt.valueSet && value=="")
+				vm.resultData.filter.splice(i, 1);
+		}
+
+		if (!foundEntry && value!="")
+			vm.resultData.filter.push(filter);
 	}
 
 	ok() {
 		this.activeModal.close(this.resultData);
-		console.log('OK Pressed');
 	}
 
 	cancel() {
 		this.activeModal.dismiss('cancel');
-		console.log('Cancel Pressed');
 	}
 }

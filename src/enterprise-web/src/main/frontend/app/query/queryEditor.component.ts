@@ -32,7 +32,6 @@ export class QueryEditComponent {
 	private nextRuleID: number;
 	private chartViewModel: any;
 	private results: any;
-	private dataModel: boolean;
 	private startingRules: StartingRules;
 	private query: Query;
 	private libraryItem: LibraryItem;
@@ -56,8 +55,6 @@ export class QueryEditComponent {
 			{value: 'INCLUDE', displayName: 'Include patient in final result'},
 			{value: 'NO_ACTION', displayName: 'No further action'}
 		];
-		this.dataModel = false;
-
 
 		this.startingRules = {
 			ruleId: []
@@ -75,8 +72,7 @@ export class QueryEditComponent {
 			description: null,
 			folderUuid: transition.params()['itemUuid'],
 			query: this.query,
-			codeSet : null,
-			listReport : null
+			codeSet : null
 		};
 
 		this.createModel(this.libraryItem);
@@ -173,10 +169,6 @@ export class QueryEditComponent {
 		}
 	};
 
-	ShowDataModel() {
-		this.dataModel = !this.dataModel;
-	};
-
 	clearQuery() {
 		let vm = this;
 		MessageBoxDialog.open(vm.$modal, 'Clear Rules', 'Are you sure you want to clear the rules in this query (changes will not be saved)?', 'Yes', 'No')
@@ -215,20 +207,20 @@ export class QueryEditComponent {
 	//
 	// Add a new rule to the chart.
 	//
-	addNewRule(mode: any) {
+	addNewRule(type: any) {
 		//
 		// Template for a new rule.
 		//
 
 		if (this.nextRuleID === 1) { // Add to new Query
 
-			if (mode == 1 || mode == 3) { // Rule or Expression
+			if (type == 1 || type == 3) { // Feature or Test
 
 				this.createStartRule(-162, 25);
 
-				this.createNewRule(194, 5);
+				this.createNewRule(194, 5, type);
 			}
-			else if (mode == 2) { // Query as a Rule
+			else if (type == 2) { // Query as a Feature
 				let querySelection: QuerySelection;
 				let vm = this;
 				QueryPickerDialog.open(this.$modal, querySelection)
@@ -242,11 +234,12 @@ export class QueryEditComponent {
 		}
 		else { // Add to existing Query
 
-			switch (mode) {
-				case "1": // normal Rule
-					this.createNewRule(566, 7);
+			switch (type) {
+				case "1": // Feature
+				case "3": // Test
+					this.createNewRule(566, 7, type);
 					break;
-				case "2": // Query as a Rule
+				case "2": // Query as a Feature
 					let querySelection: QuerySelection;
 					let vm = this;
 					QueryPickerDialog.open(this.$modal, querySelection)
@@ -254,7 +247,7 @@ export class QueryEditComponent {
 						vm.createNewQueryRule(566, 7, resultData);
 					});
 					break;
-				case "3": // Expression
+				case "4": // Expression/Function
 					this.createNewExpression(566, 7);
 					break;
 			}
@@ -282,10 +275,20 @@ export class QueryEditComponent {
 		this.chartViewModel.addRule(newStartRuleDataModel);
 	}
 
-	createNewRule(x: any, y: any) {
+	createNewRule(x: any, y: any, type: any) {
+
+		var label = "";
+		if (type=="1") {
+			label = "Feature Description"
+		} else
+		if (type=="3") {
+			label = "Test Description"
+		}
+
 		let newRuleDataModel = {
-			description: "Rule Description",
+			description: label,
 			id: this.nextRuleID++,
+			type: type,
 			layout: {
 				x: x,
 				y: y
@@ -304,8 +307,9 @@ export class QueryEditComponent {
 
 	createNewExpression(x: any, y: any) {
 		let newExpressionRuleDataModel = {
-			description: "Expression Description",
+			description: "Function Description",
 			id: this.nextRuleID++,
+			type: '4',
 			layout: {
 				x: x,
 				y: y
@@ -330,6 +334,7 @@ export class QueryEditComponent {
 		let newQueryRuleDataModel = {
 			description: resultData.name + "~" + resultData.description,
 			id: this.nextRuleID++,
+			type: "2",
 			layout: {
 				x: x,
 				y: y
@@ -470,19 +475,21 @@ export class QueryEditComponent {
 			vm.ruleId = ruleId;
 
 			let selectedRule = vm.chartViewModel.getSelectedRule();
-			if (selectedRule.data.expression) {
-				let rules = <any>[];
+			let rules = <any>[];
 
-				for (let i = 0; i < vm.chartViewModel.data.query.rule.length; ++i) {
-					if (vm.chartViewModel.data.query.rule[i].description !== "START" && !vm.chartViewModel.data.query.rule[i].expression) {
-						let rule = {
-							value: vm.chartViewModel.data.query.rule[i].id,
-							displayName: vm.chartViewModel.data.query.rule[i].description
-						};
-						rules.push(rule);
-					}
-
+			for (let i = 0; i < vm.chartViewModel.data.query.rule.length; ++i) {
+				if (vm.chartViewModel.data.query.rule[i].description !== "START"
+					&& !vm.chartViewModel.data.query.rule[i].expression
+					&& vm.chartViewModel.data.query.rule[i].id!=vm.ruleId) {
+					let rule = {
+						value: vm.chartViewModel.data.query.rule[i].id,
+						displayName: vm.chartViewModel.data.query.rule[i].description
+					};
+					rules.push(rule);
 				}
+			}
+
+			if (selectedRule.data.expression) {
 				let expression: ExpressionType = selectedRule.data.expression;
 
 				ExpressionEditDialog.open(vm.$modal, expression, rules)
@@ -495,7 +502,7 @@ export class QueryEditComponent {
 				let test: Test = selectedRule.data.test;
 				let originalResultData = jQuery.extend(true, {}, test);
 
-				TestEditDialog.open(vm.$modal, originalResultData, false)
+				TestEditDialog.open(vm.$modal, originalResultData, selectedRule.data.type, rules)
 					.result.then(function (resultData: Test) {
 
 					selectedRule.data.test = resultData;

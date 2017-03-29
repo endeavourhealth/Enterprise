@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.framework.exceptions;
 
-import org.endeavour.enterprise.json.JsonServerException;
 import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
+import org.endeavourhealth.enterprise.core.json.JsonServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

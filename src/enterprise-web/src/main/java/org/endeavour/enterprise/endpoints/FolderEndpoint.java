@@ -1,12 +1,13 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.json.*;
 import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
 import org.endeavourhealth.enterprise.core.database.DataManager;
 import org.endeavourhealth.enterprise.core.database.models.*;
+import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
+import org.endeavourhealth.enterprise.core.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         Integer folderType = folderParameters.getFolderType();
         String parentUuid = folderParameters.getParentFolderUuid();
 
-        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
         String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
 
         //work out the ItemType, either from the parameters passed up or from our parent folder
@@ -116,7 +117,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
     public Response deleteFolder(@Context SecurityContext sc, JsonFolder folderParameters) throws Exception {
         super.setLogbackMarkers(sc);
 
-        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();;
         String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
 
         String folderUuid = folderParameters.getUuid();
@@ -172,7 +173,7 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
             //if we don't have a top-level folder, for some reason, re-create it
             if (items.size() == 0) {
-                String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+                String userUuid = SecurityUtils.getCurrentUserId(sc).toString();;
                 FolderEndpoint.createTopLevelFolder(orgUuid, userUuid, itemType);
 
                 //then re-run the select
@@ -254,13 +255,6 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
 
         List<ActiveItemEntity> childActiveItems = ActiveItemEntity.retrieveDependentItems(orgUuid, folderUuid, (short)DependencyType.IsContainedWithin.getValue());
 
-        List<ActiveItemEntity> reportActiveItems = new ArrayList<>();
-        for (ActiveItemEntity activeItem: childActiveItems) {
-            if (activeItem.getItemTypeId() == DefinitionItemType.Report.getValue()) {
-                reportActiveItems.add(activeItem);
-            }
-        }
-
         HashMap<String, AuditEntity> hmAuditsByAuditUuid = new HashMap<>();
         List<AuditEntity> audits = AuditEntity.retrieveForActiveItems(childActiveItems);
         for (AuditEntity audit: audits) {
@@ -273,14 +267,21 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             hmItemsByItemUuid.put(item.getItemUuid(), item);
         }
 
+        HashMap<String, ReportResultEntity> hmReportsByItemUuid = new HashMap<>();
+        List<ReportResultEntity> reports = ItemEntity.retrieveForReports(childActiveItems);
+        for (ReportResultEntity report: reports) {
+            hmReportsByItemUuid.put(report.getQueryItemUuid(), report);
+        }
+
         for (int i = 0; i < childActiveItems.size(); i++) {
 
             ActiveItemEntity activeItem = childActiveItems.get(i);
             ItemEntity item = hmItemsByItemUuid.get(activeItem.getItemUuid());
             Short itemType = activeItem.getItemTypeId();
             AuditEntity audit = hmAuditsByAuditUuid.get(item.getAuditUuid());
+            ReportResultEntity report = hmReportsByItemUuid.get(activeItem.getItemUuid());
 
-            JsonFolderContent c = new JsonFolderContent(activeItem, item, audit);
+            JsonFolderContent c = new JsonFolderContent(activeItem, item, audit, report);
             ret.addContent(c);
 
             if (itemType == DefinitionItemType.Query.getValue()) {
@@ -290,8 +291,6 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
             } else if (itemType == DefinitionItemType.DataSource.getValue()) {
 
             } else if (itemType == DefinitionItemType.CodeSet.getValue()) {
-
-            } else if (itemType == DefinitionItemType.ListOutput.getValue()) {
 
             } else {
                 //throw new RuntimeException("Unexpected content " + item + " in folder");

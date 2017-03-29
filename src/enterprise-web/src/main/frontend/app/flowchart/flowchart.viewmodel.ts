@@ -64,6 +64,10 @@ export class flowchart {
 			return this.data.id;
 		};
 
+		this.type = function () {
+			return this.data.type;
+		};
+
 		this.test = function () {
 			return this.data.test;
 		}

@@ -1,0 +1,58 @@
+<style>
+    .form-group {
+        margin-bottom: 10px;
+    }
+</style>
+<div class="modal-header">
+    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">Run Report Parameters</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <table class="expressionTable">
+            <tr>
+                <td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top;">
+                    <div class='row'>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Organisations: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgTT }}"></span>
+                                <select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)">
+                                    <option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
+                                </select>
+                                <br/>
+                                <label>Patient Population: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
+                                <select class="form-control" style="width:300px" (change)="setSelectedPopulation($event.target)">
+                                    <option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
+                                </select>
+                                <br/>
+                                <label>Baseline Run Date: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ rdTT }}"></span>
+                                <input type="date" class="form-control" style="width:200px" [(ngModel)]="baselineDate" name="baselineDate">
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top; border: solid thin silver">
+                    <div class='row'>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <br/>
+                                <label>Run Report Against Selected Query:</label>
+                                <p>{{ item.name }}</p>
+                                <br/>
+                                <label>Query Description:</label>
+                                <p>{{ item.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default"
+            (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary"
+            (click)="save();">Run Report</button>
+</div>

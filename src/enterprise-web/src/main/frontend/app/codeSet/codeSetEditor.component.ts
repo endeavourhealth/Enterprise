@@ -44,20 +44,6 @@ export class CodeSetEditComponent {
 		return term;
 	}
 
-	getTerm(code : string) : string {
-		let vm = this;
-		let term = vm.termCache[code];
-		if (term) { return term; }
-		vm.termCache[code] = 'Loading...';
-
-		vm.codingService.getPreferredTerm(code)
-			.subscribe(
-				(concept) => vm.termCache[code] = vm.termShorten(concept.preferredTerm)
-			);
-
-		return vm.termCache[code];
-	}
-
 	showCodePicker() {
 		let vm = this;
 		CodePickerDialog.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
@@ -65,7 +51,6 @@ export class CodeSetEditComponent {
 				vm.libraryItem.codeSet.codeSetValue = result;
 		});
 	}
-
 
 	create(folderUuid: string) {
 		this.libraryItem = {

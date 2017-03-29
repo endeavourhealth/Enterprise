@@ -5,7 +5,6 @@
 			<button *ngIf="showMenu" type="button" class="btn btn-xs btn-default child-to-show pull-right" ngbDropdownToggle id="folderMenu">...</button>
 			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="folderMenu">
 				<li *ngIf="folderType == 1"><a (click)="actionItem(node.data.uuid, 2, 'add')">Add query</a></li>
-				<li *ngIf="folderType == 1"><a (click)="actionItem(node.data.uuid, 6, 'add')">Add list report</a></li>
 				<li *ngIf="folderType == 1"><a (click)="actionItem(node.data.uuid, 5, 'add')">Add code set</a></li>
 
 				<li role="separator" class="divider"></li>

@@ -10,7 +10,7 @@ export class DashboardService extends BaseHttp2Service {
 
 	getRecentDocumentsData():Observable<FolderItem[]> {
 		var params : URLSearchParams = new URLSearchParams();
-		params.append('count', '5');
+		params.append('count', '13');
 
 		return this.httpGet('api/dashboard/getRecentDocuments', { search : params });
 	}

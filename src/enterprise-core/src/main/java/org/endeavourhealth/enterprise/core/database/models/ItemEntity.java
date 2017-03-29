@@ -1,6 +1,7 @@
 package org.endeavourhealth.enterprise.core.database.models;
 
 import org.endeavourhealth.enterprise.core.database.PersistenceManager;
+import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 
 import javax.persistence.*;
@@ -260,6 +261,39 @@ public class ItemEntity {
 
         entityManager.close();
         //PersistenceManager.INSTANCE.close();
+
+        return ent;
+    }
+
+    public static List<ReportResultEntity> retrieveForReports(List<ActiveItemEntity> activeItems) throws Exception {
+        if (activeItems.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<String> parameters = new ArrayList<>();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("from ReportResultEntity WHERE ( ");
+
+        for (int i=0; i<activeItems.size(); i++) {
+            ActiveItemEntity activeItem = activeItems.get(i);
+            String itemUuid = activeItem.getItemUuid();
+
+            if (i > 0){
+                sb.append(" OR ");
+            }
+            sb.append("(queryItemUuid = '"+itemUuid+"')");
+
+        }
+        sb.append(" ) and runDate in (select max(runDate) from ReportResultEntity group by queryItemUuid) ");
+        String where = sb.toString();
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+
+        List<ReportResultEntity> ent = entityManager.createQuery(where, ReportResultEntity.class)
+                .getResultList();
+
+        entityManager.close();
 
         return ent;
     }

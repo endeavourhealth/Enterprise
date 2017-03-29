@@ -8,6 +8,11 @@
               offset="0" stop-opacity="0.99609" stop-color="#80bdff"/>
             <stop offset="0.63934" stop-opacity="0.99219" stop-color="#cce5ff"/>
         </linearGradient>
+        <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="testBackgroundGradient">
+            <stop
+                    offset="0" stop-opacity="0.99609" stop-color="#0FF0B2"/>
+            <stop offset="0.63934" stop-opacity="0.99219" stop-color="#9BFFD6"/>
+        </linearGradient>
         <linearGradient spreadMethod="pad" y2="0" x2="0" y1="1" x1="0" id="expressionRuleBackgroundGradient">
             <stop
               offset="0" stop-opacity="0.99609" stop-color="#B1EAFF"/>
@@ -40,7 +45,7 @@
                 r="40" cx="212" cy="30"
                 fill="url(#startRuleBackgroundGradient)"/>
 
-        <rect *ngIf="rule.description()!='START' && !rule.expression() && !rule.queryLibraryItemUUID()"
+        <rect *ngIf="rule.description()!='START' && rule.type()=='1' && !rule.queryLibraryItemUUID()"
               [attr.class]="rule.selected() && 'selected-rule-rect'
                       || (rule == mouseOverRule && 'mouseover-rule-rect' || 'rule-rect')"
               ry="10" rx="10" x="0" y="0"
@@ -49,7 +54,16 @@
               fill="url(#ruleBackgroundGradient)">
         </rect>
 
-        <rect *ngIf="rule.description()!='START' && rule.expression()"
+        <rect *ngIf="rule.description()!='START' && rule.type()=='3' && !rule.queryLibraryItemUUID()"
+              [attr.class]="rule.selected() && 'selected-rule-rect'
+                      || (rule == mouseOverRule && 'mouseover-rule-rect' || 'rule-rect')"
+              ry="10" rx="10" x="0" y="0"
+              [attr.width]="rule.width()"
+              [attr.height]="110"
+              fill="url(#testBackgroundGradient)">
+        </rect>
+
+        <rect *ngIf="rule.description()!='START' && rule.type()=='4'"
               [attr.class]="rule.selected() && 'selected-rule-rect'
                       || (rule == mouseOverRule && 'mouseover-rule-rect' || 'rule-rect')"
               ry="10" rx="10" x="0" y="0"
@@ -75,22 +89,22 @@
             {{rule.description()}}
         </text>
 
-        <text *ngIf="rule.description()!='START' && !rule.expression() && !rule.queryLibraryItemUUID()"
+        <text *ngIf="rule.description()!='START' && rule.type()=='1' && !rule.queryLibraryItemUUID()"
               class="rule-type-text"
               x="18"
               y="20"
 
               alignment-baseline="middle">
-            RULE
+            FEATURE
         </text>
 
-        <text *ngIf="rule.description()!='START' && rule.expression()"
+        <text *ngIf="rule.description()!='START' && rule.type()=='3'"
               class="rule-type-text"
               x="18"
               y="20"
 
               alignment-baseline="middle">
-            EXPRESSION
+            TEST
         </text>
 
         <text *ngIf="rule.description()!='START' && rule.queryLibraryItemUUID()"
@@ -99,7 +113,16 @@
               y="20"
 
               alignment-baseline="middle">
-            QUERY
+            LIBRARY FEATURE
+        </text>
+
+        <text *ngIf="rule.description()!='START' && rule.type()=='4'"
+              class="rule-type-text"
+              x="18"
+              y="20"
+
+              alignment-baseline="middle">
+            FUNCTION
         </text>
 
         <text (click)="editTest($event, rule)"

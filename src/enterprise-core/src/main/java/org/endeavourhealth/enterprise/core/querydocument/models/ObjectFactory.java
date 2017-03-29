@@ -25,7 +25,6 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _QueryDocument_QNAME = new QName("", "queryDocument");
-    private final static QName _Report_QNAME = new QName("", "report");
     private final static QName _LibraryItem_QNAME = new QName("", "libraryItem");
 
     /**
@@ -59,13 +58,7 @@ public class ObjectFactory {
         return new QueryDocument();
     }
 
-    /**
-     * Create an instance of {@link Report }
-     * 
-     */
-    public Report createReport() {
-        return new Report();
-    }
+
 
     /**
      * Create an instance of {@link LibraryItem }
@@ -73,14 +66,6 @@ public class ObjectFactory {
      */
     public LibraryItem createLibraryItem() {
         return new LibraryItem();
-    }
-
-    /**
-     * Create an instance of {@link CalculationType }
-     * 
-     */
-    public CalculationType createCalculationType() {
-        return new CalculationType();
     }
 
     /**
@@ -108,19 +93,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link FieldTest }
+     * Create an instance of {@link Filter }
      * 
      */
-    public FieldTest createFieldTest() {
-        return new FieldTest();
-    }
-
-    /**
-     * Create an instance of {@link ValueRange }
-     * 
-     */
-    public ValueRange createValueRange() {
-        return new ValueRange();
+    public Filter createFieldTest() {
+        return new Filter();
     }
 
     /**
@@ -131,13 +108,7 @@ public class ObjectFactory {
         return new Rule();
     }
 
-    /**
-     * Create an instance of {@link ListReport }
-     * 
-     */
-    public ListReport createListReport() {
-        return new ListReport();
-    }
+
 
     /**
      * Create an instance of {@link VariableType }
@@ -147,13 +118,6 @@ public class ObjectFactory {
         return new VariableType();
     }
 
-    /**
-     * Create an instance of {@link ListReportFieldBasedType }
-     * 
-     */
-    public ListReportFieldBasedType createListReportFieldBasedType() {
-        return new ListReportFieldBasedType();
-    }
 
     /**
      * Create an instance of {@link CodeSet }
@@ -188,38 +152,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ParameterType }
-     * 
-     */
-    public ParameterType createParameterType() {
-        return new ParameterType();
-    }
-
-    /**
-     * Create an instance of {@link Comparison }
-     * 
-     */
-    public Comparison createComparison() {
-        return new Comparison();
-    }
-
-    /**
-     * Create an instance of {@link CalculationParameter }
-     * 
-     */
-    public CalculationParameter createCalculationParameter() {
-        return new CalculationParameter();
-    }
-
-    /**
-     * Create an instance of {@link ListReportGroup }
-     * 
-     */
-    public ListReportGroup createListReportGroup() {
-        return new ListReportGroup();
-    }
-
-    /**
      * Create an instance of {@link ValueFrom }
      * 
      */
@@ -251,37 +183,16 @@ public class ObjectFactory {
         return new Restriction();
     }
 
-    /**
-     * Create an instance of {@link FieldOutput }
-     * 
-     */
-    public FieldOutput createFieldOutput() {
-        return new FieldOutput();
-    }
+
 
     /**
-     * Create an instance of {@link DataSource }
+     * Create an instance of {@link Test }
      * 
      */
-    public DataSource createDataSource() {
-        return new DataSource();
+    public Test createDataSource() {
+        return new Test();
     }
 
-    /**
-     * Create an instance of {@link ListReportSummaryType }
-     * 
-     */
-    public ListReportSummaryType createListReportSummaryType() {
-        return new ListReportSummaryType();
-    }
-
-    /**
-     * Create an instance of {@link ReportItem }
-     * 
-     */
-    public ReportItem createReportItem() {
-        return new ReportItem();
-    }
 
     /**
      * Create an instance of {@link Query.StartingRules }
@@ -291,31 +202,12 @@ public class ObjectFactory {
         return new Query.StartingRules();
     }
 
-    /**
-     * Create an instance of {@link Test.IsAny }
-     * 
-     */
-    public Test.IsAny createTestIsAny() {
-        return new Test.IsAny();
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link QueryDocument }{@code >}}
-     * 
-     */
     @XmlElementDecl(namespace = "", name = "queryDocument")
     public JAXBElement<QueryDocument> createQueryDocument(QueryDocument value) {
         return new JAXBElement<QueryDocument>(_QueryDocument_QNAME, QueryDocument.class, null, value);
     }
 
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Report }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "report")
-    public JAXBElement<Report> createReport(Report value) {
-        return new JAXBElement<Report>(_Report_QNAME, Report.class, null, value);
-    }
+
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link LibraryItem }{@code >}}

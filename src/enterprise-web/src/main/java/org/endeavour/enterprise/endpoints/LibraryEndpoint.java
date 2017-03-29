@@ -1,16 +1,15 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.json.JsonDeleteResponse;
-import org.endeavour.enterprise.json.JsonFolderContent;
-import org.endeavour.enterprise.json.JsonFolderContentsList;
-import org.endeavour.enterprise.json.JsonMoveItems;
 import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
+import org.endeavourhealth.enterprise.core.database.ResultsManager;
 import org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.ItemDependencyEntity;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.*;
+import org.endeavourhealth.enterprise.core.json.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,7 +60,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     public Response saveLibraryItem(@Context SecurityContext sc, LibraryItem libraryItem) throws Exception {
         super.setLogbackMarkers(sc);
 
-        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
         String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
 
         String libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
@@ -69,10 +69,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         String folderUuid = parseUuidFromStr(libraryItem.getFolderUuid());
 
         Query query = libraryItem.getQuery();
-        DataSource dataSource = libraryItem.getDataSource();
-        Test test = libraryItem.getTest();
         CodeSet codeSet = libraryItem.getCodeSet();
-        ListReport listOutput = libraryItem.getListReport();
 
         LOG.trace(String.format("SavingLibraryItem UUID %s, Name %s FolderUuid %s", libraryItemUuid, name, folderUuid));
 
@@ -83,14 +80,9 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         Short type = null;
         if (query != null) {
             type = (short)DefinitionItemType.Query.getValue();
-        } else if (dataSource != null) {
-            type = (short)DefinitionItemType.DataSource.getValue();
-        } else if (test != null) {
-            type = (short)DefinitionItemType.Test.getValue();
         } else if (codeSet != null) {
             type = (short)DefinitionItemType.CodeSet.getValue();
-        } else if (listOutput != null) {
-            type = (short)DefinitionItemType.ListOutput.getValue();
+
         } else {
             //if we've been passed no proper content, we might just be wanting to rename an existing item,
             //so work out the type from what's on the DB already
@@ -131,7 +123,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
         String libraryItemUuid = parseUuidFromStr(libraryItem.getUuid());
-        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();;
         String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
         
         LOG.trace("DeletingLibraryItem UUID {}", libraryItemUuid);
@@ -166,7 +158,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             String dependentItemUuid = dependentItem.getDependentItemUuid();
             ItemEntity item = ItemEntity.retrieveLatestForUUid(dependentItemUuid);
 
-            JsonFolderContent content = new JsonFolderContent(item, null);
+            JsonFolderContent content = new JsonFolderContent(item, null, null);
             ret.addContent(content);
         }
 
@@ -185,7 +177,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     public Response moveLibraryItems(@Context SecurityContext sc, JsonMoveItems parameters) throws Exception {
         super.setLogbackMarkers(sc);
 
-        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();;
         String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
 
         LOG.trace("moveLibraryItems");
@@ -198,4 +190,304 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 .ok()
                 .build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getConceptChildren")
+    public Response getConceptChildren(@Context SecurityContext sc, @QueryParam("id") String id) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<Object[]> concepts = ConceptEntity.findConceptChildren(id);
+
+        List<JsonCode> ret = new ArrayList<>();
+
+        String prevDefinition = "";
+
+        for (Object[] conceptEntity: concepts) {
+            String conceptId = conceptEntity[0].toString();
+            String definition = conceptEntity[1].toString();
+            String parentType = conceptEntity[2]==null?"":conceptEntity[2].toString();
+            String parentTypeId = conceptEntity[3]==null?"":conceptEntity[3].toString();
+            String baseType = conceptEntity[4]==null?"":conceptEntity[4].toString();
+            String baseTypeId = conceptEntity[5]==null?"":conceptEntity[5].toString();
+            String dataTypeId = conceptEntity[6].toString();
+            String conceptTypeId = conceptEntity[7].toString();
+            String present = conceptEntity[8].toString();
+            String units = conceptEntity[9]==null?"":conceptEntity[9].toString();
+
+
+            if (definition.equals(prevDefinition))
+                continue;
+
+            prevDefinition = definition;
+
+            if (conceptTypeId.equals("1")|| // don't show resource or unit types
+                    conceptTypeId.equals("3")) {
+                continue;
+            }
+
+            JsonCode code = new JsonCode();
+            code.setId(conceptId);
+            code.setLabel(definition);
+            code.setDataType(dataTypeId);
+            code.setParentType(parentType);
+            code.setBaseType(baseType);
+            code.setPresent(present);
+            code.setUnits(units);
+
+            ret.add(code);
+        }
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getConceptParents")
+    public Response getConceptParents(@Context SecurityContext sc, @QueryParam("id") String id) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<Object[]> concepts = ConceptEntity.findConceptParents(id);
+
+        List<JsonCode> ret = new ArrayList<>();
+
+        String prevDefinition = "";
+
+        for (Object[] conceptEntity: concepts) {
+            String conceptId = conceptEntity[0].toString();
+            String definition = conceptEntity[1].toString();
+            String parentType = conceptEntity[2]==null?"":conceptEntity[2].toString();
+            String parentTypeId = conceptEntity[3]==null?"":conceptEntity[3].toString();
+            String baseType = conceptEntity[4]==null?"":conceptEntity[4].toString();
+            String baseTypeId = conceptEntity[5]==null?"":conceptEntity[5].toString();
+            String dataTypeId = conceptEntity[6].toString();
+            String conceptTypeId = conceptEntity[7].toString();
+            String parentConceptTypeId = conceptEntity[8].toString();
+            String present = conceptEntity[9].toString();
+            String units = conceptEntity[10]==null?"":conceptEntity[10].toString();
+
+
+            if (parentType.equals(prevDefinition))
+                continue;
+
+            prevDefinition = parentType;
+
+            if (conceptTypeId.equals("1")|| // don't show resource or unit types
+                    conceptTypeId.equals("3")||
+                    parentConceptTypeId.equals("1")|| // don't show resource or unit types
+                    parentConceptTypeId.equals("3")) {
+                continue;
+            }
+
+            JsonCode code = new JsonCode();
+            code.setId(parentTypeId);
+            code.setLabel(parentType);
+            code.setDataType(dataTypeId);
+            code.setParentType(parentType);
+            code.setBaseType(baseType);
+            code.setPresent(present);
+            code.setUnits(units);
+
+
+            ret.add(code);
+        }
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getConcepts")
+    public Response getConcepts(@Context SecurityContext sc, @QueryParam("term") String term) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<Object[]> concepts = ConceptEntity.findConcept(term);
+
+        List<JsonCode> results = new ArrayList<>();
+
+        String prevDefinition = "";
+
+        for (Object[] conceptEntity: concepts) {
+            String conceptId = conceptEntity[0].toString();
+            String definition = conceptEntity[1].toString();
+            String parentType = conceptEntity[2]==null?"":conceptEntity[2].toString();
+            String parentTypeId = conceptEntity[3]==null?"":conceptEntity[3].toString();
+            String baseType = conceptEntity[4]==null?"":conceptEntity[4].toString();
+            String baseTypeId = conceptEntity[5]==null?"":conceptEntity[5].toString();
+            String dataTypeId = conceptEntity[6].toString();
+            String conceptTypeId = conceptEntity[7].toString();
+            String present = conceptEntity[8].toString();
+            String units = conceptEntity[9]==null?"":conceptEntity[9].toString();
+
+            if (definition.equals(prevDefinition))
+                continue;
+
+            prevDefinition = definition;
+
+            if (conceptTypeId.equals("1")|| // don't show resource or unit types
+                    conceptTypeId.equals("3")) {
+                continue;
+            }
+
+            JsonCode code = new JsonCode();
+            code.setId(conceptId);
+            code.setLabel(definition);
+            code.setDataType(dataTypeId);
+            code.setParentType(parentType);
+            code.setBaseType(baseType);
+            code.setPresent(present);
+            code.setUnits(units);
+
+            results.add(code);
+        }
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getOrganisations")
+    public Response getOrganisations(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<Object[]> organisations = OrganizationEntity.getOrganisations();
+
+        List<JsonOrganisation> results = new ArrayList<>();
+
+        for (Object[] orgEntity: organisations) {
+            String id = orgEntity[0].toString();
+            String name = orgEntity[1].toString();
+
+            JsonOrganisation org = new JsonOrganisation();
+            org.setId(id);
+            org.setName(name);
+
+            results.add(org);
+        }
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getReportResults")
+    public Response getReportResults(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<ReportResultEntity[]> results = ReportResultEntity.getReportResults(queryItemUuid, runDate);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getAllReportResults")
+    public Response getAllReportResults(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<ReportResultEntity[]> results = ReportResultEntity.getAllReportResults(queryItemUuid);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getReportPatients")
+    public Response getReportPatients(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Short organisationId) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<ReportPatientsEntity[]> results = ReportPatientsEntity.getReportPatients(queryItemUuid, runDate, organisationId);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getReportPatientsEHR")
+    public Response getReportPatientsEHR(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Short organisationId) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<Object[]> results = ReportPatientsEntity.getReportPatientsEHR(queryItemUuid, runDate, organisationId);
+
+        Object[] header = new Object[] { "patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "patient_townsend_score", "observation_clinical_effective_date", "observation_snomed_concept_id", "observation_original_code", "observation_original_term", "observation_value", "observation_units", "observation_is_problem", "organisation_name", "organisation_ods_code", "organisation_type", "practitioner_name", "practitioner_role_code", "practitioner_role_description" };
+
+        results.add(0, header);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/runReport")
+    public Response runReport(@Context SecurityContext sc, JsonReportRun report) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
+        String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
+
+        ResultsManager resultsManager = new ResultsManager();
+
+        ItemEntity item = ItemEntity.retrieveLatestForUUid(report.getQueryItemUuid());
+        String xml = item.getXmlContent();
+        LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
+
+        resultsManager.runReport(libraryItem, report, userUuid);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(null)
+                .build();
+    }
+
 }

@@ -1,7 +1,7 @@
 <div class="module">
 	<div class="container-fluid">
 		<div class="module-heading">
-			Library items
+			Library Items
 		</div>
 		<div class="module-body">
 			<form>
@@ -17,36 +17,46 @@
 								<table class="table table-striped table-condensed">
 									<thead>
 										<tr>
-											<th class="col-md-6" (click)="sortField='name'; sortReverse=!sortReverse">Title
+											<th style="width:250px" (click)="sortField='name'; sortReverse=!sortReverse">Title
 												<span *ngIf="sortField == 'name'"
 															class="fa fa-sm"
 															[ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
-											<th class="col-md-3" (click)="sortField='lastModified'; sortReverse=!sortReverse">Date modified
+											<th style="width:150px" (click)="sortField='lastModified'; sortReverse=!sortReverse">Date modified
 												<span *ngIf="sortField == 'lastModified'"
 															class="fa fa-sm"
 															[ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
-											<th class="col-md-2" (click)="sortField='type'; sortReverse=!sortReverse">Type
+											<th style="width:100px" (click)="sortField='type'; sortReverse=!sortReverse">Type
 												<span *ngIf="sortField == 'type'"
 															class="fa fa-sm"
 															[ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
-											<th class="col-md-1"></th>
+											<th style="width:150px" (click)="sortField='name'; sortReverse=!sortReverse">Last Report Run
+												<span *ngIf="sortField == 'name'"
+													  class="fa fa-sm"
+													  [ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
+											</th>
+											<th style="width:100px">Options</th>
 										</tr>
 									</thead>
 									<tbody>
 										<tr class="hover-box show-child-on-hover" *ngFor="let item of getContents()">
 											<td>
 												<a style="cursor: pointer" (click)="actionItemEdit(item.uuid, item.type, 'edit')">{{item.name}}</a>
-												<span class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{item.description}}" *ngIf="item.description"></span>
+												<span class="fa fa-info-circle fa-right-pad text-muted" style="cursor:pointer" ngbTooltip="{{item.description}}" *ngIf="item.description"></span>
 											</td>
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 											<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>
-												<div ngbDropdown class="child-to-show">
+												<a style="cursor: pointer" (click)="viewReport(item)">{{item.lastRun | date:'dd-MMM-yyyy HH:mm:ss'}}</a>
+											</td>
+											<td>
+												<div ngbDropdown >
 													<button type="button" class="btn btn-xs btn-default" ngbDropdownToggle id="itemMenu">...</button>
-													<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="itemMenu">
+													<ul class="dropdown-menu dropdown-menu-right" style="cursor:pointer" aria-labelledby="itemMenu">
+														<li *ngIf="item.type==2"><a (click)="runReport(item)">Run Report</a></li>
+														<li role="separator" class="divider"></li>
 														<li class="disabled"><a href="#">Rename</a></li>
 														<li><a (click)="deleteItem(item)">Delete</a></li>
 														<li role="separator" class="divider"></li>

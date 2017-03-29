@@ -36,9 +36,6 @@ export class DashboardComponent {
 			case ItemType.Query:
 				this.$state.go('app.queryEdit', {itemUuid: item.uuid, itemAction: action});
 				break;
-			case ItemType.ListOutput:
-				this.$state.go('app.listOutputEdit', {itemUuid: item.uuid, itemAction: action});
-				break;
 			case ItemType.CodeSet:
 				this.$state.go('app.codeSetEdit', {itemUuid: item.uuid, itemAction: action});
 				break;

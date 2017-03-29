@@ -26,6 +26,8 @@ public class DataManager {
         entityManager.getTransaction().commit();
 
         entityManager.close();
+
+
     }
 
     public static void saveDeletedItems(AuditEntity audit, List<ItemEntity> items, List<ActiveItemEntity> activeItems) throws Exception {

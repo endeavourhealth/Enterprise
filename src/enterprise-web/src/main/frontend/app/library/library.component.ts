@@ -1,5 +1,6 @@
 import {Component} from "@angular/core";
 import {StateService} from "ui-router-ng2";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {ModuleStateService} from "../common/moduleState.service";
 import {LibraryService} from "./library.service";
 import {LoggerService} from "../common/logger.service";
@@ -9,6 +10,10 @@ import {FolderNode} from "../folder/models/FolderNode";
 import {FolderItem} from "./models/FolderItem";
 import {LibraryItem} from "./models/LibraryItem";
 import {ActionItem} from "../folder/models/ActionItem";
+import {ReportEditDialog} from "../reports/reportEditor.dialog";
+import {ReportViewDialog} from "../reports/reportViewer.dialog";
+import {ReportRun} from "../reports/models/ReportRun";
+import {ReportService} from "../reports/report.service";
 
 @Component({
 	template : require('./library.html')
@@ -19,7 +24,9 @@ export class LibraryComponent {
 	itemSummaryList: ItemSummaryList;
 
 	constructor(protected libraryService: LibraryService,
+				protected reportService: ReportService,
 							protected logger: LoggerService,
+							private $modal: NgbModal,
 							protected moduleStateService: ModuleStateService,
 							protected $state: StateService) {
 	}
@@ -55,9 +62,6 @@ export class LibraryComponent {
 			case ItemType.Query:
 				this.$state.go('app.queryEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
 				break;
-			case ItemType.ListOutput:
-				this.$state.go('app.listOutputEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
-				break;
 			case ItemType.CodeSet:
 				this.$state.go('app.codeSetEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
 				break;
@@ -87,6 +91,50 @@ export class LibraryComponent {
 				},
 				(error) => vm.logger.error('Error deleting library item', error, 'Delete item')
 			);
+	}
+
+	runReport(item: FolderItem) {
+		var vm = this;
+		console.log(item);
+
+		let reportRun: ReportRun = {
+			organisation: [],
+			population: "",
+			baselineDate: "",
+			queryItemUuid: ""
+		};
+
+		ReportEditDialog.open(vm.$modal, reportRun, item)
+			.result.then(function (resultData: ReportRun) {
+			console.log(resultData);
+			resultData.queryItemUuid = item.uuid;
+
+			vm.reportService.runReport(resultData)
+				.subscribe(
+					(data) => {
+						vm.refresh();
+					});
+
+		});
+	}
+
+	viewReport(item: FolderItem) {
+		var vm = this;
+		console.log(item);
+
+		let reportRun: ReportRun = {
+			organisation: [],
+			population: "",
+			baselineDate: "",
+			queryItemUuid: ""
+		};
+
+		ReportViewDialog.open(vm.$modal, reportRun, item)
+			.result.then(function (resultData: ReportRun) {
+
+			console.log(resultData);
+
+		});
 	}
 
 	saveState() {

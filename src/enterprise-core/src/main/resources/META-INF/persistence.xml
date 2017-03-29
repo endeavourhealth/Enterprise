@@ -10,7 +10,7 @@
         <class>org.endeavourhealth.enterprise.core.database.models.ItemDependencyEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.ItemTypeEntity</class>
         <properties>
-            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/enterprise_admin"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://10.44.112.59:3306/enterprise_admin"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.connection.username" value="enterprise"/>
             <property name="hibernate.connection.password" value="forget|LEADER|suit|5?"/>
@@ -39,7 +39,7 @@
         <class>org.endeavourhealth.enterprise.core.database.models.data.ReportPatientsEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.PatientGenderEntity</class>
         <properties>
-            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/enterprise_data_pseudonymised"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://10.44.112.59:3306/enterprise_data_pseudonymised"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.connection.username" value="enterprise"/>
             <property name="hibernate.connection.password" value="forget|LEADER|suit|5?"/>

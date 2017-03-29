@@ -59,8 +59,8 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('7', 'Referral', '0', '7', '1','0','1');
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('8', 'Allergy', '0', '8', '1','0','1');
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('9', 'Sex', '1', '1', '1','8','2');
-INSERT INTO `enterprise_data_pseudonymised`.`concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('10', 'Male', '9', '1', '1', '11','0');
-INSERT INTO `enterprise_data_pseudonymised`.`concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('11', 'Female', '9', '1', '1', '11','0');
+INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('10', 'Male', '9', '1', '1', '11','0');
+INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('11', 'Female', '9', '1', '1', '11','0');
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('12', 'Age Years', '1', '1', '1','13','2');
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('13', 'Age Months', '1', '1', '1','13','2');
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('14', 'Age Weeks', '1', '1', '1','13','2');
@@ -100,6 +100,19 @@ join enterprise_admin.snomed s3 on s3.pid = h.parent_pid
 update `enterprise_data_pseudonymised`.`Concept` c
 join enterprise_data_pseudonymised.observation o on o.snomed_concept_id = c.ConceptId
 set c.present = 1
+update `enterprise_data_pseudonymised`.`Concept` c
+join enterprise_data_pseudonymised.medication_statement o on o.dmd_id = c.ConceptId
+set c.present = 1
+update `enterprise_data_pseudonymised`.`Concept` c
+join enterprise_data_pseudonymised.allergy_intolerance o on o.snomed_concept_id = c.ConceptId
+set c.present = 1
+update `enterprise_data_pseudonymised`.`Concept` c
+join enterprise_data_pseudonymised.referral_request o on o.snomed_concept_id = c.ConceptId
+set c.present = 1
+update `enterprise_data_pseudonymised`.`Concept` c
+join enterprise_data_pseudonymised.encounter o on o.snomed_concept_id = c.ConceptId
+set c.present = 1
+
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 (`ConceptId`,

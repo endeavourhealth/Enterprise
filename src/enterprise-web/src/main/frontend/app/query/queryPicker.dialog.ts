@@ -85,7 +85,9 @@ export class QueryPickerDialog implements OnInit {
 
 				vm.libraryService.getFolderContents(node.uuid)
 						.subscribe(
+
 							(data) => {
+								console.log(data);
 								vm.itemSummaryList = data;
 								node.loading = false;
 						});
@@ -95,6 +97,7 @@ export class QueryPickerDialog implements OnInit {
 				let vm = this;
 				switch (item.type) {
 						case ItemType.Query:
+						case ItemType.CodeSet:
 								let querySelection: QuerySelection = {
 										id: item.uuid,
 										name: item.name,

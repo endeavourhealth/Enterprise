@@ -1,0 +1,102 @@
+<style>
+    .form-group {
+        margin-bottom: 10px;
+    }
+</style>
+<div class="modal-header">
+    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">Report Viewer</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+        <table class="expressionTable">
+            <tr>
+                <td style="width: 75%; padding-right: 15px; padding-left: 15px; vertical-align: top;">
+                    <div style="vertical-align: top; display: inline-block; width:300px">
+                        <div class='row'>
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label>Time of Report Run</label>
+                                    <div>{{runDate | date:'dd-MMM-yyyy HH:mm:ss'}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <label>Report Denominator Baseline</label>
+                                    <div>{{getPopulationName(population)}} on or before {{baselineDate | date:'dd-MMM-yyyy'}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="vertical-align: top;display: inline-block;">
+                        <div class='row' style="margin-left:20px; height:auto; overflow-y:scroll; max-height: 150px;">
+                            <table style="border: solid thin silver; table-layout:fixed; width:296px">
+                                <tr style="border: solid thin silver">
+                                    <th style="width:110px;padding: 5px">Previous Runs</th>
+                                    <th style="width:186px;padding: 5px">Denominator Baseline</th>
+                                </tr>
+                                <tr *ngFor="let result of allReportResults">
+                                    <td style="padding: 5px;border: solid thin silver"><a (click)="getReportResults(result.queryItemUuid,result.runDate)" style="cursor:pointer;">{{result.runDate | date:'dd-MMM-yyyy HH:mm:ss'}}</a></td>
+                                    <td style="padding: 5px;border: solid thin silver">{{getPopulationName(result.populationTypeId)}} on or before {{result.baselineDate | date:'dd-MMM-yyyy'}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class='row'>
+                        <div class="col-xs-12">
+                            <label><u>Report Results</u></label>
+                        </div>
+                    </div>
+                    <div class='row' style="height:auto; overflow-y:scroll; max-height: 300px;">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <table style="border: solid thin silver">
+                                    <tr style="border: solid thin silver">
+                                        <th style="padding: 5px">Organisation</th>
+                                        <th style="padding: 5px">Patients matching Query</th>
+                                        <th style="padding: 5px">Patients in Denominator</th>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold;width: 300px;padding: 5px;border: solid thin silver">All Organisations</td>
+                                        <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{enumeratorTotal}}</td>
+                                        <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{denominatorTotal}}</td>
+                                    </tr>
+                                    <tr *ngFor="let result of reportResult">
+                                        <td style="width: 300px;padding: 5px;border: solid thin silver">{{getOrganisationName(result.organisationId)}}</td>
+                                        <td style="padding: 5px;border: solid thin silver"><a (click)="getReportPatientsEHR(result.queryItemUuid,result.runDate,result.organisationId)" style="cursor:pointer;">{{result.enumeratorCount}}</a></td>
+                                        <td style="padding: 5px;border: solid thin silver">{{result.denominatorCount}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td style="width: 25%; padding-right: 15px; padding-left: 15px; vertical-align: top; border: solid thin silver">
+                    <div class='row'>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <br/>
+                                <label>Query:</label>
+                                <p>{{ item.name }}</p>
+                                <br/>
+                                <label>Query Description:</label>
+                                <p>{{ item.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </form>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default"
+            (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary"
+            (click)="save();">Ok</button>
+</div>

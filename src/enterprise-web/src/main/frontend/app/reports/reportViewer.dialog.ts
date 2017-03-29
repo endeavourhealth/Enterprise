@@ -1,0 +1,179 @@
+import {Component, Input, OnInit} from "@angular/core";
+import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
+import {LoggerService} from "../common/logger.service";
+import {ReportRun} from "./models/ReportRun";
+import {Organisation} from "./models/Organisation";
+import {ReportResult} from "./models/ReportResult";
+import {ReportPatient} from "./models/ReportPatient";
+import {ReportPatientExport} from "./models/ReportPatientExport";
+import {ReportService} from "./report.service";
+import {FolderItem} from "../library/models/FolderItem";
+
+@Component({
+    selector: 'ngbd-modal-content',
+    template: require('./reportViewer.html')
+})
+export class ReportViewDialog implements OnInit {
+
+    public static open(modalService: NgbModal, reportRun: ReportRun, item: FolderItem) {
+        const modalRef = modalService.open(ReportViewDialog, { backdrop : "static", size : "lg"});
+        modalRef.componentInstance.resultData = reportRun;
+        modalRef.componentInstance.item = item;
+
+        return modalRef;
+    }
+
+    @Input() resultData;
+    @Input() item : FolderItem;
+
+    population: string = "";
+    baselineDate: string = "";
+    runDate: string = "";
+
+    populations = [
+        {id: 0, type: 'Currently registered'},
+        {id: 1, type: 'All patients'}
+    ];
+
+    organisations = <any>[];
+    reportResult: ReportResult[];
+    allReportResults: ReportResult;
+    reportPatient: ReportPatient;
+
+    enumeratorTotal : number = 0;
+    denominatorTotal : number = 0;
+
+    constructor(protected reportService: ReportService,
+                protected $uibModalInstance : NgbActiveModal,
+                private logger : LoggerService) {
+
+    }
+
+    ngOnInit(): void {
+        var vm = this;
+
+        vm.reportService.getOrganisations()
+            .subscribe(
+                (data) => {
+                    vm.organisations = data;
+                });
+
+        vm.getReportResults(vm.item.uuid, vm.item.lastRun);
+
+        vm.reportService.getAllReportResults(vm.item.uuid)
+            .subscribe(
+                (data) => {
+                    vm.allReportResults = data;
+                });
+    }
+
+    getReportResults(uuid:string, lastRun:number) {
+        var vm = this;
+
+        vm.reportService.getReportResults(uuid, lastRun)
+            .subscribe(
+                (data) => {
+                    vm.reportResult = data;
+                    vm.baselineDate = vm.reportResult[0].baselineDate;
+                    vm.runDate = vm.reportResult[0].runDate;
+                    vm.population = vm.reportResult[0].populationTypeId;
+
+                    vm.enumeratorTotal = 0;
+                    vm.denominatorTotal = 0;
+
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        vm.enumeratorTotal += Number(vm.reportResult[i].enumeratorCount);
+                        vm.denominatorTotal += Number(vm.reportResult[i].denominatorCount);
+                    }
+
+                });
+    }
+
+    getReportPatients(uuid:string, lastRun:number, organisationId:string) {
+        var vm = this;
+
+        vm.reportService.getReportPatients(uuid, lastRun, organisationId)
+            .subscribe(
+                (data) => {
+                    let reportPatientExport : ReportPatientExport[] = <any>[];
+
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        let repExp : ReportPatientExport = {
+                            organisation: this.getOrganisationName(data[i].organisationId),
+                            patientId: data[i].patientId,
+                            pseudoId: data[i].pseudoId
+                        }
+                        reportPatientExport.push(repExp);
+                    }
+
+                    var csvData = this.ConvertToCSV(reportPatientExport);
+                    var blob = new Blob([csvData], { type: 'text/csv' });
+                    var url= window.URL.createObjectURL(blob);
+                    window.open(url);
+                });
+    }
+
+    getReportPatientsEHR(uuid:string, lastRun:number, organisationId:string) {
+        var vm = this;
+
+        vm.reportService.getReportPatientsEHR(uuid, lastRun, organisationId)
+            .subscribe(
+                (data) => {
+                    var csvData = this.ConvertToCSV(data);
+                    var blob = new Blob([csvData], { type: 'text/csv' });
+                    var url= window.URL.createObjectURL(blob);
+                    window.open(url);
+                });
+    }
+
+    ConvertToCSV(objArray) {
+        var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+        var str = '';
+        var row = "";
+
+        for (var i = 0; i < array.length; i++) {
+            array[i][22] = array[i][22].replace(',','');
+            var line = '';
+            for (var index in array[i]) {
+                if (line != '') line += ','
+
+                line += array[i][index];
+            }
+            str += line + '\r\n';
+        }
+        return str;
+    }
+
+    getOrganisationName(id) {
+        var vm = this;
+        for (var i = 0, len = vm.organisations.length; i < len; i++) {
+            if (vm.organisations[i].id == id) {
+                return vm.organisations[i].name;
+            }
+        }
+        return null;
+    }
+
+    getPopulationName(id) {
+        var vm = this;
+        for (var i = 0, len = vm.populations.length; i < len; i++) {
+            if (vm.populations[i].id == id) {
+                return vm.populations[i].type;
+            }
+        }
+        return null;
+    }
+
+    save() {
+        var vm = this;
+        this.ok();
+    }
+
+    ok() {
+        this.$uibModalInstance.close(this.resultData);
+    }
+
+    cancel() {
+        this.$uibModalInstance.dismiss('cancel');
+    }
+}

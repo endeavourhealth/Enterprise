@@ -3,7 +3,6 @@ import {Http, URLSearchParams} from "@angular/http";
 import {BaseHttp2Service} from "../core/baseHttp2.service";
 import {Observable} from "rxjs";
 import {LibraryItem} from "./models/LibraryItem";
-import {EntityMap} from "../listOutput/models/EntityMap";
 import {ItemSummaryList} from "./models/ItemSummaryList";
 
 @Injectable()
@@ -34,7 +33,6 @@ export class LibraryService extends BaseHttp2Service {
 		return this.httpPost('api/library/deleteLibraryItem', request);
 	}
 
-	getEntityMap():Observable<EntityMap> {
-		return this.httpGet('api/entity/getEntityMap');
-	}
+
+
 }

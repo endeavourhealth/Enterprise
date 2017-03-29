@@ -1,9 +1,8 @@
-import {FieldTest} from "./FieldTest";
-import {DataSource} from "./DataSource";
-import {IsAny} from "./IsAny";
+import {Filter} from "./Filter";
+import {Restriction} from "../../expressions/models/Restriction";
+
 export class Test {
-	dataSource: DataSource;
-	dataSourceUuid: string;
-	isAny: IsAny;
-	fieldTest: FieldTest[];
+	testRuleId : string;
+	filter : Filter[];
+	restriction : Restriction;
 }

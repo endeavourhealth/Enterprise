@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum ValueRelativeUnit {
 
+    @XmlEnumValue("day")
+    DAY("day"),
     @XmlEnumValue("month")
     MONTH("month"),
     @XmlEnumValue("year")

@@ -10,6 +10,7 @@ export class EkbCodingService extends CodingService {
 	constructor (http : Http) { super(http); }
 
 	searchCodes(searchData : string): Observable<CodeSetValue[]> {
+
 		let vm = this;
 		let params = new URLSearchParams();
 		params.append('term', searchData);

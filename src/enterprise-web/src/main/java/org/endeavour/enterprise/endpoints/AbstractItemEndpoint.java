@@ -1,8 +1,5 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.json.JsonDeleteResponse;
-import org.endeavour.enterprise.json.JsonMoveItem;
-import org.endeavour.enterprise.json.JsonMoveItems;
 import org.endeavour.enterprise.utility.QueryDocumentReaderFindDependentUuids;
 import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.database.*;
@@ -10,6 +7,9 @@ import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
 import org.endeavourhealth.enterprise.core.database.models.*;
+import org.endeavourhealth.enterprise.core.json.JsonDeleteResponse;
+import org.endeavourhealth.enterprise.core.json.JsonMoveItem;
+import org.endeavourhealth.enterprise.core.json.JsonMoveItems;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 

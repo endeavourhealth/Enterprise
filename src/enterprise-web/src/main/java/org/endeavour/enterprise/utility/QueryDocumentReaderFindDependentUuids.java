@@ -5,7 +5,6 @@ import org.endeavourhealth.enterprise.core.querydocument.models.*;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDocumentReader {
 
@@ -35,13 +34,6 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
         super.processQuery(query);
     }
 
-    @Override
-    protected void processReportItem(ReportItem reportItem) {
-        addUuid(reportItem.getListReportLibraryItemUuid());
-        addUuid(reportItem.getQueryLibraryItemUuid());
-
-        super.processReportItem(reportItem);
-    }
 
     @Override
     protected void processRule(Rule rule) {
@@ -52,36 +44,12 @@ public final class QueryDocumentReaderFindDependentUuids extends AbstractQueryDo
     }
 
     @Override
-    protected void processDataSource(DataSource dataSource) {
-        List<String> ids = dataSource.getDataSourceUuid();
+    protected void processFilter(Filter filter) {
+        List<String> ids = filter.getCodeSetLibraryItemUuid();
         for (String id: ids) {
             addUuid(id);
         }
 
-        super.processDataSource(dataSource);
-    }
-
-    @Override
-    protected void processCalculationParameter(CalculationParameter calculationParameter) {
-        addUuid(calculationParameter.getDataSourceUuid());
-
-        super.processCalculationParameter(calculationParameter);
-    }
-
-    @Override
-    protected void processTest(Test test) {
-        addUuid(test.getDataSourceUuid());
-
-        super.processTest(test);
-    }
-
-    @Override
-    protected void processFieldTest(FieldTest fieldTest) {
-        List<String> ids = fieldTest.getCodeSetLibraryItemUuid();
-        for (String id: ids) {
-            addUuid(id);
-        }
-
-        super.processFieldTest(fieldTest);
+        super.processFilter(filter);
     }
 }

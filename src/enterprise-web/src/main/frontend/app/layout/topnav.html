@@ -6,22 +6,27 @@
 				<span class="logo">Enterprise</span>
 			</div>
 			<div class="pull-right" style="padding: 10px;color:gray">
-				Logged in : {{currentUser.title}} {{currentUser.forename}} {{currentUser.surname}}
-
-
-				<!--<div class="dropdown" uib-dropdown>-->
-				<!--Organisation : <a href="#" class="dropdown-toggle" uib-dropdown-toggle>-->
-				<!--{{ topnav.selectedRole.organisationName }}-->
-				<!--<span class="caret"></span>-->
-				<!--</a>-->
-				<!--<ul uib-dropdown-menu>-->
-				<!--<li ng-repeat="endUserRole in topnav.currentUser.userInRoles">-->
-				<!--<a href="#" ng-click="topnav.updateRole(endUserRole.userInRoleUuid)">-->
-				<!--{{ endUserRole.organisationName }}-->
-				<!--</a>-->
-				<!--</li>-->
-				<!--</ul>-->
-				<!--</div>-->
+				<span class="dropdown" ngbDropdown>
+					Logged in :
+					<button class="dropdown-toggle" ngbDropdownToggle id="optionsMenu">
+						{{currentUser.title}} {{currentUser.forename}} {{currentUser.surname}}
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="optionsMenu">
+						<li style="cursor:pointer; padding-left: 5px; padding-right: 5px; padding-bottom: 5px" class="nav-text">
+							<div (click)="navigateUserAccount()" class="menuItem" >
+								<i class="fa fa-user-circle-o fa-2x"></i>
+								User account
+							</div>
+						</li>
+						<li style="cursor:pointer; padding-left: 5px; padding-right: 5px;" class="nav-text">
+							<div (click)="logout()" class="menuItem">
+								<i class="fa fa-power-off fa-2x"></i>
+								Logout
+							</div>
+						</li>
+					</ul>
+				</span>
 			</div>
 		</div>
 	</div>

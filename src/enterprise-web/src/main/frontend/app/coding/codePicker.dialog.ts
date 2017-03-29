@@ -4,6 +4,7 @@ import {ITreeOptions} from "angular2-tree-component";
 import {CodeSetValue} from "../codeSet/models/CodeSetValue";
 import {ExclusionTreeNode} from "./models/ExclusionTreeNode";
 import {CodingService} from "./coding.service";
+import {LoggerService} from "../common/logger.service";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -33,11 +34,12 @@ export class CodePickerDialog {
 
 	exclusionTreeData : ExclusionTreeNode[];
 
-	constructor(protected activeModal : NgbActiveModal,
-							private codingService : CodingService) {
+	constructor(private logger : LoggerService,
+				protected activeModal : NgbActiveModal,
+				private codingService : CodingService) {
 		this.termCache = {};
 		this.options = {
-			childrenField : 'exclusion',
+			childrenField : 'children',
 			idField : 'code'
 		};
 	}
@@ -68,6 +70,7 @@ export class CodePickerDialog {
 		vm.codingService.getCodeChildren(itemToDisplay.code)
 			.subscribe(
 				(result) => vm.children = result
+
 			);
 
 		vm.codingService.getCodeParents(itemToDisplay.code)
@@ -76,11 +79,32 @@ export class CodePickerDialog {
 			);
 
 		vm.highlightedMatch = itemToDisplay;
+
+
 	}
 
 	addToSelection(match : CodeSetValue) {
+
+		for (var i = 0; i < this.resultData.length; ++i) {
+			var baseType = this.resultData[i].baseType;
+
+			if (baseType!=match.baseType) {
+				this.logger.error('Each rule must have concepts of the same base type (i.e. Patient and Observation concepts cannot be mixed in the same rule)');
+				return;
+
+			}
+		}
+
 		let item : CodeSetValue = {
 			code : match.code,
+			term : match.term,
+			dataType : match.dataType,
+			parentType : match.parentType,
+			baseType : match.baseType,
+			present : match.present,
+			valueFrom : match.valueFrom,
+			valueTo : match.valueTo,
+			units : match.units,
 			includeChildren : true,
 			exclusion : []
 		};
@@ -101,12 +125,13 @@ export class CodePickerDialog {
 		vm.codingService.getCodeChildren(selection.code)
 			.subscribe(
 				(result) => {
+
 				let rootNode : ExclusionTreeNode = {
 					codeSetValue : selection,
 					children : []
 				} as ExclusionTreeNode;
 
-				result.forEach((child) => {
+					result.forEach((child) => {
 					// If "includeChildren" is ticked
 					if (selection.includeChildren) {
 						// and no "excludes" then tick
@@ -118,20 +143,27 @@ export class CodePickerDialog {
 								return exclusion.code !== child.code;
 							});
 						}
+
 					}
+
 
 					let childNode : ExclusionTreeNode = {
 						codeSetValue : child
 					} as ExclusionTreeNode;
 
+
 					rootNode.children.push(childNode);
 				});
 
 				vm.exclusionTreeData = [ rootNode ];
+
+					console.log(vm.exclusionTreeData);
+
 			});
 	}
 
 	tickNode(node : ExclusionTreeNode) {
+		console.log(node);
 		if (node.codeSetValue.code === this.highlightedSelection.code) {
 			// Ticking root so empty exclusions and tick all children
 			this.highlightedSelection.exclusion = [];
@@ -193,27 +225,6 @@ export class CodePickerDialog {
 			}
 		}
 		return -1;
-	}
-
-	termShorten(term : string) {
-		term = term.replace(' (disorder)', '');
-		term = term.replace(' (observable entity)', '');
-		term = term.replace(' (finding)', '');
-		return term;
-	}
-
-	getTerm(code : string) : string {
-		let vm = this;
-		let term = vm.termCache[code];
-		if (term) { return term; }
-		vm.termCache[code] = 'Loading...';
-
-		vm.codingService.getPreferredTerm(code)
-			.subscribe(
-				(concept) => vm.termCache[code] = vm.termShorten(concept.preferredTerm)
-			);
-
-		return vm.termCache[code];
 	}
 
 	ok() {

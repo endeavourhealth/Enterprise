@@ -1,8 +1,9 @@
 package org.endeavour.enterprise.endpoints;
 
-import org.endeavour.enterprise.json.JsonFolderContent;
+import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.coreui.endpoints.AbstractEndpoint;
 import org.endeavourhealth.enterprise.core.database.models.*;
+import org.endeavourhealth.enterprise.core.json.JsonFolderContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,8 @@ public final class DashboardEndpoint extends AbstractEndpoint {
     public Response getRecentDocuments(@Context SecurityContext sc, @QueryParam("count") int count) throws Exception {
         super.setLogbackMarkers(sc);
 
-        String userUuid = "B5D86DA5-5E57-422E-B2C5-7E9C6F3DEA32";
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
+
         String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
 
         LOG.trace("getRecentDocuments {}", count);
@@ -41,7 +43,7 @@ public final class DashboardEndpoint extends AbstractEndpoint {
             ItemEntity item = ItemEntity.retrieveForActiveItem(activeItem);
             AuditEntity audit = AuditEntity.retrieveForUuid(item.getAuditUuid());
 
-            JsonFolderContent content = new JsonFolderContent(activeItem, item, audit);
+            JsonFolderContent content = new JsonFolderContent(activeItem, item, audit, null);
             ret.add(content);
         }
 

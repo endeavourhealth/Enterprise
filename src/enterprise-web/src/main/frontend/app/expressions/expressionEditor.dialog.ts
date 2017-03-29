@@ -89,8 +89,8 @@ export class ExpressionEditDialog implements OnInit {
         vm.expressionVariableName1 = resultData.variable[0].variableName;
         vm.expressionRuleId1 = resultData.variable[0].ruleId.toString();
         if (resultData.variable[0].restriction) {
-            vm.expressionRestrictionFieldName1 = resultData.variable[0].restriction.fieldName;
-            vm.expressionRestrictionOrderDirection1 = resultData.variable[0].restriction.orderDirection;
+            vm.expressionRestrictionFieldName1 = resultData.variable[0].restriction.restriction;
+            vm.expressionRestrictionOrderDirection1 = "";
             vm.expressionRestrictionCount1 = resultData.variable[0].restriction.count.toString();
         }
         vm.expressionTestField1 = resultData.variable[0].fieldName;
@@ -100,8 +100,8 @@ export class ExpressionEditDialog implements OnInit {
             vm.expressionVariableName2 = resultData.variable[1].variableName;
             vm.expressionRuleId2 = resultData.variable[1].ruleId.toString();
             if (resultData.variable[1].restriction) {
-                vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.fieldName;
-                vm.expressionRestrictionOrderDirection2 = resultData.variable[1].restriction.orderDirection;
+                vm.expressionRestrictionFieldName2 = resultData.variable[1].restriction.restriction;
+                vm.expressionRestrictionOrderDirection2 = "";
                 vm.expressionRestrictionCount2 = resultData.variable[1].restriction.count.toString();
             }
             vm.expressionTestField2 = resultData.variable[1].fieldName;
@@ -207,9 +207,8 @@ export class ExpressionEditDialog implements OnInit {
             vm.expressionFunction2 = null;
 
         var restriction : Restriction = {
-            fieldName : vm.expressionRestrictionFieldName1,
-            orderDirection : vm.expressionRestrictionOrderDirection1,
-            count : Number(vm.expressionRestrictionCount1)
+            restriction : vm.expressionRestrictionFieldName1,
+            count : vm.expressionRestrictionCount1
         }
 
         if (!vm.expressionRestrictionFieldName1||vm.expressionRestrictionFieldName1=="undefined"||vm.expressionRestrictionFieldName1=="") {
@@ -227,9 +226,8 @@ export class ExpressionEditDialog implements OnInit {
         vm.resultData.variable.push(variableType);
 
         var restriction : Restriction = {
-            fieldName : vm.expressionRestrictionFieldName2,
-            orderDirection : vm.expressionRestrictionOrderDirection2,
-            count : Number(vm.expressionRestrictionCount2)
+            restriction : vm.expressionRestrictionFieldName2,
+            count : vm.expressionRestrictionCount2
         }
 
         if (!vm.expressionRestrictionFieldName2||vm.expressionRestrictionFieldName2=="undefined"||vm.expressionRestrictionFieldName2=="") {

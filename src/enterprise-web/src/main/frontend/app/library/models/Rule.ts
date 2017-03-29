@@ -6,6 +6,7 @@ import {LayoutType} from "./LayoutType";
 export class Rule {
     description : string;
     id : string;
+    type : string;
     test : Test;
     testLibraryItemUUID : string;
     queryLibraryItemUUID : string;

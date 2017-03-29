@@ -1,5 +1,4 @@
 export class Restriction {
-	fieldName : string;
-	orderDirection : string;
-	count : number;
+	restriction : string;
+	count : string;
 }

@@ -33,7 +33,9 @@ public enum CodingSystem {
     @XmlEnumValue("SnomedCt")
     SNOMED_CT("SnomedCt"),
     @XmlEnumValue("CTV3")
-    CTV_3("CTV3");
+    CTV_3("CTV3"),
+    @XmlEnumValue("Endeavour")
+    ENDEAVOUR("Endeavour");
     private final String value;
 
     CodingSystem(String v) {

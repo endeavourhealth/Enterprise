@@ -295,7 +295,7 @@ public class ResultsManager {
             reportResult.setEndUserUuid(userUuid);
             reportResult.setBaselineDate(baselineDate);
             reportResult.setRunDate(now);
-            reportResult.setOrganisationId(Short.parseShort(org.getId()));
+            reportResult.setOrganisationId(Long.parseLong(org.getId()));
             reportResult.setQueryItemUuid(report.getQueryItemUuid());
             reportResult.setPopulationTypeId(Byte.parseByte(report.getPopulation()));
 
@@ -334,7 +334,7 @@ public class ResultsManager {
                 ReportPatientsEntity reportPatientsEntity = new ReportPatientsEntity();
                 reportPatientsEntity.setRunDate(now);
                 reportPatientsEntity.setQueryItemUuid(report.getQueryItemUuid());
-                reportPatientsEntity.setOrganisationId(Short.parseShort(org.getId()));
+                reportPatientsEntity.setOrganisationId(Long.parseLong(org.getId()));
                 reportPatientsEntity.setPatientId(id);
                 reportPatientsEntity.setPseudoId(pseudoId);
 

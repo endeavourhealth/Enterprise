@@ -2,7 +2,6 @@ package org.endeavourhealth.enterprise.core.database.models;
 
 import org.endeavourhealth.enterprise.core.database.PersistenceManager;
 import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
-import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 
 import javax.persistence.*;
 import java.util.ArrayList;

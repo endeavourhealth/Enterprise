@@ -1,16 +1,13 @@
 package org.endeavourhealth.enterprise.core.database.models.data;
 
-import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.database.PersistenceManager;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
- * Created by darren on 12/03/17.
+ * Created by darren on 29/03/17.
  */
 @Entity
 @Table(name = "ReportResult", schema = "enterprise_data_pseudonymised", catalog = "")
@@ -19,7 +16,7 @@ public class ReportResultEntity {
     private String endUserUuid;
     private Timestamp baselineDate;
     private Timestamp runDate;
-    private short organisationId;
+    private long organisationId;
     private String queryItemUuid;
     private byte populationTypeId;
     private Integer denominatorCount;
@@ -67,11 +64,11 @@ public class ReportResultEntity {
 
     @Basic
     @Column(name = "OrganisationId", nullable = false)
-    public short getOrganisationId() {
+    public long getOrganisationId() {
         return organisationId;
     }
 
-    public void setOrganisationId(short organisationId) {
+    public void setOrganisationId(long organisationId) {
         this.organisationId = organisationId;
     }
 
@@ -144,7 +141,7 @@ public class ReportResultEntity {
         result = 31 * result + (endUserUuid != null ? endUserUuid.hashCode() : 0);
         result = 31 * result + (baselineDate != null ? baselineDate.hashCode() : 0);
         result = 31 * result + (runDate != null ? runDate.hashCode() : 0);
-        result = 31 * result + (int) organisationId;
+        result = 31 * result + (int) (organisationId ^ (organisationId >>> 32));
         result = 31 * result + (queryItemUuid != null ? queryItemUuid.hashCode() : 0);
         result = 31 * result + (int) populationTypeId;
         result = 31 * result + (denominatorCount != null ? denominatorCount.hashCode() : 0);
@@ -181,11 +178,11 @@ public class ReportResultEntity {
 
     public static List<ReportResultEntity[]> getAllReportResults(String queryItemUuid) throws Exception {
         String where = "SELECT a from ReportResultEntity a"
-        + " where reportResultId in ( "+
-        "SELECT MAX(reportResultId) "+
-        "FROM ReportResultEntity where queryItemUuid = :queryItemUuid "+
-        "GROUP BY runDate "+
-        ") ORDER BY runDate desc";
+                + " where reportResultId in ( "+
+                "SELECT MAX(reportResultId) "+
+                "FROM ReportResultEntity where queryItemUuid = :queryItemUuid "+
+                "GROUP BY runDate "+
+                ") ORDER BY runDate desc";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
 

@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * Created by darren on 23/03/17.
+ * Created by darren on 29/03/17.
  */
 @Entity
 @Table(name = "ReportPatients", schema = "enterprise_data_pseudonymised", catalog = "")
@@ -15,7 +15,7 @@ public class ReportPatientsEntity {
     private int reportPatientId;
     private Timestamp runDate;
     private String queryItemUuid;
-    private short organisationId;
+    private long organisationId;
     private long patientId;
     private String pseudoId;
 
@@ -51,11 +51,11 @@ public class ReportPatientsEntity {
 
     @Basic
     @Column(name = "OrganisationId", nullable = false)
-    public short getOrganisationId() {
+    public long getOrganisationId() {
         return organisationId;
     }
 
-    public void setOrganisationId(short organisationId) {
+    public void setOrganisationId(long organisationId) {
         this.organisationId = organisationId;
     }
 
@@ -102,7 +102,7 @@ public class ReportPatientsEntity {
         int result = reportPatientId;
         result = 31 * result + (runDate != null ? runDate.hashCode() : 0);
         result = 31 * result + (queryItemUuid != null ? queryItemUuid.hashCode() : 0);
-        result = 31 * result + (int) organisationId;
+        result = 31 * result + (int) (organisationId ^ (organisationId >>> 32));
         result = 31 * result + (int) (patientId ^ (patientId >>> 32));
         result = 31 * result + (pseudoId != null ? pseudoId.hashCode() : 0);
         return result;

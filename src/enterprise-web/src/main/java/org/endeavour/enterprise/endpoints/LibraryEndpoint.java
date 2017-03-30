@@ -448,15 +448,25 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReportPatientsEHR")
     public Response getReportPatientsEHR(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Short organisationId) throws Exception {
-        super.setLogbackMarkers(sc);
 
-        List<Object[]> results = ReportPatientsEntity.getReportPatientsEHR(queryItemUuid, runDate, organisationId);
+        List<Object[]> results = null;
 
-        Object[] header = new Object[] { "patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "patient_townsend_score", "observation_clinical_effective_date", "observation_snomed_concept_id", "observation_original_code", "observation_original_term", "observation_value", "observation_units", "observation_is_problem", "organisation_name", "organisation_ods_code", "organisation_type", "practitioner_name", "practitioner_role_code", "practitioner_role_description" };
+        LOG.trace("Called getReportPatientsEHR", "");
 
-        results.add(0, header);
+        try {
+            super.setLogbackMarkers(sc);
 
-        clearLogbackMarkers();
+            results = ReportPatientsEntity.getReportPatientsEHR(queryItemUuid, runDate, organisationId);
+
+            Object[] header = new Object[] { "patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "patient_townsend_score", "observation_clinical_effective_date", "observation_snomed_concept_id", "observation_original_code", "observation_original_term", "observation_value", "observation_units", "observation_is_problem", "organisation_name", "organisation_ods_code", "organisation_type", "practitioner_name", "practitioner_role_code", "practitioner_role_description" };
+
+            results.add(0, header);
+
+            clearLogbackMarkers();
+
+        }catch(Exception e){
+            LOG.trace("getReportPatientsEHR", e.getMessage());
+        }
 
         return Response
                 .ok()

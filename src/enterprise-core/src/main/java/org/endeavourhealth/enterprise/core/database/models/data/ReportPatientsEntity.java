@@ -108,7 +108,7 @@ public class ReportPatientsEntity {
         return result;
     }
 
-    public static List<Object[]> getReportPatients(String type, String queryItemUuid, String runDate, Short organisationId) throws Exception {
+    public static List<Object[]> getReportPatients(String type, String queryItemUuid, String runDate, Long organisationId) throws Exception {
         String where = "";
 
         if (type.equals("EHR"))

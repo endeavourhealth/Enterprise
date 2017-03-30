@@ -430,7 +430,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReportPatients")
-    public Response getReportPatients(@Context SecurityContext sc, @QueryParam("type") String type, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Short organisationId) throws Exception {
+    public Response getReportPatients(@Context SecurityContext sc, @QueryParam("type") String type, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Long organisationId) throws Exception {
 
         List<Object[]> results = null;
 

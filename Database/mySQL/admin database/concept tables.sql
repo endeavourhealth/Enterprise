@@ -82,6 +82,12 @@ ALTER TABLE `enterprise_data_pseudonymised`.`observation`
 ADD INDEX `snomed_concept_id` (`snomed_concept_id` ASC);
 ALTER TABLE `enterprise_data_pseudonymised`.`referral_request` 
 ADD INDEX `snomed_concept_id` (`snomed_concept_id` ASC);
+ALTER TABLE `enterprise_data_pseudonymised`.`episode_of_care` 
+ADD INDEX `patient_id` (`patient_id` ASC);
+ALTER TABLE `enterprise_data_pseudonymised`.`observation` 
+ADD INDEX `snomed_problem` (`snomed_concept_id` ASC, `is_problem` ASC)
+ALTER TABLE `enterprise_data_pseudonymised`.`observation` 
+ADD INDEX `snomed_value` (`snomed_concept_id` ASC, `value` ASC);
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 (`ConceptId`,

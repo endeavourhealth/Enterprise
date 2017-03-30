@@ -31,22 +31,14 @@ export class ReportService extends BaseHttp2Service {
 		return this.httpGet('api/library/getAllReportResults', {search : params});
 	}
 
-	getReportPatients(queryItemUuid : string, runDate, organisationId):Observable<ReportPatient[]> {
+	getReportPatients(type : string, queryItemUuid : string, runDate, organisationId):Observable<any[]> {
 		var params : URLSearchParams = new URLSearchParams();
+		params.append('type', type);
 		params.append('queryItemUuid', queryItemUuid);
 		params.append('runDate', runDate);
 		params.append('organisationId', organisationId);
 
 		return this.httpGet('api/library/getReportPatients', {search : params});
-	}
-
-	getReportPatientsEHR(queryItemUuid : string, runDate, organisationId):Observable<any[]> {
-		var params : URLSearchParams = new URLSearchParams();
-		params.append('queryItemUuid', queryItemUuid);
-		params.append('runDate', runDate);
-		params.append('organisationId', organisationId);
-
-		return this.httpGet('api/library/getReportPatientsEHR', {search : params});
 	}
 
 	runReport(result : ReportRun):Observable<ReportRun> {

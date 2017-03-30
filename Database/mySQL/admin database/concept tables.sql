@@ -15,9 +15,9 @@ CREATE TABLE `enterprise_data_pseudonymised`.`Concept` (
   PRIMARY KEY (`Id`),
   KEY `ConceptId` (`ConceptId`),
   KEY `Definition` (`Definition`),
-  KEY `ParentTypeConceptId` (`ParentTypeConceptId`)
+  KEY `ParentTypeConceptId` (`ParentTypeConceptId`),
+  KEY `BaseTypeConceptId` (`BaseTypeConceptId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-
   
 CREATE TABLE `enterprise_data_pseudonymised`.`DataType` (
   `DataTypeId` TINYINT(1) NOT NULL,

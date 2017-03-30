@@ -18,26 +18,26 @@
 				</div>
 			</div>
 
-			<div class="form-group col-md-4"><span style="color:black"><i class="fa fa-info-circle" aria-hidden="true"></i> Use % before or after search term to extend search range (i.e. %height%)</span>
+			<div class="form-group col-md-4"><span style="color:black;font-size:10px"><i class="fa fa-info-circle" aria-hidden="true"></i> Use % before the search term to extend the concept search (i.e. %height - will include the term 'height' anywhere within the concept term)</span>
 			</div>
 
-			<div class="form-group col-md-4"><span style="color:black"><i class="fa fa-info-circle" aria-hidden="true"></i> Concepts displayed in </span>
-				<span style="color:green">GREEN</span>
-				<span style="color:black"> indicate that the concept is present in the EHR record</span>
+			<div class="form-group col-md-4"><span style="color:black;font-size:10px"><i class="fa fa-info-circle" aria-hidden="true"></i> Concepts displayed in </span>
+				<span style="color:green;font-size:10px">GREEN</span>
+				<span style="color:black;font-size:10px"> indicate that the concept is present in the EHR record</span>
 			</div>
 		</div>
 
 		<!-- Matches -->
 		<div class="row">
 			<div class="form-group col-md-4">
-				<label class="control-label">Parent Concepts</label> <small class="text-muted">(Dbl click to navigate up)</small>
+				<label class="control-label">Parent Concepts</label> <small class="text-muted">(dbl-click to navigate up)</small>
 				<div class="scroll-box-150 form-control">
 					<div *ngFor="let parent of parents"
 							 (dblclick)="displayCode(parent, true)"
 							 class="hover-box show-child-on-hover striped"
 							 [ngClass]="{'previous-selection': parent?.code == previousSelection?.code}">
-						<span *ngIf="parent.present=='0'" style="color:black">{{ parent.term }}</span>
-						<span *ngIf="parent.present=='1'" style="color:green">{{ parent.term }}</span>
+						<span *ngIf="parent.present=='0'" style="color:black;font-size:12px">{{ parent.term }}</span>
+						<span *ngIf="parent.present=='1'" style="color:green;font-size:12px">{{ parent.term }}</span>
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
 							<span class="fa fa-sm fa-plus"></span>
 						</button>
@@ -57,8 +57,8 @@
 						<span *ngIf="match.baseType=='Allergy'" style="cursor: pointer" class="fa fa-exclamation-triangle fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
 						<span *ngIf="match.baseType=='Referral'" style="cursor: pointer" class="fa fa-h-square fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
 						<span *ngIf="match.baseType=='Encounter'" style="cursor: pointer" class="fa fa-user-md fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span *ngIf="match.present=='0'" style="color:black">{{ match.term }}</span>
-						<span *ngIf="match.present=='1'" style="color:green">{{ match.term }}</span>
+						<span *ngIf="match.present=='0'" style="color:black;font-size:12px">{{ match.term }}</span>
+						<span *ngIf="match.present=='1'" style="color:green;font-size:12px">{{ match.term }}</span>
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(match)">
 							<span class="fa fa-sm fa-plus"></span>
 						</button>
@@ -66,14 +66,14 @@
 				</div>
 			</div>
 			<div class="form-group col-md-4">
-				<label class="control-label">Child Concepts</label> <small class="text-muted">(Dbl click to navigate down)</small>
+				<label class="control-label">Child Concepts</label> <small class="text-muted">(dbl-click to navigate down)</small>
 				<div class="scroll-box-150 form-control">
 					<div *ngFor="let child of children"
 							 (dblclick)="displayCode(child, true)"
 							 class="hover-box show-child-on-hover striped"
 							 [ngClass]="{'previous-selection': child?.code == previousSelection?.code}">
-						<span *ngIf="child.present=='0'" style="color:black">{{ child.term }}</span>
-						<span *ngIf="child.present=='1'" style="color:green">{{ child.term }}</span>
+						<span *ngIf="child.present=='0'" style="color:black;font-size:12px">{{ child.term }}</span>
+						<span *ngIf="child.present=='1'" style="color:green;font-size:12px">{{ child.term }}</span>
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
 							<span class="fa fa-sm fa-plus"></span>
 						</button>
@@ -90,7 +90,7 @@
 					<div *ngFor="let selection of resultData"
 							 (click)="displayExclusionTree(selection)"
 							 class="hover-box show-child-on-hover striped"
-							 [ngClass]="{'selection': selection == highlightedSelection}">
+							 [ngClass]="{'selection': selection == highlightedSelection}" style="color:black;font-size:12px">
 						{{ selection.term }}
 						<span class="label label-success" *ngIf="selection.includeChildren && (!selection.exclusion || selection.exclusion.length == 0)">All child codes</span>
 						<span class="label label-warning" *ngIf="selection.includeChildren && (selection.exclusion && selection.exclusion.length > 0)">Some child codes</span>
@@ -103,7 +103,7 @@
 			</div>
 			<div class="form-group col-md-6">
 				<label class="control-label">Inclusions/Exclusions</label>
-				<div class="scroll-box-150 form-control">
+				<div class="scroll-box-150 form-control" style="color:black;font-size:12px">
 					<Tree [nodes]="exclusionTreeData" [options]="options">
 						<template #treeNodeTemplate let-node="node">
 								<span class="folder-item">
@@ -122,11 +122,6 @@
 					</Tree>
 
 				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-6">
-				<label class="control-label">Icon Descriptions</label>
 			</div>
 		</div>
 		<div class="row">

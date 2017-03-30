@@ -186,7 +186,7 @@ public class ConceptEntity {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
 
         List<Object[]> ent = entityManager.createQuery(where)
-                .setParameter("term", term).getResultList();
+                .setParameter("term", term+"%").getResultList();
 
         entityManager.close();
 

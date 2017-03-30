@@ -207,7 +207,7 @@ public class ResultsManager {
                 }
             } else if (field.equals("EFFECTIVE_DATE")) {
                 if (filter.getValueFrom()!=null) {
-                    String dateFrom = filter.getValueFrom().getConstant();
+                    String dateFrom = "-"+filter.getValueFrom().getConstant();
                     if (filter.getValueFrom().getRelativeUnit()!=null) {
                         String relativeUnit = filter.getValueFrom().getRelativeUnit().value();
                         Timestamp baselineDate = convertToDate(report.getBaselineDate());

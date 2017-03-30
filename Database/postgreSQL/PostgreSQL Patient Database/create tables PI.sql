@@ -212,7 +212,7 @@ CREATE TABLE organization
   type_code character varying(50),
   type_desc character varying(255),
   postcode character varying(10),
-  parent_organization_id integer,
+  parent_organization_id bigint,
   CONSTRAINT pk_organization_id PRIMARY KEY (id)
 )
 WITH (
@@ -358,6 +358,7 @@ CREATE TABLE episode_of_care
   date_registered date,
   date_registered_end date,
   usual_gp_practitioner_id bigint,
+  managing_organization_id bigint,
   CONSTRAINT pk_episode_of_care_id PRIMARY KEY (id),
   CONSTRAINT fk_episode_of_care_patient_id_organisation_id FOREIGN KEY (patient_id, organization_id)
       REFERENCES public.patient (id, organization_id) MATCH SIMPLE

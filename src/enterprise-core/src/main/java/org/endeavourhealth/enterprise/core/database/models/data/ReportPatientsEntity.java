@@ -108,35 +108,11 @@ public class ReportPatientsEntity {
         return result;
     }
 
-    public static List<ReportPatientsEntity[]> getReportPatients(String queryItemUuid, String runDate, Short organisationId) throws Exception {
-        String where = "select r " +
-                "from ReportPatientsEntity r where queryItemUuid = :queryItemUuid "+
-                "and runDate = :runDate and organisationId = :organisationId";
+    public static List<Object[]> getReportPatients(String type, String queryItemUuid, String runDate, Short organisationId) throws Exception {
+        String where = "";
 
-        Timestamp runDate1 = null;
-
-        try{
-            runDate1 = new java.sql.Timestamp(Long.parseLong(runDate));
-        }catch(Exception e){
-
-        }
-
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
-
-        List<ReportPatientsEntity[]> ent = entityManager.createQuery(where)
-                .setParameter("queryItemUuid", queryItemUuid)
-                .setParameter("runDate", runDate1)
-                .setParameter("organisationId", organisationId)
-                .getResultList();
-
-        entityManager.close();
-
-        return ent;
-
-    }
-
-    public static List<Object[]> getReportPatientsEHR(String queryItemUuid, String runDate, Short organisationId) throws Exception {
-        String where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
+        if (type.equals("EHR"))
+            where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
                 "o.clinicalEffectiveDate, o.snomedConceptId, o.originalCode, o.originalTerm, o.value, o.units, o.isProblem, " +
                 "og.name, og.odsCode, og.typeDesc, "+
                 "pr.name, pr.roleCode, pr.roleDesc "+
@@ -148,6 +124,15 @@ public class ReportPatientsEntity {
                 "join PractitionerEntity pr on pr.id = o.practitionerId "+
                 "where queryItemUuid = :queryItemUuid "+
                 "and runDate = :runDate and organisationId = :organisationId";
+        else
+            where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
+                    "og.name, og.odsCode, og.typeDesc "+
+                    "from ReportPatientsEntity r "+
+                    "join PatientEntity p on p.id = r.patientId "+
+                    "join PatientGenderEntity pg on pg.id = p.patientGenderId "+
+                    "join OrganizationEntity og on og.id = p.organizationId "+
+                    "where queryItemUuid = :queryItemUuid "+
+                    "and runDate = :runDate and organisationId = :organisationId";
 
         Timestamp runDate1 = null;
 

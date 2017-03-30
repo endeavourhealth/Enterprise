@@ -430,42 +430,30 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getReportPatients")
-    public Response getReportPatients(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Short organisationId) throws Exception {
-        super.setLogbackMarkers(sc);
-
-        List<ReportPatientsEntity[]> results = ReportPatientsEntity.getReportPatients(queryItemUuid, runDate, organisationId);
-
-        clearLogbackMarkers();
-
-        return Response
-                .ok()
-                .entity(results)
-                .build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/getReportPatientsEHR")
-    public Response getReportPatientsEHR(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Short organisationId) throws Exception {
+    public Response getReportPatients(@Context SecurityContext sc, @QueryParam("type") String type, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Short organisationId) throws Exception {
 
         List<Object[]> results = null;
 
-        LOG.trace("Called getReportPatientsEHR", "");
+        LOG.trace("Called getReportPatients", "");
 
         try {
             super.setLogbackMarkers(sc);
 
-            results = ReportPatientsEntity.getReportPatientsEHR(queryItemUuid, runDate, organisationId);
+            results = ReportPatientsEntity.getReportPatients(type, queryItemUuid, runDate, organisationId);
 
-            Object[] header = new Object[] { "patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "patient_townsend_score", "observation_clinical_effective_date", "observation_snomed_concept_id", "observation_original_code", "observation_original_term", "observation_value", "observation_units", "observation_is_problem", "organisation_name", "organisation_ods_code", "organisation_type", "practitioner_name", "practitioner_role_code", "practitioner_role_description" };
+            Object[] header = null;
+
+            if (type.equals("EHR"))
+                header = new Object[] { "patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "patient_townsend_score", "observation_clinical_effective_date", "observation_snomed_concept_id", "observation_original_code", "observation_original_term", "observation_value", "observation_units", "observation_is_problem", "organisation_name", "organisation_ods_code", "organisation_type", "practitioner_name", "practitioner_role_code", "practitioner_role_description" };
+            else
+                header = new Object[] { "patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "patient_townsend_score", "organisation_name", "organisation_ods_code", "organisation_type" };
 
             results.add(0, header);
 
             clearLogbackMarkers();
 
         }catch(Exception e){
-            LOG.trace("getReportPatientsEHR", e.getMessage());
+            LOG.trace("getReportPatients", e.getMessage());
         }
 
         return Response

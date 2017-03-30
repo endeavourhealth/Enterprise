@@ -5,7 +5,6 @@ import {ReportRun} from "./models/ReportRun";
 import {Organisation} from "./models/Organisation";
 import {ReportResult} from "./models/ReportResult";
 import {ReportPatient} from "./models/ReportPatient";
-import {ReportPatientExport} from "./models/ReportPatientExport";
 import {ReportService} from "./report.service";
 import {FolderItem} from "../library/models/FolderItem";
 
@@ -92,31 +91,9 @@ export class ReportViewDialog implements OnInit {
     getReportPatients(uuid:string, lastRun:number, organisationId:string) {
         var vm = this;
 
-        vm.reportService.getReportPatients(uuid, lastRun, organisationId)
-            .subscribe(
-                (data) => {
-                    let reportPatientExport : ReportPatientExport[] = <any>[];
+        var type = "PATIENT";
 
-                    for (var i = 0, len = data.length; i < len; i++) {
-                        let repExp : ReportPatientExport = {
-                            organisation: this.getOrganisationName(data[i].organisationId),
-                            patientId: data[i].patientId,
-                            pseudoId: data[i].pseudoId
-                        }
-                        reportPatientExport.push(repExp);
-                    }
-
-                    var csvData = this.ConvertToCSV(reportPatientExport);
-                    var blob = new Blob([csvData], { type: 'text/csv' });
-                    var url= window.URL.createObjectURL(blob);
-                    window.open(url);
-                });
-    }
-
-    getReportPatientsEHR(uuid:string, lastRun:number, organisationId:string) {
-        var vm = this;
-
-        vm.reportService.getReportPatientsEHR(uuid, lastRun, organisationId)
+        vm.reportService.getReportPatients(type, uuid, lastRun, organisationId)
             .subscribe(
                 (data) => {
                     var csvData = this.ConvertToCSV(data);
@@ -132,7 +109,8 @@ export class ReportViewDialog implements OnInit {
         var row = "";
 
         for (var i = 0; i < array.length; i++) {
-            array[i][22] = array[i][22].replace(',','');
+            if (array[i][22]!=null)
+                array[i][22] = array[i][22].replace(',','');
             var line = '';
             for (var index in array[i]) {
                 if (line != '') line += ','

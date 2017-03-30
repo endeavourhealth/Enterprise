@@ -66,7 +66,7 @@
                                     </tr>
                                     <tr *ngFor="let result of reportResult">
                                         <td style="width: 300px;padding: 5px;border: solid thin silver">{{getOrganisationName(result.organisationId)}}</td>
-                                        <td style="padding: 5px;border: solid thin silver"><a (click)="getReportPatientsEHR(result.queryItemUuid,result.runDate,result.organisationId)" style="cursor:pointer;">{{result.enumeratorCount}}</a></td>
+                                        <td style="padding: 5px;border: solid thin silver"><a (click)="getReportPatients(result.queryItemUuid,result.runDate,result.organisationId)" style="cursor:pointer;">{{result.enumeratorCount}}</a></td>
                                         <td style="padding: 5px;border: solid thin silver">{{result.denominatorCount}}</td>
                                     </tr>
                                 </table>

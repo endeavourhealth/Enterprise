@@ -69,16 +69,16 @@
 								<th style="width: 140px">Value <=</th>
 							</tr>
 							<tr style="height:40px" *ngFor="let selection of codeSelection; let isLast=last">
-								<td>
+								<td style="color:black;font-size:12px">
 									{{ selection.baseType }}
 								</td>
-								<td *ngIf="selection.parentType!=selection.baseType">
+								<td *ngIf="selection.parentType!=selection.baseType"  style="color:black;font-size:12px">
 									{{ selection.parentType }}
 								</td>
 								<td *ngIf="selection.parentType==selection.baseType">
 
 								</td>
-								<td>
+								<td style="color:black;font-size:12px">
 									{{ selection.term.split("(")[0] }}
 								</td>
 								<td *ngIf="selection.dataType=='8'||selection.dataType=='13'||selection.baseType=='Observation'">
@@ -204,16 +204,16 @@
 		<div class='row' *ngIf="testType=='date' || (dateEditor&&type=='1')" style="margin-left: 1px;">
 			<div class="col-xs-6">
 				<div class="form-group">
-					<span *ngIf="datetype == 'absolute'">From:</span>
+					<span *ngIf="datetype == 'absolute'">From (>=):</span>
 					<p class="input-group" *ngIf="datetype == 'absolute'">
 						<input type="date" class="form-control" [(ngModel)]="filterDateFrom" name="dateFrom">
 					</p>
-					<span *ngIf="datetype == 'relative'">From:</span>
+					<span *ngIf="datetype == 'relative'">From (>=):</span>
 					<p class="input-group" *ngIf="datetype == 'relative'">
 						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateFromRelativeValue" name="dateFromRelativeValue">
 						<select class="form-control" style="width:100px" [(ngModel)]="filterDateFromRelativePeriod" name="dateFromRelativePeriod">
 							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;of the
+						</select>&nbsp;&nbsp;before the
 						<select class="form-control" [(ngModel)]="testDateFromRuleId" name="testDateFromRuleId" >
 							<option *ngFor="let rule of rules" value="{{rule.value}}">{{rule.displayName}}</option>
 						</select>
@@ -222,16 +222,16 @@
 			</div>
 			<div class="col-xs-6">
 				<div class="form-group">
-					<span *ngIf="datetype == 'absolute'">To:</span>
+					<span *ngIf="datetype == 'absolute'">To (<=):</span>
 					<p class="input-group" *ngIf="datetype == 'absolute'">
 						<input type="date" class="form-control" [(ngModel)]="filterDateTo" name="dateTo">
 					</p>
-					<span *ngIf="datetype == 'relative'">To:</span>
+					<span *ngIf="datetype == 'relative'">To (<=):</span>
 					<p class="input-group" *ngIf="datetype == 'relative'">
 						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateToRelativeValue" name="dateToRelativeValue">
 						<select class="form-control" style="width:100px" [(ngModel)]="filterDateToRelativePeriod" name="dateToRelativePeriod">
 							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;of the
+						</select>&nbsp;&nbsp;after the
 						<select class="form-control" [(ngModel)]="testDateToRuleId" name="testDateToRuleId" >
 							<option *ngFor="let rule of rules" value="{{rule.value}}">{{rule.displayName}}</option>
 						</select>

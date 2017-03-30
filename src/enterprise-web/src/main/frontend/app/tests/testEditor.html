@@ -60,13 +60,13 @@
 					</label>
 
 					<div *ngIf="type=='1'" style="cursor: pointer; height:auto; overflow-y:scroll; min-height: 30px; max-height: 150px;" >
-						<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px;width:850px">
+						<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px;width:830px">
 							<tr *ngIf="showConceptResults">
 								<th style="width: 150px">Data Source</th>
 								<th style="width: 200px">Parent Concept</th>
 								<th style="width: 200px">Concept Term</th>
-								<th style="width: 150px">Value From</th>
-								<th style="width: 150px">Value To</th>
+								<th style="width: 140px">Value >=</th>
+								<th style="width: 140px">Value <=</th>
 							</tr>
 							<tr style="height:40px" *ngFor="let selection of codeSelection; let isLast=last">
 								<td>
@@ -81,10 +81,10 @@
 								<td>
 									{{ selection.term.split("(")[0] }}
 								</td>
-								<td *ngIf="selection.dataType=='8'||selection.dataType=='13'||selection.units!=''">
+								<td *ngIf="selection.dataType=='8'||selection.dataType=='13'||selection.baseType=='Observation'">
 									<input type="text" style="width:100px;background: lightyellow" [(ngModel)]="selection.valueFrom" [ngModelOptions]="{standalone: true}"><span style="font-size: 10px;"> {{selection.units}}</span>
 								</td>
-								<td *ngIf="selection.dataType=='13'||selection.units!=''">
+								<td *ngIf="selection.dataType=='13'||selection.baseType=='Observation'">
 									<input type="text" style="width:100px;background: lightyellow" [(ngModel)]="selection.valueTo" [ngModelOptions]="{standalone: true}"><span style="font-size: 10px;"> {{selection.units}}</span>
 								</td>
 								<td *ngIf="selection.dataType=='2'||selection.dataType=='14'">

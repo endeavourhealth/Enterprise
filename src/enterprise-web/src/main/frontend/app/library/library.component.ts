@@ -95,7 +95,6 @@ export class LibraryComponent {
 
 	runReport(item: FolderItem) {
 		var vm = this;
-		console.log(item);
 
 		let reportRun: ReportRun = {
 			organisation: [],
@@ -106,7 +105,9 @@ export class LibraryComponent {
 
 		ReportEditDialog.open(vm.$modal, reportRun, item)
 			.result.then(function (resultData: ReportRun) {
-			console.log(resultData);
+
+			item.isRunning = true;
+
 			resultData.queryItemUuid = item.uuid;
 
 			vm.reportService.runReport(resultData)

@@ -105,19 +105,19 @@ join enterprise_admin.snomed s3 on s3.pid = h.parent_pid
 
 update `enterprise_data_pseudonymised`.`Concept` c
 join enterprise_data_pseudonymised.observation o on o.snomed_concept_id = c.ConceptId
-set c.present = 1
+set c.present = 1;
 update `enterprise_data_pseudonymised`.`Concept` c
 join enterprise_data_pseudonymised.medication_statement o on o.dmd_id = c.ConceptId
-set c.present = 1
+set c.present = 1;
 update `enterprise_data_pseudonymised`.`Concept` c
 join enterprise_data_pseudonymised.allergy_intolerance o on o.snomed_concept_id = c.ConceptId
-set c.present = 1
+set c.present = 1;
 update `enterprise_data_pseudonymised`.`Concept` c
 join enterprise_data_pseudonymised.referral_request o on o.snomed_concept_id = c.ConceptId
-set c.present = 1
+set c.present = 1;
 update `enterprise_data_pseudonymised`.`Concept` c
 join enterprise_data_pseudonymised.encounter o on o.snomed_concept_id = c.ConceptId
-set c.present = 1
+set c.present = 1;
 
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
@@ -130,7 +130,7 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 `ConceptTypeId`,
 `Present`)
 select distinct snomed_concept_id,original_term,'2','2',1,11,0,1 from enterprise_data_pseudonymised.observation
-where snomed_concept_id IS NOT NULL
+where snomed_concept_id IS NOT NULL;
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 (`ConceptId`,
@@ -142,7 +142,7 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 `ConceptTypeId`,
 `Present`)
 select distinct dmd_id,original_term,'4','4',1,11,0,1 from enterprise_data_pseudonymised.medication_statement
-where dmd_id IS NOT NULL
+where dmd_id IS NOT NULL;
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 (`ConceptId`,
@@ -154,7 +154,7 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 `ConceptTypeId`,
 `Present`)
 select distinct snomed_concept_id,original_term,'8','8',1,11,0,1 from enterprise_data_pseudonymised.allergy_intolerance
-where snomed_concept_id IS NOT NULL
+where snomed_concept_id IS NOT NULL;
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 (`ConceptId`,
@@ -166,7 +166,7 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 `ConceptTypeId`,
 `Present`)
 select distinct snomed_concept_id,original_term,'7','7',1,11,0,1 from enterprise_data_pseudonymised.referral_request
-where snomed_concept_id IS NOT NULL
+where snomed_concept_id IS NOT NULL;
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 (`ConceptId`,
@@ -178,7 +178,7 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 `ConceptTypeId`,
 `Present`)
 select distinct snomed_concept_id,original_term,'6','6',1,11,0,1 from enterprise_data_pseudonymised.encounter
-where snomed_concept_id IS NOT NULL
+where snomed_concept_id IS NOT NULL;
 
 
 

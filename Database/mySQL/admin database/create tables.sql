@@ -56,10 +56,12 @@ CREATE TABLE enterprise_data_pseudonymised.`ReportPatients` (
   `OrganisationId` BIGINT(20) NOT NULL,
   `PatientId` BIGINT(20) NOT NULL,
   `PseudoId` varchar(255) DEFAULT NULL,
+  `RuleId` int(11) NOT NULL,
   PRIMARY KEY (`ReportPatientId`),
   KEY `RunDate` (`RunDate`),
   KEY `QueryItemUuid` (`QueryItemUuid`),
-  KEY `OrganisationId` (`OrganisationId`)
+  KEY `OrganisationId` (`OrganisationId`),
+  KEY `RuleId` (`RuleId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 CREATE TABLE enterprise_data_pseudonymised.`ReportResult` (
   `ReportResultId` int(11) NOT NULL AUTO_INCREMENT,
@@ -71,9 +73,11 @@ CREATE TABLE enterprise_data_pseudonymised.`ReportResult` (
   `PopulationTypeId` tinyint(1) NOT NULL,
   `DenominatorCount` int(11) DEFAULT NULL,
   `EnumeratorCount` int(11) DEFAULT NULL,
+  `RuleId` int(11) NOT NULL,
   PRIMARY KEY (`ReportResultId`),
   KEY `RunDate` (`RunDate`),
-  KEY `QueryItemUuid` (`QueryItemUuid`)
+  KEY `QueryItemUuid` (`QueryItemUuid`),
+  KEY `RuleId` (`RuleId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 INSERT INTO enterprise_admin.ItemType(ItemTypeId, Description) VALUES (5, 'CodeSet');

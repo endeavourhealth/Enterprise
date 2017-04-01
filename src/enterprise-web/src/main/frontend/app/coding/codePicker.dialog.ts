@@ -6,6 +6,7 @@ import {ExclusionTreeNode} from "./models/ExclusionTreeNode";
 import {CodingService} from "./coding.service";
 import {LoggerService} from "../common/logger.service";
 
+
 @Component({
 	selector: 'ngbd-modal-content',
 	template: require('./codePicker.html')

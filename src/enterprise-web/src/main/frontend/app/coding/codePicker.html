@@ -36,8 +36,8 @@
 							 (dblclick)="displayCode(parent, true)"
 							 class="hover-box show-child-on-hover striped"
 							 [ngClass]="{'previous-selection': parent?.code == previousSelection?.code}">
-						<span *ngIf="parent.present=='0'" style="color:black;font-size:12px">{{ parent.term }}</span>
-						<span *ngIf="parent.present=='1'" style="color:green;font-size:12px">{{ parent.term }}</span>
+						<span ngbTooltip="{{parent.code}}" *ngIf="parent.present=='0'" style="color:black;font-size:12px">{{ parent.term }}</span>
+						<span ngbTooltip="{{parent.code}}" *ngIf="parent.present=='1'" style="color:green;font-size:12px">{{ parent.term }}</span>
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
 							<span class="fa fa-sm fa-plus"></span>
 						</button>
@@ -57,8 +57,8 @@
 						<span *ngIf="match.baseType=='Allergy'" style="cursor: pointer" class="fa fa-exclamation-triangle fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
 						<span *ngIf="match.baseType=='Referral'" style="cursor: pointer" class="fa fa-h-square fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
 						<span *ngIf="match.baseType=='Encounter'" style="cursor: pointer" class="fa fa-user-md fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span *ngIf="match.present=='0'" style="color:black;font-size:12px">{{ match.term }}</span>
-						<span *ngIf="match.present=='1'" style="color:green;font-size:12px">{{ match.term }}</span>
+						<span ngbTooltip="{{match.code}}" *ngIf="match.present=='0'" style="color:black;font-size:12px">{{ match.term }}</span>
+						<span ngbTooltip="{{match.code}}" *ngIf="match.present=='1'" style="color:green;font-size:12px">{{ match.term }}</span>
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(match)">
 							<span class="fa fa-sm fa-plus"></span>
 						</button>
@@ -72,8 +72,8 @@
 							 (dblclick)="displayCode(child, true)"
 							 class="hover-box show-child-on-hover striped"
 							 [ngClass]="{'previous-selection': child?.code == previousSelection?.code}">
-						<span *ngIf="child.present=='0'" style="color:black;font-size:12px">{{ child.term }}</span>
-						<span *ngIf="child.present=='1'" style="color:green;font-size:12px">{{ child.term }}</span>
+						<span ngbTooltip="{{child.code}}" *ngIf="child.present=='0'" style="color:black;font-size:12px">{{ child.term }}</span>
+						<span ngbTooltip="{{child.code}}" *ngIf="child.present=='1'" style="color:green;font-size:12px">{{ child.term }}</span>
 						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
 							<span class="fa fa-sm fa-plus"></span>
 						</button>
@@ -87,7 +87,7 @@
 			<div class="form-group col-md-6">
 				<label class="control-label">Selected Concept(s)</label>
 				<div class="scroll-box-150 form-control">
-					<div *ngFor="let selection of resultData"
+					<div ngbTooltip="{{selection.code}}" *ngFor="let selection of resultData"
 							 (click)="displayExclusionTree(selection)"
 							 class="hover-box show-child-on-hover striped"
 							 [ngClass]="{'selection': selection == highlightedSelection}" style="color:black;font-size:12px">
@@ -116,7 +116,7 @@
 									<span class="text-danger fa fa-ban"
 												(click)="tickNode(node.data)"
 												*ngIf="!node.data.codeSetValue.includeChildren"> </span>
-									<span>{{ node.data.codeSetValue.term }}</span>
+									<span ngbTooltip="{{node.data.codeSetValue.code}}">{{ node.data.codeSetValue.term }}</span>
 							</span>
 						</template>
 					</Tree>

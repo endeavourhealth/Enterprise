@@ -506,6 +506,11 @@ export class QueryEditComponent {
 					.result.then(function (resultData: Test) {
 
 					selectedRule.data.test = resultData;
+
+					if (vm.ruleDescription=="Feature Description") {
+						vm.ruleDescription = selectedRule.data.test.filter[0].codeSet.codeSetValue[0].term;
+						vm.ruleDescriptionChange();
+					}
 				});
 			}
 		}

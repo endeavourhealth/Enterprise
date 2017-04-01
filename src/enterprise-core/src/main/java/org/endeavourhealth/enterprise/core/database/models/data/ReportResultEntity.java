@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * Created by darren on 29/03/17.
+ * Created by darren on 30/03/17.
  */
 @Entity
 @Table(name = "ReportResult", schema = "enterprise_data_pseudonymised", catalog = "")
@@ -195,5 +195,4 @@ public class ReportResultEntity {
         return ent;
 
     }
-
 }

@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * Created by darren on 29/03/17.
+ * Created by darren on 30/03/17.
  */
 @Entity
 @Table(name = "ReportPatients", schema = "enterprise_data_pseudonymised", catalog = "")
@@ -17,7 +17,6 @@ public class ReportPatientsEntity {
     private String queryItemUuid;
     private long organisationId;
     private long patientId;
-    private String pseudoId;
 
     @Id
     @Column(name = "ReportPatientId", nullable = false)
@@ -69,16 +68,6 @@ public class ReportPatientsEntity {
         this.patientId = patientId;
     }
 
-    @Basic
-    @Column(name = "PseudoId", nullable = true, length = 255)
-    public String getPseudoId() {
-        return pseudoId;
-    }
-
-    public void setPseudoId(String pseudoId) {
-        this.pseudoId = pseudoId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -92,7 +81,6 @@ public class ReportPatientsEntity {
         if (runDate != null ? !runDate.equals(that.runDate) : that.runDate != null) return false;
         if (queryItemUuid != null ? !queryItemUuid.equals(that.queryItemUuid) : that.queryItemUuid != null)
             return false;
-        if (pseudoId != null ? !pseudoId.equals(that.pseudoId) : that.pseudoId != null) return false;
 
         return true;
     }
@@ -104,7 +92,6 @@ public class ReportPatientsEntity {
         result = 31 * result + (queryItemUuid != null ? queryItemUuid.hashCode() : 0);
         result = 31 * result + (int) (organisationId ^ (organisationId >>> 32));
         result = 31 * result + (int) (patientId ^ (patientId >>> 32));
-        result = 31 * result + (pseudoId != null ? pseudoId.hashCode() : 0);
         return result;
     }
 
@@ -113,17 +100,17 @@ public class ReportPatientsEntity {
 
         if (type.equals("EHR"))
             where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
-                "o.clinicalEffectiveDate, o.snomedConceptId, o.originalCode, o.originalTerm, o.value, o.units, o.isProblem, " +
-                "og.name, og.odsCode, og.typeDesc, "+
-                "pr.name, pr.roleCode, pr.roleDesc "+
-                "from ReportPatientsEntity r "+
-                "join PatientEntity p on p.id = r.patientId "+
-                "join PatientGenderEntity pg on pg.id = p.patientGenderId "+
-                "join ObservationEntity o on o.patientId = r.patientId "+
-                "join OrganizationEntity og on og.id = o.organizationId "+
-                "join PractitionerEntity pr on pr.id = o.practitionerId "+
-                "where queryItemUuid = :queryItemUuid "+
-                "and runDate = :runDate and organisationId = :organisationId";
+                    "o.clinicalEffectiveDate, o.snomedConceptId, o.originalCode, o.originalTerm, o.value, o.units, o.isProblem, " +
+                    "og.name, og.odsCode, og.typeDesc, "+
+                    "pr.name, pr.roleCode, pr.roleDesc "+
+                    "from ReportPatientsEntity r "+
+                    "join PatientEntity p on p.id = r.patientId "+
+                    "join PatientGenderEntity pg on pg.id = p.patientGenderId "+
+                    "join ObservationEntity o on o.patientId = r.patientId "+
+                    "join OrganizationEntity og on og.id = o.organizationId "+
+                    "join PractitionerEntity pr on pr.id = o.practitionerId "+
+                    "where queryItemUuid = :queryItemUuid "+
+                    "and runDate = :runDate and organisationId = :organisationId";
         else
             where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
                     "og.name, og.odsCode, og.typeDesc "+

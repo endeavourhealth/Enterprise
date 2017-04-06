@@ -53,7 +53,7 @@ public class ResultsManager {
 
     public static void runReport(LibraryItem libraryItem, JsonReportRun report, String userUuid) throws Exception {
 
-        List<QueryRun> queryRuns = new ArrayList<>();
+        List<QueryResult> queryResults = new ArrayList<>();
 
         for (Rule rule: libraryItem.getQuery().getRule()) { // execute each rule
             List<Filter> filters = rule.getTest().getFilter();
@@ -270,7 +270,7 @@ public class ResultsManager {
 
             List<JsonOrganisation> organisations = report.getOrganisation();
 
-            for (JsonOrganisation org: organisations) {
+            for (JsonOrganisation organisationInReport: organisations) {
                 Timestamp baselineDate = convertToDate(report.getBaselineDate());
                 String patientWhere = "";
 
@@ -296,64 +296,104 @@ public class ResultsManager {
 
                 List<PatientEntity> patients = entityManager.
                         createQuery(patientWhere, PatientEntity.class)
-                        .setParameter("organizationId", Long.parseLong(org.getId()))
+                        .setParameter("organizationId", Long.parseLong(organisationInReport.getId()))
                         .setParameter("baseline", baselineDate)
                         .getResultList();
 
-                // For each organisation - add the rule's identified list of patients to the overall Query Run list
-                QueryRun queryRun = new QueryRun();
-                queryRun.setOrganisationId(Long.parseLong(org.getId()));
-                queryRun.setRuleId(ruleId);
-                queryRun.setOnPass(rule.getOnPass());
-                queryRun.setOnFail(rule.getOnFail());
+                // For each organisation - add the rule's identified list of patients to the overall Query Result list
+                QueryResult queryResult = new QueryResult();
+                queryResult.setOrganisationId(Long.parseLong(organisationInReport.getId()));
+                queryResult.setRuleId(ruleId);
+                queryResult.setOnPass(rule.getOnPass());
+                queryResult.setOnFail(rule.getOnFail());
                 List<Long> queryPatients = new ArrayList<>();
                 for (PatientEntity patientEntity: patients) {
                     queryPatients.add(patientEntity.getId());
                 }
-                queryRun.setPatients(queryPatients);
-                queryRuns.add(queryRun);
+                queryResult.setPatients(queryPatients);
+                queryResults.add(queryResult);
 
                 entityManager.close();
-            } // next organisation
-        } // next Rule
+            } // next organisation in report
+        } // next Rule in Query
 
-        // Store the report results for each organisation
+        // Calculate and store the results for each organisation in the report
         List<JsonOrganisation> organisations = report.getOrganisation();
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
-        for (JsonOrganisation org: organisations) {
+        for (JsonOrganisation organisationInReport: organisations) {
 
-            // calculate the final list of patients from the query rules for the organisation
+            // calculate report denominator count
+            String where = "";
+
+            if (report.getPopulation().equals("0")) // currently registered
+                where = "select distinct p " +
+                        "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id "+
+                        "where p.dateOfDeath IS NULL and p.organizationId = :organizationId "+
+                        "and e.registrationTypeId = 2 "+
+                        "and e.dateRegistered <= :baseline "+
+                        "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
+            else if (report.getPopulation().equals("1")) // all patients
+                where = "select distinct p " +
+                        "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id "+
+                        "where p.organizationId = :organizationId "+
+                        "and e.dateRegistered <= :baseline "+
+                        "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
+
+            EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+            Timestamp baselineDate = convertToDate(report.getBaselineDate());
+
+            List<PatientEntity> patients = entityManager.
+                    createQuery(where, PatientEntity.class)
+                    .setParameter("organizationId", Long.parseLong(organisationInReport.getId()))
+                    .setParameter("baseline", baselineDate)
+                    .getResultList();
+
+            // For each organisation - get the denominator list of patients (needed for FAILED rule conditions)
+            List<Long> denominatorPatients = new ArrayList<>();
+            for (PatientEntity patientEntity: patients) {
+                denominatorPatients.add(patientEntity.getId());
+            }
+
+            entityManager.close();
+
+            // for each organisation, calculate the final list of patients from the query rules
             List<Long> finalPatients = new ArrayList<>();
-            Integer ruleId = 1;
+            Integer ruleId = libraryItem.getQuery().getStartingRules().getRuleId().get(0);
 
-            RuleActionOperator previousRulePassActionOperator = null;
+            RuleActionOperator previousRuleAction = null;
 
-            while (true){
-                QueryRun queryRun = getRuleResults(ruleId, queryRuns, Long.parseLong(org.getId()));
-                List<Long> patients1 = queryRun.getPatients();  // get patients in rule
-                if (patients1.isEmpty()) {
+            while (true){ // loop through all the rules
+                RuleAction rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
+                RuleAction ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
+
+                List<Long> patients1 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()), denominatorPatients);  // get patients in rule
+
+                if (patients1.isEmpty() &&
+                        (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)|| rulePassAction.getAction().equals(RuleActionOperator.INCLUDE) ||
+                        ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)|| ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE))) {
                     finalPatients = new ArrayList<Long>(patients1); // save final list of patients
                     break;
                 }
-                if (previousRulePassActionOperator!=null && previousRulePassActionOperator.equals(RuleActionOperator.GOTO_RULES)) {
+
+                if (previousRuleAction!=null && previousRuleAction.equals(RuleActionOperator.GOTO_RULES)) {
                     finalPatients.retainAll(patients1); // narrow down to patients common in both lists
                     if (finalPatients.isEmpty()) {
                         break;
                     }
                 }
-                RuleActionOperator rulePassActionOperator = queryRun.getOnPass().getAction();
-                RuleActionOperator ruleFailActionOperator = queryRun.getOnFail().getAction();
-                if (rulePassActionOperator.equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
-                    List<Integer> nextPassRuleIds = queryRun.getOnPass().getRuleId();
-                    ruleId = nextPassRuleIds.get(0);
-                    queryRun = getRuleResults(ruleId, queryRuns, Long.parseLong(org.getId()));
-                    List<Long> patients2 = queryRun.getPatients(); // get patients in next rule
+                if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)||ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
+                    List<Integer> nextRuleIds = null;
+                    ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
+
+                    List<Long> patients2 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()), denominatorPatients);  // get patients in rule
+
                     if (patients2.isEmpty()) {
                         finalPatients = new ArrayList<Long>(patients2); // save final list of patients
                         break;
                     }
+
                     if (finalPatients.isEmpty())
                         patients2.retainAll(patients1); // narrow down to patients common in both lists
                     else {
@@ -365,99 +405,104 @@ public class ResultsManager {
                     }
 
                     finalPatients = new ArrayList<Long>(patients2); // save final list of patients
-                    rulePassActionOperator = queryRun.getOnPass().getAction();
-                    ruleFailActionOperator = queryRun.getOnFail().getAction();
-                    if (rulePassActionOperator.equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
-                        previousRulePassActionOperator = RuleActionOperator.GOTO_RULES;
-                        nextPassRuleIds = queryRun.getOnPass().getRuleId();
-                        ruleId = nextPassRuleIds.get(0);
-                    } else if (rulePassActionOperator.equals(RuleActionOperator.INCLUDE)) {
+
+                    rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
+                    ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
+
+                    if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES) || ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
+                        previousRuleAction = RuleActionOperator.GOTO_RULES;
+                        ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
+                    } else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
                         break;
                     }
-                } else if (rulePassActionOperator.equals(RuleActionOperator.INCLUDE)) {
+                } else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
                     if (finalPatients.isEmpty())
-                        finalPatients = new ArrayList<Long>(patients1); // save final list of patients
+                        finalPatients = new ArrayList<Long>(patients1);
                     break;
                 }
-                else if (rulePassActionOperator.equals(RuleActionOperator.NO_ACTION)) {
-                    finalPatients = new ArrayList<Long>(); // save zero final list of patients
-                    break;
-                }
+
             }
 
-
-            // save each patient identifier into the query report patient table
+            // save each patient identified into the query report patient table
             for (Long patient: finalPatients) {
                 ReportPatientsEntity reportPatientsEntity = new ReportPatientsEntity();
                 reportPatientsEntity.setRunDate(now);
                 reportPatientsEntity.setQueryItemUuid(report.getQueryItemUuid());
-                reportPatientsEntity.setOrganisationId(Long.parseLong(org.getId()));
+                reportPatientsEntity.setOrganisationId(Long.parseLong(organisationInReport.getId()));
                 Long patientId = patient.longValue();
                 reportPatientsEntity.setPatientId(patientId);
 
                 saveReportPatients(reportPatientsEntity);
             }
 
-            Timestamp baselineDate = convertToDate(report.getBaselineDate());
-
-            // save the counts to the query report summary table
+            // save the query counts to the report summary table
             ReportResultEntity reportResult = new ReportResultEntity();
             reportResult.setEndUserUuid(userUuid);
             reportResult.setBaselineDate(baselineDate);
             reportResult.setRunDate(now);
-            reportResult.setOrganisationId(Long.parseLong(org.getId()));
+            reportResult.setOrganisationId(Long.parseLong(organisationInReport.getId()));
             reportResult.setQueryItemUuid(report.getQueryItemUuid());
             reportResult.setPopulationTypeId(Byte.parseByte(report.getPopulation()));
             reportResult.setEnumeratorCount(finalPatients.size());
-
-            // calculate report denominator count
-
-            String where = "";
-
-            if (report.getPopulation().equals("0")) // currently registered
-                where = "select count(1) " +
-                        "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id "+
-                        "where p.dateOfDeath IS NULL and p.organizationId = :organizationId "+
-                        "and e.registrationTypeId = 2 "+
-                        "and e.dateRegistered <= :baseline "+
-                        "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
-            else if (report.getPopulation().equals("1")) // all patients
-                where = "select count(1) " +
-                        "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id "+
-                        "where p.organizationId = :organizationId "+
-                        "and e.dateRegistered <= :baseline "+
-                        "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
-
-            EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
-
-            Long denominatorCount = (Long)entityManager.createQuery(where)
-                    .setParameter("organizationId", Long.parseLong(org.getId()))
-                    .setParameter("baseline", baselineDate)
-                    .getSingleResult();
-
-            reportResult.setDenominatorCount(denominatorCount.intValue());
+            reportResult.setDenominatorCount(denominatorPatients.size());
 
             // save the counts to the query report summary table
             saveReportResult(reportResult);
 
-            entityManager.close();
-
-        } // next organisation
+        } // next organisation in report
 
     }
 
-    public static QueryRun getRuleResults(Integer ruleId, List<QueryRun> queryRuns, Long organisationId) throws Exception {
+    public static RuleAction getRuleAction(Boolean pass, Integer ruleId, List<QueryResult> queryResults, Long organisationId) throws Exception {
 
-        QueryRun queryRun = null;
+        RuleAction ruleAction = null;
 
-        for (QueryRun qr: queryRuns) {
+        for (QueryResult qr: queryResults) {
             if (qr.getOrganisationId() == organisationId && qr.getRuleId()==ruleId) {
-                queryRun = qr;
+                if (pass)
+                    ruleAction = qr.getOnPass();
+                else
+                    ruleAction = qr.getOnFail();
                 break;
             }
         }
 
-        return queryRun;
+        return ruleAction;
     }
 
- }
+    public static List<Long> getRulePatients(Integer ruleId, List<QueryResult> queryResults, Long organisationId, List<Long> denominatorPatients) throws Exception {
+
+        List<Long> patients = null;
+
+        for (QueryResult qr: queryResults) {
+            if (qr.getOrganisationId() == organisationId && qr.getRuleId()==ruleId) {
+                patients = qr.getPatients();  // get patients in rule
+
+                RuleActionOperator ruleFailAction = qr.getOnFail().getAction();
+
+                if (ruleFailAction.equals(RuleActionOperator.INCLUDE) || ruleFailAction.equals(RuleActionOperator.GOTO_RULES)) {
+                    List<Long> denominatorPatients1 = new ArrayList<Long>(denominatorPatients);
+                    denominatorPatients1.removeAll(patients); // fail action so calculate patients from denominator who have not met the rule's conditions
+                    patients = new ArrayList<Long>(denominatorPatients1);
+                }
+
+                break;
+            }
+        }
+
+        return patients;
+    }
+
+    public static List<Integer> getNextRuleIds(RuleAction rulePassAction, RuleAction ruleFailAction) throws Exception {
+
+        List<Integer> nextRuleIds = null;
+        if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES))
+            nextRuleIds = rulePassAction.getRuleId();
+        else if (ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES))
+            nextRuleIds = ruleFailAction.getRuleId();
+
+        return nextRuleIds;
+
+    }
+
+}

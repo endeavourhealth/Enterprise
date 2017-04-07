@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS registration_type;
 DROP TABLE IF EXISTS lsoa_lookup;
 DROP TABLE IF EXISTS msoa_lookup;
 
+
 -- Table: lsoa_lookup
 
 CREATE TABLE lsoa_lookup
@@ -38,6 +39,20 @@ CREATE TABLE lsoa_lookup
   lsoa_name character varying(255),
   imd_rank integer,
   imd_decile integer,
+  income_rank integer,
+  income_decile integer,
+  employment_rank integer,
+  employment_decile integer,
+  education_rank integer,
+  education_decile integer,
+  health_rank integer,
+  health_decile integer,
+  crime_rank integer,
+  crime_decile integer,
+  housing_and_services_barriers_rank integer,
+  housing_and_services_barriers_decile integer,
+  living_environment_rank integer,
+  living_environment_decile integer,  
   CONSTRAINT pk_lsoa_lookup PRIMARY KEY (lsoa_code)
 );
 

@@ -28,6 +28,29 @@ DROP TABLE IF EXISTS referral_request_type;
 DROP TABLE IF EXISTS medication_statement_authorisation_type;
 DROP TABLE IF EXISTS patient_gender;
 DROP TABLE IF EXISTS registration_type;
+DROP TABLE IF EXISTS lsoa_lookup;
+DROP TABLE IF EXISTS msoa_lookup;
+
+-- Table: lsoa_lookup
+
+CREATE TABLE lsoa_lookup
+(
+  lsoa_code character(9) NOT NULL,
+  lsoa_name character varying(255),
+  imd_rank integer,
+  imd_decile integer,
+  CONSTRAINT pk_lsoa_lookup PRIMARY KEY (lsoa_code)
+);
+
+-- Table: msoa_lookup
+
+CREATE TABLE msoa_lookup
+(
+  msoa_code character(9) NOT NULL,
+  msoa_name character varying(255),
+  CONSTRAINT pk_msoa_lookup PRIMARY KEY (msoa_code)
+);
+
 
 -- Table: date_precision
 

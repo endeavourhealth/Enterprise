@@ -362,60 +362,72 @@ public class ResultsManager {
             List<Long> finalPatients = new ArrayList<>();
             Integer ruleId = libraryItem.getQuery().getStartingRules().getRuleId().get(0);
 
-            RuleActionOperator previousRuleAction = null;
+            Integer i = 0;
 
             while (true){ // loop through all the rules
+                i++;
+
                 RuleAction rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
                 RuleAction ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
 
-                List<Long> patients1 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()), denominatorPatients);  // get patients in rule
+                List<Long> patients1 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()));  // get patients in rule
 
-                if (patients1.isEmpty() &&
-                        (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)|| rulePassAction.getAction().equals(RuleActionOperator.INCLUDE) ||
-                        ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)|| ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE))) {
-                    finalPatients = new ArrayList<Long>(patients1); // save final list of patients
-                    break;
+                if (i==1 &&
+                    (ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE) ||
+                    ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES))) {
+
+                    List<Long> denominatorPatients1 = new ArrayList<Long>(denominatorPatients);
+                    denominatorPatients1.removeAll(patients1); // fail action so calculate patients from denominator who have not met the rule's conditions
+                    patients1 = new ArrayList<Long>(denominatorPatients1);
                 }
 
-                if (previousRuleAction!=null && previousRuleAction.equals(RuleActionOperator.GOTO_RULES)) {
-                    finalPatients.retainAll(patients1); // narrow down to patients common in both lists
-                    if (finalPatients.isEmpty()) {
+                if (i>1 &&
+                        (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
+                        rulePassAction.getAction().equals(RuleActionOperator.INCLUDE) ||
+                        ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
+                        ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE))) {
+
+                    if (ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
+                        ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
+                        finalPatients.removeAll(patients1); // fail action so remove patients not matching criteria
+                    } else
+                        finalPatients.retainAll(patients1); // narrow down to patients common in both lists
+
+                    if (finalPatients.isEmpty())
                         break;
-                    }
                 }
-                if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)||ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
+
+                if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
+                    ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
                     List<Integer> nextRuleIds = null;
                     ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
 
-                    List<Long> patients2 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()), denominatorPatients);  // get patients in rule
-
-                    if (patients2.isEmpty()) {
-                        finalPatients = new ArrayList<Long>(patients2); // save final list of patients
-                        break;
-                    }
-
-                    if (finalPatients.isEmpty())
-                        patients2.retainAll(patients1); // narrow down to patients common in both lists
-                    else {
-                        patients2.retainAll(finalPatients); // narrow down to patients common in both lists
-                        if (patients2.isEmpty()) {
-                            finalPatients = new ArrayList<Long>(patients2); // save final list of patients
-                            break;
-                        }
-                    }
-
-                    finalPatients = new ArrayList<Long>(patients2); // save final list of patients
+                    List<Long> patients2 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()));  // get patients in rule
 
                     rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
                     ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
 
-                    if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES) || ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
-                        previousRuleAction = RuleActionOperator.GOTO_RULES;
+                    if (finalPatients.isEmpty())
+                        finalPatients = new ArrayList<Long>(patients1); // save final list of patients
+
+                    if (ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
+                        ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE))
+                        finalPatients.removeAll(patients2); // fail action so remove patients not matching criteria
+                    else
+                        finalPatients.retainAll(patients2); // narrow down to patients common in both lists
+
+                    if (finalPatients.isEmpty())
+                        break;
+
+                    if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES) ||
+                        ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES))  // Rule passes and moves to next rule
                         ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
-                    } else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
+                    else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||
+                            ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
                         break;
                     }
-                } else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
+                } else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||
+                            ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
                     if (finalPatients.isEmpty())
                         finalPatients = new ArrayList<Long>(patients1);
                     break;
@@ -470,22 +482,13 @@ public class ResultsManager {
         return ruleAction;
     }
 
-    public static List<Long> getRulePatients(Integer ruleId, List<QueryResult> queryResults, Long organisationId, List<Long> denominatorPatients) throws Exception {
+    public static List<Long> getRulePatients(Integer ruleId, List<QueryResult> queryResults, Long organisationId) throws Exception {
 
         List<Long> patients = null;
 
         for (QueryResult qr: queryResults) {
             if (qr.getOrganisationId() == organisationId && qr.getRuleId()==ruleId) {
                 patients = qr.getPatients();  // get patients in rule
-
-                RuleActionOperator ruleFailAction = qr.getOnFail().getAction();
-
-                if (ruleFailAction.equals(RuleActionOperator.INCLUDE) || ruleFailAction.equals(RuleActionOperator.GOTO_RULES)) {
-                    List<Long> denominatorPatients1 = new ArrayList<Long>(denominatorPatients);
-                    denominatorPatients1.removeAll(patients); // fail action so calculate patients from denominator who have not met the rule's conditions
-                    patients = new ArrayList<Long>(denominatorPatients1);
-                }
-
                 break;
             }
         }

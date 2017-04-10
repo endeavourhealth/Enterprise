@@ -370,36 +370,27 @@ public class ResultsManager {
                 RuleAction rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
                 RuleAction ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
 
-                List<Long> patients1 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()));  // get patients in rule
+                List<Long> patients1 = getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()));  // get patients in rule
 
-                if (i==1 &&
-                    (ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE) ||
-                    ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES))) {
+                if (i==1 && ruleFailIncludeGoto(ruleFailAction)) {
 
                     List<Long> denominatorPatients1 = new ArrayList<Long>(denominatorPatients);
                     denominatorPatients1.removeAll(patients1); // fail action so calculate patients from denominator who have not met the rule's conditions
                     patients1 = new ArrayList<Long>(denominatorPatients1);
-                }
 
-                if (i>1 &&
-                        (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
-                        rulePassAction.getAction().equals(RuleActionOperator.INCLUDE) ||
-                        ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
-                        ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE))) {
+                } else if (i>1 && (rulePassIncludeGoto(rulePassAction) || ruleFailIncludeGoto(ruleFailAction))) {
 
-                    if (ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
-                        ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
+                    if (ruleFailIncludeGoto(ruleFailAction))
                         finalPatients.removeAll(patients1); // fail action so remove patients not matching criteria
-                    } else
+                    else
                         finalPatients.retainAll(patients1); // narrow down to patients common in both lists
 
                     if (finalPatients.isEmpty())
                         break;
                 }
 
-                if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
-                    ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)) { // Rule passes and moves to next rule
-                    List<Integer> nextRuleIds = null;
+                if (rulePassFailGoto(rulePassAction, ruleFailAction)) { // Rule passes and moves to next rule
+
                     ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
 
                     List<Long> patients2 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()));  // get patients in rule
@@ -408,10 +399,9 @@ public class ResultsManager {
                     ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
 
                     if (finalPatients.isEmpty())
-                        finalPatients = new ArrayList<Long>(patients1); // save final list of patients
+                        finalPatients = new ArrayList<Long>(patients1); // first rule
 
-                    if (ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
-                        ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE))
+                    if (ruleFailIncludeGoto(ruleFailAction))
                         finalPatients.removeAll(patients2); // fail action so remove patients not matching criteria
                     else
                         finalPatients.retainAll(patients2); // narrow down to patients common in both lists
@@ -419,17 +409,17 @@ public class ResultsManager {
                     if (finalPatients.isEmpty())
                         break;
 
-                    if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES) ||
-                        ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES))  // Rule passes and moves to next rule
+                    if (rulePassFailGoto(rulePassAction, ruleFailAction))  // Rule passes and moves to next rule
                         ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
-                    else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||
-                            ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
+
+                    else if (rulePassFailInclude(rulePassAction, ruleFailAction)) // Rule includes patients, so break out the loop
                         break;
-                    }
-                } else if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||
-                            ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE)) {
-                    if (finalPatients.isEmpty())
+
+                } else if (rulePassFailInclude(rulePassAction, ruleFailAction)) { // Rule includes patients, so break out the loop
+
+                    if (finalPatients.isEmpty()) // Only one rule in Query
                         finalPatients = new ArrayList<Long>(patients1);
+
                     break;
                 }
 
@@ -506,6 +496,50 @@ public class ResultsManager {
 
         return nextRuleIds;
 
+    }
+
+    public static Boolean ruleFailIncludeGoto(RuleAction ruleFailAction) throws Exception {
+
+        Boolean result = false;
+
+        if (ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE) ||
+            ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES))
+            result = true;
+
+        return result;
+    }
+
+    public static Boolean rulePassIncludeGoto(RuleAction rulePassAction) throws Exception {
+
+        Boolean result = false;
+
+        if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE) ||
+            rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES))
+            result = true;
+
+        return result;
+    }
+
+    public static Boolean rulePassFailGoto(RuleAction rulePassAction, RuleAction ruleFailAction) throws Exception {
+
+        Boolean result = false;
+
+        if (rulePassAction.getAction().equals(RuleActionOperator.GOTO_RULES)||
+            ruleFailAction.getAction().equals(RuleActionOperator.GOTO_RULES))
+            result = true;
+
+        return result;
+    }
+
+    public static Boolean rulePassFailInclude(RuleAction rulePassAction, RuleAction ruleFailAction) throws Exception {
+
+        Boolean result = false;
+
+        if (rulePassAction.getAction().equals(RuleActionOperator.INCLUDE)||
+            ruleFailAction.getAction().equals(RuleActionOperator.INCLUDE))
+            result = true;
+
+        return result;
     }
 
 }

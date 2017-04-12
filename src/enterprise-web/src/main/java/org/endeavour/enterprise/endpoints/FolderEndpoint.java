@@ -6,7 +6,6 @@ import org.endeavourhealth.enterprise.core.DependencyType;
 
 import org.endeavourhealth.enterprise.core.database.DataManager;
 import org.endeavourhealth.enterprise.core.database.models.*;
-import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
 import org.endeavourhealth.enterprise.core.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,75 +237,4 @@ public final class FolderEndpoint extends AbstractItemEndpoint {
         DataManager db = new DataManager();
         db.saveFolders(audit, item, activeItemReports);
     }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/getFolderContents")
-    public Response getFolderContents(@Context SecurityContext sc, @QueryParam("folderUuid") String uuidStr) throws Exception {
-        super.setLogbackMarkers(sc);
-
-        String folderUuid = uuidStr;
-        String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
-
-        LOG.trace("GettingFolderContents for folder {}", folderUuid);
-
-        JsonFolderContentsList ret = new JsonFolderContentsList();
-
-        List<ActiveItemEntity> childActiveItems = ActiveItemEntity.retrieveDependentItems(orgUuid, folderUuid, (short)DependencyType.IsContainedWithin.getValue());
-
-        HashMap<String, AuditEntity> hmAuditsByAuditUuid = new HashMap<>();
-        List<AuditEntity> audits = AuditEntity.retrieveForActiveItems(childActiveItems);
-        for (AuditEntity audit: audits) {
-            hmAuditsByAuditUuid.put(audit.getAuditUuid(), audit);
-        }
-
-        HashMap<String, ItemEntity> hmItemsByItemUuid = new HashMap<>();
-        List<ItemEntity> items = ItemEntity.retrieveForActiveItems(childActiveItems);
-        for (ItemEntity item: items) {
-            hmItemsByItemUuid.put(item.getItemUuid(), item);
-        }
-
-        HashMap<String, ReportResultEntity> hmReportsByItemUuid = new HashMap<>();
-        List<ReportResultEntity> reports = ItemEntity.retrieveForReports(childActiveItems);
-        for (ReportResultEntity report: reports) {
-            hmReportsByItemUuid.put(report.getQueryItemUuid(), report);
-        }
-
-        for (int i = 0; i < childActiveItems.size(); i++) {
-
-            ActiveItemEntity activeItem = childActiveItems.get(i);
-            ItemEntity item = hmItemsByItemUuid.get(activeItem.getItemUuid());
-            Short itemType = activeItem.getItemTypeId();
-            AuditEntity audit = hmAuditsByAuditUuid.get(item.getAuditUuid());
-            ReportResultEntity report = hmReportsByItemUuid.get(activeItem.getItemUuid());
-
-            JsonFolderContent c = new JsonFolderContent(activeItem, item, audit, report);
-            ret.addContent(c);
-
-            if (itemType == DefinitionItemType.Query.getValue()) {
-
-            } else if (itemType == DefinitionItemType.Test.getValue()) {
-
-            } else if (itemType == DefinitionItemType.DataSource.getValue()) {
-
-            } else if (itemType == DefinitionItemType.CodeSet.getValue()) {
-
-            } else {
-                //throw new RuntimeException("Unexpected content " + item + " in folder");
-            }
-        }
-
-        if (ret.getContents() != null) {
-            Collections.sort(ret.getContents());
-        }
-
-        clearLogbackMarkers();
-
-        return Response
-                .ok()
-                .entity(ret)
-                .build();
-    }
-
 }

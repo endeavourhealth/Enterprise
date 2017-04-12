@@ -1,26 +1,29 @@
+// Styling
+import '../content/css/index.css';
+
 // Core
 import {NgModule} from '@angular/core';
-import {Application} from "./application";
 
 // Modules
-import {FlowchartModule} from "./flowchart/flowchart.module";
 import {DashboardModule} from "./dashboard/dashboard.module";
-import {LibraryModule} from "./library/library.module";
+import {EnterpriseLibraryModule} from "./enterpriseLibrary/library.module";
 import {CodeSetModule} from "./codeSet/codeSet.module";
 import {QueryModule} from "./query/query.module";
 
 // State components
 import {DashboardComponent} from "./dashboard/dashboard.component";
-import {LibraryComponent} from "./library/library.component";
+import {LibraryComponent} from "./enterpriseLibrary/library.component";
 import {CodeSetEditComponent} from "./codeSet/codeSetEditor.component";
 import {QueryEditComponent} from "./query/queryEditor.component";
+import {Application, FlowchartModule} from "eds-common-js";
+import {EnterpriseMenuService} from "./enterprise.menu";
 
 @NgModule(
 	Application.Define({
 		modules: [
 			FlowchartModule,
 			DashboardModule,
-			LibraryModule,
+			EnterpriseLibraryModule,
 			CodeSetModule,
 			QueryModule,
 		],
@@ -30,7 +33,8 @@ import {QueryEditComponent} from "./query/queryEditor.component";
 			{ name : 'app.codeSetEdit', url : '/codeSetEdit/:itemAction/:itemUuid', component : CodeSetEditComponent },
 			{name: 'app.queryEdit', url: '/queryEdit/:itemAction/:itemUuid', component: QueryEditComponent }
 		],
-		defaultState : { state: 'app.dashboard', params: {} }
+		defaultState : { state: 'app.dashboard', params: {} },
+		menuManager : EnterpriseMenuService
 	})
 )
 export class AppModule {}

@@ -1,19 +1,18 @@
 import {Component} from "@angular/core";
 import {StateService} from "ui-router-ng2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {ModuleStateService} from "../common/moduleState.service";
-import {LibraryService} from "./library.service";
-import {LoggerService} from "../common/logger.service";
-import {ItemType} from "./models/ItemType";
-import {ItemSummaryList} from "./models/ItemSummaryList";
-import {FolderNode} from "../folder/models/FolderNode";
-import {FolderItem} from "./models/FolderItem";
-import {LibraryItem} from "./models/LibraryItem";
-import {ActionItem} from "../folder/models/ActionItem";
+import {EnterpriseLibraryItem} from "./models/EnterpriseLibraryItem";
 import {ReportEditDialog} from "../reports/reportEditor.dialog";
 import {ReportViewDialog} from "../reports/reportViewer.dialog";
 import {ReportRun} from "../reports/models/ReportRun";
 import {ReportService} from "../reports/report.service";
+import {LibraryService, LoggerService, ModuleStateService} from "eds-common-js";
+import {ItemSummaryList} from "eds-common-js/dist/library/models/ItemSummaryList";
+import {ItemType} from "eds-common-js/dist/folder/models/ItemType";
+import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
+import {FolderNode} from "eds-common-js/dist/folder/models/FolderNode";
+import {ActionItem} from "eds-common-js/dist/folder/models/ActionItem";
+import {ActionMenuItem} from "eds-common-js/dist/folder/models/ActionMenuItem";
 
 @Component({
 	template : require('./library.html')
@@ -22,6 +21,7 @@ export class LibraryComponent {
 	treeData: FolderNode[];
 	selectedFolder: FolderNode;
 	itemSummaryList: ItemSummaryList;
+	actionMenuItems : ActionMenuItem[];
 
 	constructor(protected libraryService: LibraryService,
 				protected reportService: ReportService,
@@ -29,6 +29,10 @@ export class LibraryComponent {
 							private $modal: NgbModal,
 							protected moduleStateService: ModuleStateService,
 							protected $state: StateService) {
+		this.actionMenuItems = [
+			{ type : ItemType.Query, text : 'Add query' },
+			{ type : ItemType.CodeSet, text : 'Add code set ' }
+		];
 	}
 
 	folderChanged($event) {
@@ -150,7 +154,7 @@ export class LibraryComponent {
 		var vm = this;
 		vm.libraryService.getLibraryItem(item.uuid)
 			.subscribe(
-				(libraryItem: LibraryItem) => {
+				(libraryItem: EnterpriseLibraryItem) => {
 					vm.moduleStateService.setState('libraryClipboard', libraryItem);
 					vm.logger.success('Item cut to clipboard', libraryItem, 'Cut');
 				},
@@ -162,7 +166,7 @@ export class LibraryComponent {
 		var vm = this;
 		vm.libraryService.getLibraryItem(item.uuid)
 			.subscribe(
-				(libraryItem: LibraryItem) => {
+				(libraryItem: EnterpriseLibraryItem) => {
 					vm.moduleStateService.setState('libraryClipboard', libraryItem);
 					libraryItem.uuid = null;		// Force save as new
 					vm.logger.success('Item copied to clipboard', libraryItem, 'Copy');
@@ -173,7 +177,7 @@ export class LibraryComponent {
 
 	pasteItem(node: FolderNode) {
 		var vm = this;
-		var libraryItem: LibraryItem = vm.moduleStateService.getState('libraryClipboard') as LibraryItem;
+		var libraryItem: EnterpriseLibraryItem = vm.moduleStateService.getState('libraryClipboard') as EnterpriseLibraryItem;
 		if (libraryItem) {
 			libraryItem.folderUuid = node.uuid;
 			vm.libraryService.saveLibraryItem(libraryItem)

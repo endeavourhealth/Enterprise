@@ -1,9 +1,9 @@
 import {Component} from "@angular/core";
 import {StateService} from "ui-router-ng2";
-import {FolderItem} from "../library/models/FolderItem";
 import {DashboardService} from "./dashboard.service";
-import {LoggerService} from "../common/logger.service";
-import {ItemType} from "../library/models/ItemType";
+import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
+import {LoggerService} from "eds-common-js";
+import {ItemType} from "eds-common-js/dist/folder/models/ItemType";
 
 @Component({
 	template : require('./dashboard.html')

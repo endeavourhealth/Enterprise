@@ -4,8 +4,7 @@ import {ITreeOptions} from "angular2-tree-component";
 import {CodeSetValue} from "../codeSet/models/CodeSetValue";
 import {ExclusionTreeNode} from "./models/ExclusionTreeNode";
 import {CodingService} from "./coding.service";
-import {LoggerService} from "../common/logger.service";
-
+import {LoggerService} from "eds-common-js";
 
 @Component({
 	selector: 'ngbd-modal-content',

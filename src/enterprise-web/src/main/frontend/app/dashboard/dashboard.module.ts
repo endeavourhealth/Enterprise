@@ -4,7 +4,7 @@ import {FormsModule} from "@angular/forms";
 import {DashboardService} from "./dashboard.service";
 import {DashboardComponent} from "./dashboard.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
-import {LibraryModule} from "../library/library.module";
+import {EnterpriseLibraryModule} from "../enterpriseLibrary/library.module";
 
 @NgModule({
 	imports : [
@@ -12,7 +12,7 @@ import {LibraryModule} from "../library/library.module";
 		FormsModule,
 		NgbModule,
 
-		LibraryModule,
+		EnterpriseLibraryModule,
 	],
 	declarations : [
 		DashboardComponent

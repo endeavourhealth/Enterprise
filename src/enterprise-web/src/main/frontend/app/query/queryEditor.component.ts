@@ -2,19 +2,16 @@ import {Component} from "@angular/core";
 import {Transition, StateService} from "ui-router-ng2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 
-import {LoggerService} from "../common/logger.service";
-import {LibraryService} from "../library/library.service";
 import {ExpressionEditDialog} from "../expressions/expressionEditor.dialog";
 import {TestEditDialog} from "../tests/testEditor.dialog";
 import {QueryPickerDialog} from "./queryPicker.dialog";
-import {flowchart} from "../flowchart/flowchart.viewmodel";
-import {MessageBoxDialog} from "../dialogs/messageBox/messageBox.dialog";
 import {StartingRules} from "./models/StartingRules";
 import {Query} from "./models/Query";
-import {LibraryItem} from "../library/models/LibraryItem";
+import {EnterpriseLibraryItem} from "../enterpriseLibrary/models/EnterpriseLibraryItem";
 import {ExpressionType} from "../expressions/models/ExpressionType";
 import {QuerySelection} from "./models/QuerySelection";
 import {Test} from "../tests/models/Test";
+import {flowchart, LibraryService, LoggerService, MessageBoxDialog} from "eds-common-js";
 
 @Component({
 	template : require('./queryEditor.html'),
@@ -34,7 +31,7 @@ export class QueryEditComponent {
 	private results: any;
 	private startingRules: StartingRules;
 	private query: Query;
-	private libraryItem: LibraryItem;
+	private libraryItem: EnterpriseLibraryItem;
 	private rulePassAction: string;
 	private ruleFailAction: string;
 	private ruleDescription: string;
@@ -80,7 +77,7 @@ export class QueryEditComponent {
 		this.performAction(transition.params()['itemAction'], transition.params()['itemUuid']);
 	}
 
-	private createModel(libraryItem: LibraryItem) {
+	private createModel(libraryItem: EnterpriseLibraryItem) {
 		this.chartViewModel = new flowchart.ChartViewModel(libraryItem);
 	}
 
@@ -96,14 +93,14 @@ export class QueryEditComponent {
 
 	load(itemUuid : string) {
 		let vm = this;
-		vm.libraryService.getLibraryItem(itemUuid)
+		vm.libraryService.getLibraryItem<EnterpriseLibraryItem>(itemUuid)
 			.subscribe(
 				(libraryItem) => vm.processLibraryItem(libraryItem),
 				(error) => vm.logger.error('Error loading query', error, 'Error')
 			);
 	}
 
-	processLibraryItem(libraryItem : LibraryItem) {
+	processLibraryItem(libraryItem : EnterpriseLibraryItem) {
 		let vm = this;
 		vm.createModel(libraryItem);
 

@@ -78,16 +78,23 @@ ALTER TABLE `enterprise_data_pseudonymised`.`medication_order`
 ADD INDEX `snomed_concept_id` (`dmd_id` ASC);
 ALTER TABLE `enterprise_data_pseudonymised`.`medication_statement` 
 ADD INDEX `snomed_concept_id` (`dmd_id` ASC);
-ALTER TABLE `enterprise_data_pseudonymised`.`observation` 
-ADD INDEX `snomed_concept_id` (`snomed_concept_id` ASC);
 ALTER TABLE `enterprise_data_pseudonymised`.`referral_request` 
 ADD INDEX `snomed_concept_id` (`snomed_concept_id` ASC);
-ALTER TABLE `enterprise_data_pseudonymised`.`episode_of_care` 
-ADD INDEX `patient_id` (`patient_id` ASC);
+
 ALTER TABLE `enterprise_data_pseudonymised`.`observation` 
-ADD INDEX `snomed_problem` (`snomed_concept_id` ASC, `is_problem` ASC)
-ALTER TABLE `enterprise_data_pseudonymised`.`observation` 
+ADD INDEX `snomed_concept_id` (`snomed_concept_id` ASC),
+ADD INDEX `snomed_problem` (`snomed_concept_id` ASC, `is_problem` ASC),
 ADD INDEX `snomed_value` (`snomed_concept_id` ASC, `value` ASC);
+
+ALTER TABLE `enterprise_data_pseudonymised`.`patient` 
+ADD INDEX `organization_id` (`organization_id` ASC);
+
+ALTER TABLE `enterprise_data_pseudonymised`.`episode_of_care` 
+ADD INDEX `patient_id` (`patient_id` ASC),
+ADD INDEX `registration_type_id` (`registration_type_id` ASC),
+ADD INDEX `date_registered` (`date_registered` ASC),
+ADD INDEX `date_registered_end` (`date_registered_end` ASC);
+
 
 INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 (`ConceptId`,

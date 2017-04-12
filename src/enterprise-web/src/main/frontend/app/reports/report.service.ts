@@ -1,11 +1,10 @@
 import {Injectable} from "@angular/core";
 import {Http, URLSearchParams} from "@angular/http";
-import {BaseHttp2Service} from "../core/baseHttp2.service";
 import {Observable} from "rxjs";
 import {Organisation} from "./models/Organisation";
 import {ReportResult} from "./models/ReportResult";
 import {ReportRun} from "./models/ReportRun";
-import {ReportPatient} from "./models/ReportPatient";
+import {BaseHttp2Service} from "eds-common-js";
 
 @Injectable()
 export class ReportService extends BaseHttp2Service {

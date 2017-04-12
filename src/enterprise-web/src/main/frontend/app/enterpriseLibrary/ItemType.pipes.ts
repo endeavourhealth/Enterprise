@@ -1,11 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ItemType} from './models/ItemType';
+import {ItemType} from "eds-common-js/dist/folder/models/ItemType";
 
 @Pipe({name: 'itemTypeIdToString'})
 export class ItemTypeIdToStringPipe implements PipeTransform {
 	transform (input: number): string {
 		switch (input) {
-			case ItemType.Folder:
+			case ItemType.ReportFolder:
 				return 'Folder';
 			case ItemType.Report:
 				return 'Report';
@@ -13,11 +13,11 @@ export class ItemTypeIdToStringPipe implements PipeTransform {
 				return 'Query';
 			case ItemType.Test:
 				return 'Test';
-			case ItemType.Datasource:
-				return 'Datasource';
+			case ItemType.Resource:
+				return 'Resource';
 			case ItemType.CodeSet:
 				return 'Code set';
-			case ItemType.ListOutput:
+			case ItemType.DataSet:
 				return 'List report';
 			default:
 				return 'Unknown [' + input + ']';
@@ -29,7 +29,7 @@ export class ItemTypeIdToStringPipe implements PipeTransform {
 export class ItemTypeIdToIconPipe implements PipeTransform {
 	transform (input: number): string {
 		switch (input) {
-			case ItemType.Folder:
+			case ItemType.ReportFolder:
 				return 'fa-folder-open';
 			case ItemType.Report:
 				return 'fa-file';
@@ -37,11 +37,11 @@ export class ItemTypeIdToIconPipe implements PipeTransform {
 				return 'fa-question-circle';
 			case ItemType.Test:
 				return 'fa-random';
-			case ItemType.Datasource:
+			case ItemType.Resource:
 				return 'fa-database';
 			case ItemType.CodeSet:
 				return 'fa-tags';
-			case ItemType.ListOutput:
+			case ItemType.DataSet:
 				return 'fa-list-alt';
 			default:
 				return 'text-danger fa-exclamation-triangle';

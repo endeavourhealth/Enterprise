@@ -1,13 +1,13 @@
 import {Input, Component, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {FolderService} from "../folder/folder.service";
-import {FolderNode} from "../folder/models/FolderNode";
-import {ItemSummaryList} from "../library/models/ItemSummaryList";
-import {FolderType} from "../folder/models/FolderType";
-import {FolderItem} from "../library/models/FolderItem";
-import {ItemType} from "../library/models/ItemType";
-import {LibraryService} from "../library/library.service";
 import {QuerySelection} from "./models/QuerySelection";
+import {LibraryService} from "eds-common-js";
+import {ItemSummaryList} from "eds-common-js/dist/library/models/ItemSummaryList";
+import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
+import {ItemType} from "eds-common-js/dist/folder/models/ItemType";
+import {FolderNode} from "eds-common-js/dist/folder/models/FolderNode";
+import {FolderType} from "eds-common-js/dist/folder/models/FolderType";
+import {FolderService} from "eds-common-js/dist/folder/folder.service";
 
 @Component({
 		selector: 'ngbd-modal-content',

@@ -1,9 +1,9 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {LoggerService} from "../common/logger.service";
 import {ExpressionType} from "./models/ExpressionType";
 import {VariableType} from "./models/VariableType";
 import {Restriction} from "./models/Restriction";
+import {LoggerService} from "eds-common-js";
 
 @Component({
     selector: 'ngbd-modal-content',

@@ -4,8 +4,6 @@ import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {CodePickerDialog} from "../coding/codePicker.dialog";
 import {Test} from "./models/Test";
 import {CodeSetValue} from "../codeSet/models/CodeSetValue";
-import {DataType} from "../codeSet/models/DataType";
-import {Concept} from "../coding/models/Concept";
 import {Restriction} from "../expressions/models/Restriction";
 import {ValueTo} from "./models/ValueTo";
 import {Filter} from "./models/Filter";
@@ -15,9 +13,8 @@ import {ValueSet} from "./models/ValueSet";
 import {CodingService} from "../coding/coding.service";
 import {QueryPickerDialog} from "../query/queryPicker.dialog";
 import {QuerySelection} from "../query/models/QuerySelection";
-import {LibraryService} from "../library/library.service";
-import {LoggerService} from "../common/logger.service";
-import {LibraryItem} from "../library/models/LibraryItem";
+import {EnterpriseLibraryItem} from "../enterpriseLibrary/models/EnterpriseLibraryItem";
+import {LibraryService, LoggerService} from "eds-common-js";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -77,7 +74,7 @@ export class TestEditDialog implements OnInit{
 	restrictions = ['','LATEST','EARLIEST','HIGHEST','LOWEST'];
 	periods = ['','DAY','WEEK','MONTH','YEAR'];
 
-	libraryItem : LibraryItem;
+	libraryItem : EnterpriseLibraryItem;
 
 	constructor(
 		protected $modal : NgbModal,
@@ -243,7 +240,7 @@ export class TestEditDialog implements OnInit{
 		QueryPickerDialog.open(this.$modal, querySelection)
 			.result.then(function (resultData: QuerySelection) {
 
-			vm.libraryService.getLibraryItem(resultData.id)
+			vm.libraryService.getLibraryItem<EnterpriseLibraryItem>(resultData.id)
 				.subscribe(
 					(libraryItem) => {
 						vm.libraryItem = libraryItem;

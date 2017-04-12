@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {LoggerService} from "../common/logger.service";
 import {ReportRun} from "./models/ReportRun";
 import {Organisation} from "./models/Organisation";
 import {ReportService} from "./report.service";
-import {FolderItem} from "../library/models/FolderItem";
+import {LoggerService} from "eds-common-js";
+import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 
 @Component({
     selector: 'ngbd-modal-content',

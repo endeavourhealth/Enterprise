@@ -183,7 +183,7 @@ public class ConceptEntity {
                 "c.dataTypeId,c.conceptTypeId,c.present "+
                 "order by c.present desc, c.definition";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
                 .setParameter("term", term+"%").getResultList();
@@ -214,7 +214,7 @@ public class ConceptEntity {
                 "c.dataTypeId,c.conceptTypeId,c2.conceptTypeId,c2.present,o.units "+
                 "order by c2.present desc, c2.definition";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
                 .setParameter("id", id).getResultList();
@@ -246,7 +246,7 @@ public class ConceptEntity {
                 "c.dataTypeId,c.conceptTypeId,c.present,o.units "+
                 "order by c.present desc, c.definition";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
                 .setParameter("id", id).getResultList();

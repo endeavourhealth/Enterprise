@@ -90,7 +90,7 @@ public class ItemDependencyEntity {
                 + " AND a.itemUuid = d.itemUuid"
                 + " AND a.auditUuid = d.auditUuid";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         Integer result = (Integer)entityManager.createQuery(where)
                 .setParameter("dependentItemUuid", dependentItemUuid)
@@ -106,7 +106,7 @@ public class ItemDependencyEntity {
     public static List<ItemDependencyEntity> retrieveForActiveItem(ActiveItemEntity activeItem) throws Exception {
         String where = "from ItemDependencyEntity WHERE itemUuid = :itemUuid"
                 + " AND auditUuid = :auditUuid";
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemDependencyEntity> ent = entityManager.createQuery(where, ItemDependencyEntity.class)
                 .setParameter("itemUuid", activeItem.getItemUuid())
@@ -124,7 +124,7 @@ public class ItemDependencyEntity {
                 + " AND auditUuid = :auditUuid"
                 + " AND dependencyTypeId = :dependencyTypeId";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemDependencyEntity> ent = entityManager.createQuery(where, ItemDependencyEntity.class)
                 .setParameter("itemUuid", activeItem.getItemUuid())
@@ -142,7 +142,7 @@ public class ItemDependencyEntity {
         String where = "from ItemDependencyEntity WHERE itemUuid = :itemUuid"
                 + " AND auditUuid = :auditUuid"
                 + " AND dependencyTypeId = :dependencyTypeId";
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemDependencyEntity> ent = entityManager.createQuery(where, ItemDependencyEntity.class)
                 .setParameter("itemUuid", itemUuid)
@@ -163,7 +163,7 @@ public class ItemDependencyEntity {
                 + " AND a.isDeleted = 0"
                 + " WHERE dependentItemUuid = :dependentItemUuid";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemDependencyEntity> ent = entityManager.createQuery(where, ItemDependencyEntity.class)
                 .setParameter("dependentItemUuid", dependentItemUuid)
@@ -183,7 +183,7 @@ public class ItemDependencyEntity {
                 + " WHERE dependentItemUuid = :dependentItemUuid"
                 + " AND dependencyTypeId = :dependencyTypeId";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemDependencyEntity> ent = entityManager.createQuery(where, ItemDependencyEntity.class)
                 .setParameter("dependentItemUuid", dependentItemUuid)

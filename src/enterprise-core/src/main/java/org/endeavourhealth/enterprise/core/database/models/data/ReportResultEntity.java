@@ -163,7 +163,7 @@ public class ReportResultEntity {
 
         }
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<ReportResultEntity[]> ent = entityManager.createQuery(where)
                 .setParameter("queryItemUuid", queryItemUuid)
@@ -184,7 +184,7 @@ public class ReportResultEntity {
                 "GROUP BY runDate "+
                 ") ORDER BY runDate desc";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<ReportResultEntity[]> ent = entityManager.createQuery(where)
                 .setParameter("queryItemUuid", queryItemUuid)

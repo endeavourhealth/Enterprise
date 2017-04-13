@@ -124,7 +124,7 @@ public class OrganizationEntity {
         String where = "select distinct o.id, o.name " +
                 "from PatientEntity p join OrganizationEntity o on o.id = p.organizationId";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
                 .getResultList();

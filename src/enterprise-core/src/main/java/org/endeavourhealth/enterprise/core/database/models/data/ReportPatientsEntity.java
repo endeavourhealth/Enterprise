@@ -129,7 +129,7 @@ public class ReportPatientsEntity {
 
         }
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
                 .setParameter("queryItemUuid", queryItemUuid)

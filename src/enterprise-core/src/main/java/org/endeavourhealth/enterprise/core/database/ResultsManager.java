@@ -13,7 +13,7 @@ import java.util.*;
 public class ResultsManager {
 
     public static void saveReportPatients(ReportPatientsEntity result) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         entityManager.getTransaction().begin();
 
@@ -25,7 +25,7 @@ public class ResultsManager {
     }
 
     public static void saveReportResult(ReportResultEntity result) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         entityManager.getTransaction().begin();
 
@@ -292,7 +292,7 @@ public class ResultsManager {
                             "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " +sqlWhere;
                 }
 
-                EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+                EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
                 List<PatientEntity> patients = entityManager.
                         createQuery(patientWhere, PatientEntity.class)
@@ -341,7 +341,7 @@ public class ResultsManager {
                         "and e.dateRegistered <= :baseline "+
                         "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
 
-            EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+            EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
             Timestamp baselineDate = convertToDate(report.getBaselineDate());
 
             List<PatientEntity> patients = entityManager.

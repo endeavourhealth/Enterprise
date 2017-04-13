@@ -122,7 +122,7 @@ public class ItemEntity {
                 + " AND a.auditUuid = e.auditUuid"
                 + " WHERE a.itemUuid = :itemUuid";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         ItemEntity ent = entityManager.createQuery(where, ItemEntity.class)
                 .setParameter("itemUuid", itemUuid)
@@ -140,7 +140,7 @@ public class ItemEntity {
                 + " WHERE auditUuid = :auditUuid"
                 + " AND itemUuid = :itemUuid";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         ItemEntity ent = entityManager.createQuery(where, ItemEntity.class)
                 .setParameter("auditUuid", auditUuid)
@@ -158,7 +158,7 @@ public class ItemEntity {
                 + " WHERE auditUuid = :auditUuid"
                 + " AND itemUuid = :itemUuid";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         ItemEntity ent = entityManager.createQuery(where, ItemEntity.class)
                 .setParameter("auditUuid", activeItem.getAuditUuid())
@@ -188,7 +188,7 @@ public class ItemEntity {
                 + " AND ad.auditUuid = d.auditUuid"
                 + " AND ad.isDeleted = 0";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemEntity> ent = entityManager.createQuery(where, ItemEntity.class)
                 .setParameter("dependentItemUuid", dependentItemUuid)
@@ -216,7 +216,7 @@ public class ItemEntity {
                 + " AND d.auditUuid = i.auditUuid"
                 + " AND d.dependencyTypeId = :dependencyTypeId"
                 + ")";
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemEntity> ent = entityManager.createQuery(where, ItemEntity.class)
                 .setParameter("itemTypeId", itemTypeId)
@@ -253,7 +253,7 @@ public class ItemEntity {
         }
         String where = sb.toString();
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemEntity> ent = entityManager.createQuery(where, ItemEntity.class)
                 .getResultList();
@@ -287,7 +287,7 @@ public class ItemEntity {
         sb.append(" ) and runDate in (select max(runDate) from ReportResultEntity group by queryItemUuid) ");
         String where = sb.toString();
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager2();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<ReportResultEntity> ent = entityManager.createQuery(where, ReportResultEntity.class)
                 .getResultList();
@@ -308,7 +308,7 @@ public class ItemEntity {
                 + " AND a.auditUuid = i.auditUuid"
                 + " AND i.itemUuid IN :itemUuids";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ItemEntity> ent = entityManager.createQuery(where, ItemEntity.class)
                 .setParameter("itemUuids", itemUuids)

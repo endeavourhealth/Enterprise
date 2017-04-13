@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
 
-    <persistence-unit name="NewPersistenceUnit">
+    <persistence-unit name="enterprise_admin">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.AuditEntity</class>
@@ -10,17 +10,17 @@
         <class>org.endeavourhealth.enterprise.core.database.models.ItemDependencyEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.ItemTypeEntity</class>
         <properties>
-            <property name="hibernate.connection.url" value="jdbc:mysql://10.44.112.59:3306/enterprise_admin"/>
-            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-            <property name="hibernate.connection.username" value="enterprise"/>
-            <property name="hibernate.connection.password" value="forget|LEADER|suit|5?"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/enterprise_admin"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="hibernate.connection.username" value=""/>
+            <property name="hibernate.connection.password" value=""/>
             <property name="hibernate.archive.autodetection" value="class"/>
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hbm2ddl.auto" value="update"/>
         </properties>
     </persistence-unit>
-    <persistence-unit name="NewPersistenceUnit2">
+    <persistence-unit name="enterprise_data">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>org.endeavourhealth.enterprise.core.database.models.data.AllergyIntoleranceEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.EncounterEntity</class>
@@ -39,10 +39,10 @@
         <class>org.endeavourhealth.enterprise.core.database.models.data.ReportPatientsEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.PatientGenderEntity</class>
         <properties>
-            <property name="hibernate.connection.url" value="jdbc:mysql://10.44.112.59:3306/enterprise_data_pseudonymised"/>
-            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-            <property name="hibernate.connection.username" value="enterprise"/>
-            <property name="hibernate.connection.password" value="forget|LEADER|suit|5?"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/enterprise_data_pseudonymised"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="hibernate.connection.username" value=""/>
+            <property name="hibernate.connection.password" value=""/>
             <property name="hibernate.archive.autodetection" value="class"/>
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="true"/>

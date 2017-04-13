@@ -130,7 +130,7 @@ public class ActiveItemEntity {
                     + " WHERE a.organisationUuid = :organisationUuid";
 
     public static ActiveItemEntity retrieveForItemUuid(String itemUuid) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         ActiveItemEntity ent = entityManager.createQuery(SELECT_QUERY_FOR_UUID, ActiveItemEntity.class).setParameter("itemUuid", itemUuid).getSingleResult();
 
@@ -153,7 +153,7 @@ public class ActiveItemEntity {
                 + " AND a.organisationUuid = :organisationUuid"
                 + " ORDER BY ae.timeStamp DESC";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ActiveItemEntity> ent = entityManager.createQuery(where, ActiveItemEntity.class)
                 .setParameter("endUserUuid", endUserUuid)
@@ -170,7 +170,7 @@ public class ActiveItemEntity {
 
 
     public static int retrieveCountDependencies(String dependentItemUuid, Short dependencyTypeId) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         Long result = (Long)entityManager.createQuery(SELECT_QUERY_FOR_COUNT)
                 .setParameter("dependentItemUuid", dependentItemUuid)
@@ -184,7 +184,7 @@ public class ActiveItemEntity {
     }
 
     public static List<ActiveItemEntity> retrieveDependentItems(String organisationUuid, String dependentItemUuid, Short dependencyTypeId) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<ActiveItemEntity> ent = entityManager.createQuery(SELECT_QUERY_FOR_DEPENDENT, ActiveItemEntity.class)
                 .setParameter("dependentItemUuid", dependentItemUuid)

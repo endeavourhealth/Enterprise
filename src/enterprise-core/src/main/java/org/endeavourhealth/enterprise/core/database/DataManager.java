@@ -12,7 +12,7 @@ public class DataManager {
 
     public static void saveItems(AuditEntity audit, ItemEntity item, ActiveItemEntity activeItem,
                                  List<ItemDependencyEntity> itemdependencyEntities) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         entityManager.getTransaction().begin();
 
@@ -31,7 +31,7 @@ public class DataManager {
     }
 
     public static void saveDeletedItems(AuditEntity audit, List<ItemEntity> items, List<ActiveItemEntity> activeItems) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         entityManager.getTransaction().begin();
 
@@ -50,7 +50,7 @@ public class DataManager {
 
     public static void saveMovedItems(AuditEntity audit, List<ItemEntity> items, List<ActiveItemEntity> activeItems,
                                  List<ItemDependencyEntity> itemdependencyEntities) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         entityManager.getTransaction().begin();
 
@@ -71,7 +71,7 @@ public class DataManager {
     }
 
     public static void saveFolders(AuditEntity audit, ItemEntity item, ActiveItemEntity activeItem) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         entityManager.getTransaction().begin();
 

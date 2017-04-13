@@ -115,7 +115,7 @@ public class AuditEntity {
             return new ArrayList<>();
         }
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<AuditEntity> ent = entityManager.createQuery(SELECT_QUERY_UUID_LIST, AuditEntity.class).setParameter("auditUuid", uuids).getResultList();
 
@@ -126,7 +126,7 @@ public class AuditEntity {
     }
 
     public static AuditEntity retrieveForUuid(String auditUuid) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         AuditEntity ent = entityManager.createQuery(SELECT_QUERY_FOR_UUID, AuditEntity.class).setParameter("auditUuid", auditUuid).getSingleResult();
 
@@ -137,7 +137,7 @@ public class AuditEntity {
     }
 
     public static AuditEntity retrieveLatest() throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         AuditEntity ent = entityManager.createQuery(SELECT_QUERY_FOR_LATEST, AuditEntity.class).getSingleResult();
 
@@ -155,7 +155,7 @@ public class AuditEntity {
 
         String where = "from AuditEntity WHERE auditUuid IN :uuids";
 
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
 
         List<AuditEntity> ent = entityManager.createQuery(where, AuditEntity.class).setParameter("uuids", uuids).getResultList();
 

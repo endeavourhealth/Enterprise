@@ -1,5 +1,4 @@
 
-
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;
 DROP TABLE IF EXISTS allergy_intolerance;
@@ -18,6 +17,7 @@ DROP TABLE IF EXISTS appointment;
 DROP TABLE IF EXISTS episode_of_care;
 DROP TABLE IF EXISTS patient;
 DROP TABLE IF EXISTS schedule;
+DROP TABLE IF EXISTS person;
 DROP TABLE IF EXISTS practitioner;
 DROP TABLE IF EXISTS organization;
 DROP TABLE IF EXISTS date_precision;
@@ -338,6 +338,44 @@ CREATE UNIQUE INDEX schedule_id
   USING btree
   (id);
 
+-- Table: public.person
+
+-- DROP TABLE public.person;
+
+CREATE TABLE public.person
+(
+  id bigint NOT NULL,
+  patient_gender_id smallint NOT NULL,
+  nhs_number character varying(255),
+  date_of_birth date NOT NULL,
+  date_of_death date,
+  postcode character varying(20),
+  household_id bigint,
+  lsoa_code character varying(50),
+  msoa_code character varying(50),
+  CONSTRAINT pk_person_id PRIMARY KEY (id),
+  CONSTRAINT fk_person_patient_gender_id FOREIGN KEY (patient_gender_id)
+      REFERENCES public.patient_gender (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.person
+  OWNER TO postgres;
+
+-- Index: public.person_id
+
+-- DROP INDEX public.person_id;
+
+CREATE UNIQUE INDEX person_id
+  ON public.person
+  USING btree
+  (id);
+ALTER TABLE public.person CLUSTER ON person_id;
+
+  
+  
 -- Table: public.patient
 
 -- DROP TABLE public.patient;
@@ -356,7 +394,6 @@ CREATE TABLE patient
   household_id bigint,
   lsoa_code character varying(50),
   msoa_code character varying(50),
-  townsend_score real,
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
       REFERENCES public.organization (id) MATCH SIMPLE

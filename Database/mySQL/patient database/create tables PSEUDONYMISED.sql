@@ -361,7 +361,6 @@ CREATE TABLE episode_of_care
   date_registered date,
   date_registered_end date,
   usual_gp_practitioner_id bigint,
-  managing_organization_id bigint,
   CONSTRAINT pk_episode_of_care_id PRIMARY KEY (id),
   CONSTRAINT fk_episode_of_care_patient_id_organisation_id FOREIGN KEY (patient_id, organization_id)
       REFERENCES patient (id, organization_id) MATCH SIMPLE
@@ -444,6 +443,7 @@ CREATE TABLE encounter
   original_code character varying(20),
   original_term character varying(1000),
   episode_of_care_id bigint,
+  service_provider_organization_id bigint,
   CONSTRAINT pk_encounter_id PRIMARY KEY (id),
   CONSTRAINT fk_encounter_appointment_id FOREIGN KEY (appointment_id)
       REFERENCES appointment (id) MATCH SIMPLE
@@ -459,7 +459,10 @@ CREATE TABLE encounter
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_encounter_episode_of_care_id FOREIGN KEY (episode_of_care_id)
       REFERENCES episode_of_care (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION            
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_service_provider_organization_id FOREIGN KEY (service_provider_organization_id)
+      REFERENCES organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION		  
 );
 
 -- Index: encounter_id

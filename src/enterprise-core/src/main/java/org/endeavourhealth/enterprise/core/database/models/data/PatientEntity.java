@@ -23,7 +23,6 @@ public class PatientEntity {
     private Long householdId;
     private String lsoaCode;
     private String msoaCode;
-    private Double townsendScore;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -155,15 +154,7 @@ public class PatientEntity {
         this.msoaCode = msoaCode;
     }
 
-    @Basic
-    @Column(name = "townsend_score", nullable = true, precision = 0)
-    public Double getTownsendScore() {
-        return townsendScore;
-    }
 
-    public void setTownsendScore(Double townsendScore) {
-        this.townsendScore = townsendScore;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -186,8 +177,7 @@ public class PatientEntity {
         if (householdId != null ? !householdId.equals(that.householdId) : that.householdId != null) return false;
         if (lsoaCode != null ? !lsoaCode.equals(that.lsoaCode) : that.lsoaCode != null) return false;
         if (msoaCode != null ? !msoaCode.equals(that.msoaCode) : that.msoaCode != null) return false;
-        if (townsendScore != null ? !townsendScore.equals(that.townsendScore) : that.townsendScore != null)
-            return false;
+
 
         return true;
     }
@@ -207,7 +197,7 @@ public class PatientEntity {
         result = 31 * result + (householdId != null ? householdId.hashCode() : 0);
         result = 31 * result + (lsoaCode != null ? lsoaCode.hashCode() : 0);
         result = 31 * result + (msoaCode != null ? msoaCode.hashCode() : 0);
-        result = 31 * result + (townsendScore != null ? townsendScore.hashCode() : 0);
+
         return result;
     }
 }

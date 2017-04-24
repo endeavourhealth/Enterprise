@@ -68,7 +68,6 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('16', 'Post Code Prefix', '1', '1', '1','8','2');
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('17', 'LSOA Code', '1', '1', '1','8','2');
 INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('18', 'MSOA Code', '1', '1', '1','8','2');
-INSERT INTO `enterprise_data_pseudonymised`.`Concept` (`ConceptId`, `Definition`, `ParentTypeConceptId`, `BaseTypeConceptId`, `Status`, `DataTypeId`, `ConceptTypeId`) VALUES ('19', 'Townsend Score', '1', '1', '1','13','2');
 
 ALTER TABLE `enterprise_data_pseudonymised`.`allergy_intolerance` 
 ADD INDEX `snomed_concept_id` (`snomed_concept_id` ASC);

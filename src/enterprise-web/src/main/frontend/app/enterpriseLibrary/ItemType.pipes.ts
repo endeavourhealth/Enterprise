@@ -10,7 +10,7 @@ export class ItemTypeIdToStringPipe implements PipeTransform {
 			case ItemType.Report:
 				return 'Report';
 			case ItemType.Query:
-				return 'Query';
+				return 'Cohort';
 			case ItemType.Test:
 				return 'Test';
 			case ItemType.Resource:

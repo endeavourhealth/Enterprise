@@ -1,6 +1,6 @@
 <div class="module">
 	<div class="container-fluid">
-		<div class="module-heading">Query editor
+		<div class="module-heading">Cohort editor
 			<div class="pull-right">
 				<button class="btn btn-sm btn-default"
 								(click)="zoomIn()"
@@ -15,25 +15,25 @@
 				&nbsp;|&nbsp;
 				<button class="btn btn-sm btn-primary"
 								(click)="addNewRule('1')"
-								title="Add a new feature to this query">
+								title="Add a new feature to this cohort">
 					<i class="fa fa-plus"></i> Feature
 				</button>
 
 				<button class="btn btn-sm btn-default"
 								(click)="addNewRule('2')"
-								title="Add a library query to this query">
-					<i class="fa fa-plus"></i> Library Query
+								title="Add a library cohort to this cohort">
+					<i class="fa fa-plus"></i> Library Cohort
 				</button>
 
 				<button class="btn btn-sm btn-success"
 								(click)="addNewRule('3')"
-								title="Add a new test to this query">
+								title="Add a new test to this cohort">
 					<i class="fa fa-plus"></i> Test
 				</button>
 
 				<button class="btn btn-sm btn-info"
 						(click)="addNewRule('4')"
-						title="Add a new function rule to this query">
+						title="Add a new function rule to this cohort">
 					<i class="fa fa-plus"></i> Function
 				</button>
 
@@ -45,7 +45,7 @@
 				</button>
 				<button class="btn btn-sm btn-danger"
 								(click)="clearQuery()"
-								title="Clear the rules in this this query without saving">
+								title="Clear the rules in this this cohort without saving">
 					<i class="fa fa-eraser"></i> Clear Rules
 				</button>
 				&nbsp;|&nbsp;
@@ -73,7 +73,7 @@
 				<aside class="query-aside">
 					<div class="queryDiv">
 						<div class="queryHeader">
-							Query Properties
+							Cohort Properties
 
 						</div>
 
@@ -81,10 +81,10 @@
 							<div class="row">
 								<form class="form">
 									<fieldset>
-										<label class="control-label" style="padding: 0px 10px 0px 15px;">Query Name:</label>
+										<label class="control-label" style="padding: 0px 10px 0px 15px;">Cohort Name:</label>
 										<input class="form-control" type="text" name="queryName" [(ngModel)]="queryName"
 													 style="margin: 0px 0px 15px 10px;width:275px" (ngModelChange)="queryNameChange()">
-										<label class="control-label" style="padding: 0px 10px 0px 15px;">Query Description:</label>
+										<label class="control-label" style="padding: 0px 10px 0px 15px;">Cohort Description:</label>
 										<textarea class="form-control" [(ngModel)]="queryDescription"
 															style="height: 90px; margin: 0px 0px 15px 10px;width:275px"
 															(ngModelChange)="queryDescriptionChange()" name="queryDescription">

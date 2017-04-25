@@ -30,7 +30,7 @@ export class LibraryComponent {
 							protected moduleStateService: ModuleStateService,
 							protected $state: StateService) {
 		this.actionMenuItems = [
-			{ type : ItemType.Query, text : 'Add query' },
+			{ type : ItemType.Query, text : 'Add cohort' },
 			{ type : ItemType.CodeSet, text : 'Add code set ' }
 		];
 	}

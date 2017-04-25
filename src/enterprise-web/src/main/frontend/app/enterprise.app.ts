@@ -15,7 +15,8 @@ import {DashboardComponent} from "./dashboard/dashboard.component";
 import {LibraryComponent} from "./enterpriseLibrary/library.component";
 import {CodeSetEditComponent} from "./codeSet/codeSetEditor.component";
 import {QueryEditComponent} from "./query/queryEditor.component";
-import {Application, FlowchartModule} from "eds-common-js";
+import {Application} from "eds-common-js";
+import {FlowchartModule} from "./flowChart/flowchart.module";
 import {EnterpriseMenuService} from "./enterprise.menu";
 
 @NgModule(

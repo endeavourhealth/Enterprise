@@ -180,7 +180,7 @@ export class QueryEditComponent {
 
 	cancelChanges() {
 		let vm = this;
-		MessageBoxDialog.open(vm.$modal, 'Cancel Changes', 'Are you sure you want to cancel the editing of this query (changes will not be saved) ?', 'Yes', 'No')
+		MessageBoxDialog.open(vm.$modal, 'Cancel Changes', 'Are you sure you want to cancel the editing of this cohort (changes will not be saved) ?', 'Yes', 'No')
 			.result.then(function () {
 			vm.logger.error('Query not saved');
 			vm.state.go(vm.transition.from());

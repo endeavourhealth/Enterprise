@@ -8,7 +8,8 @@ import {QueryPickerDialog} from "./queryPicker.dialog";
 import {TestsModule} from "../tests/tests.module";
 import {ExpressionsModule} from "../expressions/expressions.module";
 import {EnterpriseLibraryModule} from "../enterpriseLibrary/library.module";
-import {DialogsModule, FlowchartModule, FolderModule, LoggerModule} from "eds-common-js";
+import {DialogsModule, FolderModule, LoggerModule} from "eds-common-js";
+import {FlowchartModule} from "../flowChart/flowchart.module";
 
 @NgModule({
 	imports : [

@@ -28,9 +28,9 @@ export class ReportEditDialog implements OnInit {
     baselineDate: string = "";
     queryItemUuid: string = "";
 
-    orgTT: string = "Please select one or more organisations to include in the report. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
-    ppTT: string = "Please select a patient population as the denominator for the report.";
-    rdTT: string = "Please specify a run date for the report. i.e. patients registered on or before that date.";
+    orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
+    ppTT: string = "Please select a patient population as the denominator.";
+    rdTT: string = "Please specify a run date. i.e. patients registered on or before that date.";
 
     populations = [
         {id: -1, type: ''},

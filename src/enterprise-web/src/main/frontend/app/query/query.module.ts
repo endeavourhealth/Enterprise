@@ -9,7 +9,7 @@ import {TestsModule} from "../tests/tests.module";
 import {ExpressionsModule} from "../expressions/expressions.module";
 import {EnterpriseLibraryModule} from "../enterpriseLibrary/library.module";
 import {DialogsModule, FolderModule, LoggerModule} from "eds-common-js";
-import {FlowchartModule} from "../flowChart/flowchart.module";
+import {FlowchartModule} from "../flowchart/flowchart.module";
 
 @NgModule({
 	imports : [

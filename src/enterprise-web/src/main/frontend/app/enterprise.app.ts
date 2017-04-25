@@ -16,7 +16,7 @@ import {LibraryComponent} from "./enterpriseLibrary/library.component";
 import {CodeSetEditComponent} from "./codeSet/codeSetEditor.component";
 import {QueryEditComponent} from "./query/queryEditor.component";
 import {Application} from "eds-common-js";
-import {FlowchartModule} from "./flowChart/flowchart.module";
+import {FlowchartModule} from "./flowchart/flowchart.module";
 import {EnterpriseMenuService} from "./enterprise.menu";
 
 @NgModule(

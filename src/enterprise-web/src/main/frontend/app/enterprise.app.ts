@@ -18,6 +18,8 @@ import {QueryEditComponent} from "./query/queryEditor.component";
 import {Application} from "eds-common-js";
 import {FlowchartModule} from "./flowchart/flowchart.module";
 import {EnterpriseMenuService} from "./enterprise.menu";
+import {ReportEditComponent} from "./report/reportEditor.component";
+import {ReportModule} from "./report/report.module";
 
 @NgModule(
 	Application.Define({
@@ -27,12 +29,14 @@ import {EnterpriseMenuService} from "./enterprise.menu";
 			EnterpriseLibraryModule,
 			CodeSetModule,
 			QueryModule,
+			ReportModule,
 		],
 		states: [
-			{name: 'app.dashboard', url: '/dashboard', component: DashboardComponent },
-			{name : 'app.library', url: '/library', component : LibraryComponent },
+			{ name: 'app.dashboard', url: '/dashboard', component: DashboardComponent },
+			{ name : 'app.library', url: '/library', component : LibraryComponent },
 			{ name : 'app.codeSetEdit', url : '/codeSetEdit/:itemAction/:itemUuid', component : CodeSetEditComponent },
-			{name: 'app.queryEdit', url: '/queryEdit/:itemAction/:itemUuid', component: QueryEditComponent }
+			{ name: 'app.queryEdit', url: '/queryEdit/:itemAction/:itemUuid', component: QueryEditComponent },
+			{ name : 'app.reportEdit', url: '/reportEdit/:itemAction/:itemUuid', component: ReportEditComponent }
 		],
 		defaultState : { state: 'app.dashboard', params: {} },
 		menuManager : EnterpriseMenuService

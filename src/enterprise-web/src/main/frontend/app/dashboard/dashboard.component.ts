@@ -39,6 +39,9 @@ export class DashboardComponent {
 			case ItemType.CodeSet:
 				this.$state.go('app.codeSetEdit', {itemUuid: item.uuid, itemAction: action});
 				break;
+			case ItemType.Report:
+				this.$state.go('app.reportEdit', {itemUuid: item.uuid, itemAction: action});
+				break;
 		}
 	}
 }

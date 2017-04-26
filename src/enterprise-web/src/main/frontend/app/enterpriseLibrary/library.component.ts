@@ -6,7 +6,7 @@ import {ReportEditDialog} from "../reports/reportEditor.dialog";
 import {ReportViewDialog} from "../reports/reportViewer.dialog";
 import {ReportRun} from "../reports/models/ReportRun";
 import {ReportService} from "../reports/report.service";
-import {LibraryService, LoggerService, ModuleStateService} from "eds-common-js";
+import {LibraryService, LoggerService, MessageBoxDialog, ModuleStateService} from "eds-common-js";
 import {ItemSummaryList} from "eds-common-js/dist/library/models/ItemSummaryList";
 import {ItemType} from "eds-common-js/dist/folder/models/ItemType";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
@@ -31,7 +31,8 @@ export class LibraryComponent {
 							protected $state: StateService) {
 		this.actionMenuItems = [
 			{ type : ItemType.Query, text : 'Add cohort' },
-			{ type : ItemType.CodeSet, text : 'Add code set ' }
+			{ type : ItemType.CodeSet, text : 'Add code set ' },
+			{ type : ItemType.Report, text : 'Add report' }
 		];
 	}
 
@@ -69,6 +70,9 @@ export class LibraryComponent {
 			case ItemType.CodeSet:
 				this.$state.go('app.codeSetEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
 				break;
+			case ItemType.Report:
+				this.$state.go('app.reportEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
+				break;
 			default:
 				this.logger.error('Invalid item type', actionItemProp.type, 'Item ' + actionItemProp.action);
 				break;
@@ -97,7 +101,7 @@ export class LibraryComponent {
 			);
 	}
 
-	runReport(item: FolderItem) {
+	runCohort(item: FolderItem) {
 		var vm = this;
 
 		let reportRun: ReportRun = {
@@ -140,6 +144,16 @@ export class LibraryComponent {
 			console.log(resultData);
 
 		});
+	}
+
+	runReport(item: FolderItem) {
+		let vm = this;
+		MessageBoxDialog.open(vm.$modal, "Run Report", "Run report now", "Yes", "No");
+	}
+
+	scheduleReport(item: FolderItem) {
+		let vm = this;
+		MessageBoxDialog.open(vm.$modal, "Run Report", "Schedule report", "Yes", "No");
 	}
 
 	saveState() {

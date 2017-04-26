@@ -43,22 +43,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Test }
-     * 
-     */
-    public Test createTest() {
-        return new Test();
-    }
-
-    /**
      * Create an instance of {@link QueryDocument }
      * 
      */
     public QueryDocument createQueryDocument() {
         return new QueryDocument();
     }
-
-
 
     /**
      * Create an instance of {@link LibraryItem }
@@ -93,14 +83,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Filter }
-     * 
-     */
-    public Filter createFieldTest() {
-        return new Filter();
-    }
-
-    /**
      * Create an instance of {@link Rule }
      * 
      */
@@ -108,7 +90,13 @@ public class ObjectFactory {
         return new Rule();
     }
 
-
+    /**
+     * Create an instance of {@link ReportCohortFeature }
+     * 
+     */
+    public ReportCohortFeature createReportCohortFeature() {
+        return new ReportCohortFeature();
+    }
 
     /**
      * Create an instance of {@link VariableType }
@@ -117,7 +105,6 @@ public class ObjectFactory {
     public VariableType createVariableType() {
         return new VariableType();
     }
-
 
     /**
      * Create an instance of {@link CodeSet }
@@ -152,11 +139,27 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Test }
+     * 
+     */
+    public Test createTest() {
+        return new Test();
+    }
+
+    /**
      * Create an instance of {@link ValueFrom }
      * 
      */
     public ValueFrom createValueFrom() {
         return new ValueFrom();
+    }
+
+    /**
+     * Create an instance of {@link Filter }
+     * 
+     */
+    public Filter createFilter() {
+        return new Filter();
     }
 
     /**
@@ -183,16 +186,13 @@ public class ObjectFactory {
         return new Restriction();
     }
 
-
-
     /**
-     * Create an instance of {@link Test }
+     * Create an instance of {@link Report }
      * 
      */
-    public Test createDataSource() {
-        return new Test();
+    public Report createReport() {
+        return new Report();
     }
-
 
     /**
      * Create an instance of {@link Query.StartingRules }
@@ -202,12 +202,14 @@ public class ObjectFactory {
         return new Query.StartingRules();
     }
 
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link QueryDocument }{@code >}}
+     * 
+     */
     @XmlElementDecl(namespace = "", name = "queryDocument")
     public JAXBElement<QueryDocument> createQueryDocument(QueryDocument value) {
         return new JAXBElement<QueryDocument>(_QueryDocument_QNAME, QueryDocument.class, null, value);
     }
-
-
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link LibraryItem }{@code >}}

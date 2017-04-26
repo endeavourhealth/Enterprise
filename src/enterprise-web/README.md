@@ -1,41 +1,41 @@
-#Endeavour Enterprise Reporting
+# Endeavour Enterprise Reporting
 
 ## Requirements
 
-###General
+### General
  SPA framework
  NPM
  Error handling
  Menu decision
  Frame header
 
-###Login
+### Login
  Users/Passwords
  Password security
  Cookie authentication
  Choose organisation?
  
-###Dashboard
+### Dashboard
  Populate recent tabs
  Start/stop engine
  
-###Library manager
+### Library manager
  
-###Report manager
+### Report manager
  Run request
 
-###Admin module (new users)
+### Admin module (new users)
 
-###Audit module
+### Audit module
 
-###Builders
- Codeset builder
- Date
- Value
- Valueset
+### Builders
+#### Codeset builder
+* Date
+* Value
+* Valueset
 
-###Query builder
- Feature builder
- Library picker
- 
-###Report builder
+#### Query builder
+* Feature builder
+* Library picker
+
+#### Report builder

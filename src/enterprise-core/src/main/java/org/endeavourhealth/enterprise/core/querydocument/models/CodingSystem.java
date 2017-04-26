@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="DMD"/>
  *     &lt;enumeration value="SnomedCt"/>
  *     &lt;enumeration value="CTV3"/>
+ *     &lt;enumeration value="Endeavour"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>

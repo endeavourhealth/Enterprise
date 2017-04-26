@@ -69,8 +69,7 @@ export class QueryEditComponent {
 			description: null,
 			folderUuid: transition.params()['itemUuid'],
 			query: this.query,
-			codeSet : null
-		};
+		} as EnterpriseLibraryItem;
 
 		this.createModel(this.libraryItem);
 

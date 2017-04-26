@@ -148,7 +148,7 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             throw new BadRequestException("LibraryItems and Reports must have a containing folder UUID");
         }
 
-        //if saving a folder or we're AMENDING a library item or report, then there's notning more to validate
+        //if saving a folder or we're AMENDING a library item or report, then there's nothing more to validate
         if (containingFolderUuid == null) {
             return;
         }
@@ -160,13 +160,8 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
             if (itemType != DefinitionItemType.LibraryFolder.getValue()
                     && itemType != DefinitionItemType.CodeSet.getValue()
                     && itemType != DefinitionItemType.Query.getValue()
-                    && itemType != DefinitionItemType.ListOutput.getValue()) {
-                throw new BadRequestException("Library folder UUID " + containingFolderUuid + " cannot contain a " + itemType);
-            }
-        } else if (containingFolderType == DefinitionItemType.ReportFolder.getValue()) {
-            //report folders can only contain other report folders and reports
-            if (itemType != DefinitionItemType.ReportFolder.getValue()
-                    && itemType != DefinitionItemType.Report.getValue()) {
+                    && itemType != DefinitionItemType.ListOutput.getValue()
+										&& itemType != DefinitionItemType.Report.getValue()) {
                 throw new BadRequestException("Library folder UUID " + containingFolderUuid + " cannot contain a " + itemType);
             }
         } else {

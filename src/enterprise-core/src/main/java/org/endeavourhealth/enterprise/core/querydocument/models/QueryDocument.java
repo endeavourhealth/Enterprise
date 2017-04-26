@@ -20,7 +20,6 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="folder" type="{}folder" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="libraryItem" type="{}libraryItem" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="report" type="{}report" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -96,7 +95,5 @@ public class QueryDocument {
         }
         return this.libraryItem;
     }
-
-
 
 }

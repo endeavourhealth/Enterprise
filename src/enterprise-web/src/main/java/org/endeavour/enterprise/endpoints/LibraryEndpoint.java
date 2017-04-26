@@ -140,6 +140,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
         Query query = libraryItem.getQuery();
         CodeSet codeSet = libraryItem.getCodeSet();
+        Report report = libraryItem.getReport();
 
         LOG.trace(String.format("SavingLibraryItem UUID %s, Name %s FolderUuid %s", libraryItemUuid, name, folderUuid));
 
@@ -151,8 +152,9 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
         if (query != null) {
             type = (short)DefinitionItemType.Query.getValue();
         } else if (codeSet != null) {
-            type = (short)DefinitionItemType.CodeSet.getValue();
-
+					type = (short) DefinitionItemType.CodeSet.getValue();
+				} else if (report != null) {
+					type = (short) DefinitionItemType.Report.getValue();
         } else {
             //if we've been passed no proper content, we might just be wanting to rename an existing item,
             //so work out the type from what's on the DB already
@@ -207,6 +209,33 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 .entity(ret)
                 .build();
     }
+
+    @GET
+		@Produces(MediaType.APPLICATION_JSON)
+		@Consumes(MediaType.APPLICATION_JSON)
+		@Path("/getLibraryItemNames")
+		public Response getLibraryItemNames(@Context SecurityContext sc, @QueryParam("itemUuids") List<String> itemUuids) {
+			super.setLogbackMarkers(sc);
+
+			LOG.trace("getLibraryItemNames", itemUuids);
+			Map<String, String> names = new HashMap<>();
+
+			for (String itemUuid : itemUuids) {
+				try {
+					ItemEntity item = ItemEntity.retrieveLatestForUUid(itemUuid);
+					names.put(itemUuid, item.getTitle());
+				} catch (Exception e) {
+					names.put(itemUuid, "Error!");
+					LOG.error("Error loading name for library item " + itemUuid);
+				}
+			}
+
+			return Response
+					.ok()
+					.entity(names)
+					.build();
+		}
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

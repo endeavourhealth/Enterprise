@@ -3,11 +3,36 @@ package org.endeavourhealth.enterprise.core.querydocument.models;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 
+/**
+ * <p>Java class for value complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="value">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="constant" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="testRuleId" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;choice>
+ *           &lt;element name="absoluteUnit" type="{}valueAbsoluteUnit"/>
+ *           &lt;element name="relativeUnit" type="{}valueRelativeUnit"/>
+ *         &lt;/choice>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "value", propOrder = {
     "constant",
@@ -21,42 +46,107 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class Value {
 
+    @XmlElement(required = true)
     protected String constant;
+    @XmlElement(required = true)
+    protected String testRuleId;
     @XmlSchemaType(name = "string")
     protected ValueAbsoluteUnit absoluteUnit;
     @XmlSchemaType(name = "string")
     protected ValueRelativeUnit relativeUnit;
 
-    protected String testRuleId;
-
+    /**
+     * Gets the value of the constant property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
     public String getConstant() {
         return constant;
     }
 
+    /**
+     * Sets the value of the constant property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
     public void setConstant(String value) {
         this.constant = value;
     }
 
+    /**
+     * Gets the value of the testRuleId property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
     public String getTestRuleId() {
         return testRuleId;
     }
 
+    /**
+     * Sets the value of the testRuleId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
     public void setTestRuleId(String value) {
         this.testRuleId = value;
     }
 
+    /**
+     * Gets the value of the absoluteUnit property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ValueAbsoluteUnit }
+     *     
+     */
     public ValueAbsoluteUnit getAbsoluteUnit() {
         return absoluteUnit;
     }
 
+    /**
+     * Sets the value of the absoluteUnit property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ValueAbsoluteUnit }
+     *     
+     */
     public void setAbsoluteUnit(ValueAbsoluteUnit value) {
         this.absoluteUnit = value;
     }
 
+    /**
+     * Gets the value of the relativeUnit property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ValueRelativeUnit }
+     *     
+     */
     public ValueRelativeUnit getRelativeUnit() {
         return relativeUnit;
     }
 
+    /**
+     * Sets the value of the relativeUnit property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ValueRelativeUnit }
+     *     
+     */
     public void setRelativeUnit(ValueRelativeUnit value) {
         this.relativeUnit = value;
     }

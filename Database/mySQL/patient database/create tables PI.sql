@@ -70,7 +70,7 @@ CREATE TABLE msoa_lookup
 CREATE TABLE date_precision
 (
   id smallint NOT NULL,
-  value character varying(10) NOT NULL,
+  value character varying(11) NOT NULL,
   CONSTRAINT pk_date_precision_id PRIMARY KEY (id)
 );
   
@@ -78,6 +78,8 @@ INSERT INTO date_precision (id, value) VALUES (1, 'year');
 INSERT INTO date_precision (id, value) VALUES (2, 'month');
 INSERT INTO date_precision (id, value) VALUES (5, 'day');
 INSERT INTO date_precision (id, value) VALUES (12, 'minute');
+INSERT INTO date_precision (id, value) VALUES (13, 'second');
+INSERT INTO date_precision (id, value) VALUES (14, 'millisecond');
 
 -- Table: appointment_status
 
@@ -509,6 +511,7 @@ CREATE TABLE allergy_intolerance
   snomed_concept_id bigint,
   original_code character varying(20),
   original_term character varying(1000),
+  is_review boolean NOT NULL,
   CONSTRAINT pk_allergy_intolerance_id PRIMARY KEY (id),
   CONSTRAINT fk_allergy_intolerance_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -669,6 +672,7 @@ CREATE TABLE observation
   original_code character varying(20),
   is_problem boolean NOT NULL,
   original_term character varying(1000),
+  is_review boolean NOT NULL,
   CONSTRAINT pk_observation_id PRIMARY KEY (id),
   CONSTRAINT fk_observation_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
@@ -776,6 +780,7 @@ CREATE TABLE referral_request
   outgoing_referral boolean,
   original_code character varying(20),
   original_term character varying(1000),
+  is_review boolean NOT NULL,
   CONSTRAINT pk_referral_request_id PRIMARY KEY (id),
   CONSTRAINT fk_referral_request_date_precision FOREIGN KEY (date_precision_id)
       REFERENCES date_precision (id) MATCH SIMPLE

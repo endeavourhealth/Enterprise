@@ -4,8 +4,10 @@ import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.database.ResultsManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
+import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
+import org.endeavourhealth.enterprise.core.querydocument.models.ReportCohortFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,18 +26,31 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/run")
-	public Response run(@Context SecurityContext sc, JsonCohortRun report) throws Exception {
+	public Response run(@Context SecurityContext sc, JsonReportRun report) throws Exception {
 		super.setLogbackMarkers(sc);
 
 		String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
 
-		ResultsManager resultsManager = new ResultsManager();
-
-		ItemEntity item = ItemEntity.retrieveLatestForUUid(report.getQueryItemUuid());
+		ItemEntity item = ItemEntity.retrieveLatestForUUid(report.getReportItemUuid());
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
-		resultsManager.runReport(libraryItem, report, userUuid);
+		LOG.info("Running report " + libraryItem.getName());
+
+		for (ReportCohortFeature feature : libraryItem.getReport().getCohortFeature()) {
+			LOG.info("Running report feature " + feature.getFieldName());
+			ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(feature.getCohortFeatureUuid());
+			String featureXml = featureEntity.getXmlContent();
+			LibraryItem featureItem = QueryDocumentSerializer.readLibraryItemFromXml(featureXml);
+
+			JsonCohortRun featureRun = new JsonCohortRun();
+			featureRun.setBaselineDate(report.getBaselineDate());
+			featureRun.setOrganisation(report.getOrganisation());
+			featureRun.setPopulation(report.getPopulation());
+			featureRun.setQueryItemUuid(feature.getCohortFeatureUuid());
+
+			ResultsManager.runReport(featureItem, featureRun, userUuid);
+		}
 
 		clearLogbackMarkers();
 

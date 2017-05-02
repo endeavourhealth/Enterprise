@@ -14,6 +14,8 @@ import {FolderNode} from "eds-common-js/dist/folder/models/FolderNode";
 import {ActionItem} from "eds-common-js/dist/folder/models/ActionItem";
 import {ActionMenuItem} from "eds-common-js/dist/folder/models/ActionMenuItem";
 import {ReportRunnerDialog} from "../report/reportRunner.dialog";
+import {ReportService} from "../report/report.service";
+import {ReportRun} from "../report/models/ReportRun";
 
 @Component({
 	template : require('./library.html')
@@ -25,7 +27,8 @@ export class LibraryComponent {
 	actionMenuItems: ActionMenuItem[];
 
 	constructor(protected libraryService: LibraryService,
-							protected reportService: CohortService,
+							protected cohortService: CohortService,
+							protected reportService : ReportService,
 							protected logger: LoggerService,
 							private $modal: NgbModal,
 							protected moduleStateService: ModuleStateService,
@@ -119,7 +122,7 @@ export class LibraryComponent {
 
 			resultData.queryItemUuid = item.uuid;
 
-			vm.reportService.runCohort(resultData)
+			vm.cohortService.runCohort(resultData)
 				.subscribe(
 					(data) => {
 						vm.refresh();
@@ -147,16 +150,27 @@ export class LibraryComponent {
 	}
 
 	runReport(item: FolderItem) {
+		let reportRun: ReportRun = {
+			organisation: [],
+			population: "",
+			baselineDate: "",
+			reportItemUuid: item.uuid
+		};
+
 		let vm = this;
-		ReportRunnerDialog.open(vm.$modal, item).result.then(
+		ReportRunnerDialog.open(vm.$modal, reportRun, item).result.then(
 			(result) => vm.executeReport(item, result),
 			(error) => vm.logger.error("Error running report", error)
 		);
 	}
 
-	executeReport(report : FolderItem, cohort : FolderItem) {
-		this.logger.info("Running report " + report.name + " against cohort " + cohort.name);
-
+	executeReport(report : FolderItem, reportRun : ReportRun) {
+		let vm = this;
+		vm.logger.info("Running report " + report.name);
+		vm.reportService.runReport(reportRun).subscribe(
+			(result) => vm.logger.success("Report run"),
+			(error) => vm.logger.error("Report failed", error)
+		);
 	}
 
 	scheduleReport(item: FolderItem) {

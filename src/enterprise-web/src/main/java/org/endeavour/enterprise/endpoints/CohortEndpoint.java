@@ -132,15 +132,12 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 		super.setLogbackMarkers(sc);
 
 		String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
-		String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
-
-		ResultsManager resultsManager = new ResultsManager();
 
 		ItemEntity item = ItemEntity.retrieveLatestForUUid(report.getQueryItemUuid());
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
-		resultsManager.runReport(libraryItem, report, userUuid);
+		ResultsManager.runReport(libraryItem, report, userUuid);
 
 		clearLogbackMarkers();
 

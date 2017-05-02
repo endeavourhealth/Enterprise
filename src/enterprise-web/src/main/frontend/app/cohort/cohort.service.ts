@@ -3,7 +3,7 @@ import {Http, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {Organisation} from "./models/Organisation";
 import {ReportResult} from "./models/ReportResult";
-import {ReportRun} from "./models/ReportRun";
+import {CohortRun} from "./models/CohortRun";
 import {BaseHttp2Service} from "eds-common-js";
 
 @Injectable()
@@ -40,7 +40,7 @@ export class CohortService extends BaseHttp2Service {
 		return this.httpGet('api/cohort/getPatients', {search : params});
 	}
 
-	runCohort(result : ReportRun):Observable<ReportRun> {
+	runCohort(result : CohortRun):Observable<CohortRun> {
 		return this.httpPost('api/cohort/run', result);
 	}
 

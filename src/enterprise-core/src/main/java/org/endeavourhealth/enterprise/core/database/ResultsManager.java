@@ -2,7 +2,7 @@ package org.endeavourhealth.enterprise.core.database;
 
 import org.endeavourhealth.enterprise.core.database.models.data.*;
 import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
-import org.endeavourhealth.enterprise.core.json.JsonReportRun;
+import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 
 import javax.persistence.EntityManager;
@@ -52,7 +52,7 @@ public class ResultsManager {
 
     }
 
-    public static void runReport(LibraryItem libraryItem, JsonReportRun report, String userUuid) throws Exception {
+    public static void runReport(LibraryItem libraryItem, JsonCohortRun report, String userUuid) throws Exception {
 
         List<QueryResult> queryResults = new ArrayList<>();
 

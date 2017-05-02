@@ -1,5 +1,5 @@
 import {Organisation} from "./Organisation";
-export class ReportRun {
+export class CohortRun {
     organisation : Organisation[];
     population: string;
     baselineDate : string;

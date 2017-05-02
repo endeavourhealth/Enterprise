@@ -4,7 +4,7 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {EnterpriseLibraryItem} from "./models/EnterpriseLibraryItem";
 import {CohortEditDialog} from "../cohort/cohortEditor.dialog";
 import {CohortViewDialog} from "../cohort/cohortViewer.dialog";
-import {ReportRun} from "../cohort/models/ReportRun";
+import {CohortRun} from "../cohort/models/CohortRun";
 import {CohortService} from "../cohort/cohort.service";
 import {LibraryService, LoggerService, MessageBoxDialog, ModuleStateService} from "eds-common-js";
 import {ItemSummaryList} from "eds-common-js/dist/library/models/ItemSummaryList";
@@ -105,7 +105,7 @@ export class LibraryComponent {
 	runCohort(item: FolderItem) {
 		var vm = this;
 
-		let reportRun: ReportRun = {
+		let reportRun: CohortRun = {
 			organisation: [],
 			population: "",
 			baselineDate: "",
@@ -113,7 +113,7 @@ export class LibraryComponent {
 		};
 
 		CohortEditDialog.open(vm.$modal, reportRun, item)
-			.result.then(function (resultData: ReportRun) {
+			.result.then(function (resultData: CohortRun) {
 
 			item.isRunning = true;
 
@@ -131,7 +131,7 @@ export class LibraryComponent {
 		var vm = this;
 		console.log(item);
 
-		let reportRun: ReportRun = {
+		let reportRun: CohortRun = {
 			organisation: [],
 			population: "",
 			baselineDate: "",
@@ -139,7 +139,7 @@ export class LibraryComponent {
 		};
 
 		CohortViewDialog.open(vm.$modal, reportRun, item)
-			.result.then(function (resultData: ReportRun) {
+			.result.then(function (resultData: CohortRun) {
 
 			console.log(resultData);
 

@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {ReportRun} from "./models/ReportRun";
+import {CohortRun} from "./models/CohortRun";
 import {Organisation} from "./models/Organisation";
 import {CohortService} from "./cohort.service";
 import {LoggerService} from "eds-common-js";
@@ -12,7 +12,7 @@ import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 })
 export class CohortEditDialog implements OnInit {
 
-    public static open(modalService: NgbModal, reportRun: ReportRun, item: FolderItem) {
+    public static open(modalService: NgbModal, reportRun: CohortRun, item: FolderItem) {
         const modalRef = modalService.open(CohortEditDialog, { backdrop : "static", size : "lg"});
         modalRef.componentInstance.resultData = reportRun;
         modalRef.componentInstance.item = item;

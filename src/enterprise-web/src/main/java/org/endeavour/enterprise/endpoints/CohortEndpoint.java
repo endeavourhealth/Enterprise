@@ -1,14 +1,8 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavourhealth.common.security.SecurityUtils;
-import org.endeavourhealth.enterprise.core.DefinitionItemType;
-import org.endeavourhealth.enterprise.core.DependencyType;
 import org.endeavourhealth.enterprise.core.database.ResultsManager;
-import org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity;
-import org.endeavourhealth.enterprise.core.database.models.AuditEntity;
-import org.endeavourhealth.enterprise.core.database.models.ItemDependencyEntity;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
-import org.endeavourhealth.enterprise.core.database.models.data.ConceptEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.OrganizationEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.ReportPatientsEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
@@ -134,7 +128,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/run")
-	public Response run(@Context SecurityContext sc, JsonReportRun report) throws Exception {
+	public Response run(@Context SecurityContext sc, JsonCohortRun report) throws Exception {
 		super.setLogbackMarkers(sc);
 
 		String userUuid = SecurityUtils.getCurrentUserId(sc).toString();

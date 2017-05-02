@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public final class JsonReportRun {
+public final class JsonCohortRun {
 
     private List<JsonOrganisation> organisation = new ArrayList<>();
     private String population = null;
     private String baselineDate = null;
     private String queryItemUuid = null;
 
-    public JsonReportRun() {
+    public JsonCohortRun() {
     }
 
     /**

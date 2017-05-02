@@ -7,7 +7,7 @@ import {ReportRun} from "./models/ReportRun";
 import {BaseHttp2Service} from "eds-common-js";
 
 @Injectable()
-export class ReportService extends BaseHttp2Service {
+export class CohortService extends BaseHttp2Service {
 	constructor(http : Http) { super(http); }
 
 	getOrganisations():Observable<Organisation> {
@@ -15,7 +15,7 @@ export class ReportService extends BaseHttp2Service {
 		return this.httpGet('api/library/getOrganisations');
 	}
 
-	getReportResults(queryItemUuid : string, runDate):Observable<ReportResult[]> {
+	getCohortResults(queryItemUuid : string, runDate):Observable<ReportResult[]> {
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('queryItemUuid', queryItemUuid);
 		params.append('runDate', runDate);
@@ -23,14 +23,14 @@ export class ReportService extends BaseHttp2Service {
 		return this.httpGet('api/library/getReportResults', {search : params});
 	}
 
-	getAllReportResults(queryItemUuid : string):Observable<ReportResult> {
+	getAllCohortResults(queryItemUuid : string):Observable<ReportResult> {
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('queryItemUuid', queryItemUuid);
 
 		return this.httpGet('api/library/getAllReportResults', {search : params});
 	}
 
-	getReportPatients(type : string, queryItemUuid : string, runDate, organisationId):Observable<any[]> {
+	getCohortPatients(type : string, queryItemUuid : string, runDate, organisationId):Observable<any[]> {
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('type', type);
 		params.append('queryItemUuid', queryItemUuid);
@@ -40,7 +40,7 @@ export class ReportService extends BaseHttp2Service {
 		return this.httpGet('api/library/getReportPatients', {search : params});
 	}
 
-	runReport(result : ReportRun):Observable<ReportRun> {
+	runCohort(result : ReportRun):Observable<ReportRun> {
 		return this.httpPost('api/library/runReport', result);
 	}
 

@@ -4,9 +4,10 @@ import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {ItemTypeIdToStringPipe, ItemTypeIdToIconPipe} from "./ItemType.pipes";
 import {LibraryComponent} from "./library.component";
-import {ReportsModule} from "../reports/reports.module";
-import {ReportService} from "../reports/report.service";
+import {CohortModule} from "../cohort/cohort.module";
+import {CohortService} from "../cohort/cohort.service";
 import {FolderModule, LibraryModule} from "eds-common-js";
+import {ReportModule} from "../report/report.module";
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import {FolderModule, LibraryModule} from "eds-common-js";
 		FormsModule,
 		NgbModule,
 
-		ReportsModule,
+		ReportModule,
+		CohortModule,
 		FolderModule,
 		LibraryModule,
 		],
@@ -30,7 +32,7 @@ import {FolderModule, LibraryModule} from "eds-common-js";
 		ItemTypeIdToIconPipe,
 	],
 	providers : [
-		ReportService
+		CohortService
 	]
 })
 export class EnterpriseLibraryModule {}

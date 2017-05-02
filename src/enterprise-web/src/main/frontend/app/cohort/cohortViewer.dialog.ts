@@ -3,18 +3,18 @@ import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {ReportRun} from "./models/ReportRun";
 import {ReportResult} from "./models/ReportResult";
 import {ReportPatient} from "./models/ReportPatient";
-import {ReportService} from "./report.service";
+import {CohortService} from "./cohort.service";
 import {LoggerService} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 
 @Component({
     selector: 'ngbd-modal-content',
-    template: require('./reportViewer.html')
+    template: require('./cohortViewer.html')
 })
-export class ReportViewDialog implements OnInit {
+export class CohortViewDialog implements OnInit {
 
     public static open(modalService: NgbModal, reportRun: ReportRun, item: FolderItem) {
-        const modalRef = modalService.open(ReportViewDialog, { backdrop : "static", size : "lg"});
+        const modalRef = modalService.open(CohortViewDialog, { backdrop : "static", size : "lg"});
         modalRef.componentInstance.resultData = reportRun;
         modalRef.componentInstance.item = item;
 
@@ -41,7 +41,7 @@ export class ReportViewDialog implements OnInit {
     enumeratorTotal : number = 0;
     denominatorTotal : number = 0;
 
-    constructor(protected reportService: ReportService,
+    constructor(protected reportService: CohortService,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
 
@@ -58,7 +58,7 @@ export class ReportViewDialog implements OnInit {
 
         vm.getReportResults(vm.item.uuid, vm.item.lastRun);
 
-        vm.reportService.getAllReportResults(vm.item.uuid)
+        vm.reportService.getAllCohortResults(vm.item.uuid)
             .subscribe(
                 (data) => {
                     vm.allReportResults = data;
@@ -68,7 +68,7 @@ export class ReportViewDialog implements OnInit {
     getReportResults(uuid:string, lastRun:number) {
         var vm = this;
 
-        vm.reportService.getReportResults(uuid, lastRun)
+        vm.reportService.getCohortResults(uuid, lastRun)
             .subscribe(
                 (data) => {
                     vm.reportResult = data;
@@ -92,7 +92,7 @@ export class ReportViewDialog implements OnInit {
 
         var type = "PATIENT";
 
-        vm.reportService.getReportPatients(type, uuid, lastRun, organisationId)
+        vm.reportService.getCohortPatients(type, uuid, lastRun, organisationId)
             .subscribe(
                 (data) => {
                     var csvData = this.ConvertToCSV(data);

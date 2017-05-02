@@ -57,7 +57,7 @@
 													<button type="button" class="btn btn-xs btn-default" ngbDropdownToggle id="itemMenu">...</button>
 													<ul class="dropdown-menu dropdown-menu-right" style="cursor:pointer" aria-labelledby="itemMenu">
 														<li *ngIf="item.type==2"><a (click)="runCohort(item)">Run Cohort Totals</a></li>
-														<li *ngIf="item.type==1"><a (click)="runReport(item)">Run Now</a></li>
+														<li *ngIf="item.type==1"><a (click)="runCohort(item)">Run Now</a></li>
 														<li *ngIf="item.type==1"><a (click)="scheduleReport(item)">Schedule</a></li>
 														<li role="separator" class="divider"></li>
 														<li class="disabled"><a href="#">Rename</a></li>

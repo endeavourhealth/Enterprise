@@ -2,10 +2,10 @@ import {Component} from "@angular/core";
 import {StateService} from "ui-router-ng2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {EnterpriseLibraryItem} from "./models/EnterpriseLibraryItem";
-import {ReportEditDialog} from "../reports/reportEditor.dialog";
-import {ReportViewDialog} from "../reports/reportViewer.dialog";
-import {ReportRun} from "../reports/models/ReportRun";
-import {ReportService} from "../reports/report.service";
+import {CohortEditDialog} from "../cohort/cohortEditor.dialog";
+import {CohortViewDialog} from "../cohort/cohortViewer.dialog";
+import {ReportRun} from "../cohort/models/ReportRun";
+import {CohortService} from "../cohort/cohort.service";
 import {LibraryService, LoggerService, MessageBoxDialog, ModuleStateService} from "eds-common-js";
 import {ItemSummaryList} from "eds-common-js/dist/library/models/ItemSummaryList";
 import {ItemType} from "eds-common-js/dist/folder/models/ItemType";
@@ -13,6 +13,7 @@ import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {FolderNode} from "eds-common-js/dist/folder/models/FolderNode";
 import {ActionItem} from "eds-common-js/dist/folder/models/ActionItem";
 import {ActionMenuItem} from "eds-common-js/dist/folder/models/ActionMenuItem";
+import {ReportRunnerDialog} from "../report/reportRunner.dialog";
 
 @Component({
 	template : require('./library.html')
@@ -21,18 +22,18 @@ export class LibraryComponent {
 	treeData: FolderNode[];
 	selectedFolder: FolderNode;
 	itemSummaryList: ItemSummaryList;
-	actionMenuItems : ActionMenuItem[];
+	actionMenuItems: ActionMenuItem[];
 
 	constructor(protected libraryService: LibraryService,
-				protected reportService: ReportService,
+							protected reportService: CohortService,
 							protected logger: LoggerService,
 							private $modal: NgbModal,
 							protected moduleStateService: ModuleStateService,
 							protected $state: StateService) {
 		this.actionMenuItems = [
-			{ type : ItemType.Query, text : 'Add cohort' },
-			{ type : ItemType.CodeSet, text : 'Add code set ' },
-			{ type : ItemType.Report, text : 'Add report' }
+			{type: ItemType.Query, text: 'Add cohort'},
+			{type: ItemType.CodeSet, text: 'Add code set '},
+			{type: ItemType.Report, text: 'Add report'}
 		];
 	}
 
@@ -61,7 +62,7 @@ export class LibraryComponent {
 				});
 	}
 
-	actionItem(actionItemProp : ActionItem) {
+	actionItem(actionItemProp: ActionItem) {
 		this.saveState();
 		switch (actionItemProp.type) {
 			case ItemType.Query:
@@ -79,11 +80,11 @@ export class LibraryComponent {
 		}
 	}
 
-	actionItemEdit(uuid : string, type : ItemType, action : string) {
-		var actionItemProp : ActionItem = {
-			uuid : uuid,
-			type : type,
-			action : action
+	actionItemEdit(uuid: string, type: ItemType, action: string) {
+		var actionItemProp: ActionItem = {
+			uuid: uuid,
+			type: type,
+			action: action
 		}
 		this.actionItem(actionItemProp);
 	}
@@ -111,19 +112,18 @@ export class LibraryComponent {
 			queryItemUuid: ""
 		};
 
-		ReportEditDialog.open(vm.$modal, reportRun, item)
+		CohortEditDialog.open(vm.$modal, reportRun, item)
 			.result.then(function (resultData: ReportRun) {
 
 			item.isRunning = true;
 
 			resultData.queryItemUuid = item.uuid;
 
-			vm.reportService.runReport(resultData)
+			vm.reportService.runCohort(resultData)
 				.subscribe(
 					(data) => {
 						vm.refresh();
 					});
-
 		});
 	}
 
@@ -138,7 +138,7 @@ export class LibraryComponent {
 			queryItemUuid: ""
 		};
 
-		ReportViewDialog.open(vm.$modal, reportRun, item)
+		CohortViewDialog.open(vm.$modal, reportRun, item)
 			.result.then(function (resultData: ReportRun) {
 
 			console.log(resultData);
@@ -148,7 +148,15 @@ export class LibraryComponent {
 
 	runReport(item: FolderItem) {
 		let vm = this;
-		MessageBoxDialog.open(vm.$modal, "Run Report", "Run report now", "Yes", "No");
+		ReportRunnerDialog.open(vm.$modal, item).result.then(
+			(result) => vm.executeReport(item, result),
+			(error) => vm.logger.error("Error running report", error)
+		);
+	}
+
+	executeReport(report : FolderItem, cohort : FolderItem) {
+		this.logger.info("Running report " + report.name + " against cohort " + cohort.name);
+
 	}
 
 	scheduleReport(item: FolderItem) {

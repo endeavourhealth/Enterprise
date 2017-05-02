@@ -2,18 +2,18 @@ import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {ReportRun} from "./models/ReportRun";
 import {Organisation} from "./models/Organisation";
-import {ReportService} from "./report.service";
+import {CohortService} from "./cohort.service";
 import {LoggerService} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 
 @Component({
     selector: 'ngbd-modal-content',
-    template: require('./reportEditor.html')
+    template: require('./cohortEditor.html')
 })
-export class ReportEditDialog implements OnInit {
+export class CohortEditDialog implements OnInit {
 
     public static open(modalService: NgbModal, reportRun: ReportRun, item: FolderItem) {
-        const modalRef = modalService.open(ReportEditDialog, { backdrop : "static", size : "lg"});
+        const modalRef = modalService.open(CohortEditDialog, { backdrop : "static", size : "lg"});
         modalRef.componentInstance.resultData = reportRun;
         modalRef.componentInstance.item = item;
 
@@ -40,7 +40,7 @@ export class ReportEditDialog implements OnInit {
 
     organisations = <any>[];
 
-    constructor(protected reportService: ReportService,
+    constructor(protected reportService: CohortService,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
 

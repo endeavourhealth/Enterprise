@@ -1,11 +1,11 @@
 import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule} from "@angular/forms";
-import {ReportService} from "./report.service";
+import {CohortService} from "./cohort.service";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
-import {ReportEditDialog} from "./reportEditor.dialog";
-import {ReportViewDialog} from "./reportViewer.dialog";
+import {CohortEditDialog} from "./cohortEditor.dialog";
+import {CohortViewDialog} from "./cohortViewer.dialog";
 
 @NgModule({
 	imports : [
@@ -14,15 +14,15 @@ import {ReportViewDialog} from "./reportViewer.dialog";
 		NgbModule
 	],
 	declarations : [
-		ReportEditDialog,
-		ReportViewDialog
+		CohortEditDialog,
+		CohortViewDialog
 	],
 	entryComponents : [
-		ReportEditDialog,
-		ReportViewDialog
+		CohortEditDialog,
+		CohortViewDialog
 	],
 	providers : [
-		ReportService,
+		CohortService,
 	]
 })
-export class ReportsModule {}
+export class CohortModule {}

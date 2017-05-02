@@ -1,0 +1,24 @@
+<div class="modal-header">
+    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">Report Parameters</h4>
+</div>
+<div class="modal-body">
+    <form role="form">
+			<div class="row">
+				<div class="form-group col-md-12">
+					<label for="cohort">Base cohort</label>
+					<div class="input-group">
+						<input type="text" class="form-control" id="cohort" name="cohort" readonly [ngModel]="cohort?.name">
+						<span class="input-group-addon" (click)="pickCohort()"><i class="fa fa-search" id="pickCohort" aria-hidden="true"></i></span>
+					</div>
+				</div>
+			</div>
+		</form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default"
+            (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="!cohort"
+            (click)="ok()">Run Now</button>
+</div>

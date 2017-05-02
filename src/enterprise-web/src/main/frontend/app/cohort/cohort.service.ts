@@ -12,7 +12,7 @@ export class CohortService extends BaseHttp2Service {
 
 	getOrganisations():Observable<Organisation> {
 
-		return this.httpGet('api/library/getOrganisations');
+		return this.httpGet('api/cohort/getOrganisations');
 	}
 
 	getCohortResults(queryItemUuid : string, runDate):Observable<ReportResult[]> {
@@ -20,14 +20,14 @@ export class CohortService extends BaseHttp2Service {
 		params.append('queryItemUuid', queryItemUuid);
 		params.append('runDate', runDate);
 
-		return this.httpGet('api/library/getReportResults', {search : params});
+		return this.httpGet('api/cohort/getResults', {search : params});
 	}
 
 	getAllCohortResults(queryItemUuid : string):Observable<ReportResult> {
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('queryItemUuid', queryItemUuid);
 
-		return this.httpGet('api/library/getAllReportResults', {search : params});
+		return this.httpGet('api/cohort/getAllResults', {search : params});
 	}
 
 	getCohortPatients(type : string, queryItemUuid : string, runDate, organisationId):Observable<any[]> {
@@ -37,11 +37,11 @@ export class CohortService extends BaseHttp2Service {
 		params.append('runDate', runDate);
 		params.append('organisationId', organisationId);
 
-		return this.httpGet('api/library/getReportPatients', {search : params});
+		return this.httpGet('api/cohort/getPatients', {search : params});
 	}
 
 	runCohort(result : ReportRun):Observable<ReportRun> {
-		return this.httpPost('api/library/runReport', result);
+		return this.httpPost('api/cohort/run', result);
 	}
 
 

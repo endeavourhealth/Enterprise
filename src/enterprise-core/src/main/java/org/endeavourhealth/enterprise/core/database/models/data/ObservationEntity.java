@@ -23,6 +23,7 @@ public class ObservationEntity {
     private String originalCode;
     private byte isProblem;
     private String originalTerm;
+    private Byte isReview;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -210,5 +211,15 @@ public class ObservationEntity {
         result = 31 * result + (int) isProblem;
         result = 31 * result + (originalTerm != null ? originalTerm.hashCode() : 0);
         return result;
+    }
+
+    @Basic
+    @Column(name = "is_review", nullable = true)
+    public Byte getIsReview() {
+        return isReview;
+    }
+
+    public void setIsReview(Byte isReview) {
+        this.isReview = isReview;
     }
 }

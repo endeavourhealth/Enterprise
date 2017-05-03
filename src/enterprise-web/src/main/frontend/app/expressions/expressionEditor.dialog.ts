@@ -208,7 +208,9 @@ export class ExpressionEditDialog implements OnInit {
 
         var restriction : Restriction = {
             restriction : vm.expressionRestrictionFieldName1,
-            count : vm.expressionRestrictionCount1
+            count : vm.expressionRestrictionCount1,
+            prefix : "",
+            field : null
         }
 
         if (!vm.expressionRestrictionFieldName1||vm.expressionRestrictionFieldName1=="undefined"||vm.expressionRestrictionFieldName1=="") {
@@ -227,7 +229,9 @@ export class ExpressionEditDialog implements OnInit {
 
         var restriction : Restriction = {
             restriction : vm.expressionRestrictionFieldName2,
-            count : vm.expressionRestrictionCount2
+            count : vm.expressionRestrictionCount2,
+            prefix : "",
+            field : null
         }
 
         if (!vm.expressionRestrictionFieldName2||vm.expressionRestrictionFieldName2=="undefined"||vm.expressionRestrictionFieldName2=="") {

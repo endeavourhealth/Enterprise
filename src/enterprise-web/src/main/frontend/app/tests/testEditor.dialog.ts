@@ -66,13 +66,15 @@ export class TestEditDialog implements OnInit{
 	filterDateToRelativePeriod : String;
 	restriction: string;
 	restrictionCount: string = "1";
-	disableRestrictionCount : boolean = false;
+	fieldPrefix: string;
 	editMode : boolean = false;
 	showRestriction : boolean = false;
 	codeSelection : CodeSetValue[] = [];
+	fields = <any>[];
 
-	restrictions = ['','LATEST','EARLIEST','HIGHEST','LOWEST'];
+	restrictions = ['','ALL','LATEST','EARLIEST','HIGHEST','LOWEST'];
 	periods = ['','DAY','WEEK','MONTH','YEAR'];
+	keepFields = ['CLINICAL_DATE','VALUE','CODE','HCP'];
 
 	libraryItem : EnterpriseLibraryItem;
 
@@ -108,7 +110,6 @@ export class TestEditDialog implements OnInit{
 		else if (this.type=="3")
 			this.title = "Test Editor";
 
-		this.disableRestrictionCount = true;
 
 	}
 
@@ -216,6 +217,7 @@ export class TestEditDialog implements OnInit{
 			vm.showRestriction = true;
 			vm.restriction = resultData.restriction.restriction;
 			vm.restrictionCount = resultData.restriction.count;
+			vm.fieldPrefix = resultData.restriction.prefix;
 		}
 
 	}
@@ -645,22 +647,6 @@ export class TestEditDialog implements OnInit{
 
 	}
 
-	restrictionChange(value : any) {
-		var vm = this;
-
-		if (!value || vm.restriction=="") {
-			vm.resultData.restriction = null;
-			return;
-		}
-
-		var restriction : Restriction = {
-			restriction: vm.restriction,
-			count: vm.restrictionCount
-		};
-
-		vm.resultData.restriction = restriction;
-	}
-
 	problemChange(e) {
 		var vm = this;
 
@@ -801,6 +787,38 @@ export class TestEditDialog implements OnInit{
 
 		if (!foundEntry && value!="")
 			vm.resultData.filter.push(filter);
+	}
+
+	setSelectedFields(selectElement) {
+		var vm = this;
+		vm.fields = <any>[];
+		for (var i = 0; i < selectElement.options.length; i++) {
+			var optionElement = selectElement.options[i];
+			if (optionElement.selected) {
+				vm.fields.push(optionElement.value);
+			}
+		}
+		this.restrictionChange('1');
+	}
+
+	restrictionChange(value : any) {
+		var vm = this;
+
+		if (!value || vm.restriction=="") {
+			vm.resultData.restriction = null;
+			return;
+		}
+
+		var restriction : Restriction = {
+			restriction: vm.restriction,
+			count: vm.restrictionCount,
+			prefix: vm.fieldPrefix,
+			field: vm.fields
+		};
+
+		vm.resultData.restriction = restriction;
+
+		console.log(vm.resultData.restriction);
 	}
 
 	ok() {

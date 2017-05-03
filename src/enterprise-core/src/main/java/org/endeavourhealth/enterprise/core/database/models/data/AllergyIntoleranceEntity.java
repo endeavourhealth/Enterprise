@@ -20,6 +20,7 @@ public class AllergyIntoleranceEntity {
     private Long snomedConceptId;
     private String originalCode;
     private String originalTerm;
+    private Byte isReview;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -171,5 +172,15 @@ public class AllergyIntoleranceEntity {
         result = 31 * result + (originalCode != null ? originalCode.hashCode() : 0);
         result = 31 * result + (originalTerm != null ? originalTerm.hashCode() : 0);
         return result;
+    }
+
+    @Basic
+    @Column(name = "is_review", nullable = true)
+    public Byte getIsReview() {
+        return isReview;
+    }
+
+    public void setIsReview(Byte isReview) {
+        this.isReview = isReview;
     }
 }

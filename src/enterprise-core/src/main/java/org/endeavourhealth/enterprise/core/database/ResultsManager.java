@@ -118,13 +118,6 @@ public class ResultsManager {
                                     sqlWhere += " and d.lsoaCode like '" + valueFrom + "%'";
                                 } else if (term.equals("MSOA Code")) {
                                     sqlWhere += " and d.msoaCode like '" + valueFrom + "%'";
-                                } else if (term.equals("Townsend Score")) {
-                                    if (!valueFrom.equals("") && !valueTo.equals(""))
-                                        sqlWhere += " and d.townsendScore between '" + valueFrom + "' and '" + valueTo + "'";
-                                    else if (!valueFrom.equals("") && valueTo.equals(""))
-                                        sqlWhere += " and d.townsendScore >= '" + valueFrom + "'";
-                                    else if (valueFrom.equals("") && !valueTo.equals(""))
-                                        sqlWhere += " and d.townsendScore <= '" + valueTo + "'";
                                 } else if (term.equals("Date of Death")) {
                                     if (!valueFrom.equals("") && !valueTo.equals(""))
                                         sqlWhere += " and d.dateOfDeath between '" + valueFrom + "' and '" + valueTo + "'";

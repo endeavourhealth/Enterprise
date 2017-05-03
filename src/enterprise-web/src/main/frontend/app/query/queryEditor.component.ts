@@ -11,7 +11,8 @@ import {EnterpriseLibraryItem} from "../enterpriseLibrary/models/EnterpriseLibra
 import {ExpressionType} from "../expressions/models/ExpressionType";
 import {QuerySelection} from "./models/QuerySelection";
 import {Test} from "../tests/models/Test";
-import {flowchart, LibraryService, LoggerService, MessageBoxDialog} from "eds-common-js";
+import {LibraryService, LoggerService, MessageBoxDialog} from "eds-common-js";
+import {flowchart} from "../flowchart/flowchart.viewmodel";
 
 @Component({
 	template : require('./queryEditor.html'),
@@ -95,7 +96,7 @@ export class QueryEditComponent {
 		vm.libraryService.getLibraryItem<EnterpriseLibraryItem>(itemUuid)
 			.subscribe(
 				(libraryItem) => vm.processLibraryItem(libraryItem),
-				(error) => vm.logger.error('Error loading query', error, 'Error')
+				(error) => vm.logger.error('Error loading cohort', error, 'Error')
 			);
 	}
 
@@ -167,7 +168,7 @@ export class QueryEditComponent {
 
 	clearQuery() {
 		let vm = this;
-		MessageBoxDialog.open(vm.$modal, 'Clear Rules', 'Are you sure you want to clear the rules in this query (changes will not be saved)?', 'Yes', 'No')
+		MessageBoxDialog.open(vm.$modal, 'Clear Rules', 'Are you sure you want to clear the rules in this cohort (changes will not be saved)?', 'Yes', 'No')
 			.result.then(function () {
 			vm.chartViewModel.clearQuery();
 			vm.ruleDescription = "";
@@ -181,7 +182,7 @@ export class QueryEditComponent {
 		let vm = this;
 		MessageBoxDialog.open(vm.$modal, 'Cancel Changes', 'Are you sure you want to cancel the editing of this cohort (changes will not be saved) ?', 'Yes', 'No')
 			.result.then(function () {
-			vm.logger.error('Query not saved');
+			vm.logger.error('Cohort not saved');
 			vm.state.go(vm.transition.from());
 		});
 	}
@@ -208,7 +209,7 @@ export class QueryEditComponent {
 		// Template for a new rule.
 		//
 
-		if (this.nextRuleID === 1) { // Add to new Query
+		if (this.nextRuleID === 1) { // Add to new Cohort
 
 			if (type == 1 || type == 3) { // Feature or Test
 
@@ -216,7 +217,7 @@ export class QueryEditComponent {
 
 				this.createNewRule(194, 5, type);
 			}
-			else if (type == 2) { // Query as a Feature
+			else if (type == 2) { // Cohort as a Feature
 				let querySelection: QuerySelection;
 				let vm = this;
 				QueryPickerDialog.open(this.$modal, querySelection)
@@ -228,14 +229,14 @@ export class QueryEditComponent {
 
 			this.chartViewModel.addStartingRule(1);
 		}
-		else { // Add to existing Query
+		else { // Add to existing Cohort
 
 			switch (type) {
 				case "1": // Feature
 				case "3": // Test
 					this.createNewRule(566, 7, type);
 					break;
-				case "2": // Query as a Feature
+				case "2": // Cohort as a Feature
 					let querySelection: QuerySelection;
 					let vm = this;
 					QueryPickerDialog.open(this.$modal, querySelection)
@@ -359,19 +360,19 @@ export class QueryEditComponent {
 	save(close: boolean) {
 		let vm = this;
 		if (vm.queryName === "") {
-			vm.logger.error('Please enter a name for the query');
+			vm.logger.error('Please enter a name for the cohort');
 			return;
 		}
 
 		if (vm.chartViewModel.data.query.rule.length === 0) {
-			vm.logger.error('Please create a rule in this query');
+			vm.logger.error('Please create a rule in this cohort');
 			return;
 		}
 
 		for (let i = 0; i < vm.chartViewModel.data.query.rule.length; ++i) {
 			let rule = vm.chartViewModel.data.query.rule[i];
 			if (!rule.test && !rule.expression && !rule.queryLibraryItemUUID && rule.description !== "START") {
-				vm.logger.error('Rule "' + rule.description + '" does not have a test');
+				vm.logger.error('Rule "' + rule.description + '" does not have any criteria');
 				return;
 			}
 		}
@@ -379,7 +380,7 @@ export class QueryEditComponent {
 		for (let i = 0; i < vm.chartViewModel.data.query.rule.length; ++i) {
 			let rule = vm.chartViewModel.data.query.rule[i];
 			if (!rule.test && (rule.expression && rule.expression.variable.length === 0) && rule.description !== "START") {
-				vm.logger.error('Expression "' + rule.description + '" does not have any variables');
+				vm.logger.error('Function "' + rule.description + '" does not have any variables');
 				return;
 			}
 		}
@@ -434,14 +435,14 @@ export class QueryEditComponent {
 
 					vm.chartViewModel.addRule(newStartRuleDataModel);
 
-					vm.logger.success('Query saved successfully', libraryItem, 'Saved');
+					vm.logger.success('Cohort saved successfully', libraryItem, 'Saved');
 
 					if (close) {
 
 						vm.state.go(vm.transition.from());
 					}
 				},
-				(error) => vm.logger.error('Error saving query', error, 'Error')
+				(error) => vm.logger.error('Error saving cohort', error, 'Error')
 			);
 	}
 

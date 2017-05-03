@@ -1,20 +1,35 @@
 package org.endeavourhealth.enterprise.core.database.models.data;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Date;
 
 /**
  * Created by darren on 23/03/17.
  */
 @Entity
-@javax.persistence.Table(name = "referral_request", schema = "enterprise_data_pseudonymised", catalog = "")
+@Table(name = "referral_request", schema = "enterprise_data_pseudonymised", catalog = "")
 public class ReferralRequestEntity {
     private long id;
+    private long organizationId;
+    private long patientId;
+    private long personId;
+    private Long encounterId;
+    private Long practitionerId;
+    private Date clinicalEffectiveDate;
+    private Short datePrecisionId;
+    private Long snomedConceptId;
+    private Long requesterOrganizationId;
+    private Long recipientOrganizationId;
+    private Short priorityId;
+    private Short typeId;
+    private String mode;
+    private Byte outgoingReferral;
+    private String originalCode;
+    private String originalTerm;
+    private Byte isReview;
 
     @Id
-    @javax.persistence.Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false)
     public long getId() {
         return id;
     }
@@ -23,10 +38,8 @@ public class ReferralRequestEntity {
         this.id = id;
     }
 
-    private long organizationId;
-
     @Basic
-    @javax.persistence.Column(name = "organization_id", nullable = false)
+    @Column(name = "organization_id", nullable = false)
     public long getOrganizationId() {
         return organizationId;
     }
@@ -35,10 +48,8 @@ public class ReferralRequestEntity {
         this.organizationId = organizationId;
     }
 
-    private long patientId;
-
     @Basic
-    @javax.persistence.Column(name = "patient_id", nullable = false)
+    @Column(name = "patient_id", nullable = false)
     public long getPatientId() {
         return patientId;
     }
@@ -47,10 +58,8 @@ public class ReferralRequestEntity {
         this.patientId = patientId;
     }
 
-    private long personId;
-
     @Basic
-    @javax.persistence.Column(name = "person_id", nullable = false)
+    @Column(name = "person_id", nullable = false)
     public long getPersonId() {
         return personId;
     }
@@ -59,10 +68,8 @@ public class ReferralRequestEntity {
         this.personId = personId;
     }
 
-    private Long encounterId;
-
     @Basic
-    @javax.persistence.Column(name = "encounter_id", nullable = true)
+    @Column(name = "encounter_id", nullable = true)
     public Long getEncounterId() {
         return encounterId;
     }
@@ -71,10 +78,8 @@ public class ReferralRequestEntity {
         this.encounterId = encounterId;
     }
 
-    private Long practitionerId;
-
     @Basic
-    @javax.persistence.Column(name = "practitioner_id", nullable = true)
+    @Column(name = "practitioner_id", nullable = true)
     public Long getPractitionerId() {
         return practitionerId;
     }
@@ -83,10 +88,8 @@ public class ReferralRequestEntity {
         this.practitionerId = practitionerId;
     }
 
-    private Date clinicalEffectiveDate;
-
     @Basic
-    @javax.persistence.Column(name = "clinical_effective_date", nullable = true)
+    @Column(name = "clinical_effective_date", nullable = true)
     public Date getClinicalEffectiveDate() {
         return clinicalEffectiveDate;
     }
@@ -95,10 +98,8 @@ public class ReferralRequestEntity {
         this.clinicalEffectiveDate = clinicalEffectiveDate;
     }
 
-    private Short datePrecisionId;
-
     @Basic
-    @javax.persistence.Column(name = "date_precision_id", nullable = true)
+    @Column(name = "date_precision_id", nullable = true)
     public Short getDatePrecisionId() {
         return datePrecisionId;
     }
@@ -107,10 +108,8 @@ public class ReferralRequestEntity {
         this.datePrecisionId = datePrecisionId;
     }
 
-    private Long snomedConceptId;
-
     @Basic
-    @javax.persistence.Column(name = "snomed_concept_id", nullable = true)
+    @Column(name = "snomed_concept_id", nullable = true)
     public Long getSnomedConceptId() {
         return snomedConceptId;
     }
@@ -119,10 +118,8 @@ public class ReferralRequestEntity {
         this.snomedConceptId = snomedConceptId;
     }
 
-    private Long requesterOrganizationId;
-
     @Basic
-    @javax.persistence.Column(name = "requester_organization_id", nullable = true)
+    @Column(name = "requester_organization_id", nullable = true)
     public Long getRequesterOrganizationId() {
         return requesterOrganizationId;
     }
@@ -131,10 +128,8 @@ public class ReferralRequestEntity {
         this.requesterOrganizationId = requesterOrganizationId;
     }
 
-    private Long recipientOrganizationId;
-
     @Basic
-    @javax.persistence.Column(name = "recipient_organization_id", nullable = true)
+    @Column(name = "recipient_organization_id", nullable = true)
     public Long getRecipientOrganizationId() {
         return recipientOrganizationId;
     }
@@ -143,10 +138,8 @@ public class ReferralRequestEntity {
         this.recipientOrganizationId = recipientOrganizationId;
     }
 
-    private Short priorityId;
-
     @Basic
-    @javax.persistence.Column(name = "priority_id", nullable = true)
+    @Column(name = "priority_id", nullable = true)
     public Short getPriorityId() {
         return priorityId;
     }
@@ -155,10 +148,8 @@ public class ReferralRequestEntity {
         this.priorityId = priorityId;
     }
 
-    private Short typeId;
-
     @Basic
-    @javax.persistence.Column(name = "type_id", nullable = true)
+    @Column(name = "type_id", nullable = true)
     public Short getTypeId() {
         return typeId;
     }
@@ -167,10 +158,8 @@ public class ReferralRequestEntity {
         this.typeId = typeId;
     }
 
-    private String mode;
-
     @Basic
-    @javax.persistence.Column(name = "mode", nullable = true, length = 50)
+    @Column(name = "mode", nullable = true, length = 50)
     public String getMode() {
         return mode;
     }
@@ -179,10 +168,8 @@ public class ReferralRequestEntity {
         this.mode = mode;
     }
 
-    private Byte outgoingReferral;
-
     @Basic
-    @javax.persistence.Column(name = "outgoing_referral", nullable = true)
+    @Column(name = "outgoing_referral", nullable = true)
     public Byte getOutgoingReferral() {
         return outgoingReferral;
     }
@@ -191,10 +178,8 @@ public class ReferralRequestEntity {
         this.outgoingReferral = outgoingReferral;
     }
 
-    private String originalCode;
-
     @Basic
-    @javax.persistence.Column(name = "original_code", nullable = true, length = 20)
+    @Column(name = "original_code", nullable = true, length = 20)
     public String getOriginalCode() {
         return originalCode;
     }
@@ -203,10 +188,8 @@ public class ReferralRequestEntity {
         this.originalCode = originalCode;
     }
 
-    private String originalTerm;
-
     @Basic
-    @javax.persistence.Column(name = "original_term", nullable = true, length = 1000)
+    @Column(name = "original_term", nullable = true, length = 1000)
     public String getOriginalTerm() {
         return originalTerm;
     }
@@ -270,5 +253,15 @@ public class ReferralRequestEntity {
         result = 31 * result + (originalCode != null ? originalCode.hashCode() : 0);
         result = 31 * result + (originalTerm != null ? originalTerm.hashCode() : 0);
         return result;
+    }
+
+    @Basic
+    @Column(name = "is_review", nullable = true)
+    public Byte getIsReview() {
+        return isReview;
+    }
+
+    public void setIsReview(Byte isReview) {
+        this.isReview = isReview;
     }
 }

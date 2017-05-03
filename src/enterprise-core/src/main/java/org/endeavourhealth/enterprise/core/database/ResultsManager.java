@@ -53,8 +53,13 @@ public class ResultsManager {
     }
 
     public static void runReport(LibraryItem libraryItem, JsonCohortRun report, String userUuid) throws Exception {
+			Timestamp runDate = new Timestamp(System.currentTimeMillis());
+			runReport(libraryItem, report, userUuid, runDate);
+		}
 
-        List<QueryResult> queryResults = new ArrayList<>();
+		public static void runReport(LibraryItem libraryItem, JsonCohortRun report, String userUuid, Timestamp runDate) throws Exception {
+
+			List<QueryResult> queryResults = new ArrayList<>();
 
         for (Rule rule: libraryItem.getQuery().getRule()) { // execute each rule
             List<Filter> filters = rule.getTest().getFilter();
@@ -314,8 +319,6 @@ public class ResultsManager {
         // Calculate and store the results for each organisation in the report
         List<JsonOrganisation> organisations = report.getOrganisation();
 
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-
         for (JsonOrganisation organisationInReport: organisations) {
 
             // calculate report denominator count
@@ -422,7 +425,7 @@ public class ResultsManager {
             // save each patient identified into the query report patient table
             for (Long patient: finalPatients) {
                 ReportPatientsEntity reportPatientsEntity = new ReportPatientsEntity();
-                reportPatientsEntity.setRunDate(now);
+                reportPatientsEntity.setRunDate(runDate);
                 reportPatientsEntity.setQueryItemUuid(report.getQueryItemUuid());
                 reportPatientsEntity.setOrganisationId(Long.parseLong(organisationInReport.getId()));
                 Long patientId = patient.longValue();
@@ -435,7 +438,7 @@ public class ResultsManager {
             ReportResultEntity reportResult = new ReportResultEntity();
             reportResult.setEndUserUuid(userUuid);
             reportResult.setBaselineDate(baselineDate);
-            reportResult.setRunDate(now);
+            reportResult.setRunDate(runDate);
             reportResult.setOrganisationId(Long.parseLong(organisationInReport.getId()));
             reportResult.setQueryItemUuid(report.getQueryItemUuid());
             reportResult.setPopulationTypeId(Byte.parseByte(report.getPopulation()));

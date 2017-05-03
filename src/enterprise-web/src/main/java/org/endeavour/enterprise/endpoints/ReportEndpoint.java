@@ -1,6 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavourhealth.common.security.SecurityUtils;
+import org.endeavourhealth.enterprise.core.database.ReportManager;
 import org.endeavourhealth.enterprise.core.database.ResultsManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
@@ -35,22 +36,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
-		LOG.info("Running report " + libraryItem.getName());
-
-		for (ReportCohortFeature feature : libraryItem.getReport().getCohortFeature()) {
-			LOG.info("Running report feature " + feature.getFieldName());
-			ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(feature.getCohortFeatureUuid());
-			String featureXml = featureEntity.getXmlContent();
-			LibraryItem featureItem = QueryDocumentSerializer.readLibraryItemFromXml(featureXml);
-
-			JsonCohortRun featureRun = new JsonCohortRun();
-			featureRun.setBaselineDate(report.getBaselineDate());
-			featureRun.setOrganisation(report.getOrganisation());
-			featureRun.setPopulation(report.getPopulation());
-			featureRun.setQueryItemUuid(feature.getCohortFeatureUuid());
-
-			ResultsManager.runReport(featureItem, featureRun, userUuid);
-		}
+		ReportManager.run(userUuid, report, libraryItem);
 
 		clearLogbackMarkers();
 

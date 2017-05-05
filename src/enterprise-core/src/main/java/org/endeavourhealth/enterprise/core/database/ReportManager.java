@@ -9,6 +9,8 @@ import org.endeavourhealth.enterprise.core.querydocument.models.ReportCohortFeat
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,27 +24,50 @@ public class ReportManager {
 		Timestamp runDate = new Timestamp(System.currentTimeMillis());
 		List<String> orgIds = reportRun.getOrganisation().stream().map(o -> o.getId()).collect(Collectors.toList());
 
-		String select = " SELECT patient.pseudo_id, patient.organization_id ";
-		String from = " FROM patient ";
-		String where = " WHERE patient.organization_id IN (" + String.join(",", orgIds) + ")"; // TODO : Population restriction
+		String select = " SELECT p.pseudoId, p.organizationId ";
+		String from = " FROM PatientEntity p ";
+		String where = " WHERE p.organizationId IN (" + String.join(",", orgIds) + ")"; // TODO : Population restriction
 
 		Integer i = 0;
 		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature()) {
 			runCohort(userUuid, reportRun, feature, runDate);
 
-			String alias = "field"+(i++).toString(); // TODO : feature.getFieldName();
-			select += ", " +alias + ".PatientId";		// TODO : Select additional data fields
-			from += " LEFT OUTER JOIN ReportPatients " + alias;
-			from += " ON " + alias + ".PatientId = patient.id";
-			from += " AND " + alias + ".OrganisationId = patient.organization_id ";
-			from += " AND " + alias + ".QueryItemUuid = '" + feature.getCohortFeatureUuid() + "'";
-			from += " AND " + alias + ".RunDate = '" + runDate.toString() + "'";
+			String alias = "field"+i.toString(); // TODO : feature.getFieldName();
+			select += ", " +alias + ".patientId";		// TODO : Select additional data fields
+			from += " LEFT OUTER JOIN ReportPatientsEntity " + alias;
+			from += " ON " + alias + ".patientId = p.id";
+			from += " AND " + alias + ".organisationId = p.organizationId ";
+			from += " AND " + alias + ".queryItemUuid = :queryUuid"+i.toString();
+			from += " AND " + alias + ".runDate = :runDate"+i.toString();
+
+			i++;
 		}
 
-		LOG.info(select);
-		LOG.info(from);
-		LOG.info(where);
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+		Query query = entityManager.createQuery(select + from + where);
 
+
+		i = 0;
+		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature()) {
+			query.setParameter("runDate"+i.toString(), runDate);
+			query.setParameter("queryUuid"+i.toString(), feature.getCohortFeatureUuid());
+			i++;
+		}
+
+		List<Object[]> results = query.getResultList();
+
+		i = 0;
+		for (Object[] row : results) {
+			String rowData = i.toString();
+			for (Object field : row) {
+				if (field != null)
+					rowData += ", " + field.toString();
+				else
+					rowData += ", [null]";
+			}
+			LOG.info(rowData);
+			i++;
+		}
 	}
 
 	private static void runCohort(String userUuid, JsonReportRun reportRun, ReportCohortFeature feature, Timestamp runDate) throws Exception {

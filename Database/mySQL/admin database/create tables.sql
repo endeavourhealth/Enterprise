@@ -51,7 +51,7 @@ CREATE TABLE enterprise_admin.ItemType (
 );
 CREATE TABLE enterprise_data_pseudonymised.`ReportPatients` (
   `ReportPatientId` int(11) NOT NULL AUTO_INCREMENT,
-  `RunDate` timestamp NULL DEFAULT NULL,
+  `RunDate` timestamp(3) NULL DEFAULT NULL,
   `QueryItemUuid` char(36) NOT NULL,
   `OrganisationId` BIGINT(20) NOT NULL,
   `PatientId` BIGINT(20) NOT NULL,
@@ -63,8 +63,8 @@ CREATE TABLE enterprise_data_pseudonymised.`ReportPatients` (
 CREATE TABLE enterprise_data_pseudonymised.`ReportResult` (
   `ReportResultId` int(11) NOT NULL AUTO_INCREMENT,
   `EndUserUuid` char(36) NOT NULL,
-  `BaselineDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `RunDate` timestamp NULL DEFAULT NULL,
+  `BaselineDate` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `RunDate` timestamp(3) NULL DEFAULT NULL,
   `OrganisationId` BIGINT(20) NOT NULL,
   `QueryItemUuid` char(36) NOT NULL,
   `PopulationTypeId` tinyint(1) NOT NULL,

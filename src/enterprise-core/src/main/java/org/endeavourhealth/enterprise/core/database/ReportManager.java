@@ -34,7 +34,7 @@ public class ReportManager {
 
 			String alias = "field"+i.toString(); // TODO : feature.getFieldName();
 			select += ", " +alias + ".patientId";		// TODO : Select additional data fields
-			from += " LEFT OUTER JOIN ReportPatientsEntity " + alias;
+			from += " LEFT OUTER JOIN CohortPatientsEntity " + alias;
 			from += " ON " + alias + ".patientId = p.id";
 			from += " AND " + alias + ".organisationId = p.organizationId ";
 			from += " AND " + alias + ".queryItemUuid = :queryUuid"+i.toString();
@@ -56,18 +56,18 @@ public class ReportManager {
 
 		List<Object[]> results = query.getResultList();
 
-		i = 0;
-		for (Object[] row : results) {
-			String rowData = i.toString();
-			for (Object field : row) {
-				if (field != null)
-					rowData += ", " + field.toString();
-				else
-					rowData += ", [null]";
-			}
-			LOG.info(rowData);
-			i++;
-		}
+//		i = 0;
+//		for (Object[] row : results) {
+//			String rowData = i.toString();
+//			for (Object field : row) {
+//				if (field != null)
+//					rowData += ", " + field.toString();
+//				else
+//					rowData += ", [null]";
+//			}
+//			LOG.info(rowData);
+//			i++;
+//		}
 	}
 
 	private static void runCohort(String userUuid, JsonReportRun reportRun, ReportCohortFeature feature, Timestamp runDate) throws Exception {

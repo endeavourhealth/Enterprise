@@ -4,7 +4,6 @@ import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
-import org.endeavourhealth.enterprise.core.database.ResultsManager;
 import org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.AuditEntity;
 import org.endeavourhealth.enterprise.core.database.models.ItemDependencyEntity;
@@ -57,9 +56,9 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 			hmItemsByItemUuid.put(item.getItemUuid(), item);
 		}
 
-		HashMap<String, ReportResultEntity> hmReportsByItemUuid = new HashMap<>();
-		List<ReportResultEntity> reports = ItemEntity.retrieveForReports(childActiveItems);
-		for (ReportResultEntity report: reports) {
+		HashMap<String, CohortResultEntity> hmReportsByItemUuid = new HashMap<>();
+		List<CohortResultEntity> reports = ItemEntity.retrieveForReports(childActiveItems);
+		for (CohortResultEntity report: reports) {
 			hmReportsByItemUuid.put(report.getQueryItemUuid(), report);
 		}
 
@@ -69,7 +68,7 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 			ItemEntity item = hmItemsByItemUuid.get(activeItem.getItemUuid());
 			Short itemType = activeItem.getItemTypeId();
 			AuditEntity audit = hmAuditsByAuditUuid.get(item.getAuditUuid());
-			ReportResultEntity report = hmReportsByItemUuid.get(activeItem.getItemUuid());
+			CohortResultEntity report = hmReportsByItemUuid.get(activeItem.getItemUuid());
 
 			JsonFolderContent c = new JsonFolderContent(activeItem, item, audit, report);
 			ret.addContent(c);

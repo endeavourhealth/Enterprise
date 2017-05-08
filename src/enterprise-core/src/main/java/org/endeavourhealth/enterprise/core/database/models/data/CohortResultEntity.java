@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "ReportResult", schema = "enterprise_data_pseudonymised", catalog = "")
-public class ReportResultEntity {
+public class CohortResultEntity {
     private int reportResultId;
     private String endUserUuid;
     private Timestamp baselineDate;
@@ -117,7 +117,7 @@ public class ReportResultEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ReportResultEntity that = (ReportResultEntity) o;
+        CohortResultEntity that = (CohortResultEntity) o;
 
         if (reportResultId != that.reportResultId) return false;
         if (organisationId != that.organisationId) return false;
@@ -149,9 +149,9 @@ public class ReportResultEntity {
         return result;
     }
 
-    public static List<ReportResultEntity[]> getReportResults(String queryItemUuid, String runDate) throws Exception {
+    public static List<CohortResultEntity[]> getReportResults(String queryItemUuid, String runDate) throws Exception {
         String where = "select r " +
-                "from ReportResultEntity r where queryItemUuid = :queryItemUuid and runDate = :runDate";
+                "from CohortResultEntity r where queryItemUuid = :queryItemUuid and runDate = :runDate";
 
         Timestamp runDate1 = null;
 
@@ -165,7 +165,7 @@ public class ReportResultEntity {
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        List<ReportResultEntity[]> ent = entityManager.createQuery(where)
+        List<CohortResultEntity[]> ent = entityManager.createQuery(where)
                 .setParameter("queryItemUuid", queryItemUuid)
                 .setParameter("runDate", runDate1)
                 .getResultList();
@@ -176,17 +176,17 @@ public class ReportResultEntity {
 
     }
 
-    public static List<ReportResultEntity[]> getAllReportResults(String queryItemUuid) throws Exception {
-        String where = "SELECT a from ReportResultEntity a"
+    public static List<CohortResultEntity[]> getAllReportResults(String queryItemUuid) throws Exception {
+        String where = "SELECT a from CohortResultEntity a"
                 + " where reportResultId in ( "+
                 "SELECT MAX(reportResultId) "+
-                "FROM ReportResultEntity where queryItemUuid = :queryItemUuid "+
+                "FROM CohortResultEntity where queryItemUuid = :queryItemUuid "+
                 "GROUP BY runDate "+
                 ") ORDER BY runDate desc";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        List<ReportResultEntity[]> ent = entityManager.createQuery(where)
+        List<CohortResultEntity[]> ent = entityManager.createQuery(where)
                 .setParameter("queryItemUuid", queryItemUuid)
                 .getResultList();
 

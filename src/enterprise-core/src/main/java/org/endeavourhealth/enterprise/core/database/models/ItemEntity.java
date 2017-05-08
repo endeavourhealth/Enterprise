@@ -1,7 +1,7 @@
 package org.endeavourhealth.enterprise.core.database.models;
 
 import org.endeavourhealth.enterprise.core.database.PersistenceManager;
-import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.CohortResultEntity;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -264,7 +264,7 @@ public class ItemEntity {
         return ent;
     }
 
-    public static List<ReportResultEntity> retrieveForReports(List<ActiveItemEntity> activeItems) throws Exception {
+    public static List<CohortResultEntity> retrieveForReports(List<ActiveItemEntity> activeItems) throws Exception {
         if (activeItems.isEmpty()) {
             return new ArrayList<>();
         }
@@ -272,7 +272,7 @@ public class ItemEntity {
         List<String> parameters = new ArrayList<>();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("from ReportResultEntity WHERE ( ");
+        sb.append("from CohortResultEntity WHERE ( ");
 
         for (int i=0; i<activeItems.size(); i++) {
             ActiveItemEntity activeItem = activeItems.get(i);
@@ -284,12 +284,12 @@ public class ItemEntity {
             sb.append("(queryItemUuid = '"+itemUuid+"')");
 
         }
-        sb.append(" ) and runDate in (select max(runDate) from ReportResultEntity group by queryItemUuid) ");
+        sb.append(" ) and runDate in (select max(runDate) from CohortResultEntity group by queryItemUuid) ");
         String where = sb.toString();
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        List<ReportResultEntity> ent = entityManager.createQuery(where, ReportResultEntity.class)
+        List<CohortResultEntity> ent = entityManager.createQuery(where, CohortResultEntity.class)
                 .getResultList();
 
         entityManager.close();

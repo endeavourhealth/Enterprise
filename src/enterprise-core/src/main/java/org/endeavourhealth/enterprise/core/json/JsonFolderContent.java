@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.AuditEntity;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
-import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.CohortResultEntity;
 
 import java.util.Date;
 
@@ -23,11 +23,11 @@ public final class JsonFolderContent implements Comparable {
 
     }
 
-    public JsonFolderContent(ActiveItemEntity activeItem, ItemEntity item, AuditEntity audit, ReportResultEntity report) {
+    public JsonFolderContent(ActiveItemEntity activeItem, ItemEntity item, AuditEntity audit, CohortResultEntity report) {
         this(item, audit, report);
         setTypeEnum(activeItem.getItemTypeId());
     }
-    public JsonFolderContent(ItemEntity item, AuditEntity audit, ReportResultEntity report) {
+    public JsonFolderContent(ItemEntity item, AuditEntity audit, CohortResultEntity report) {
         this.uuid = item.getItemUuid();
         this.name = item.getTitle();
         this.description = item.getDescription();

@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "ReportPatients", schema = "enterprise_data_pseudonymised", catalog = "")
-public class ReportPatientsEntity {
+public class CohortPatientsEntity {
     private int reportPatientId;
     private Timestamp runDate;
     private String queryItemUuid;
@@ -73,7 +73,7 @@ public class ReportPatientsEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ReportPatientsEntity that = (ReportPatientsEntity) o;
+        CohortPatientsEntity that = (CohortPatientsEntity) o;
 
         if (reportPatientId != that.reportPatientId) return false;
         if (organisationId != that.organisationId) return false;
@@ -103,7 +103,7 @@ public class ReportPatientsEntity {
                     "o.clinicalEffectiveDate, o.snomedConceptId, o.originalCode, o.originalTerm, o.value, o.units, o.isProblem, " +
                     "og.name, og.odsCode, og.typeDesc, "+
                     "pr.name, pr.roleCode, pr.roleDesc "+
-                    "from ReportPatientsEntity r "+
+                    "from CohortPatientsEntity r "+
                     "join PatientEntity p on p.id = r.patientId "+
                     "join PatientGenderEntity pg on pg.id = p.patientGenderId "+
                     "join ObservationEntity o on o.patientId = r.patientId "+
@@ -114,7 +114,7 @@ public class ReportPatientsEntity {
         else
             where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
                     "og.name, og.odsCode, og.typeDesc "+
-                    "from ReportPatientsEntity r "+
+                    "from CohortPatientsEntity r "+
                     "join PatientEntity p on p.id = r.patientId "+
                     "join PatientGenderEntity pg on pg.id = p.patientGenderId "+
                     "join OrganizationEntity og on og.id = p.organizationId "+

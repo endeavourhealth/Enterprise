@@ -4,8 +4,8 @@ import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.database.ResultsManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.OrganizationEntity;
-import org.endeavourhealth.enterprise.core.database.models.data.ReportPatientsEntity;
-import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.CohortPatientsEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.CohortResultEntity;
 import org.endeavourhealth.enterprise.core.json.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
@@ -61,7 +61,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	public Response getResults(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate) throws Exception {
 		super.setLogbackMarkers(sc);
 
-		List<ReportResultEntity[]> results = ReportResultEntity.getReportResults(queryItemUuid, runDate);
+		List<CohortResultEntity[]> results = CohortResultEntity.getReportResults(queryItemUuid, runDate);
 
 		clearLogbackMarkers();
 
@@ -78,7 +78,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	public Response getAllResults(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate) throws Exception {
 		super.setLogbackMarkers(sc);
 
-		List<ReportResultEntity[]> results = ReportResultEntity.getAllReportResults(queryItemUuid);
+		List<CohortResultEntity[]> results = CohortResultEntity.getAllReportResults(queryItemUuid);
 
 		clearLogbackMarkers();
 
@@ -101,7 +101,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 		try {
 			super.setLogbackMarkers(sc);
 
-			results = ReportPatientsEntity.getReportPatients(type, queryItemUuid, runDate, organisationId);
+			results = CohortPatientsEntity.getReportPatients(type, queryItemUuid, runDate, organisationId);
 
 			Object[] header = null;
 

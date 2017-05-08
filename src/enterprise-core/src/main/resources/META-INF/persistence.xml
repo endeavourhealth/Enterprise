@@ -33,11 +33,11 @@
         <class>org.endeavourhealth.enterprise.core.database.models.data.PatientEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.PractitionerEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.ReferralRequestEntity</class>
-        <class>org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.data.CohortResultEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.ConceptEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.ConceptTypeEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.DataTypeEntity</class>
-        <class>org.endeavourhealth.enterprise.core.database.models.data.ReportPatientsEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.data.CohortPatientsEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.PatientGenderEntity</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/enterprise_data_pseudonymised"/>

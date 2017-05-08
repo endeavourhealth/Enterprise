@@ -12,7 +12,7 @@ import java.util.*;
 
 public class ResultsManager {
 
-    public static void saveReportPatients(ReportPatientsEntity result) throws Exception {
+    public static void saveReportPatients(CohortPatientsEntity result) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         entityManager.getTransaction().begin();
@@ -24,7 +24,7 @@ public class ResultsManager {
         entityManager.close();
     }
 
-    public static void saveReportResult(ReportResultEntity result) throws Exception {
+    public static void saveReportResult(CohortResultEntity result) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         entityManager.getTransaction().begin();
@@ -424,18 +424,18 @@ public class ResultsManager {
 
             // save each patient identified into the query report patient table
             for (Long patient: finalPatients) {
-                ReportPatientsEntity reportPatientsEntity = new ReportPatientsEntity();
-                reportPatientsEntity.setRunDate(runDate);
-                reportPatientsEntity.setQueryItemUuid(report.getQueryItemUuid());
-                reportPatientsEntity.setOrganisationId(Long.parseLong(organisationInReport.getId()));
+                CohortPatientsEntity cohortPatientsEntity = new CohortPatientsEntity();
+                cohortPatientsEntity.setRunDate(runDate);
+                cohortPatientsEntity.setQueryItemUuid(report.getQueryItemUuid());
+                cohortPatientsEntity.setOrganisationId(Long.parseLong(organisationInReport.getId()));
                 Long patientId = patient.longValue();
-                reportPatientsEntity.setPatientId(patientId);
+                cohortPatientsEntity.setPatientId(patientId);
 
-                saveReportPatients(reportPatientsEntity);
+                saveReportPatients(cohortPatientsEntity);
             }
 
             // save the query counts to the report summary table
-            ReportResultEntity reportResult = new ReportResultEntity();
+            CohortResultEntity reportResult = new CohortResultEntity();
             reportResult.setEndUserUuid(userUuid);
             reportResult.setBaselineDate(baselineDate);
             reportResult.setRunDate(runDate);

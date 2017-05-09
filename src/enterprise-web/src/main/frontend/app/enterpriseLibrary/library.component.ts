@@ -130,18 +130,18 @@ export class LibraryComponent {
 		});
 	}
 
-	viewReport(item: FolderItem) {
+	viewCohort(item: FolderItem) {
 		var vm = this;
 		console.log(item);
 
-		let reportRun: CohortRun = {
+		let cohortRun: CohortRun = {
 			organisation: [],
 			population: "",
 			baselineDate: "",
 			queryItemUuid: ""
 		};
 
-		CohortViewDialog.open(vm.$modal, reportRun, item)
+		CohortViewDialog.open(vm.$modal, cohortRun, item)
 			.result.then(function (resultData: CohortRun) {
 
 			console.log(resultData);

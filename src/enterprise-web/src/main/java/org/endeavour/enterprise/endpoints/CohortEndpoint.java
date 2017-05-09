@@ -1,7 +1,7 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavourhealth.common.security.SecurityUtils;
-import org.endeavourhealth.enterprise.core.database.ResultsManager;
+import org.endeavourhealth.enterprise.core.database.CohortManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.OrganizationEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.CohortPatientsEntity;
@@ -137,7 +137,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
-		ResultsManager.runCohort(libraryItem, cohortRun, userUuid);
+		CohortManager.runCohort(libraryItem, cohortRun, userUuid);
 
 		clearLogbackMarkers();
 

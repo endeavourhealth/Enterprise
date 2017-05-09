@@ -1,7 +1,9 @@
 package org.endeavourhealth.enterprise.core.database;
 
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.*;
 import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
+import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
@@ -68,6 +70,8 @@ public class ReportManager {
 //			LOG.info(rowData);
 //			i++;
 //		}
+
+		saveReport(userUuid, reportRun, reportItem, runDate);
 	}
 
 	private static void runCohort(String userUuid, JsonReportRun reportRun, ReportCohortFeature feature, Timestamp runDate) throws Exception {
@@ -82,6 +86,48 @@ public class ReportManager {
 		featureRun.setPopulation(reportRun.getPopulation());
 		featureRun.setQueryItemUuid(feature.getCohortFeatureUuid());
 
-		ResultsManager.runCohort(featureItem, featureRun, userUuid, runDate);
+		CohortManager.runCohort(featureItem, featureRun, userUuid, runDate);
+	}
+
+	private static void saveReport(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) {
+
+
+		ReportResultEntity reportResult = new ReportResultEntity()
+				.setEndUserUuid(userUuid)
+				.setReportItemUuid(reportItem.getUuid())
+				.setRunDate(runDate);
+
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+		entityManager.getTransaction().begin();
+
+		reportResult = entityManager.merge(reportResult);
+		LOG.info("Report " + reportResult.getReportResultId() + " Saved.");
+
+		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature()) {
+			ReportResultQueryEntity reportResultQuery = new ReportResultQueryEntity()
+					.setId(
+							new ReportResultQueryEntityKey()
+									.setReportResultId(reportResult.getReportResultId())
+									.setQueryItemUuid(feature.getCohortFeatureUuid())
+					);
+
+			entityManager.persist(reportResultQuery);
+		}
+
+		for (JsonOrganisation organisation : reportRun.getOrganisation()) {
+			ReportResultOrganisationEntity reportResultOrganisation = new ReportResultOrganisationEntity()
+					.setId(
+							new ReportResultOrganisationEntityKey()
+									.setReportResultId(reportResult.getReportResultId())
+									.setOrganisationId(Long.parseLong(organisation.getId()))
+					);
+
+			entityManager.persist(reportResultOrganisation);
+		}
+
+		entityManager.getTransaction().commit();
+
+		entityManager.close();
 	}
 }

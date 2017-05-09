@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class ResultsManager {
+public class CohortManager {
 
     public static void saveCohortPatients(CohortPatientsEntity result) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();

@@ -2,13 +2,10 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.database.ReportManager;
-import org.endeavourhealth.enterprise.core.database.ResultsManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
-import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
 import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
-import org.endeavourhealth.enterprise.core.querydocument.models.ReportCohortFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

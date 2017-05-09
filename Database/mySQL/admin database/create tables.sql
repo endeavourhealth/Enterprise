@@ -6,6 +6,9 @@ DROP TABLE IF EXISTS enterprise_admin.ItemDependency;
 DROP TABLE IF EXISTS enterprise_admin.ItemType;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortPatients;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortResult;
+DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResult;
+DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultQuery;
+DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultOrganisation;
 
 CREATE TABLE enterprise_admin.ActiveItem (
 	ActiveItemUuid char(36) NOT NULL,
@@ -86,3 +89,22 @@ INSERT INTO enterprise_admin.DependencyType(DependencyTypeId, Description) VALUE
 INSERT INTO enterprise_admin.DependencyType(DependencyTypeId, Description) VALUES (2, 'Uses');
 
 
+CREATE TABLE enterprise_data_pseudonymised.ReportResult (
+  ReportResultId int(11) NOT NULL AUTO_INCREMENT,
+  EndUserUuid char(36) NOT NULL,
+  ReportItemUuid char(36) NOT NULL,
+  RunDate timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`ReportResultId`),
+  KEY `RunDate` (`RunDate`),
+  KEY `ReportItemUuid` (`ReportItemUuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+CREATE TABLE enterprise_data_pseudonymised.ReportResultQuery (
+	ReportResultId int(11) NOT NULL,
+    QueryItemUuid char(36) NOT NULL
+);
+
+CREATE TABLE enterprise_data_pseudonymised.ReportResultOrganisation (
+	ReportResultId int(11) NOT NULL,
+    OrganisationId bigint(20) NOT NULL
+);

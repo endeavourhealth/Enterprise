@@ -12,7 +12,7 @@ import java.util.*;
 
 public class ResultsManager {
 
-    public static void saveReportPatients(CohortPatientsEntity result) throws Exception {
+    public static void saveCohortPatients(CohortPatientsEntity result) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         entityManager.getTransaction().begin();
@@ -24,7 +24,7 @@ public class ResultsManager {
         entityManager.close();
     }
 
-    public static void saveReportResult(CohortResultEntity result) throws Exception {
+    public static void saveCohortResult(CohortResultEntity result) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         entityManager.getTransaction().begin();
@@ -52,12 +52,12 @@ public class ResultsManager {
 
     }
 
-    public static void runReport(LibraryItem libraryItem, JsonCohortRun report, String userUuid) throws Exception {
+    public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid) throws Exception {
 			Timestamp runDate = new Timestamp(System.currentTimeMillis());
-			runReport(libraryItem, report, userUuid, runDate);
+			runCohort(libraryItem, cohortRun, userUuid, runDate);
 		}
 
-		public static void runReport(LibraryItem libraryItem, JsonCohortRun report, String userUuid, Timestamp runDate) throws Exception {
+		public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate) throws Exception {
 
 			List<QueryResult> queryResults = new ArrayList<>();
 
@@ -193,7 +193,7 @@ public class ResultsManager {
                         String dateFrom = "-"+filter.getValueFrom().getConstant();
                         if (filter.getValueFrom().getRelativeUnit()!=null) {
                             String relativeUnit = filter.getValueFrom().getRelativeUnit().value();
-                            Timestamp baselineDate = convertToDate(report.getBaselineDate());
+                            Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
                             java.text.SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                             Calendar calDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
                             dateFormat.setCalendar(calDate);
@@ -220,7 +220,7 @@ public class ResultsManager {
                         String dateTo = filter.getValueTo().getConstant();
                         if (filter.getValueTo().getRelativeUnit()!=null) {
                             String relativeUnit = filter.getValueTo().getRelativeUnit().value();
-                            Timestamp baselineDate = convertToDate(report.getBaselineDate());
+                            Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
                             java.text.SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                             Calendar calDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
                             dateFormat.setCalendar(calDate);
@@ -267,13 +267,13 @@ public class ResultsManager {
 
             // Run the rule SQL for each organisation in the report
 
-            List<JsonOrganisation> organisations = report.getOrganisation();
+            List<JsonOrganisation> organisations = cohortRun.getOrganisation();
 
-            for (JsonOrganisation organisationInReport: organisations) {
-                Timestamp baselineDate = convertToDate(report.getBaselineDate());
+            for (JsonOrganisation organisationInCohort: organisations) {
+                Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
                 String patientWhere = "";
 
-                if (report.getPopulation().equals("0")) { // currently registered
+                if (cohortRun.getPopulation().equals("0")) { // currently registered
                     patientWhere = "select distinct p " +
                             "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
                             "JOIN " + dataTable + " d on d." + patientJoinField + " = p.id " +
@@ -282,7 +282,7 @@ public class ResultsManager {
                             "and e.dateRegistered <= :baseline " +
                             "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " +sqlWhere;
                 }
-                else if (report.getPopulation().equals("1")) { // all patients
+                else if (cohortRun.getPopulation().equals("1")) { // all patients
                     patientWhere = "select distinct p " +
                             "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
                             "JOIN " + dataTable + " d on d." + patientJoinField + " = p.id " +
@@ -295,13 +295,13 @@ public class ResultsManager {
 
                 List<PatientEntity> patients = entityManager.
                         createQuery(patientWhere, PatientEntity.class)
-                        .setParameter("organizationId", Long.parseLong(organisationInReport.getId()))
+                        .setParameter("organizationId", Long.parseLong(organisationInCohort.getId()))
                         .setParameter("baseline", baselineDate)
                         .getResultList();
 
                 // For each organisation - add the rule's identified list of patients to the overall Query Result list
                 QueryResult queryResult = new QueryResult();
-                queryResult.setOrganisationId(Long.parseLong(organisationInReport.getId()));
+                queryResult.setOrganisationId(Long.parseLong(organisationInCohort.getId()));
                 queryResult.setRuleId(ruleId);
                 queryResult.setOnPass(rule.getOnPass());
                 queryResult.setOnFail(rule.getOnFail());
@@ -313,25 +313,25 @@ public class ResultsManager {
                 queryResults.add(queryResult);
 
                 entityManager.close();
-            } // next organisation in report
+            } // next organisation in cohort
         } // next Rule in Query
 
-        // Calculate and store the results for each organisation in the report
-        List<JsonOrganisation> organisations = report.getOrganisation();
+        // Calculate and store the results for each organisation in the cohort
+        List<JsonOrganisation> organisations = cohortRun.getOrganisation();
 
-        for (JsonOrganisation organisationInReport: organisations) {
+        for (JsonOrganisation organisationInCohort: organisations) {
 
-            // calculate report denominator count
+            // calculate cohort denominator count
             String where = "";
 
-            if (report.getPopulation().equals("0")) // currently registered
+            if (cohortRun.getPopulation().equals("0")) // currently registered
                 where = "select distinct p " +
                         "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id "+
                         "where p.dateOfDeath IS NULL and p.organizationId = :organizationId "+
                         "and e.registrationTypeId = 2 "+
                         "and e.dateRegistered <= :baseline "+
                         "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
-            else if (report.getPopulation().equals("1")) // all patients
+            else if (cohortRun.getPopulation().equals("1")) // all patients
                 where = "select distinct p " +
                         "from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id "+
                         "where p.organizationId = :organizationId "+
@@ -339,11 +339,11 @@ public class ResultsManager {
                         "and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
 
             EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-            Timestamp baselineDate = convertToDate(report.getBaselineDate());
+            Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
 
             List<PatientEntity> patients = entityManager.
                     createQuery(where, PatientEntity.class)
-                    .setParameter("organizationId", Long.parseLong(organisationInReport.getId()))
+                    .setParameter("organizationId", Long.parseLong(organisationInCohort.getId()))
                     .setParameter("baseline", baselineDate)
                     .getResultList();
 
@@ -364,10 +364,10 @@ public class ResultsManager {
             while (true){ // loop through all the rules
                 i++;
 
-                RuleAction rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
-                RuleAction ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
+                RuleAction rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
+                RuleAction ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
 
-                List<Long> patients1 = getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()));  // get patients in rule
+                List<Long> patients1 = getRulePatients(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));  // get patients in rule
 
                 if (i==1 && ruleFailIncludeGoto(ruleFailAction)) {
 
@@ -390,10 +390,10 @@ public class ResultsManager {
 
                     ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
 
-                    List<Long> patients2 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInReport.getId()));  // get patients in rule
+                    List<Long> patients2 =  getRulePatients(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));  // get patients in rule
 
-                    rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
-                    ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInReport.getId()));
+                    rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
+                    ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
 
                     if (finalPatients.isEmpty())
                         finalPatients = new ArrayList<Long>(patients1); // first rule
@@ -422,33 +422,33 @@ public class ResultsManager {
 
             }
 
-            // save each patient identified into the query report patient table
+            // save each patient identified into the query cohort patient table
             for (Long patient: finalPatients) {
                 CohortPatientsEntity cohortPatientsEntity = new CohortPatientsEntity();
                 cohortPatientsEntity.setRunDate(runDate);
-                cohortPatientsEntity.setQueryItemUuid(report.getQueryItemUuid());
-                cohortPatientsEntity.setOrganisationId(Long.parseLong(organisationInReport.getId()));
+                cohortPatientsEntity.setQueryItemUuid(cohortRun.getQueryItemUuid());
+                cohortPatientsEntity.setOrganisationId(Long.parseLong(organisationInCohort.getId()));
                 Long patientId = patient.longValue();
                 cohortPatientsEntity.setPatientId(patientId);
 
-                saveReportPatients(cohortPatientsEntity);
+                saveCohortPatients(cohortPatientsEntity);
             }
 
-            // save the query counts to the report summary table
-            CohortResultEntity reportResult = new CohortResultEntity();
-            reportResult.setEndUserUuid(userUuid);
-            reportResult.setBaselineDate(baselineDate);
-            reportResult.setRunDate(runDate);
-            reportResult.setOrganisationId(Long.parseLong(organisationInReport.getId()));
-            reportResult.setQueryItemUuid(report.getQueryItemUuid());
-            reportResult.setPopulationTypeId(Byte.parseByte(report.getPopulation()));
-            reportResult.setEnumeratorCount(finalPatients.size());
-            reportResult.setDenominatorCount(denominatorPatients.size());
+            // save the query counts to the cohort summary table
+            CohortResultEntity cohortResult = new CohortResultEntity();
+            cohortResult.setEndUserUuid(userUuid);
+            cohortResult.setBaselineDate(baselineDate);
+            cohortResult.setRunDate(runDate);
+            cohortResult.setOrganisationId(Long.parseLong(organisationInCohort.getId()));
+            cohortResult.setQueryItemUuid(cohortRun.getQueryItemUuid());
+            cohortResult.setPopulationTypeId(Byte.parseByte(cohortRun.getPopulation()));
+            cohortResult.setEnumeratorCount(finalPatients.size());
+            cohortResult.setDenominatorCount(denominatorPatients.size());
 
-            // save the counts to the query report summary table
-            saveReportResult(reportResult);
+            // save the counts to the query cohort summary table
+            saveCohortResult(cohortResult);
 
-        } // next organisation in report
+        } // next organisation in cohort
 
     }
 

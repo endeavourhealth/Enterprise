@@ -61,7 +61,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	public Response getResults(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate) throws Exception {
 		super.setLogbackMarkers(sc);
 
-		List<CohortResultEntity[]> results = CohortResultEntity.getReportResults(queryItemUuid, runDate);
+		List<CohortResultEntity[]> results = CohortResultEntity.getCohortResults(queryItemUuid, runDate);
 
 		clearLogbackMarkers();
 
@@ -78,7 +78,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	public Response getAllResults(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate) throws Exception {
 		super.setLogbackMarkers(sc);
 
-		List<CohortResultEntity[]> results = CohortResultEntity.getAllReportResults(queryItemUuid);
+		List<CohortResultEntity[]> results = CohortResultEntity.getAllCohortResults(queryItemUuid);
 
 		clearLogbackMarkers();
 
@@ -101,7 +101,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 		try {
 			super.setLogbackMarkers(sc);
 
-			results = CohortPatientsEntity.getReportPatients(type, queryItemUuid, runDate, organisationId);
+			results = CohortPatientsEntity.getCohortPatients(type, queryItemUuid, runDate, organisationId);
 
 			Object[] header = null;
 
@@ -128,16 +128,16 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/run")
-	public Response run(@Context SecurityContext sc, JsonCohortRun report) throws Exception {
+	public Response run(@Context SecurityContext sc, JsonCohortRun cohortRun) throws Exception {
 		super.setLogbackMarkers(sc);
 
 		String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
 
-		ItemEntity item = ItemEntity.retrieveLatestForUUid(report.getQueryItemUuid());
+		ItemEntity item = ItemEntity.retrieveLatestForUUid(cohortRun.getQueryItemUuid());
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
-		ResultsManager.runReport(libraryItem, report, userUuid);
+		ResultsManager.runCohort(libraryItem, cohortRun, userUuid);
 
 		clearLogbackMarkers();
 

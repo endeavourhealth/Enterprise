@@ -12,9 +12,9 @@ import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 })
 export class CohortEditDialog implements OnInit {
 
-    public static open(modalService: NgbModal, reportRun: CohortRun, item: FolderItem) {
+    public static open(modalService: NgbModal, cohortRun: CohortRun, item: FolderItem) {
         const modalRef = modalService.open(CohortEditDialog, { backdrop : "static", size : "lg"});
-        modalRef.componentInstance.resultData = reportRun;
+        modalRef.componentInstance.resultData = cohortRun;
         modalRef.componentInstance.item = item;
 
         return modalRef;
@@ -40,7 +40,7 @@ export class CohortEditDialog implements OnInit {
 
     organisations = <any>[];
 
-    constructor(protected reportService: CohortService,
+    constructor(protected cohortService: CohortService,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
 
@@ -49,7 +49,7 @@ export class CohortEditDialog implements OnInit {
     ngOnInit(): void {
         var vm = this;
 
-        vm.reportService.getOrganisations()
+        vm.cohortService.getOrganisations()
             .subscribe(
                 (data) => {
                     vm.organisations = data;

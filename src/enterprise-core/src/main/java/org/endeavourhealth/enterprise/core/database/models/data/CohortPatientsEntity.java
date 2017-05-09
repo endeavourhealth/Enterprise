@@ -10,22 +10,22 @@ import java.util.List;
  * Created by darren on 30/03/17.
  */
 @Entity
-@Table(name = "ReportPatients", schema = "enterprise_data_pseudonymised", catalog = "")
+@Table(name = "CohortPatients", schema = "enterprise_data_pseudonymised", catalog = "")
 public class CohortPatientsEntity {
-    private int reportPatientId;
+    private int cohortPatientId;
     private Timestamp runDate;
     private String queryItemUuid;
     private long organisationId;
     private long patientId;
 
     @Id
-    @Column(name = "ReportPatientId", nullable = false)
-    public int getReportPatientId() {
-        return reportPatientId;
+    @Column(name = "CohortPatientId", nullable = false)
+    public int getCohortPatientId() {
+        return cohortPatientId;
     }
 
-    public void setReportPatientId(int reportPatientId) {
-        this.reportPatientId = reportPatientId;
+    public void setCohortPatientId(int cohortPatientId) {
+        this.cohortPatientId = cohortPatientId;
     }
 
     @Basic
@@ -75,7 +75,7 @@ public class CohortPatientsEntity {
 
         CohortPatientsEntity that = (CohortPatientsEntity) o;
 
-        if (reportPatientId != that.reportPatientId) return false;
+        if (cohortPatientId != that.cohortPatientId) return false;
         if (organisationId != that.organisationId) return false;
         if (patientId != that.patientId) return false;
         if (runDate != null ? !runDate.equals(that.runDate) : that.runDate != null) return false;
@@ -87,7 +87,7 @@ public class CohortPatientsEntity {
 
     @Override
     public int hashCode() {
-        int result = reportPatientId;
+        int result = cohortPatientId;
         result = 31 * result + (runDate != null ? runDate.hashCode() : 0);
         result = 31 * result + (queryItemUuid != null ? queryItemUuid.hashCode() : 0);
         result = 31 * result + (int) (organisationId ^ (organisationId >>> 32));
@@ -95,7 +95,7 @@ public class CohortPatientsEntity {
         return result;
     }
 
-    public static List<Object[]> getReportPatients(String type, String queryItemUuid, String runDate, Long organisationId) throws Exception {
+    public static List<Object[]> getCohortPatients(String type, String queryItemUuid, String runDate, Long organisationId) throws Exception {
         String where = "";
 
         if (type.equals("EHR"))

@@ -1,8 +1,8 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {CohortRun} from "./models/CohortRun";
-import {ReportResult} from "./models/ReportResult";
-import {ReportPatient} from "./models/ReportPatient";
+import {CohortResult} from "./models/CohortResult";
+import {CohortPatient} from "./models/CohortPatient";
 import {CohortService} from "./cohort.service";
 import {LoggerService} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
@@ -13,9 +13,9 @@ import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 })
 export class CohortViewDialog implements OnInit {
 
-    public static open(modalService: NgbModal, reportRun: CohortRun, item: FolderItem) {
+    public static open(modalService: NgbModal, cohortRun: CohortRun, item: FolderItem) {
         const modalRef = modalService.open(CohortViewDialog, { backdrop : "static", size : "lg"});
-        modalRef.componentInstance.resultData = reportRun;
+        modalRef.componentInstance.resultData = cohortRun;
         modalRef.componentInstance.item = item;
 
         return modalRef;
@@ -34,14 +34,14 @@ export class CohortViewDialog implements OnInit {
     ];
 
     organisations = <any>[];
-    reportResult: ReportResult[];
-    allReportResults: ReportResult;
-    reportPatient: ReportPatient;
+    cohortResult: CohortResult[];
+    allCohortResults: CohortResult;
+    cohortPatient: CohortPatient;
 
     enumeratorTotal : number = 0;
     denominatorTotal : number = 0;
 
-    constructor(protected reportService: CohortService,
+    constructor(protected cohortService: CohortService,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
 
@@ -50,49 +50,49 @@ export class CohortViewDialog implements OnInit {
     ngOnInit(): void {
         var vm = this;
 
-        vm.reportService.getOrganisations()
+        vm.cohortService.getOrganisations()
             .subscribe(
                 (data) => {
                     vm.organisations = data;
                 });
 
-        vm.getReportResults(vm.item.uuid, vm.item.lastRun);
+        vm.getCohortResults(vm.item.uuid, vm.item.lastRun);
 
-        vm.reportService.getAllCohortResults(vm.item.uuid)
+        vm.cohortService.getAllCohortResults(vm.item.uuid)
             .subscribe(
                 (data) => {
-                    vm.allReportResults = data;
+                    vm.allCohortResults = data;
                 });
     }
 
-    getReportResults(uuid:string, lastRun:number) {
+    getCohortResults(uuid:string, lastRun:number) {
         var vm = this;
 
-        vm.reportService.getCohortResults(uuid, lastRun)
+        vm.cohortService.getCohortResults(uuid, lastRun)
             .subscribe(
                 (data) => {
-                    vm.reportResult = data;
-                    vm.baselineDate = vm.reportResult[0].baselineDate;
-                    vm.runDate = vm.reportResult[0].runDate;
-                    vm.population = vm.reportResult[0].populationTypeId;
+                    vm.cohortResult = data;
+                    vm.baselineDate = vm.cohortResult[0].baselineDate;
+                    vm.runDate = vm.cohortResult[0].runDate;
+                    vm.population = vm.cohortResult[0].populationTypeId;
 
                     vm.enumeratorTotal = 0;
                     vm.denominatorTotal = 0;
 
                     for (var i = 0, len = data.length; i < len; i++) {
-                        vm.enumeratorTotal += Number(vm.reportResult[i].enumeratorCount);
-                        vm.denominatorTotal += Number(vm.reportResult[i].denominatorCount);
+                        vm.enumeratorTotal += Number(vm.cohortResult[i].enumeratorCount);
+                        vm.denominatorTotal += Number(vm.cohortResult[i].denominatorCount);
                     }
 
                 });
     }
 
-    getReportPatients(uuid:string, lastRun:number, organisationId:string) {
+    getCohortPatients(uuid:string, lastRun:number, organisationId:string) {
         var vm = this;
 
         var type = "PATIENT";
 
-        vm.reportService.getCohortPatients(type, uuid, lastRun, organisationId)
+        vm.cohortService.getCohortPatients(type, uuid, lastRun, organisationId)
             .subscribe(
                 (data) => {
                     var csvData = this.ConvertToCSV(data);

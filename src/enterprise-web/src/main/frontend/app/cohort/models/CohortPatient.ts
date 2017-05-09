@@ -1,5 +1,5 @@
-export class ReportPatient {
-    reportPatientId : string;
+export class CohortPatient {
+    cohortPatientId : string;
     runDate : string;
     queryItemUuid : string;
     organisationId: string;

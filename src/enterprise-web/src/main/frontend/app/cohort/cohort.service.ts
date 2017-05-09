@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Http, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {Organisation} from "./models/Organisation";
-import {ReportResult} from "./models/ReportResult";
+import {CohortResult} from "./models/CohortResult";
 import {CohortRun} from "./models/CohortRun";
 import {BaseHttp2Service} from "eds-common-js";
 
@@ -15,7 +15,7 @@ export class CohortService extends BaseHttp2Service {
 		return this.httpGet('api/cohort/getOrganisations');
 	}
 
-	getCohortResults(queryItemUuid : string, runDate):Observable<ReportResult[]> {
+	getCohortResults(queryItemUuid : string, runDate):Observable<CohortResult[]> {
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('queryItemUuid', queryItemUuid);
 		params.append('runDate', runDate);
@@ -23,7 +23,7 @@ export class CohortService extends BaseHttp2Service {
 		return this.httpGet('api/cohort/getResults', {search : params});
 	}
 
-	getAllCohortResults(queryItemUuid : string):Observable<ReportResult> {
+	getAllCohortResults(queryItemUuid : string):Observable<CohortResult> {
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('queryItemUuid', queryItemUuid);
 

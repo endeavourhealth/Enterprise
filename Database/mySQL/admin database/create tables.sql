@@ -4,8 +4,8 @@ DROP TABLE IF EXISTS enterprise_admin.DependencyType;
 DROP TABLE IF EXISTS enterprise_admin.Item;
 DROP TABLE IF EXISTS enterprise_admin.ItemDependency;
 DROP TABLE IF EXISTS enterprise_admin.ItemType;
-DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportPatients;
-DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResult;
+DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortPatients;
+DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortResult;
 
 CREATE TABLE enterprise_admin.ActiveItem (
 	ActiveItemUuid char(36) NOT NULL,
@@ -49,19 +49,19 @@ CREATE TABLE enterprise_admin.ItemType (
 	Description varchar(100) NOT NULL,
 	PRIMARY KEY (ItemTypeId)
 );
-CREATE TABLE enterprise_data_pseudonymised.`ReportPatients` (
-  `ReportPatientId` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE enterprise_data_pseudonymised.`CohortPatients` (
+  `CohortPatientId` int(11) NOT NULL AUTO_INCREMENT,
   `RunDate` timestamp(3) NULL DEFAULT NULL,
   `QueryItemUuid` char(36) NOT NULL,
   `OrganisationId` BIGINT(20) NOT NULL,
   `PatientId` BIGINT(20) NOT NULL,
-  PRIMARY KEY (`ReportPatientId`),
+  PRIMARY KEY (`CohortPatientId`),
   KEY `RunDate` (`RunDate`),
   KEY `QueryItemUuid` (`QueryItemUuid`),
   KEY `OrganisationId` (`OrganisationId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-CREATE TABLE enterprise_data_pseudonymised.`ReportResult` (
-  `ReportResultId` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE enterprise_data_pseudonymised.`CohortResult` (
+  `CohortResultId` int(11) NOT NULL AUTO_INCREMENT,
   `EndUserUuid` char(36) NOT NULL,
   `BaselineDate` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `RunDate` timestamp(3) NULL DEFAULT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE enterprise_data_pseudonymised.`ReportResult` (
   `PopulationTypeId` tinyint(1) NOT NULL,
   `DenominatorCount` int(11) DEFAULT NULL,
   `EnumeratorCount` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ReportResultId`),
+  PRIMARY KEY (`CohortResultId`),
   KEY `RunDate` (`RunDate`),
   KEY `QueryItemUuid` (`QueryItemUuid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;

@@ -37,7 +37,7 @@
                                     <th style="width:110px;padding: 5px">Previous Runs</th>
                                     <th style="width:186px;padding: 5px">Denominator Baseline</th>
                                 </tr>
-                                <tr *ngFor="let result of allReportResults">
+                                <tr *ngFor="let result of allCohortResults">
                                     <td style="padding: 5px;border: solid thin silver"><a (click)="getCohortResults(result.queryItemUuid,result.runDate)" style="cursor:pointer;">{{result.runDate | date:'dd-MMM-yyyy HH:mm:ss'}}</a></td>
                                     <td style="padding: 5px;border: solid thin silver">{{getPopulationName(result.populationTypeId)}} on or before {{result.baselineDate | date:'dd-MMM-yyyy'}}</td>
                                 </tr>
@@ -64,7 +64,7 @@
                                         <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{enumeratorTotal}}</td>
                                         <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{denominatorTotal}}</td>
                                     </tr>
-                                    <tr *ngFor="let result of reportResult">
+                                    <tr *ngFor="let result of cohortResult">
                                         <td style="width: 300px;padding: 5px;border: solid thin silver">{{getOrganisationName(result.organisationId)}}</td>
                                         <td style="padding: 5px;border: solid thin silver"><a (click)="getCohortPatients(result.queryItemUuid,result.runDate,result.organisationId)" style="cursor:pointer;">{{result.enumeratorCount}}</a></td>
                                         <td style="padding: 5px;border: solid thin silver">{{result.denominatorCount}}</td>

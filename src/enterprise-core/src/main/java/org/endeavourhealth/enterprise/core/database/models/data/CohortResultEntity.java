@@ -10,9 +10,9 @@ import java.util.List;
  * Created by darren on 30/03/17.
  */
 @Entity
-@Table(name = "ReportResult", schema = "enterprise_data_pseudonymised", catalog = "")
+@Table(name = "CohortResult", schema = "enterprise_data_pseudonymised", catalog = "")
 public class CohortResultEntity {
-    private int reportResultId;
+    private int cohortResultId;
     private String endUserUuid;
     private Timestamp baselineDate;
     private Timestamp runDate;
@@ -23,13 +23,13 @@ public class CohortResultEntity {
     private Integer enumeratorCount;
 
     @Id
-    @Column(name = "ReportResultId", nullable = false)
-    public int getReportResultId() {
-        return reportResultId;
+    @Column(name = "CohortResultId", nullable = false)
+    public int getCohortResultId() {
+        return cohortResultId;
     }
 
-    public void setReportResultId(int reportResultId) {
-        this.reportResultId = reportResultId;
+    public void setCohortResultId(int cohortResultId) {
+        this.cohortResultId = cohortResultId;
     }
 
     @Basic
@@ -119,7 +119,7 @@ public class CohortResultEntity {
 
         CohortResultEntity that = (CohortResultEntity) o;
 
-        if (reportResultId != that.reportResultId) return false;
+        if (cohortResultId != that.cohortResultId) return false;
         if (organisationId != that.organisationId) return false;
         if (populationTypeId != that.populationTypeId) return false;
         if (endUserUuid != null ? !endUserUuid.equals(that.endUserUuid) : that.endUserUuid != null) return false;
@@ -137,7 +137,7 @@ public class CohortResultEntity {
 
     @Override
     public int hashCode() {
-        int result = reportResultId;
+        int result = cohortResultId;
         result = 31 * result + (endUserUuid != null ? endUserUuid.hashCode() : 0);
         result = 31 * result + (baselineDate != null ? baselineDate.hashCode() : 0);
         result = 31 * result + (runDate != null ? runDate.hashCode() : 0);
@@ -149,7 +149,7 @@ public class CohortResultEntity {
         return result;
     }
 
-    public static List<CohortResultEntity[]> getReportResults(String queryItemUuid, String runDate) throws Exception {
+    public static List<CohortResultEntity[]> getCohortResults(String queryItemUuid, String runDate) throws Exception {
         String where = "select r " +
                 "from CohortResultEntity r where queryItemUuid = :queryItemUuid and runDate = :runDate";
 
@@ -176,10 +176,10 @@ public class CohortResultEntity {
 
     }
 
-    public static List<CohortResultEntity[]> getAllReportResults(String queryItemUuid) throws Exception {
+    public static List<CohortResultEntity[]> getAllCohortResults(String queryItemUuid) throws Exception {
         String where = "SELECT a from CohortResultEntity a"
-                + " where reportResultId in ( "+
-                "SELECT MAX(reportResultId) "+
+                + " where cohortResultId in ( "+
+                "SELECT MAX(cohortResultId) "+
                 "FROM CohortResultEntity where queryItemUuid = :queryItemUuid "+
                 "GROUP BY runDate "+
                 ") ORDER BY runDate desc";

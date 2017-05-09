@@ -82,6 +82,6 @@ public class ReportManager {
 		featureRun.setPopulation(reportRun.getPopulation());
 		featureRun.setQueryItemUuid(feature.getCohortFeatureUuid());
 
-		ResultsManager.runReport(featureItem, featureRun, userUuid, runDate);
+		ResultsManager.runCohort(featureItem, featureRun, userUuid, runDate);
 	}
 }

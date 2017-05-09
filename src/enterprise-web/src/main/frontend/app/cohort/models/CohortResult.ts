@@ -1,5 +1,5 @@
-export class ReportResult {
-    reportResultId : string;
+export class CohortResult {
+    cohortResultId : string;
     endUserUuid: string;
     baselineDate : string;
     runDate : string;

@@ -71,7 +71,10 @@ public class ReportManager {
 //			i++;
 //		}
 
+		entityManager.close();
+
 		saveReport(userUuid, reportRun, reportItem, runDate);
+
 	}
 
 	private static void runCohort(String userUuid, JsonReportRun reportRun, ReportCohortFeature feature, Timestamp runDate) throws Exception {

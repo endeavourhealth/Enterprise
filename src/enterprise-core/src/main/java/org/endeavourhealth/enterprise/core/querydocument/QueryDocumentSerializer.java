@@ -33,6 +33,10 @@ public abstract class QueryDocumentSerializer {
         return XmlSerializer.deserializeFromString(QueryDocument.class, xml, XSD);
     }
 
+    public static String writeToXml(LibraryItem libraryItem) {
+			JAXBElement element = OBJECT_FACTORY.createLibraryItem(libraryItem);
+			return XmlSerializer.serializeToString(element, XSD);
+		}
 
     public static String writeToXml(QueryDocument q) {
         if (q.getFolder().isEmpty()

@@ -20,20 +20,77 @@ import java.util.stream.Collectors;
 public class ReportManager {
 	private static final Logger LOG = LoggerFactory.getLogger(ReportManager.class);
 
-	public static void run(String userUuid, JsonReportRun reportRun, LibraryItem reportItem) throws Exception {
+	public static Timestamp run(String userUuid, JsonReportRun reportRun, LibraryItem reportItem) throws Exception {
 		LOG.info("Running report " + reportItem.getName());
 
 		Timestamp runDate = new Timestamp(System.currentTimeMillis());
-		List<String> orgIds = reportRun.getOrganisation().stream().map(o -> o.getId()).collect(Collectors.toList());
 
+		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature())
+			runCohort(userUuid, reportRun, feature, runDate);
+
+		saveReport(userUuid, reportRun, reportItem, runDate);
+
+		List<String> featureUuids = reportItem.getReport().getCohortFeature().stream()
+				.map(ReportCohortFeature::getCohortFeatureUuid)
+				.collect(Collectors.toList());
+		List<String> orgIds = reportRun.getOrganisation().stream()
+				.map(JsonOrganisation::getId)
+				.collect(Collectors.toList());
+
+		loadReportResults(featureUuids, orgIds, runDate);
+
+		return runDate;
+	}
+
+	public static List<ReportResultEntity> getReportResultList(String reportItemUuid) {
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+		List<ReportResultEntity> reportResultList = entityManager
+				.createQuery("SELECT r FROM ReportResultEntity r WHERE r.reportItemUuid = :reportItemUuid")
+				.setParameter("reportItemUuid", reportItemUuid)
+				.getResultList();
+
+		return reportResultList;
+	}
+
+	public static List<Object[]> getReportResults(int reportResultId) {
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+		ReportResultEntity reportResult = (ReportResultEntity) entityManager
+				.createQuery("SELECT r FROM ReportResultEntity r WHERE r.reportResultId = :reportResultId")
+				.setParameter("reportResultId", reportResultId)
+				.getSingleResult();
+
+		if (reportResult == null)
+			LOG.error("No report found with id " + reportResultId);
+
+		List<ReportResultQueryEntity> reportResultQueries = entityManager
+				.createQuery("SELECT q FROM ReportResultQueryEntity q WHERE q.id.reportResultId = :reportResultId")
+				.setParameter("reportResultId", reportResultId)
+				.getResultList();
+
+		List<ReportResultOrganisationEntity> reportResultOrgs = entityManager
+				.createQuery("SELECT o FROM ReportResultOrganisationEntity o WHERE o.id.reportResultId = :reportResultId")
+				.setParameter("reportResultId", reportResultId)
+				.getResultList();
+
+		List<String> featureUuids = reportResultQueries.stream()
+				.map(q -> q.getId().getQueryItemUuid())
+				.collect(Collectors.toList());
+
+		List<String> orgIds = reportResultOrgs.stream()
+				.map(o -> Long.toString(o.getId().getOrganisationId()))
+				.collect(Collectors.toList());
+
+		return loadReportResults(featureUuids, orgIds, reportResult.getRunDate());
+	}
+
+	private static List<Object[]> loadReportResults(List<String> cohortFeatureUuids, List<String> orgIds, Timestamp runDate) {
 		String select = " SELECT p.pseudoId, p.organizationId ";
 		String from = " FROM PatientEntity p ";
 		String where = " WHERE p.organizationId IN (" + String.join(",", orgIds) + ")"; // TODO : Population restriction
 
-		Integer i = 0;
-		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature()) {
-			runCohort(userUuid, reportRun, feature, runDate);
-
+		for (Integer i = 0; i < cohortFeatureUuids.size(); i++) {
 			String alias = "field"+i.toString(); // TODO : feature.getFieldName();
 			select += ", " +alias + ".patientId";		// TODO : Select additional data fields
 			from += " LEFT OUTER JOIN CohortPatientsEntity " + alias;
@@ -41,18 +98,16 @@ public class ReportManager {
 			from += " AND " + alias + ".organisationId = p.organizationId ";
 			from += " AND " + alias + ".queryItemUuid = :queryUuid"+i.toString();
 			from += " AND " + alias + ".runDate = :runDate"+i.toString();
-
-			i++;
 		}
 
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 		Query query = entityManager.createQuery(select + from + where);
 
 
-		i = 0;
-		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature()) {
+		Integer i = 0;
+		for (String featureUuid : cohortFeatureUuids) {
 			query.setParameter("runDate"+i.toString(), runDate);
-			query.setParameter("queryUuid"+i.toString(), feature.getCohortFeatureUuid());
+			query.setParameter("queryUuid"+i.toString(), featureUuid);
 			i++;
 		}
 
@@ -73,8 +128,7 @@ public class ReportManager {
 
 		entityManager.close();
 
-		saveReport(userUuid, reportRun, reportItem, runDate);
-
+		return results;
 	}
 
 	private static void runCohort(String userUuid, JsonReportRun reportRun, ReportCohortFeature feature, Timestamp runDate) throws Exception {
@@ -92,16 +146,30 @@ public class ReportManager {
 		CohortManager.runCohort(featureItem, featureRun, userUuid, runDate);
 	}
 
-	private static void saveReport(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) {
+	private static void saveReport(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws Exception {
+		ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(reportItem.getUuid());
+		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(featureEntity.getXmlContent());
+		libraryItem.getReport().setLastRunDate(runDate.getTime());
 
+		featureEntity.setXmlContent(QueryDocumentSerializer.writeToXml(libraryItem));
 
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
+		entityManager.getTransaction().begin();
+		entityManager.merge(featureEntity);
+
+		saveReportResults(userUuid, reportRun, reportItem, runDate);
+
+		entityManager.getTransaction().commit();
+		entityManager.close();
+	}
+
+	private static void saveReportResults(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) {
 		ReportResultEntity reportResult = new ReportResultEntity()
 				.setEndUserUuid(userUuid)
 				.setReportItemUuid(reportItem.getUuid())
 				.setRunDate(runDate);
 
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-
 		entityManager.getTransaction().begin();
 
 		reportResult = entityManager.merge(reportResult);
@@ -130,7 +198,6 @@ public class ReportManager {
 		}
 
 		entityManager.getTransaction().commit();
-
 		entityManager.close();
 	}
 }

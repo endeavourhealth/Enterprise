@@ -23,11 +23,11 @@ public final class JsonFolderContent implements Comparable {
 
     }
 
-    public JsonFolderContent(ActiveItemEntity activeItem, ItemEntity item, AuditEntity audit, CohortResultEntity report) {
-        this(item, audit, report);
+    public JsonFolderContent(ActiveItemEntity activeItem, ItemEntity item, AuditEntity audit, CohortResultEntity cohort) {
+        this(item, audit, cohort);
         setTypeEnum(activeItem.getItemTypeId());
     }
-    public JsonFolderContent(ItemEntity item, AuditEntity audit, CohortResultEntity report) {
+    public JsonFolderContent(ItemEntity item, AuditEntity audit, CohortResultEntity cohort) {
         this.uuid = item.getItemUuid();
         this.name = item.getTitle();
         this.description = item.getDescription();
@@ -36,8 +36,8 @@ public final class JsonFolderContent implements Comparable {
             this.lastModified = new Date(audit.getTimeStamp().getTime());
         }
 
-        if (report != null) {
-            this.lastRun = new Date(report.getRunDate().getTime());
+        if (cohort != null) {
+            this.lastRun = new Date(cohort.getRunDate().getTime());
         }
     }
 

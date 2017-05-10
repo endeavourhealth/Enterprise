@@ -49,7 +49,7 @@
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 											<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>
-												<a *ngIf="!item.isRunning" style="cursor: pointer" (click)="viewCohort(item)">{{item.lastRun | date:'dd-MMM-yyyy HH:mm:ss'}}</a>
+												<a *ngIf="!item.isRunning" style="cursor: pointer" (click)="viewLastRun(item)">{{item.lastRun | date:'dd-MMM-yyyy HH:mm:ss'}}</a>
 												<span *ngIf="item.isRunning" style="color:darkgreen">running...</span>
 											</td>
 											<td>

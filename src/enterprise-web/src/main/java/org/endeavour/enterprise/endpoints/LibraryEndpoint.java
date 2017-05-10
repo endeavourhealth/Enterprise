@@ -68,9 +68,9 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 			ItemEntity item = hmItemsByItemUuid.get(activeItem.getItemUuid());
 			Short itemType = activeItem.getItemTypeId();
 			AuditEntity audit = hmAuditsByAuditUuid.get(item.getAuditUuid());
-			CohortResultEntity report = hmReportsByItemUuid.get(activeItem.getItemUuid());
+			CohortResultEntity cohort = hmReportsByItemUuid.get(activeItem.getItemUuid());
 
-			JsonFolderContent c = new JsonFolderContent(activeItem, item, audit, report);
+			JsonFolderContent c = new JsonFolderContent(activeItem, item, audit, cohort);
 			ret.addContent(c);
 
 			if (itemType == DefinitionItemType.Query.getValue()) {
@@ -81,6 +81,11 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 
 			} else if (itemType == DefinitionItemType.CodeSet.getValue()) {
 
+			} else if (itemType == DefinitionItemType.Report.getValue()) {
+				LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(item.getXmlContent());
+				Report report = libraryItem.getReport();
+				if (report != null && report.getLastRunDate() != null)
+					c.setLastRun(new Date(report.getLastRunDate()));
 			} else {
 				//throw new RuntimeException("Unexpected content " + item + " in folder");
 			}

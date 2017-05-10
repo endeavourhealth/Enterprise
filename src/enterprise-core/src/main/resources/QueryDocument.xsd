@@ -219,6 +219,7 @@
     <xs:complexType name="report">
         <xs:sequence>
             <xs:element name="cohortFeature" type="reportCohortFeature" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="lastRunDate" type="xs:long" minOccurs="0" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="reportCohortFeature">

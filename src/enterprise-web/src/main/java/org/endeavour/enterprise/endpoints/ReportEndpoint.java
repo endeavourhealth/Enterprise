@@ -3,9 +3,11 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.database.ReportManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
 import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
+import org.endeavourhealth.enterprise.core.querydocument.models.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +16,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.sql.Timestamp;
+import java.util.List;
 
 @Path("/report")
 public final class ReportEndpoint extends AbstractItemEndpoint {
@@ -33,7 +37,28 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
-		ReportManager.run(userUuid, report, libraryItem);
+		Timestamp runDate = ReportManager.run(userUuid, report, libraryItem);
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(runDate.getTime())
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/reportResult")
+	public Response reportResult(@Context SecurityContext sc, @QueryParam("reportItemUuid") String reportItemUuid) {
+		super.setLogbackMarkers(sc);
+
+		List<ReportResultEntity> reportResultEntityList = ReportManager.getReportResultList(reportItemUuid);
+
+		for (ReportResultEntity reportResult : reportResultEntityList) {
+			LOG.info("Result Id : " + reportResult.getReportResultId());
+		}
 
 		clearLogbackMarkers();
 

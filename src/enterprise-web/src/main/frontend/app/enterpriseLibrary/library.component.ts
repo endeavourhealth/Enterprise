@@ -130,6 +130,14 @@ export class LibraryComponent {
 		});
 	}
 
+	viewLastRun(item : FolderItem) {
+		switch (item.type) {
+			case ItemType.Query:
+				this.viewCohort(item);
+				break;
+		}
+	}
+
 	viewCohort(item: FolderItem) {
 		var vm = this;
 		console.log(item);

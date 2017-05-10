@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="cohortFeature" type="{}reportCohortFeature" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="lastRunDate" type="{http://www.w3.org/2001/XMLSchema}long" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -29,11 +30,13 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "report", propOrder = {
-    "cohortFeature"
+    "cohortFeature",
+    "lastRunDate"
 })
 public class Report {
 
     protected List<ReportCohortFeature> cohortFeature;
+    protected Long lastRunDate;
 
     /**
      * Gets the value of the cohortFeature property.
@@ -62,6 +65,30 @@ public class Report {
             cohortFeature = new ArrayList<ReportCohortFeature>();
         }
         return this.cohortFeature;
+    }
+
+    /**
+     * Gets the value of the lastRunDate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getLastRunDate() {
+        return lastRunDate;
+    }
+
+    /**
+     * Sets the value of the lastRunDate property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setLastRunDate(Long value) {
+        this.lastRunDate = value;
     }
 
 }

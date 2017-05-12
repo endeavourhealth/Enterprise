@@ -9,51 +9,55 @@
 </div>
 <div class="modal-body">
 	<form role="form">
-		<table class="expressionTable">
-			<tr>
-				<td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top;">
-					<div class='row'>
-						<div class="col-xs-12">
-							<div class="form-group">
-								<label>Organisations: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgTT }}"></span>
-								<select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)">
-									<option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
-								</select>
-								<br/>
-								<label>Patient Population: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
-								<select class="form-control" style="width:300px" (change)="setSelectedPopulation($event.target)">
-									<option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
-								</select>
-								<br/>
-								<label>Baseline Run Date: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ rdTT }}"></span>
-								<input type="date" class="form-control" style="width:200px" [(ngModel)]="baselineDate" name="baselineDate">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="row">
+					<div class="form-group col-md-12">
+						<label>Organisations: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgTT }}"></span>
+						<select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)">
+							<option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
+						</select>
+					</div>
+					<div class="form-group col-md-12">
+						<label>Patient Population: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
+						<select class="form-control" style="width:300px" (change)="setSelectedPopulation($event.target)">
+							<option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
+						</select>
+					</div>
+					<div class="form-group col-md-12">
+						<label>Baseline Date: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ rdTT }}"></span>
+						<input type="date" class="form-control" style="width:200px" [(ngModel)]="baselineDate" name="baselineDate">
+					</div>
+					<div class="form-group col-md-12">
+						<input type="checkbox" [(ngModel)]="scheduled" name="scheduled"> <label (click)="scheduled = !scheduled"> Schedule Run At: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ srTT }}"></span>
+						<div class="row">
+							<div class="form-group col-md-6">
+								<input type="date" class="form-control col-md-6" [(ngModel)]="scheduleDate" name="scheduleDate" [readonly]="!scheduled">
+							</div>
+							<div class="form-group col-md-6">
+								<input type="time" class="form-control col-md-6" [(ngModel)]="scheduleTime" name="scheduleTime" [readonly]="!scheduled">
 							</div>
 						</div>
 					</div>
-				</td>
-				<td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top; border: solid thin silver">
-					<div class='row'>
-						<div class="col-xs-12">
-							<div class="form-group">
-								<br/>
-								<label>Selected Report:</label>
-								<p>{{ item.name }}</p>
-								<br/>
-								<label>Report Description:</label>
-								<p>{{ item.description }}</p>
-							</div>
-						</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="row">
+					<div class="form-group col-md-12">
+						<label>Selected Report:</label>
+						<p>{{ item.name }}</p>
 					</div>
-				</td>
-			</tr>
-		</table>
+					<div class="form-group col-md-12">
+						<label>Report Description:</label>
+						<p>{{ item.description }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
 	</form>
-
 </div>
 
 <div class="modal-footer">
-	<button type="button" class="btn btn-default"
-					(click)="cancel()">Cancel</button>
-	<button type="button" class="btn btn-primary"
-					(click)="save();">Run Now</button>
+	<button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
+	<button type="button" class="btn btn-primary" (click)="save();" [disabled]="scheduled && (scheduleDate=='' || scheduleTime=='')">Run Now</button>
 </div>

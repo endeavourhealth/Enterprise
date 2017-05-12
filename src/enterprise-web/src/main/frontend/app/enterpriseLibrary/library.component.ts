@@ -162,12 +162,16 @@ export class LibraryComponent {
 			organisation: [],
 			population: "",
 			baselineDate: "",
-			reportItemUuid: item.uuid
+			reportItemUuid: item.uuid,
+			scheduled: false,
+			scheduleDateTime: null
 		};
 
 		let vm = this;
 		ReportRunnerDialog.open(vm.$modal, reportRun, item).result.then(
-			(result) => vm.executeReport(item, result),
+			(result) => {
+				if (result) vm.executeReport(item, result)
+			},
 			(error) => vm.logger.error("Error running report", error)
 		);
 	}

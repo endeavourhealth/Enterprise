@@ -3,6 +3,7 @@ package org.endeavourhealth.enterprise.core.json;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -12,6 +13,8 @@ public final class JsonReportRun {
     private String population = null;
     private String baselineDate = null;
     private String reportItemUuid = null;
+    private Boolean scheduled = false;
+    private Date scheduleDateTime = null;
 
     public JsonReportRun() {
     }
@@ -52,4 +55,19 @@ public final class JsonReportRun {
     }
 
 
+	public Date getScheduleDateTime() {
+		return scheduleDateTime;
+	}
+
+	public void setScheduleDateTime(Date scheduleDateTime) {
+		this.scheduleDateTime = scheduleDateTime;
+	}
+
+	public Boolean getScheduled() {
+		return scheduled;
+	}
+
+	public void setScheduled(Boolean scheduled) {
+		this.scheduled = scheduled;
+	}
 }

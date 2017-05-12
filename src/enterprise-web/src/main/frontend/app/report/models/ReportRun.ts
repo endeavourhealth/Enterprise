@@ -4,4 +4,6 @@ export class ReportRun {
     population: string;
     baselineDate : string;
     reportItemUuid : string;
+    scheduled: boolean;
+    scheduleDateTime : Date;
 }

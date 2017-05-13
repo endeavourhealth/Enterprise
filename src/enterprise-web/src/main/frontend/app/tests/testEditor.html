@@ -13,45 +13,57 @@
 		<div class='row' *ngIf="type=='3'">
 			<div class="col-xs-12">
 				<div class="form-group">
-					<label>Select the Feature or Function to Test Against</label>
-					<select class="form-control" [(ngModel)]="testRuleId" name="testRuleId">
-						<option *ngFor="let rule of rules" value="{{rule.value}}">{{rule.displayName}}</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class='row' *ngIf="type=='3'" style="margin-top: 15px;margin-bottom: 15px;">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<div class="input-group">
-						<span>Test against a Concept?</span>&nbsp;&nbsp;
-						<input id="conceptTest" type="radio" name="conceptTest" [(ngModel)]="testType" value="concept" name="conceptTest">
-						&nbsp;
-						<span>or a Value?</span>&nbsp;&nbsp;
-						<input id="valueTest" type="radio" name="valueTest" [(ngModel)]="testType" value="value" name="valueTest">
-						&nbsp;
-						<span>or a Date?</span>&nbsp;&nbsp;
-						<input id="dateTest" type="radio" name="dateTest" [(ngModel)]="testType" value="date" name="dateTest">
-					</div>
+					<table style="margin-top:10px;margin-left:15px;width:830px">
+						<tr>
+							<th>Entries you can test</th>
+							<th>Test the Entry is Greater Than or Equal To</th>
+							<th>Test the Entry is Less Than or Equal To</th>
+						</tr>
+						<tr style="height:100px" *ngFor="let restriction of restrictions; let isLast=last">
+							<td style="font-size: 12px; width:220px">
+								{{ restriction.field }}
+							</td>
+							<td style="font-size: 12px">
+								<div class="form-group">
+									<div class="input-group">
+										<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueFrom.constant" [ngModelOptions]="{standalone: true}">
+										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
+											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueFrom.relativeUnit" [ngModelOptions]="{standalone: true}">
+												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+											</select>&nbsp;&nbsp;after the
+											<select class="form-control" style="width: 280px;margin-top:5px" [(ngModel)]="restriction.filter.valueFrom.testField" [ngModelOptions]="{standalone: true}">
+												<option value=""></option>
+												<option value="BASELINE_DATE">BASELINE_DATE</option>
+												<option *ngFor="let against of restrictions" value="{{against.field}}">{{against.field}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</td>
+							<td style="font-size: 12px">
+								<div class="form-group">
+									<div class="input-group">
+										<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueTo.constant" [ngModelOptions]="{standalone: true}">
+										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
+											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueTo.relativeUnit" [ngModelOptions]="{standalone: true}">
+												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+											</select>&nbsp;&nbsp;before the
+											<select class="form-control" style="width: 280px;margin-top:5px" [(ngModel)]="restriction.filter.valueTo.testField" [ngModelOptions]="{standalone: true}">
+												<option value=""></option>
+												<option value="BASELINE_DATE">BASELINE_DATE</option>
+												<option *ngFor="let against of restrictions" value="{{against.field}}">{{against.field}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
 
-		<div class='row' *ngIf="testType=='value'">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<div class="input-group">
-						<span style="font-weight:bold">Test is <span style="font-weight:bold;color:blue">"{{getRuleName(testRuleId)}}"</span></span>
-						<b> >= </b> <input id="testValueFrom" style="width:100px" type="text" (blur)="testValueFromChange(testValueFrom)" name="testValueFrom" [(ngModel)]="testValueFrom">
-						<b> <= </b> <input id="testValueTo" style="width:100px" type="text" (blur)="testValueToChange(testValueTo)" name="testValueTo" [(ngModel)]="testValueTo">
-						<a style='margin-left: 20px' class="queryLink" (click)="removeFilter('value')"><i class="fa fa-times"></i> Remove filter</a>
-					</div>
-
-				</div>
-			</div>
-		</div>
-
-		<div class='row' *ngIf="testType=='concept' || type=='1' ">
+		<div class='row' *ngIf="type=='1' ">
 			<div class="col-xs-12">
 				<div class="form-group">
 					<label>
@@ -95,23 +107,6 @@
 								</td>
 							</tr>
 						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class='row' *ngIf="testType=='concept'" style="margin-top: 15px">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<div class="input-group">
-						<span style="font-weight:bold">Test is <span style="font-weight:bold;color:blue">"{{getRuleName(testRuleId)}}"</span></span>
-						<b> in the concept list:</b>
-						<div>
-							<span *ngFor="let selection of codeSelection">
-								{{ selection.term.split("(")[0] }}
-								<span *ngIf="!this.$last">  |  </span>
-							</span>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -175,19 +170,7 @@
 			</div>
 		</div>
 
-		<div class='row' *ngIf="testType=='date'" style="margin-top: 15px">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<div class="input-group">
-						<span style="font-weight:bold">Test is <span style="font-weight:bold;color:blue">"{{getRuleName(testRuleId)}}"</span></span>
-						<b> within the following date range:</b>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class='row' *ngIf="testType=='date' || (dateEditor&&type=='1')" style="margin-left: 1px; margin-top: 15px;">
-
+		<div class='row' *ngIf="(dateEditor&&type=='1')" style="margin-left: 1px; margin-top: 15px;">
 			<div class="col-xs-12">
 				<div class="form-group">
 					<div class="input-group">
@@ -201,53 +184,47 @@
 				</div>
 			</div>
 		</div>
-		<div class='row' *ngIf="testType=='date' || (dateEditor&&type=='1')" style="margin-left: 1px;">
+		<div class='row' *ngIf="(dateEditor&&type=='1')" style="margin-left: 1px;">
 			<div class="col-xs-6">
 				<div class="form-group">
-					<span *ngIf="datetype == 'absolute'">From (>=):</span>
+					<span *ngIf="datetype == 'absolute'">Greater Than or Equal To:</span>
 					<p class="input-group" *ngIf="datetype == 'absolute'">
 						<input type="date" class="form-control" [(ngModel)]="filterDateFrom" name="dateFrom">
 					</p>
-					<span *ngIf="datetype == 'relative'">From (>=):</span>
+					<span *ngIf="datetype == 'relative'">Greater Than or Equal To:</span>
 					<p class="input-group" *ngIf="datetype == 'relative'">
 						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateFromRelativeValue" name="dateFromRelativeValue">
 						<select class="form-control" style="width:100px" [(ngModel)]="filterDateFromRelativePeriod" name="dateFromRelativePeriod">
 							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;before the
-						<select class="form-control" [(ngModel)]="testDateFromRuleId" name="testDateFromRuleId" >
-							<option *ngFor="let rule of rules" value="{{rule.value}}">{{rule.displayName}}</option>
-						</select>
+						</select>&nbsp;&nbsp;after the baseline date
 					</p>
 				</div>
 			</div>
 			<div class="col-xs-6">
 				<div class="form-group">
-					<span *ngIf="datetype == 'absolute'">To (<=):</span>
+					<span *ngIf="datetype == 'absolute'">Less Than or Equal To:</span>
 					<p class="input-group" *ngIf="datetype == 'absolute'">
 						<input type="date" class="form-control" [(ngModel)]="filterDateTo" name="dateTo">
 					</p>
-					<span *ngIf="datetype == 'relative'">To (<=):</span>
+					<span *ngIf="datetype == 'relative'">Less Than or Equal To:</span>
 					<p class="input-group" *ngIf="datetype == 'relative'">
 						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateToRelativeValue" name="dateToRelativeValue">
 						<select class="form-control" style="width:100px" [(ngModel)]="filterDateToRelativePeriod" name="dateToRelativePeriod">
 							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;after the
-						<select class="form-control" [(ngModel)]="testDateToRuleId" name="testDateToRuleId" >
-							<option *ngFor="let rule of rules" value="{{rule.value}}">{{rule.displayName}}</option>
-						</select>
+						</select>&nbsp;&nbsp;before the baseline date
 					</p>
 				</div>
 			</div>
 		</div>
-		<div *ngIf="type=='1' && showConceptResults" style="margin-top: 10px;">
+		<div style="margin-top: 10px;">
 			<a class="queryLink" (click)="toggleRestriction()"><i class="fa fa-sort-amount-asc"></i> Keep Entries</a>
 		</div>
-		<div class='row' *ngIf="showRestriction" style="margin-left:2px;"><br/>
+		<div class='row' style="margin-left:2px;"><br/>
 			<div class="col-xs-3">
 				<div class="form-group">
 					<label>Keep Entries</label>
 					<select class="form-control" [(ngModel)]="restriction" (ngModelChange)="restrictionChange(restriction)" name="restriction">
-						<option *ngFor="let restriction of restrictions" value="{{restriction}}">{{restriction}}</option>
+						<option *ngFor="let restriction of restrictionTypes" value="{{restriction}}">{{restriction}}</option>
 					</select>
 				</div>
 			</div>
@@ -257,18 +234,23 @@
 					<input type="text" class="form-control" [(ngModel)]="restrictionCount" placeholder="1" (blur)="restrictionChange(restrictionCount)" name="restrictionCount">
 				</div>
 			</div>
-			<div class="col-xs-2">
+			<div class="col-xs-3">
 				<div class="form-group">
-					<label>Field Prefix:</label>
-					<input type="text" class="form-control" [(ngModel)]="fieldPrefix" (blur)="restrictionChange(fieldPrefix)" name="fieldPrefix">
+					<label>Test Alias:</label>
+					<input type="text" style="width:190px" class="form-control" [(ngModel)]="fieldPrefix" (blur)="restrictionChange(fieldPrefix)" name="fieldPrefix">
 				</div>
 			</div>
-			<div class="col-xs-5">
+			<div class="col-xs-4">
 				<div class="form-group">
 					<label>Keep the Fields:</label>
-					<select multiple class="form-control" style="width:200px" (change)="setSelectedFields($event.target)">
-						<option *ngFor="let field of keepFields" value="{{field}}">{{field}}</option>
-					</select>
+					<div *ngFor="let field of keepFields">
+						<input type="checkbox"
+							   value="{field}}"
+							   name="keepFields"
+							   [checked]="fields.indexOf(field) >= 0"
+							   (change)="setSelectedFields(field, $event)"/>
+						{{field}}
+					</div>
 				</div>
 			</div>
 

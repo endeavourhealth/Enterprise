@@ -95,6 +95,7 @@ export class CohortViewDialog implements OnInit {
         vm.cohortService.getCohortPatients(type, uuid, lastRun, organisationId)
             .subscribe(
                 (data) => {
+                    console.log(data);
                     var csvData = this.ConvertToCSV(data);
                     var blob = new Blob([csvData], { type: 'text/csv' });
                     var url= window.URL.createObjectURL(blob);

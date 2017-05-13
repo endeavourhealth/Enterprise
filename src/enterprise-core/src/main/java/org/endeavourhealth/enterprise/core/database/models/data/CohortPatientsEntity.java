@@ -99,7 +99,7 @@ public class CohortPatientsEntity {
         String where = "";
 
         if (type.equals("EHR"))
-            where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
+            where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, "+
                     "o.clinicalEffectiveDate, o.snomedConceptId, o.originalCode, o.originalTerm, o.value, o.units, o.isProblem, " +
                     "og.name, og.odsCode, og.typeDesc, "+
                     "pr.name, pr.roleCode, pr.roleDesc "+
@@ -112,7 +112,7 @@ public class CohortPatientsEntity {
                     "where queryItemUuid = :queryItemUuid "+
                     "and runDate = :runDate and organisationId = :organisationId";
         else
-            where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, p.townsendScore, "+
+            where = "select p.id, p.pseudoId, pg.value, p.ageYears, p.ageMonths, p.ageWeeks, p.dateOfDeath, p.postcodePrefix, p.householdId, p.lsoaCode, p.msoaCode, "+
                     "og.name, og.odsCode, og.typeDesc "+
                     "from CohortPatientsEntity r "+
                     "join PatientEntity p on p.id = r.patientId "+

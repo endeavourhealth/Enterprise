@@ -13,6 +13,10 @@ import {QuerySelection} from "./models/QuerySelection";
 import {Test} from "../tests/models/Test";
 import {LibraryService, LoggerService, MessageBoxDialog} from "eds-common-js";
 import {flowchart} from "../flowchart/flowchart.viewmodel";
+import {ValueFrom} from "../tests/models/ValueFrom";
+import {ValueTo} from "../tests/models/ValueTo";
+import {Filter} from "../tests/models/Filter";
+import {ValueSet} from "../tests/models/ValueSet";
 
 @Component({
 	template : require('./queryEditor.html'),
@@ -472,24 +476,54 @@ export class QueryEditComponent {
 			vm.ruleId = ruleId;
 
 			let selectedRule = vm.chartViewModel.getSelectedRule();
-			let rules = <any>[];
+			let restrictions = <any>[];
 
 			for (let i = 0; i < vm.chartViewModel.data.query.rule.length; ++i) {
 				if (vm.chartViewModel.data.query.rule[i].description !== "START"
 					&& !vm.chartViewModel.data.query.rule[i].expression
-					&& vm.chartViewModel.data.query.rule[i].id!=vm.ruleId) {
-					let rule = {
-						value: vm.chartViewModel.data.query.rule[i].id,
-						displayName: vm.chartViewModel.data.query.rule[i].description
-					};
-					rules.push(rule);
+					&& vm.chartViewModel.data.query.rule[i].id!=vm.ruleId
+					&& vm.chartViewModel.data.query.rule[i].test.restriction!=null) {
+					for (let f = 0; f < vm.chartViewModel.data.query.rule[i].test.restriction.field.length; ++f) {
+						var valueFrom : ValueFrom = {
+							constant: null,
+							absoluteUnit: null,
+							relativeUnit: null,
+							operator: "GREATER_THAN_OR_EQUAL_TO",
+							testField: ""
+						}
+
+						var valueTo : ValueTo = {
+							constant: null,
+							absoluteUnit: null,
+							relativeUnit: null,
+							operator: "LESS_THAN_OR_EQUAL_TO",
+							testField: ""
+						}
+
+						var filter: Filter = {
+							field: "",
+							valueFrom: valueFrom,
+							valueTo: valueTo,
+							codeSet: null,
+							valueSet: null,
+							codeSetLibraryItemUuid: null,
+							negate: false
+						};
+
+						let restriction = {
+							field : vm.chartViewModel.data.query.rule[i].test.restriction.prefix+"-"+
+							vm.chartViewModel.data.query.rule[i].test.restriction.field[f],
+							filter : filter
+						}
+						restrictions.push(restriction);
+					}
 				}
 			}
 
 			if (selectedRule.data.expression) {
 				let expression: ExpressionType = selectedRule.data.expression;
 
-				ExpressionEditDialog.open(vm.$modal, expression, rules)
+				ExpressionEditDialog.open(vm.$modal, expression, restrictions)
 					.result.then(function (resultData: ExpressionType) {
 
 					selectedRule.data.expression = resultData;
@@ -499,7 +533,7 @@ export class QueryEditComponent {
 				let test: Test = selectedRule.data.test;
 				let originalResultData = jQuery.extend(true, {}, test);
 
-				TestEditDialog.open(vm.$modal, originalResultData, selectedRule.data.type, rules)
+				TestEditDialog.open(vm.$modal, originalResultData, selectedRule.data.type, restrictions)
 					.result.then(function (resultData: Test) {
 
 					selectedRule.data.test = resultData;

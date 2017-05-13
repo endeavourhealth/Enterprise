@@ -86,11 +86,11 @@
     <xs:complexType name="value">
         <xs:sequence>
             <xs:element name="constant" type="xs:string"/>
-            <xs:element name="testRuleId" type="xs:string"/>
             <xs:choice>
                 <xs:element name="absoluteUnit" type="valueAbsoluteUnit"/>
                 <xs:element name="relativeUnit" type="valueRelativeUnit"/>
             </xs:choice>
+            <xs:element name="testField" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     <xs:simpleType name="valueAbsoluteUnit">
@@ -177,7 +177,6 @@
     </xs:complexType>
     <xs:complexType name="test">
         <xs:sequence>
-            <xs:element name="testRuleId" type="xs:string"/>
             <xs:element name="filter" type="filter" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="restriction" type="restriction" minOccurs="0"/>
         </xs:sequence>

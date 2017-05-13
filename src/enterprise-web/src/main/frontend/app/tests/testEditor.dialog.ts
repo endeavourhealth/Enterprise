@@ -24,28 +24,24 @@ import {LibraryService, LoggerService} from "eds-common-js";
 	]
 })
 export class TestEditDialog implements OnInit{
-	public static open(modalService: NgbModal, test : Test, type : any, rules : any) {
+	public static open(modalService: NgbModal, test : Test, type : any, restrictions : any) {
 		const modalRef = modalService.open(TestEditDialog, { backdrop : "static", size : "lg"});
 		modalRef.componentInstance.resultData = test;
 		modalRef.componentInstance.type = type;
-		modalRef.componentInstance.rules = rules;
+		modalRef.componentInstance.restrictions = restrictions;
 
 		return modalRef;
 	}
 
 	@Input() resultData : any;
 	@Input() type : any;
-	@Input() rules = <any>[];
+	@Input() restrictions = <any>[];
 
 	showConceptResults : boolean = false;
 	title : string;
 
-	testType : string = "";
-	testRuleId : string;
-	testValueFrom : string;
-	testValueTo : string;
-	testDateFromRuleId : string;
-	testDateToRuleId : string;
+	filterValueFrom : string;
+	filterValueTo : string;
 
 	dateEditor : boolean = false;
 	problemEditor : boolean = false;
@@ -72,7 +68,7 @@ export class TestEditDialog implements OnInit{
 	codeSelection : CodeSetValue[] = [];
 	fields = <any>[];
 
-	restrictions = ['','ALL','LATEST','EARLIEST','HIGHEST','LOWEST'];
+	restrictionTypes = ['','ALL','LATEST','EARLIEST','HIGHEST','LOWEST'];
 	periods = ['','DAY','WEEK','MONTH','YEAR'];
 	keepFields = ['CLINICAL_DATE','VALUE','CODE','HCP'];
 
@@ -89,16 +85,9 @@ export class TestEditDialog implements OnInit{
 	ngOnInit(): void {
 
 		var newTest : Test = {
-			testRuleId: "",
 			filter: [],
 			restriction: null
 		};
-
-		let rule = {
-			value: "0",
-			displayName: "Baseline Date"
-		};
-		this.rules.push(rule);
 
 		if (!this.resultData||!this.resultData.filter)
 			this.resultData = newTest;
@@ -110,16 +99,13 @@ export class TestEditDialog implements OnInit{
 		else if (this.type=="3")
 			this.title = "Test Editor";
 
-
+		console.log(this.restrictions);
 	}
 
 	initialiseEditMode(resultData : Test) {
 		var vm = this;
 
 		vm.editMode = true;
-
-		if (vm.type=="3")
-			vm.testRuleId = vm.resultData.testRuleId;
 
 		if (resultData.filter === null) {
 			resultData.filter = [];
@@ -146,8 +132,6 @@ export class TestEditDialog implements OnInit{
 						vm.activeEditor = true;
 						vm.authTypeEditor = true;
 					}
-					if (vm.type=="3")
-						vm.testType="concept";
 					break;
 				case "EFFECTIVE_DATE":
 					if (filter.valueFrom) {
@@ -159,7 +143,6 @@ export class TestEditDialog implements OnInit{
 							vm.filterDateFromRelativeValue = filter.valueFrom.constant;
 							vm.filterDateFromRelativePeriod = filter.valueFrom.relativeUnit;
 							vm.datetype = "relative";
-							vm.testDateFromRuleId = filter.valueFrom.testRuleId;
 						}
 					}
 					if (filter.valueTo) {
@@ -171,19 +154,14 @@ export class TestEditDialog implements OnInit{
 							vm.filterDateToRelativeValue = filter.valueTo.constant;
 							vm.filterDateToRelativePeriod = filter.valueTo.relativeUnit;
 							vm.datetype = "relative";
-							vm.testDateToRuleId = filter.valueTo.testRuleId;
 						}
 					}
-					if (vm.type=="3")
-						vm.testType="date";
 					break;
 				case "VALUE":
 					if (filter.valueFrom)
-						vm.testValueFrom = filter.valueFrom.constant;
+						vm.filterValueFrom = filter.valueFrom.constant;
 					if (filter.valueTo)
-						vm.testValueTo = filter.valueTo.constant;
-					if (vm.type=="3")
-						vm.testType="value";
+						vm.filterValueTo = filter.valueTo.constant;
 					break;
 				case "OBSERVATION_PROBLEM":
 					for (var i = 0, len = filter.valueSet.value.length; i < len; i++) {
@@ -209,6 +187,32 @@ export class TestEditDialog implements OnInit{
 							vm.automatic = true;
 					}
 					break;
+				default :
+					if (vm.type=="3") {
+						if (filter.valueFrom) {
+							for (var i = vm.restrictions.length-1; i >= 0; --i) {
+								if (field==vm.restrictions[i].field) {
+									vm.restrictions[i].filter.valueFrom.constant = filter.valueFrom.constant;
+									if (filter.valueFrom.relativeUnit) {
+										vm.restrictions[i].filter.valueFrom.relativeUnit = filter.valueFrom.relativeUnit;
+										vm.restrictions[i].filter.valueFrom.testField = filter.valueFrom.testField;
+									}
+								}
+							}
+						}
+						if (filter.valueTo) {
+							for (var i = vm.restrictions.length-1; i >= 0; --i) {
+								if (field==vm.restrictions[i].field) {
+									vm.restrictions[i].filter.valueTo.constant = filter.valueTo.constant;
+									if (filter.valueTo.relativeUnit) {
+										vm.restrictions[i].filter.valueTo.relativeUnit = filter.valueTo.relativeUnit;
+										vm.restrictions[i].filter.valueTo.testField = filter.valueTo.testField;
+									}
+								}
+							}
+						}
+					}
+					break;
 			}
 
 		}
@@ -218,18 +222,9 @@ export class TestEditDialog implements OnInit{
 			vm.restriction = resultData.restriction.restriction;
 			vm.restrictionCount = resultData.restriction.count;
 			vm.fieldPrefix = resultData.restriction.prefix;
+			vm.fields = resultData.restriction.field;
 		}
 
-	}
-
-	getRuleName(ruleId : any) {
-		var vm = this;
-		for (var i = 0, len = vm.rules.length; i < len; i++) {
-			if (vm.rules[i].value == ruleId) {
-				return vm.rules[i].displayName;
-			}
-		}
-		return null;
 	}
 
 	formatDate(inputDate : Date) {
@@ -374,7 +369,6 @@ export class TestEditDialog implements OnInit{
 			switch(filter) {
 				case "date":
 					if (f.field=="EFFECTIVE_DATE") {
-						vm.testType = "";
 						vm.dateEditor = false;
 						vm.resultData.filter.splice(i, 1);
 						vm.datetype = "";
@@ -382,7 +376,6 @@ export class TestEditDialog implements OnInit{
 					break;
 				case "value":
 					if (f.field=="VALUE") {
-						vm.testType = "";
 						vm.resultData.filter.splice(i, 1);
 					}
 					break;
@@ -403,7 +396,7 @@ export class TestEditDialog implements OnInit{
 		return number + ""; // always return a string
 	}
 
-	testValueFromChange(value : any) {
+	filterValueFromChange(value : any, valueField : any, testField : any) {
 		var vm = this;
 
 		if (!value)
@@ -411,14 +404,14 @@ export class TestEditDialog implements OnInit{
 
 		var valueFrom : ValueFrom = {
 			constant: value,
-			testRuleId : "",
 			absoluteUnit: "NUMERIC",
 			relativeUnit: null,
-			operator: "GREATER_THAN_OR_EQUAL_TO"
+			operator: "GREATER_THAN_OR_EQUAL_TO",
+			testField: testField
 		}
 
 		var filter: Filter = {
-			field: "VALUE",
+			field: valueField,
 			valueFrom: valueFrom,
 			valueTo: null,
 			codeSet: null,
@@ -427,25 +420,20 @@ export class TestEditDialog implements OnInit{
 			negate: false
 		};
 
-		var foundEntry : boolean = false;
-
 		for (var i = 0; i < vm.resultData.filter.length; ++i) {
 			var flt = vm.resultData.filter[i];
 
-			if (flt.field=="VALUE" && flt.valueFrom && value!="") {
-				foundEntry = true;
-				filter.valueFrom = valueFrom;
-				break;
-			}
-			else if (flt.field=="VALUE" && flt.valueFrom && value=="")
+			if (flt.field==valueField && flt.valueFrom) {
 				vm.resultData.filter.splice(i, 1);
+			}
 		}
 
-		if (!foundEntry && value!="")
+		if (value!="")
 			vm.resultData.filter.push(filter);
+
 	}
 
-	testValueToChange(value : any) {
+	filterValueToChange(value : any, valueField : any, testField : any) {
 		var vm = this;
 
 		if (!value)
@@ -453,14 +441,14 @@ export class TestEditDialog implements OnInit{
 
 		var valueTo : ValueTo = {
 			constant: value,
-			testRuleId : "",
 			absoluteUnit: "NUMERIC",
 			relativeUnit: null,
-			operator: "LESS_THAN_OR_EQUAL_TO"
+			operator: "LESS_THAN_OR_EQUAL_TO",
+			testField: testField
 		}
 
 		var filter: Filter = {
-			field: "VALUE",
+			field: valueField,
 			valueFrom: null,
 			valueTo: valueTo,
 			codeSet: null,
@@ -469,22 +457,17 @@ export class TestEditDialog implements OnInit{
 			negate: false
 		};
 
-		var foundEntry : boolean = false;
-
 		for (var i = 0; i < vm.resultData.filter.length; ++i) {
 			var flt = vm.resultData.filter[i];
 
-			if (flt.field=="VALUE" && flt.valueTo && value!="") {
-				foundEntry = true;
-				filter.valueTo = valueTo;
-				break;
-			}
-			else if (flt.field=="VALUE" && flt.valueTo && value=="")
+			if (flt.field==valueField && flt.valueTo) {
 				vm.resultData.filter.splice(i, 1);
+			}
 		}
 
-		if (!foundEntry && value!="")
+		if (value!="")
 			vm.resultData.filter.push(filter);
+
 
 	}
 
@@ -499,10 +482,10 @@ export class TestEditDialog implements OnInit{
 
 		var valueFrom : ValueFrom = {
 			constant: datestring,
-			testRuleId : "",
 			absoluteUnit: "DATE",
 			relativeUnit: null,
-			operator: "GREATER_THAN_OR_EQUAL_TO"
+			operator: "GREATER_THAN_OR_EQUAL_TO",
+			testField: null
 		}
 
 		var filter: Filter = {
@@ -528,20 +511,18 @@ export class TestEditDialog implements OnInit{
 
 	}
 
-	filterRelativeDateFromChange(value : any, period : any, testDateFromRuleId : any) {
+	filterRelativeDateFromChange(value : any, period : any, dateField : any, testField : any) {
 		var vm = this;
 
 		if (!value)
 			value="";
 
-		var dateField : string = "EFFECTIVE_DATE";
-
 		var valueFrom : ValueFrom = {
 			constant: value,
-			testRuleId : testDateFromRuleId,
 			absoluteUnit: null,
 			relativeUnit: period,
-			operator: "GREATER_THAN_OR_EQUAL_TO"
+			operator: "GREATER_THAN_OR_EQUAL_TO",
+			testField: testField
 		}
 
 		var filter: Filter = {
@@ -579,10 +560,10 @@ export class TestEditDialog implements OnInit{
 
 		var valueTo : ValueTo = {
 			constant: datestring,
-			testRuleId : "",
 			absoluteUnit: "DATE",
 			relativeUnit: null,
-			operator: "LESS_THAN_OR_EQUAL_TO"
+			operator: "LESS_THAN_OR_EQUAL_TO",
+			testField: null
 		}
 
 		var filter: Filter = {
@@ -608,20 +589,18 @@ export class TestEditDialog implements OnInit{
 
 	}
 
-	filterRelativeDateToChange(value : any, period : any, testDateToRuleId : any) {
+	filterRelativeDateToChange(value : any, period : any, dateField : any, testField : any) {
 		var vm = this;
 
 		if (!value)
 			value="";
 
-		var dateField : string = "EFFECTIVE_DATE";
-
 		var valueTo : ValueTo = {
 			constant: value,
-			testRuleId : testDateToRuleId,
 			absoluteUnit: null,
 			relativeUnit: period,
-			operator: "LESS_THAN_OR_EQUAL_TO"
+			operator: "LESS_THAN_OR_EQUAL_TO",
+			testField: testField
 		}
 
 		var filter: Filter = {
@@ -693,15 +672,26 @@ export class TestEditDialog implements OnInit{
 	save() {
 		var vm = this;
 
+		if (vm.type=="3") {
+			for (var i = vm.restrictions.length-1; i >= 0; --i) {
+				var f = vm.restrictions[i].filter;
+				if (vm.restrictions[i].field.indexOf("DATE") >= 0) {
+					vm.filterRelativeDateFromChange(f.valueFrom.constant, f.valueFrom.relativeUnit, vm.restrictions[i].field, f.valueFrom.testField)
+					vm.filterRelativeDateToChange(f.valueTo.constant, f.valueTo.relativeUnit, vm.restrictions[i].field, f.valueTo.testField)
+				} else if (vm.restrictions[i].field.indexOf("VALUE") >= 0) {
+					vm.filterValueFromChange(f.valueFrom.constant, vm.restrictions[i].field, f.valueFrom.testField)
+					vm.filterValueToChange(f.valueTo.constant, vm.restrictions[i].field, f.valueTo.testField)
+				}
+			}
+		}
+
 		if (vm.datetype == 'absolute') {
 			vm.filterDateFromChange(vm.filterDateFrom);
 			vm.filterDateToChange(vm.filterDateTo);
 		} else if (vm.datetype == 'relative') {
-			vm.filterRelativeDateFromChange(vm.filterDateFromRelativeValue, vm.filterDateFromRelativePeriod, vm.testDateFromRuleId)
-			vm.filterRelativeDateToChange(vm.filterDateToRelativeValue, vm.filterDateToRelativePeriod, vm.testDateToRuleId)
+			vm.filterRelativeDateFromChange(vm.filterDateFromRelativeValue, vm.filterDateFromRelativePeriod,"EFFECTIVE_DATE", "")
+			vm.filterRelativeDateToChange(vm.filterDateToRelativeValue, vm.filterDateToRelativePeriod, "EFFECTIVE_DATE", "")
 		}
-
-		console.log(vm.resultData);
 
 		vm.removeAttributes("OBSERVATION_PROBLEM");
 		vm.removeAttributes("MEDICATION_STATUS");
@@ -727,10 +717,8 @@ export class TestEditDialog implements OnInit{
 		if (medTypes.length>0)
 			vm.filterValueChange(medTypes,"MEDICATION_TYPE");
 
-		if (vm.type=="3")
-			vm.resultData.testRuleId = vm.testRuleId;
-		else
-			vm.resultData.testRuleId = "";
+		console.log(vm.resultData);
+
 
 		this.ok();
 	}
@@ -789,13 +777,15 @@ export class TestEditDialog implements OnInit{
 			vm.resultData.filter.push(filter);
 	}
 
-	setSelectedFields(selectElement) {
+	setSelectedFields(option, event) {
 		var vm = this;
-		vm.fields = <any>[];
-		for (var i = 0; i < selectElement.options.length; i++) {
-			var optionElement = selectElement.options[i];
-			if (optionElement.selected) {
-				vm.fields.push(optionElement.value);
+
+		for (var i = 0; i < vm.keepFields.length; i++) {
+			if (event.target.checked&&vm.keepFields[i]==option){
+				vm.fields.push(vm.keepFields[i]);
+			} else if (!event.target.checked&&vm.keepFields[i]==option) {
+				let j = vm.fields.indexOf(option);
+				vm.fields.splice(j,1);
 			}
 		}
 		this.restrictionChange('1');

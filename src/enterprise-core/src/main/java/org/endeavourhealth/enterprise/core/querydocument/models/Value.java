@@ -36,9 +36,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "value", propOrder = {
     "constant",
-    "testRuleId",
     "absoluteUnit",
-    "relativeUnit"
+    "relativeUnit",
+    "testField"
 })
 @XmlSeeAlso({
     ValueTo.class,
@@ -48,12 +48,13 @@ public class Value {
 
     @XmlElement(required = true)
     protected String constant;
-    @XmlElement(required = true)
-    protected String testRuleId;
     @XmlSchemaType(name = "string")
     protected ValueAbsoluteUnit absoluteUnit;
     @XmlSchemaType(name = "string")
     protected ValueRelativeUnit relativeUnit;
+    @XmlSchemaType(name = "string")
+    protected String testField;
+
 
     /**
      * Gets the value of the constant property.
@@ -77,30 +78,6 @@ public class Value {
      */
     public void setConstant(String value) {
         this.constant = value;
-    }
-
-    /**
-     * Gets the value of the testRuleId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTestRuleId() {
-        return testRuleId;
-    }
-
-    /**
-     * Sets the value of the testRuleId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTestRuleId(String value) {
-        this.testRuleId = value;
     }
 
     /**
@@ -149,6 +126,14 @@ public class Value {
      */
     public void setRelativeUnit(ValueRelativeUnit value) {
         this.relativeUnit = value;
+    }
+
+    public String getTestField() {
+        return testField;
+    }
+
+    public void setTestField(String value) {
+        this.testField = value;
     }
 
 }

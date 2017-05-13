@@ -72,6 +72,10 @@ export class flowchart {
 			return this.data.test;
 		}
 
+		this.restriction = function () {
+			return this.data.test.restriction;
+		}
+
 		this.testLibraryItemUUID = function () {
 			return this.data.testLibraryItemUUID;
 		}

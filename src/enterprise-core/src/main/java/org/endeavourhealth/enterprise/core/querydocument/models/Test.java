@@ -32,40 +32,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "test", propOrder = {
-    "testRuleId",
     "filter",
     "restriction"
 })
 public class Test {
 
     @XmlElement(required = true)
-    protected String testRuleId;
     protected List<Filter> filter;
     protected Restriction restriction;
 
-    /**
-     * Gets the value of the testRuleId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTestRuleId() {
-        return testRuleId;
-    }
-
-    /**
-     * Sets the value of the testRuleId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTestRuleId(String value) {
-        this.testRuleId = value;
-    }
 
     /**
      * Gets the value of the filter property.

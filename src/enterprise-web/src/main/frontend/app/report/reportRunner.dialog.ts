@@ -92,8 +92,6 @@ export class ReportRunnerDialog implements OnInit {
 		vm.resultData.scheduled = vm.scheduled;
 		vm.resultData.scheduleDateTime = new Date(vm.scheduleDate + " " + vm.scheduleTime);
 
-		vm.logger.info("Schedule " + vm.resultData.scheduleDateTime);
-
 		this.ok();
 	}
 

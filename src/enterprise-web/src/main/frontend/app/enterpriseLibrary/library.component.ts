@@ -179,9 +179,17 @@ export class LibraryComponent {
 	executeReport(report : FolderItem, reportRun : ReportRun) {
 		let vm = this;
 		vm.logger.info("Running report " + report.name);
+		report.isRunning = true;
 		vm.reportService.runReport(reportRun).subscribe(
-			(result) => vm.logger.success("Report run"),
-			(error) => vm.logger.error("Report failed", error)
+			(result) => {
+				vm.logger.success("Report run");
+				report.lastRun = result;
+				report.isRunning = false;
+			},
+			(error) => {
+				vm.logger.error("Report failed", error);
+				report.isRunning = false;
+			}
 		);
 	}
 

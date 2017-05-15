@@ -63,10 +63,11 @@ CREATE TABLE enterprise_data_pseudonymised.`CohortPatients` (
   KEY `QueryItemUuid` (`QueryItemUuid`),
   KEY `OrganisationId` (`OrganisationId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
 CREATE TABLE enterprise_data_pseudonymised.`CohortResult` (
   `CohortResultId` int(11) NOT NULL AUTO_INCREMENT,
   `EndUserUuid` char(36) NOT NULL,
-  `BaselineDate` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `BaselineDate` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `RunDate` timestamp(3) NULL DEFAULT NULL,
   `OrganisationId` BIGINT(20) NOT NULL,
   `QueryItemUuid` char(36) NOT NULL,

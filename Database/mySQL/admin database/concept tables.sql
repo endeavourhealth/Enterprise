@@ -107,7 +107,7 @@ INSERT INTO `enterprise_data_pseudonymised`.`Concept`
 select s.concept_id,s.term,s3.code,'2',1,11,0,0 from enterprise_admin.snomed_lookup s
 join enterprise_admin.snomed s2 on s2.code = s.concept_id 
 join enterprise_admin.snomed_hier h on h.child_pid = s2.pid
-join enterprise_admin.snomed s3 on s3.pid = h.parent_pid
+join enterprise_admin.snomed s3 on s3.pid = h.parent_pid;
 
 update `enterprise_data_pseudonymised`.`Concept` c
 join enterprise_data_pseudonymised.observation o on o.snomed_concept_id = c.ConceptId

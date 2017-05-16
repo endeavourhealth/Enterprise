@@ -47,14 +47,19 @@ public enum PersistenceManager {
 
 		try {
 			JsonNode config = ConfigManager.getConfigurationAsJson(configId);
-			if (config.has("url"))
-				override.put("hibernate.connection.url", config.get("url").asText());
+
 			if (config.has("driverClass"))
 				override.put("hibernate.connection.driver_class", config.get("driverClass").asText());
-			if (config.has("username"))
-				override.put("hibernate.connection.username", config.get("username").asText());
-			if (config.has("password"))
-				override.put("hibernate.connection.password", config.get("password").asText());
+
+			if (config.has("enterprise_url"))
+				override.put("hibernate.connection.url", config.get("enterprise_url").asText());
+
+			if (config.has("enterprise_username"))
+				override.put("hibernate.connection.username", config.get("enterprise_username").asText());
+
+			if (config.has("enterprise_password"))
+				override.put("hibernate.connection.password", config.get("enterprise_password").asText());
+
 		} catch (Exception e) {
 			LOG.warn("Error loading config ["+configId+"]", e);
 		}

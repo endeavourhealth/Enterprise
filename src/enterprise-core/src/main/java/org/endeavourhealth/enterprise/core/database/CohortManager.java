@@ -318,8 +318,9 @@ public class CohortManager {
 
 	private static void buildEffectiveDateFilter(JsonCohortRun cohortRun, QueryMeta q, Filter filter) {
 		if (filter.getValueFrom() != null) {
-			String dateFrom = "-" + filter.getValueFrom().getConstant();
+			String dateFrom = filter.getValueFrom().getConstant();
 			if (filter.getValueFrom().getRelativeUnit() != null) {
+				dateFrom = "-" + dateFrom;
 				String relativeUnit = filter.getValueFrom().getRelativeUnit().value();
 				Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -334,6 +335,7 @@ public class CohortManager {
 		} else if (filter.getValueTo() != null) {
 			String dateTo = filter.getValueTo().getConstant();
 			if (filter.getValueTo().getRelativeUnit() != null) {
+				dateTo = "-" + dateTo;
 				String relativeUnit = filter.getValueTo().getRelativeUnit().value();
 				Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

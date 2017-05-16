@@ -485,7 +485,7 @@ export class TestEditDialog implements OnInit{
 			absoluteUnit: "DATE",
 			relativeUnit: null,
 			operator: "GREATER_THAN_OR_EQUAL_TO",
-			testField: null
+			testField: ""
 		}
 
 		var filter: Filter = {
@@ -563,7 +563,7 @@ export class TestEditDialog implements OnInit{
 			absoluteUnit: "DATE",
 			relativeUnit: null,
 			operator: "LESS_THAN_OR_EQUAL_TO",
-			testField: null
+			testField: ""
 		}
 
 		var filter: Filter = {

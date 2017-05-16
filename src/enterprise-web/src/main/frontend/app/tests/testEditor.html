@@ -191,12 +191,12 @@
 					<p class="input-group" *ngIf="datetype == 'absolute'">
 						<input type="date" class="form-control" [(ngModel)]="filterDateFrom" name="dateFrom">
 					</p>
-					<span *ngIf="datetype == 'relative'">Greater Than or Equal To:</span>
+					<span *ngIf="datetype == 'relative'">Within:</span>
 					<p class="input-group" *ngIf="datetype == 'relative'">
 						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateFromRelativeValue" name="dateFromRelativeValue">
 						<select class="form-control" style="width:100px" [(ngModel)]="filterDateFromRelativePeriod" name="dateFromRelativePeriod">
 							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;after the baseline date
+						</select>&nbsp;&nbsp;of the baseline date
 					</p>
 				</div>
 			</div>
@@ -206,12 +206,12 @@
 					<p class="input-group" *ngIf="datetype == 'absolute'">
 						<input type="date" class="form-control" [(ngModel)]="filterDateTo" name="dateTo">
 					</p>
-					<span *ngIf="datetype == 'relative'">Less Than or Equal To:</span>
+					<span *ngIf="datetype == 'relative'">More Than or Equal To:</span>
 					<p class="input-group" *ngIf="datetype == 'relative'">
 						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateToRelativeValue" name="dateToRelativeValue">
 						<select class="form-control" style="width:100px" [(ngModel)]="filterDateToRelativePeriod" name="dateToRelativePeriod">
 							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;before the baseline date
+						</select>&nbsp;&nbsp;of the baseline date
 					</p>
 				</div>
 			</div>

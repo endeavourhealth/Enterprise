@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.core.database;
 
+import org.endeavourhealth.common.cache.ObjectMapperPool;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.*;
 import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
@@ -20,7 +21,32 @@ import java.util.stream.Collectors;
 public class ReportManager {
 	private static final Logger LOG = LoggerFactory.getLogger(ReportManager.class);
 
-	public static Timestamp run(String userUuid, JsonReportRun reportRun, LibraryItem reportItem) throws Exception {
+	public static Timestamp runLater(String userUuid, JsonReportRun reportRun, LibraryItem reportItem) throws Exception {
+		Timestamp runDate = new Timestamp(reportRun.getScheduleDateTime().getTime());
+		LOG.info("Scheduling report " + reportItem.getName() + " at " + reportRun.getScheduleDateTime().toString());
+
+		String reportRunJson = ObjectMapperPool.getInstance().writeValueAsString(reportRun);
+
+		ReportScheduleEntity reportSchedule = new ReportScheduleEntity()
+				.setScheduledAt(runDate)
+				.setEndUserUuid(userUuid)
+				.setReportItemUuid(reportItem.getUuid())
+				.setReportRunParams(reportRunJson);
+
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+		entityManager.getTransaction().begin();
+
+		reportSchedule = entityManager.merge(reportSchedule);
+
+		entityManager.getTransaction().commit();
+		entityManager.close();
+
+		LOG.info("Report Schedule " + reportSchedule.getReportScheduleId() + " Saved.");
+
+		return runDate;
+	}
+
+	public static Timestamp runNow(String userUuid, JsonReportRun reportRun, LibraryItem reportItem) throws Exception {
 		LOG.info("Running report " + reportItem.getName());
 
 		Timestamp runDate = new Timestamp(System.currentTimeMillis());

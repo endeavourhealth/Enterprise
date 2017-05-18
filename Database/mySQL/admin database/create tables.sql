@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS enterprise_admin.ItemDependency;
 DROP TABLE IF EXISTS enterprise_admin.ItemType;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortPatients;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortResult;
+DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportSchedule;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResult;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultQuery;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultOrganisation;
@@ -109,3 +110,14 @@ CREATE TABLE enterprise_data_pseudonymised.ReportResultOrganisation (
 	ReportResultId int(11) NOT NULL,
     OrganisationId bigint(20) NOT NULL
 );
+
+CREATE TABLE enterprise_data_pseudonymised.ReportSchedule (
+    ReportScheduleId int(11) NOT NULL AUTO_INCREMENT,
+    ScheduledAt timestamp NOT NULL,
+    EndUserUuid char(36) NOT NULL,
+    ReportItemUuid char(36) NOT NULL,
+    ReportRunParams text NOT NULL,
+    ReportResultId int (11) NULL DEFAULT NULL,
+    PRIMARY KEY (`ReportScheduleId`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+

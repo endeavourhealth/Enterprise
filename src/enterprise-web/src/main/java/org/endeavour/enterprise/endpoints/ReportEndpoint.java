@@ -37,7 +37,11 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
-		Timestamp runDate = ReportManager.run(userUuid, report, libraryItem);
+		Timestamp runDate = null;
+		if (report.getScheduled())
+			runDate = ReportManager.runLater(userUuid, report, libraryItem);
+		else
+			runDate = ReportManager.runNow(userUuid, report, libraryItem);
 
 		clearLogbackMarkers();
 

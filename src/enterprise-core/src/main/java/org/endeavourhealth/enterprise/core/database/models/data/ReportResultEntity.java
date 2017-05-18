@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "ReportResult", schema = "enterprise_data_pseudonymised", catalog = "")
 public class ReportResultEntity {
-	private int reportResultId;
+	private long reportResultId;
 	private String endUserUuid;
 	private String reportItemUuid;
 	private Timestamp runDate;
@@ -14,11 +14,11 @@ public class ReportResultEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ReportResultId", nullable = false)
-	public int getReportResultId() {
+	public long getReportResultId() {
 		return reportResultId;
 	}
 
-	public ReportResultEntity setReportResultId(int reportResultId) {
+	public ReportResultEntity setReportResultId(long reportResultId) {
 		this.reportResultId = reportResultId;
 		return this;
 	}
@@ -74,7 +74,7 @@ public class ReportResultEntity {
 
 	@Override
 	public int hashCode() {
-		int result = reportResultId;
+		int result = (int) (reportResultId ^ (reportResultId >>> 32));
 		result = 31 * result + (endUserUuid != null ? endUserUuid.hashCode() : 0);
 		result = 31 * result + (runDate != null ? runDate.hashCode() : 0);
 		result = 31 * result + (reportItemUuid != null ? reportItemUuid.hashCode() : 0);

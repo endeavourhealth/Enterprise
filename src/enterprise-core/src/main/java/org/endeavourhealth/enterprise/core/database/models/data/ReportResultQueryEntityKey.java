@@ -7,16 +7,16 @@ import java.io.Serializable;
 
 @Embeddable
 public class ReportResultQueryEntityKey implements Serializable {
-	private int reportResultId;
+	private long reportResultId;
 	private String queryItemUuid;
 
 	@Basic
 	@Column(name = "ReportResultId", nullable = false)
-	public int getReportResultId() {
+	public long getReportResultId() {
 		return reportResultId;
 	}
 
-	public ReportResultQueryEntityKey setReportResultId(int reportResultId) {
+	public ReportResultQueryEntityKey setReportResultId(long reportResultId) {
 		this.reportResultId = reportResultId;
 		return this;
 	}
@@ -48,7 +48,7 @@ public class ReportResultQueryEntityKey implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int result = reportResultId;
+		int result = (int) (reportResultId ^ (reportResultId >>> 32));
 		result = 31 * result + (queryItemUuid != null ? queryItemUuid.hashCode() : 0);
 		return result;
 	}

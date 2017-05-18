@@ -8,16 +8,16 @@ import java.io.Serializable;
 @Embeddable
 public class ReportResultOrganisationEntityKey implements Serializable {
 
-	private int reportResultId;
+	private long reportResultId;
 	private long organisationId;
 
 	@Basic
 	@Column(name = "ReportResultId", nullable = false)
-	public int getReportResultId() {
+	public long getReportResultId() {
 		return reportResultId;
 	}
 
-	public ReportResultOrganisationEntityKey setReportResultId(int reportResultId) {
+	public ReportResultOrganisationEntityKey setReportResultId(long reportResultId) {
 		this.reportResultId = reportResultId;
 		return this;
 	}
@@ -48,7 +48,7 @@ public class ReportResultOrganisationEntityKey implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int result = reportResultId;
+		int result = (int) (reportResultId ^ (reportResultId >>> 32));
 		result = 31 * result + (int) (organisationId ^ (organisationId >>> 32));
 		return result;
 	}

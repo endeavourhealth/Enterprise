@@ -95,6 +95,12 @@ export class ReportRunnerDialog implements OnInit {
 		this.ok();
 	}
 
+	getRunCaption() {
+		if (this.scheduled)
+			return 'Schedule';
+		return 'Run now';
+	}
+
 	ok() {
 		this.$uibModalInstance.close(this.resultData);
 	}

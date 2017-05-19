@@ -7,8 +7,7 @@ import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
 import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
-import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
-import org.endeavourhealth.enterprise.core.querydocument.models.ReportCohortFeature;
+import org.endeavourhealth.enterprise.core.querydocument.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ReportManager {
@@ -163,6 +163,18 @@ public class ReportManager {
 		String featureXml = featureEntity.getXmlContent();
 		LibraryItem featureItem = QueryDocumentSerializer.readLibraryItemFromXml(featureXml);
 
+			Optional<Rule> rule = featureItem.getQuery().getRule().stream()
+						.filter(ReportManager::isEndRule)
+						.filter(ReportManager::hasReportFields)
+						.findFirst();
+
+			if (rule.isPresent()) {
+				String reportFields = String.join(", ", rule.get().getTest().getRestriction().getField());
+				LOG.debug("Cohort   : " + featureItem.getName());
+				LOG.debug("End rule : " + rule.get().getDescription());
+				LOG.debug("Fields   : " + reportFields);
+			}
+
 		JsonCohortRun featureRun = new JsonCohortRun();
 		featureRun.setBaselineDate(reportRun.getBaselineDate());
 		featureRun.setOrganisation(reportRun.getOrganisation());
@@ -170,6 +182,32 @@ public class ReportManager {
 		featureRun.setQueryItemUuid(feature.getCohortFeatureUuid());
 
 		CohortManager.runCohort(featureItem, featureRun, userUuid, runDate);
+	}
+
+	private static boolean isEndRule(Rule rule) {
+		if (rule.getOnPass().getAction() == RuleActionOperator.INCLUDE
+				&& (rule.getOnPass().getRuleId() == null || rule.getOnPass().getRuleId().size() == 0))
+			return true;
+
+		if (rule.getOnFail().getAction() == RuleActionOperator.INCLUDE
+				&& (rule.getOnFail().getRuleId() == null || rule.getOnFail().getRuleId().size() == 0))
+			return true;
+
+		return false;
+	}
+
+	private static boolean hasReportFields(Rule rule) {
+		if (rule.getTest() == null)
+			return false;
+
+		Restriction restriction = rule.getTest().getRestriction();
+		if (restriction == null)
+			return false;
+
+		if (restriction.getField() == null || restriction.getField().size() == 0)
+			return false;
+
+		return true;
 	}
 
 	private static void saveReport(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws Exception {

@@ -5,6 +5,8 @@ import {Organisation} from "./models/Organisation";
 import {LoggerService} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {CohortService} from "../cohort/cohort.service";
+import {QueryPickerDialog} from "../query/queryPicker.dialog";
+import {QuerySelection} from "../query/models/QuerySelection";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -26,6 +28,7 @@ export class ReportRunnerDialog implements OnInit {
 	organisation: Organisation = <any>[];
 	population: string = "";
 	baselineDate: string = "";
+	baselineCohort : QuerySelection;
 	queryItemUuid: string = "";
 	scheduled: boolean=false;
 	scheduleDate: string = "";
@@ -39,12 +42,14 @@ export class ReportRunnerDialog implements OnInit {
 	populations = [
 		{id: -1, type: ''},
 		{id: 0, type: 'Currently registered'},
-		{id: 1, type: 'All patients'}
+		{id: 1, type: 'All patients'},
+		{id: 2, type: 'Cohort'}
 	];
 
 	organisations = <any>[];
 
 	constructor(protected cohortService: CohortService,
+							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
 
@@ -63,27 +68,28 @@ export class ReportRunnerDialog implements OnInit {
 	setSelectedOrganisations(selectElement) {
 		var vm = this;
 		vm.resultData.organisation = <any>[];
-		for (var i = 0; i < selectElement.options.length; i++) {
-			var optionElement = selectElement.options[i];
-			if (optionElement.selected) {
-				let org = {
-					id: optionElement.value,
-					name: optionElement.text
-				};
-				vm.resultData.organisation.push(org);
-			}
+		for (let optionElement of selectElement.selectedOptions) {
+			let org = {
+				id: optionElement.value,
+				name: optionElement.text
+			};
+			vm.resultData.organisation.push(org);
 		}
 	}
 
 	setSelectedPopulation(selectElement) {
 		var vm = this;
 		vm.resultData.population = "";
-		for (var i = 0; i < selectElement.options.length; i++) {
-			var optionElement = selectElement.options[i];
-			if (optionElement.selected) {
-				vm.resultData.population = optionElement.value;
-			}
-		}
+		if (selectElement.selectedOptions.length > 0)
+			vm.resultData.population = selectElement.selectedOptions[0].value;
+	}
+
+	pickBaselineCohort() {
+		let vm = this;
+		QueryPickerDialog.open(this.$modal, null)
+			.result.then(function (resultData: QuerySelection) {
+				vm.baselineCohort = resultData;
+		});
 	}
 
 	save() {
@@ -91,6 +97,8 @@ export class ReportRunnerDialog implements OnInit {
 		vm.resultData.baselineDate = vm.baselineDate;
 		vm.resultData.scheduled = vm.scheduled;
 		vm.resultData.scheduleDateTime = new Date(vm.scheduleDate + " " + vm.scheduleTime);
+		if (vm.resultData.population == 2)
+			vm.resultData.baselineCohort = vm.baselineCohort.id;
 
 		this.ok();
 	}

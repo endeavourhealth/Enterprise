@@ -164,7 +164,8 @@ export class LibraryComponent {
 			baselineDate: "",
 			reportItemUuid: item.uuid,
 			scheduled: false,
-			scheduleDateTime: null
+			scheduleDateTime: null,
+			baselineCohortId : null
 		};
 
 		let vm = this;

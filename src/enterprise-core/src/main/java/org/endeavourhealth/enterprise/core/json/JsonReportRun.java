@@ -9,50 +9,51 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonReportRun {
 
-    private List<JsonOrganisation> organisation = new ArrayList<>();
-    private String population = null;
-    private String baselineDate = null;
-    private String reportItemUuid = null;
-    private Boolean scheduled = false;
-    private Date scheduleDateTime = null;
+	private List<JsonOrganisation> organisation = new ArrayList<>();
+	private String population = null;
+	private String baselineCohortId = null;
+	private String baselineDate = null;
+	private String reportItemUuid = null;
+	private Boolean scheduled = false;
+	private Date scheduleDateTime = null;
 
-    public JsonReportRun() {
-    }
+	public JsonReportRun() {
+	}
 
-    /**
-     * gets/sets
-     */
-    public List<JsonOrganisation> getOrganisation() {
-        return organisation;
-    }
+	/**
+	 * gets/sets
+	 */
+	public List<JsonOrganisation> getOrganisation() {
+		return organisation;
+	}
 
-    public void setOrganisation(List<JsonOrganisation> organisation) {
-        this.organisation = organisation;
-    }
+	public void setOrganisation(List<JsonOrganisation> organisation) {
+		this.organisation = organisation;
+	}
 
-    public String getPopulation() {
-        return population;
-    }
+	public String getPopulation() {
+		return population;
+	}
 
-    public void setPopulation(String population) {
-        this.population = population;
-    }
+	public void setPopulation(String population) {
+		this.population = population;
+	}
 
-    public String getBaselineDate() {
-        return baselineDate;
-    }
+	public String getBaselineDate() {
+		return baselineDate;
+	}
 
-    public void setBaselineDate(String baselineDate) {
-        this.baselineDate = baselineDate;
-    }
+	public void setBaselineDate(String baselineDate) {
+		this.baselineDate = baselineDate;
+	}
 
-    public String getReportItemUuid() {
-        return reportItemUuid;
-    }
+	public String getReportItemUuid() {
+		return reportItemUuid;
+	}
 
-    public void setReportItemUuid(String queryItemUuid) {
-        this.reportItemUuid = queryItemUuid;
-    }
+	public void setReportItemUuid(String queryItemUuid) {
+		this.reportItemUuid = queryItemUuid;
+	}
 
 
 	public Date getScheduleDateTime() {
@@ -69,5 +70,9 @@ public final class JsonReportRun {
 
 	public void setScheduled(Boolean scheduled) {
 		this.scheduled = scheduled;
+	}
+
+	public String getBaselineCohortId() {
+		return baselineCohortId;
 	}
 }

@@ -51,8 +51,14 @@ public class ReportManager {
 
 		Timestamp runDate = new Timestamp(System.currentTimeMillis());
 
-		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature())
-			runCohort(userUuid, reportRun, feature, runDate);
+		// Run the baseline cohort if one has been defined
+		if (reportRun.getBaselineCohortId() != null)
+			runCohort(userUuid, reportRun, reportRun.getBaselineCohortId(), runDate, null);
+
+		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature()) {
+			LOG.info("Running report feature " + feature.getFieldName());
+			runCohort(userUuid, reportRun, feature.getCohortFeatureUuid(), runDate, reportRun.getBaselineCohortId());
+		}
 
 		saveReport(userUuid, reportRun, reportItem, runDate);
 
@@ -157,31 +163,30 @@ public class ReportManager {
 		return results;
 	}
 
-	private static void runCohort(String userUuid, JsonReportRun reportRun, ReportCohortFeature feature, Timestamp runDate) throws Exception {
-		LOG.info("Running report feature " + feature.getFieldName());
-		ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(feature.getCohortFeatureUuid());
+	private static void runCohort(String userUuid, JsonReportRun reportRun, String featureUuid, Timestamp runDate, String baselineCohortId) throws Exception {
+		ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(featureUuid);
 		String featureXml = featureEntity.getXmlContent();
 		LibraryItem featureItem = QueryDocumentSerializer.readLibraryItemFromXml(featureXml);
 
-			Optional<Rule> rule = featureItem.getQuery().getRule().stream()
-						.filter(ReportManager::isEndRule)
-						.filter(ReportManager::hasReportFields)
-						.findFirst();
+		Optional<Rule> rule = featureItem.getQuery().getRule().stream()
+				.filter(ReportManager::isEndRule)
+				.filter(ReportManager::hasReportFields)
+				.findFirst();
 
-			if (rule.isPresent()) {
-				String reportFields = String.join(", ", rule.get().getTest().getRestriction().getField());
-				LOG.debug("Cohort   : " + featureItem.getName());
-				LOG.debug("End rule : " + rule.get().getDescription());
-				LOG.debug("Fields   : " + reportFields);
-			}
+		if (rule.isPresent()) {
+			String reportFields = String.join(", ", rule.get().getTest().getRestriction().getField());
+			LOG.debug("Cohort   : " + featureItem.getName());
+			LOG.debug("End rule : " + rule.get().getDescription());
+			LOG.debug("Fields   : " + reportFields);
+		}
 
 		JsonCohortRun featureRun = new JsonCohortRun();
 		featureRun.setBaselineDate(reportRun.getBaselineDate());
 		featureRun.setOrganisation(reportRun.getOrganisation());
 		featureRun.setPopulation(reportRun.getPopulation());
-		featureRun.setQueryItemUuid(feature.getCohortFeatureUuid());
+		featureRun.setQueryItemUuid(featureUuid);
 
-		CohortManager.runCohort(featureItem, featureRun, userUuid, runDate);
+		CohortManager.runCohort(featureItem, featureRun, userUuid, runDate, baselineCohortId);
 	}
 
 	private static boolean isEndRule(Rule rule) {

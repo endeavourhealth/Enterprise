@@ -24,10 +24,11 @@
 							<option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
 						</select>
 					</div>
-					<div class="form-group col-md-12" *ngIf="resultData.population == 2">
-						<label>Baseline Cohort: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ bcTT }}"></span>
+					<div class="form-group col-md-12">
+						<label>Restrictive Cohort: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ bcTT }}"></span>
 						<div class="input-group">
 							<input type="text" class="form-control" id="baselineCohort" name="baselineCohort" readonly [ngModel]="baselineCohort?.name">
+							<span class="input-group-addon" (click)="baselineCohort = null"><i class="fa fa-times" id="clearBaselineCohort" aria-hidden="true"></i></span>
 							<span class="input-group-addon" (click)="pickBaselineCohort()"><i class="fa fa-search" id="pickBaselineCohort" aria-hidden="true"></i></span>
 						</div>
 					</div>

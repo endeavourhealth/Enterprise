@@ -194,11 +194,6 @@ export class LibraryComponent {
 		);
 	}
 
-	scheduleReport(item: FolderItem) {
-		let vm = this;
-		MessageBoxDialog.open(vm.$modal, "Run Report", "Schedule report", "Yes", "No");
-	}
-
 	saveState() {
 		var state = {
 			selectedFolder: this.selectedFolder,

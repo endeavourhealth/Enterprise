@@ -38,12 +38,12 @@ export class ReportRunnerDialog implements OnInit {
 	ppTT: string = "Please select a patient population as the denominator.";
 	rdTT: string = "Please specify a baseline date. i.e. patients registered on or before that date.";
 	srTT: string = "Please specify an execution date/time.";
+	bcTT: string = "[Optional] restrict patient population by a cohort definition.";
 
 	populations = [
 		{id: -1, type: ''},
 		{id: 0, type: 'Currently registered'},
 		{id: 1, type: 'All patients'},
-		{id: 2, type: 'Cohort'}
 	];
 
 	organisations = <any>[];
@@ -52,7 +52,6 @@ export class ReportRunnerDialog implements OnInit {
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
-
 	}
 
 	ngOnInit(): void {
@@ -97,8 +96,8 @@ export class ReportRunnerDialog implements OnInit {
 		vm.resultData.baselineDate = vm.baselineDate;
 		vm.resultData.scheduled = vm.scheduled;
 		vm.resultData.scheduleDateTime = new Date(vm.scheduleDate + " " + vm.scheduleTime);
-		if (vm.resultData.population == 2)
-			vm.resultData.baselineCohort = vm.baselineCohort.id;
+		if (vm.baselineCohort)
+			vm.resultData.baselineCohortId = vm.baselineCohort.id;
 
 		this.ok();
 	}

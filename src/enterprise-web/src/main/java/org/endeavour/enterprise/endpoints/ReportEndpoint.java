@@ -39,9 +39,9 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 
 		Timestamp runDate = null;
 		if (report.getScheduled())
-			runDate = ReportManager.runLater(userUuid, report, libraryItem);
+			runDate = new ReportManager().runLater(userUuid, report, libraryItem);
 		else
-			runDate = ReportManager.runNow(userUuid, report, libraryItem);
+			runDate = new ReportManager().runNow(userUuid, report, libraryItem);
 
 		clearLogbackMarkers();
 
@@ -58,7 +58,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 	public Response reportResult(@Context SecurityContext sc, @QueryParam("reportItemUuid") String reportItemUuid) {
 		super.setLogbackMarkers(sc);
 
-		List<ReportResultEntity> reportResultEntityList = ReportManager.getReportResultList(reportItemUuid);
+		List<ReportResultEntity> reportResultEntityList = new ReportManager().getReportResultList(reportItemUuid);
 
 		for (ReportResultEntity reportResult : reportResultEntityList) {
 			LOG.info("Result Id : " + reportResult.getReportResultId());

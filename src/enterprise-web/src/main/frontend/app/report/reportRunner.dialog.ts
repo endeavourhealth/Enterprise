@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {ReportRun} from "./models/ReportRun";
 import {Organisation} from "./models/Organisation";
-import {LoggerService} from "eds-common-js";
+import {LoggerService, MessageBoxDialog} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {CohortService} from "../cohort/cohort.service";
 import {QueryPickerDialog} from "../query/queryPicker.dialog";
@@ -86,9 +86,7 @@ export class ReportRunnerDialog implements OnInit {
 	pickBaselineCohort() {
 		let vm = this;
 		QueryPickerDialog.open(this.$modal, null)
-			.result.then(function (resultData: QuerySelection) {
-				vm.baselineCohort = resultData;
-		});
+			.result.then((resultData: QuerySelection) => vm.baselineCohort = resultData);
 	}
 
 	save() {
@@ -108,8 +106,17 @@ export class ReportRunnerDialog implements OnInit {
 		return 'Run now';
 	}
 
+	confirmReportRunWithoutRestrictiveCohort() {
+		let vm = this;
+		MessageBoxDialog.open(vm.$modal, "Confirm report", "Not specifying a restrictive cohort may result in long run times.  Continue?", "Yes", "No")
+			.result.then(() => vm.$uibModalInstance.close(vm.resultData));
+	}
+
 	ok() {
-		this.$uibModalInstance.close(this.resultData);
+		if (this.baselineCohort)
+			this.$uibModalInstance.close(this.resultData);
+		else
+			this.confirmReportRunWithoutRestrictiveCohort();
 	}
 
 	cancel() {

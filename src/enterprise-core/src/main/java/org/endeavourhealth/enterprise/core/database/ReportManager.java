@@ -16,7 +16,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -122,7 +124,50 @@ public class ReportManager {
 	}
 
 	private List<Object[]> loadReportResults(List<String> cohortFeatureUuids, List<String> orgIds, JsonReportRun reportRun, Timestamp runDate) {
+		Map<String, List<String>> cohortFields = getCohortFieldMap(cohortFeatureUuids);
 
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+		Query query = buildReportResultsLoaderQuery(cohortFeatureUuids, orgIds, reportRun, entityManager);
+
+		setReportResultsLoaderParams(cohortFeatureUuids, reportRun, runDate, query);
+
+		List<Object[]> results = query.getResultList();
+
+//		i = 0;
+//		for (Object[] row : results) {
+//			String rowData = i.toString();
+//			for (Object field : row) {
+//				if (field != null)
+//					rowData += ", " + field.toString();
+//				else
+//					rowData += ", [null]";
+//			}
+//			LOG.info(rowData);
+//			i++;
+//		}
+
+		entityManager.close();
+
+		return results;
+	}
+
+	private void setReportResultsLoaderParams(List<String> cohortFeatureUuids, JsonReportRun reportRun, Timestamp runDate, Query query) {
+		query.setParameter("runDate" , runDate);
+		if (reportRun.getBaselineCohortId() != null)
+			query.setParameter("baselineCohortId", reportRun.getBaselineCohortId());
+		else
+			query.setParameter("baseline", reportRun.getBaselineDate());
+
+		Integer i = 0;
+		for (String featureUuid : cohortFeatureUuids) {
+			query.setParameter("runDate"+i.toString(), runDate);
+			query.setParameter("queryUuid"+i.toString(), featureUuid);
+			i++;
+		}
+	}
+
+	private Query buildReportResultsLoaderQuery(List<String> cohortFeatureUuids, List<String> orgIds, JsonReportRun reportRun, EntityManager entityManager) {
 		String select = " SELECT p.pseudoId, p.organizationId ";
 		String from = " FROM PatientEntity p ";
 		String where = "";
@@ -155,40 +200,33 @@ public class ReportManager {
 			from += " AND " + alias + ".runDate = :runDate"+i.toString();
 		}
 
-		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-		Query query = entityManager.createQuery(select + from + where);
+		return entityManager.createQuery(select + from + where);
+	}
 
-		query.setParameter("runDate" , runDate);
-		if (reportRun.getBaselineCohortId() != null)
-			query.setParameter("baselineCohortId", reportRun.getBaselineCohortId());
-		else
-			query.setParameter("baseline", reportRun.getBaselineDate());
+	private Map<String, List<String>> getCohortFieldMap(List<String> cohortFeatureUuids) {
+		Map<String, List<String>> cohortFieldMap = new HashMap<>();
 
-		Integer i = 0;
-		for (String featureUuid : cohortFeatureUuids) {
-			query.setParameter("runDate"+i.toString(), runDate);
-			query.setParameter("queryUuid"+i.toString(), featureUuid);
-			i++;
+		for (String cohortFeatureUuid : cohortFeatureUuids) {
+			try {
+				ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(cohortFeatureUuid);
+				String featureXml = featureEntity.getXmlContent();
+				LibraryItem featureItem = QueryDocumentSerializer.readLibraryItemFromXml(featureXml);
+
+				Optional<Rule> rule = featureItem.getQuery().getRule().stream()
+						.filter(this::isEndRule)
+						.filter(this::hasReportFields)
+						.findFirst();
+
+				if (rule.isPresent())
+					cohortFieldMap.put(cohortFeatureUuid, rule.get().getTest().getRestriction().getField());
+
+			} catch (Exception e) {
+				LOG.error("Could not retrieve feature " + cohortFeatureUuid);
+			}
+
 		}
 
-		List<Object[]> results = query.getResultList();
-
-//		i = 0;
-//		for (Object[] row : results) {
-//			String rowData = i.toString();
-//			for (Object field : row) {
-//				if (field != null)
-//					rowData += ", " + field.toString();
-//				else
-//					rowData += ", [null]";
-//			}
-//			LOG.info(rowData);
-//			i++;
-//		}
-
-		entityManager.close();
-
-		return results;
+		return cohortFieldMap;
 	}
 
 	private void runCohort(String userUuid, JsonReportRun reportRun, String featureUuid, Timestamp runDate, String baselineCohortId) throws Exception {

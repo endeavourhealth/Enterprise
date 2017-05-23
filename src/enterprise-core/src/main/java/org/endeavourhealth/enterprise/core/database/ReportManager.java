@@ -97,8 +97,10 @@ public class ReportManager {
 				.setParameter("reportResultId", reportResultId)
 				.getSingleResult();
 
-		if (reportResult == null)
-			LOG.error("No report found with id " + reportResultId);
+		if (reportResult == null || reportResult.getReportRunParams() == null) {
+			LOG.error("Error loading report id " + reportResultId);
+			return null;
+		}
 
 		JsonReportRun reportRun = ObjectMapperPool.getInstance().readValue(reportResult.getReportRunParams(), JsonReportRun.class);
 
@@ -128,7 +130,7 @@ public class ReportManager {
 
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-		Query query = buildReportResultsLoaderQuery(cohortFeatureUuids, orgIds, reportRun, entityManager);
+		Query query = buildReportResultsLoaderQuery(cohortFeatureUuids, orgIds, reportRun, entityManager, cohortFields);
 
 		setReportResultsLoaderParams(cohortFeatureUuids, reportRun, runDate, query);
 
@@ -167,7 +169,7 @@ public class ReportManager {
 		}
 	}
 
-	private Query buildReportResultsLoaderQuery(List<String> cohortFeatureUuids, List<String> orgIds, JsonReportRun reportRun, EntityManager entityManager) {
+	private Query buildReportResultsLoaderQuery(List<String> cohortFeatureUuids, List<String> orgIds, JsonReportRun reportRun, EntityManager entityManager, Map<String, List<String>> cohortFieldMap) {
 		String select = " SELECT p.pseudoId, p.organizationId ";
 		String from = " FROM PatientEntity p ";
 		String where = "";
@@ -190,17 +192,31 @@ public class ReportManager {
 					"and p.organizationId IN (" + String.join(",", orgIds) + ") ";
 		}
 
-		for (Integer i = 0; i < cohortFeatureUuids.size(); i++) {
+		Integer i = 0;
+		for (String cohortFeatureUuid : cohortFeatureUuids) {
 			String alias = "field"+i.toString(); // TODO : feature.getFieldName();
-			select += ", " +alias + ".patientId";		// TODO : Select additional data fields
+			List<String> cohortFields = cohortFieldMap.get(cohortFeatureUuid);
+			select += getCohortFieldsSelect(alias, cohortFields);
 			from += " LEFT OUTER JOIN CohortPatientsEntity " + alias;
 			from += " ON " + alias + ".patientId = p.id";
 			from += " AND " + alias + ".organisationId = p.organizationId ";
 			from += " AND " + alias + ".queryItemUuid = :queryUuid"+i.toString();
 			from += " AND " + alias + ".runDate = :runDate"+i.toString();
+			from += getCohortFieldsAdditionalJoins(alias, cohortFields);
+			i++;
 		}
 
 		return entityManager.createQuery(select + from + where);
+	}
+
+	private String getCohortFieldsSelect(String alias, List<String> cohortFields) {
+		// TODO : Determine additional select db fields based on "KEEP" field tags
+		return ", " +alias + ".patientId";
+	}
+
+	private String getCohortFieldsAdditionalJoins(String alias, List<String> cohortFields) {
+		// TODO : Determine additional join tables based on "KEEP" field tags
+		return "";
 	}
 
 	private Map<String, List<String>> getCohortFieldMap(List<String> cohortFeatureUuids) {

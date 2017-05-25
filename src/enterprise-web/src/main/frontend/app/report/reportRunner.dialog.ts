@@ -89,7 +89,7 @@ export class ReportRunnerDialog implements OnInit {
 			.result.then((resultData: QuerySelection) => vm.baselineCohort = resultData);
 	}
 
-	save() {
+	run() {
 		var vm = this;
 		vm.resultData.baselineDate = vm.baselineDate;
 		vm.resultData.scheduled = vm.scheduled;

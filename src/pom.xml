@@ -14,7 +14,7 @@
         <node.version>v5.5.0</node.version>
         <npm.version>3.3.12</npm.version>
         <maven.compiler.version>3.1</maven.compiler.version>
-        <eds-common.version>2.78</eds-common.version>
+        <eds-common.version>2.83-SNAPSHOT</eds-common.version>
 
 
         <amqp-client.version>3.6.2</amqp-client.version>
@@ -45,13 +45,6 @@
         <servlet.version>3.1.0</servlet.version>
         <swagger.version>1.5.10</swagger.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
 
     <modules>
         <module>enterprise-core</module>

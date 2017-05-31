@@ -8,6 +8,7 @@ import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.Query;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +41,10 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 		Timestamp runDate = null;
 		if (report.getScheduled())
 			runDate = new ReportManager().runLater(userUuid, report, libraryItem);
-		else
-			runDate = new ReportManager().runNow(userUuid, report, libraryItem);
+		else {
+			runDate = new Timestamp(System.currentTimeMillis());
+			new ReportManager().runNow(userUuid, report, libraryItem, runDate);
+		}
 
 		clearLogbackMarkers();
 

@@ -9,7 +9,7 @@ public class ScheduledTask {
 	private TimerTask task;
 	private long intevalInSeconds;
 
-	public ScheduledTask(String name, long intervalInSeconds, TimerTask task) {
+	public ScheduledTask(String name, TimerTask task, long intervalInSeconds) {
 		this.name = name;
 		this.task = task;
 		this.timer = new Timer();
@@ -17,8 +17,8 @@ public class ScheduledTask {
 	}
 
 	public void start() {
-		this.timer.schedule(this.task, 0, this.intevalInSeconds * 1000);
-	}
+		this.timer.schedule(this.task, this.intevalInSeconds * 1000, this.intevalInSeconds * 1000);
+		}
 
 	public void stop() {
 		this.timer.cancel();

@@ -16,14 +16,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ReportManager {
 	private static final Logger LOG = LoggerFactory.getLogger(ReportManager.class);
+	private static final String SCHEDULER_USER = "28aa7b57-940d-4b03-9ef8-ae25f5fa2b2f";
 
 	public Timestamp runLater(String userUuid, JsonReportRun reportRun, LibraryItem reportItem) throws Exception {
 		Timestamp runDate = new Timestamp(reportRun.getScheduleDateTime().getTime());
@@ -50,10 +48,8 @@ public class ReportManager {
 		return runDate;
 	}
 
-	public Timestamp runNow(String userUuid, JsonReportRun reportRun, LibraryItem reportItem) throws Exception {
+	public long runNow(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws Exception {
 		LOG.info("Running report " + reportItem.getName());
-
-		Timestamp runDate = new Timestamp(System.currentTimeMillis());
 
 		// Run the baseline cohort if one has been defined
 		if (reportRun.getBaselineCohortId() != null)
@@ -64,7 +60,7 @@ public class ReportManager {
 			runCohort(userUuid, reportRun, feature.getCohortFeatureUuid(), runDate, reportRun.getBaselineCohortId());
 		}
 
-		saveReport(userUuid, reportRun, reportItem, runDate);
+		long reportResultId = saveReport(userUuid, reportRun, reportItem, runDate);
 
 		List<String> featureUuids = reportItem.getReport().getCohortFeature().stream()
 				.map(ReportCohortFeature::getCohortFeatureUuid)
@@ -75,7 +71,7 @@ public class ReportManager {
 
 		loadReportResults(featureUuids, orgIds, reportRun, runDate);
 
-		return runDate;
+		return reportResultId;
 	}
 
 	public List<ReportResultEntity> getReportResultList(String reportItemUuid) {
@@ -155,11 +151,12 @@ public class ReportManager {
 	}
 
 	private void setReportResultsLoaderParams(List<String> cohortFeatureUuids, JsonReportRun reportRun, Timestamp runDate, Query query) {
-		query.setParameter("runDate" , runDate);
-		if (reportRun.getBaselineCohortId() != null)
+		if (reportRun.getBaselineCohortId() != null) {
+			query.setParameter("runDate" , runDate);
 			query.setParameter("baselineCohortId", reportRun.getBaselineCohortId());
+		}
 		else
-			query.setParameter("baseline", reportRun.getBaselineDate());
+			query.setParameter("baseline", CohortManager.convertToDate(reportRun.getBaselineDate()));
 
 		Integer i = 0;
 		for (String featureUuid : cohortFeatureUuids) {
@@ -297,7 +294,7 @@ public class ReportManager {
 		return true;
 	}
 
-	private void saveReport(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws Exception {
+	private long saveReport(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws Exception {
 		ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(reportItem.getUuid());
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(featureEntity.getXmlContent());
 		libraryItem.getReport().setLastRunDate(runDate.getTime());
@@ -308,13 +305,15 @@ public class ReportManager {
 		entityManager.getTransaction().begin();
 		entityManager.merge(featureEntity);
 
-		saveReportResults(userUuid, reportRun, reportItem, runDate);
+		long reportResultId = saveReportResults(userUuid, reportRun, reportItem, runDate);
 
 		entityManager.getTransaction().commit();
 		entityManager.close();
+
+		return reportResultId;
 	}
 
-	private void saveReportResults(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws JsonProcessingException {
+	private long saveReportResults(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws JsonProcessingException {
 		String reportRunJson = ObjectMapperPool.getInstance().writeValueAsString(reportRun);
 
 		ReportResultEntity reportResult = new ReportResultEntity()
@@ -351,6 +350,52 @@ public class ReportManager {
 			entityManager.persist(reportResultOrganisation);
 		}
 
+		entityManager.getTransaction().commit();
+		entityManager.close();
+
+		return reportResult.getReportResultId();
+	}
+
+	public void runScheduledReports() throws Exception {
+		List reportScheduleEntities = getScheduledReports();
+
+		for(Object reportScheduleEntityObject : reportScheduleEntities) {
+			ReportScheduleEntity reportScheduleEntity = (ReportScheduleEntity)reportScheduleEntityObject;
+			ItemEntity item = ItemEntity.retrieveLatestForUUid(reportScheduleEntity.getReportItemUuid());
+			String xml = item.getXmlContent();
+			LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
+			JsonReportRun jsonReportRun = ObjectMapperPool.getInstance().readValue(reportScheduleEntity.getReportRunParams(), JsonReportRun.class);
+			Timestamp runDate = new Timestamp(System.currentTimeMillis());
+
+			long reportResultId = runNow(SCHEDULER_USER, jsonReportRun, libraryItem, runDate);
+			saveScheduledReportResult(reportScheduleEntity.getReportScheduleId(), reportResultId);
+		}
+	}
+
+	private List getScheduledReports() {
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+		List reportScheduleEntities = entityManager.createQuery(
+				"SELECT r FROM ReportScheduleEntity r " +
+						"WHERE r.scheduledAt < :now " +
+						"AND r.reportResultId IS NULL " +
+						"ORDER BY r.scheduledAt")
+				.setParameter("now", new Date())
+				.getResultList();
+
+		entityManager.close();
+		return  reportScheduleEntities;
+	}
+
+	private void saveScheduledReportResult(long reportScheduleId, long reportResultId) {
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+		entityManager.getTransaction().begin();
+		entityManager.createQuery(
+				"UPDATE ReportScheduleEntity r " +
+						"SET r.reportResultId = :reportResultId " +
+						"WHERE r.reportScheduleId = :reportScheduleId ")
+				.setParameter("reportResultId", reportResultId)
+				.setParameter("reportScheduleId", reportScheduleId)
+				.executeUpdate();
 		entityManager.getTransaction().commit();
 		entityManager.close();
 	}

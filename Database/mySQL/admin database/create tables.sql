@@ -114,7 +114,7 @@ CREATE TABLE enterprise_data_pseudonymised.ReportResultOrganisation (
 
 CREATE TABLE enterprise_data_pseudonymised.ReportSchedule (
     ReportScheduleId int(11) NOT NULL AUTO_INCREMENT,
-    ScheduledAt timestamp NOT NULL,
+    ScheduledAt timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     EndUserUuid char(36) NOT NULL,
     ReportItemUuid char(36) NOT NULL,
     ReportRunParams text NOT NULL,

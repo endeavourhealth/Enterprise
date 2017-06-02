@@ -12,7 +12,7 @@ CREATE SCHEMA workspace;
 
 -- Create restricted user
 CREATE USER restricted
-WITH PASSWORD 'Taz321';
+WITH PASSWORD '<password>';
 
 -- Allow restricted user to access public schema
 GRANT USAGE ON SCHEMA public TO restricted;

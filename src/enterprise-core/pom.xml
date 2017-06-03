@@ -19,7 +19,7 @@
         <dependency>
             <groupId>org.endeavourhealth.common</groupId>
             <artifactId>security</artifactId>
-            <version>${eds-common.version}</version>
+            <version>${eds-security.version}</version>
         </dependency>
 
         <dependency>

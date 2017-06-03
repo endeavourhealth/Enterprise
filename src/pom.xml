@@ -14,7 +14,8 @@
         <node.version>v5.5.0</node.version>
         <npm.version>3.3.12</npm.version>
         <maven.compiler.version>3.1</maven.compiler.version>
-        <eds-common.version>2.83-SNAPSHOT</eds-common.version>
+        <eds-api.version>1.0-SNAPSHOT</eds-api.version>
+        <eds-security.version>1.0-SNAPSHOT</eds-security.version>
 
 
         <amqp-client.version>3.6.2</amqp-client.version>
@@ -50,6 +51,23 @@
         <module>enterprise-core</module>
         <module>enterprise-web</module>
     </modules>
+
+    <repositories>
+        <repository>
+            <snapshots />
+            <id>snapshots</id>
+            <name>libs-snapshot</name>
+            <url>http://35.176.38.222:8081/artifactory/libs-snapshot</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>maven.endeavourhealth.org-snapshots</name>
+            <url>http://35.176.38.222:8081/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>

@@ -18,10 +18,10 @@ WITH PASSWORD '<password>';
 GRANT USAGE ON SCHEMA public TO restricted;
 
 -- And workspace schema
-GRANT USAGE ON SCHEMA workspace TO restricted;
+GRANT ALL ON SCHEMA workspace TO restricted;
 
 -- Add select only for restricted user in public schema
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO restricted;
 
--- Add all for restricted user in workspace schema
+-- Add all for restricted user in workspace schema - NEEDED??
 GRANT ALL ON ALL TABLES IN SCHEMA workspace TO restricted;

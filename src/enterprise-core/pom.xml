@@ -28,6 +28,14 @@
             <artifactId>security</artifactId>
             <version>${eds-security.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.endeavourhealth.configmanager</groupId>
+            <artifactId>configmanager</artifactId>
+            <version>${endeavour-config.version}</version>
+        </dependency>
+
+
         <!-- End Common -->
 
         <dependency>

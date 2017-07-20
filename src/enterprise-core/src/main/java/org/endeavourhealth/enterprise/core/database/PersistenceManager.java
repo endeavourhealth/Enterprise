@@ -16,7 +16,7 @@ public enum PersistenceManager {
     private EntityManagerFactory emEnterpriseAdmin;
     private EntityManagerFactory emEnterpriseData;
 
-    private PersistenceManager() throws Exception {
+    private PersistenceManager() {
 
 		try {
 			Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");

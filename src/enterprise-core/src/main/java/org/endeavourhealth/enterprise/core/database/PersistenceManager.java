@@ -2,8 +2,6 @@ package org.endeavourhealth.enterprise.core.database;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.endeavourhealth.common.config.ConfigManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -14,7 +12,6 @@ import java.util.Map;
 
 public enum PersistenceManager {
     INSTANCE;
-	private static final Logger LOG = LoggerFactory.getLogger(PersistenceManager.class);
 
     private EntityManagerFactory emEnterpriseAdmin;
     private EntityManagerFactory emEnterpriseData;
@@ -61,7 +58,7 @@ public enum PersistenceManager {
 				override.put("hibernate.connection.password", config.get("enterprise_password").asText());
 
 		} catch (Exception e) {
-			LOG.warn("Error loading config ["+configId+"]", e);
+
 		}
 		return override;
 	}

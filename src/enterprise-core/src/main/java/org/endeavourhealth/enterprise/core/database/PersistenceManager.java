@@ -21,16 +21,12 @@ public enum PersistenceManager {
 
     PersistenceManager() {
 
-		try {
-			Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");
-			emEnterpriseAdmin = Persistence.createEntityManagerFactory("enterprise_admin", override);
+		Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");
+		emEnterpriseAdmin = Persistence.createEntityManagerFactory("enterprise_admin", override);
 
-			override = getHibernateOverridesFromConfig("patient_database");
-			emEnterpriseData = Persistence.createEntityManagerFactory("enterprise_data", override);
+		override = getHibernateOverridesFromConfig("patient_database");
+		emEnterpriseData = Persistence.createEntityManagerFactory("enterprise_data", override);
 
-		} catch (Exception e) {
-			System.err.println(e);
-		}
 	}
 
 	public EntityManager getEmEnterpriseAdmin() {

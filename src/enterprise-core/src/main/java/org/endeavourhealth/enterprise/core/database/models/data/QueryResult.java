@@ -12,6 +12,7 @@ public class QueryResult {
     private Long organisationId;
     private Integer ruleId;
     private List<Long> patients = new ArrayList<>();
+    private List<ObservationEntity> observations = new ArrayList<>();
     private RuleAction onPass;
     private RuleAction onFail;
 
@@ -50,5 +51,9 @@ public class QueryResult {
     public List<Long> getPatients() { return patients; }
 
     public void setPatients(List<Long> patients) { this.patients = patients; }
+
+    public List<ObservationEntity> getObservations() { return observations; }
+
+    public void setObservations(List<ObservationEntity> observations) { this.observations = observations; }
 
 }

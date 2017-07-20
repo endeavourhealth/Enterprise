@@ -480,6 +480,7 @@ export class QueryEditComponent {
 
 			for (let i = 0; i < vm.chartViewModel.data.query.rule.length; ++i) {
 				if (vm.chartViewModel.data.query.rule[i].description !== "START"
+					&& vm.chartViewModel.data.query.rule[i].type!='2'
 					&& !vm.chartViewModel.data.query.rule[i].expression
 					&& vm.chartViewModel.data.query.rule[i].id!=vm.ruleId
 					&& vm.chartViewModel.data.query.rule[i].test.restriction!=null) {

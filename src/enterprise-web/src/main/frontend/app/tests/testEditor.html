@@ -16,8 +16,8 @@
 					<table style="margin-top:10px;margin-left:15px;width:830px">
 						<tr>
 							<th>Entries you can test</th>
-							<th>Test the Entry is Less Than or Equal To</th>
-							<th>Test the Entry is Greater Than or Equal To</th>
+							<th>Test the Entry is</th>
+							<th>Test the Entry is</th>
 						</tr>
 						<tr style="height:100px" *ngFor="let restriction of restrictions; let isLast=last">
 							<td style="font-size: 12px; width:220px">
@@ -26,7 +26,9 @@
 							<td style="font-size: 12px">
 								<div class="form-group">
 									<div class="input-group">
-										<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueFrom.constant" [ngModelOptions]="{standalone: true}">
+										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') >= 0"><=&nbsp;&nbsp;</div>
+										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') < 0">>=&nbsp;&nbsp;</div>
+										<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueFrom.constant" [ngModelOptions]="{standalone: true}">
 										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
 											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueFrom.relativeUnit" [ngModelOptions]="{standalone: true}">
 												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
@@ -43,7 +45,9 @@
 							<td style="font-size: 12px">
 								<div class="form-group">
 									<div class="input-group">
-										<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueTo.constant" [ngModelOptions]="{standalone: true}">
+										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') >= 0">>=&nbsp;&nbsp;</div>
+										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') < 0"><=&nbsp;&nbsp;</div>
+										<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueTo.constant" [ngModelOptions]="{standalone: true}">
 										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
 											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueTo.relativeUnit" [ngModelOptions]="{standalone: true}">
 												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>

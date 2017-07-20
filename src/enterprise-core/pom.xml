@@ -23,6 +23,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.endeavourhealth.common</groupId>
+            <artifactId>common</artifactId>
+            <version>${eds-common.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet.version}</version>

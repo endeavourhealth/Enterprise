@@ -253,11 +253,11 @@ public class CohortManager {
 
 			// Run the rule SQL for each organisation in the report
 
-			runRuleForOrganisations(cohortRun, queryResults, rule, q, baselineCohortId, runDate, filters);
+			runRuleForOrganisations(libraryItem, cohortRun, queryResults, rule, q, baselineCohortId, runDate, filters);
 		} // next Rule in Query
 	}
 
-	private static void runRuleForOrganisations(JsonCohortRun cohortRun, List<QueryResult> queryResults, Rule rule, QueryMeta q, String baselineCohortId, Timestamp runDate, List<Filter> filters) throws Exception {
+	private static void runRuleForOrganisations(LibraryItem libraryItem, JsonCohortRun cohortRun, List<QueryResult> queryResults, Rule rule, QueryMeta q, String baselineCohortId, Timestamp runDate, List<Filter> filters) throws Exception {
 		List<JsonOrganisation> organisations = cohortRun.getOrganisation();
 
 		String cohortPopulation = cohortRun.getPopulation();
@@ -268,15 +268,17 @@ public class CohortManager {
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
 		for (JsonOrganisation organisationInCohort : organisations) {
+			List<PatientEntity> patients = null;
 			List<ObservationEntity> patientObservations = null;
 			List<ObservationEntity> patientObservations2 = new ArrayList<>();
 
 			if (rule.getType()==3) { // Test rule
+				String field = "";
 				String valueFrom = "";
 				String valueTo = "";
 
 				for (Filter filter : filters) {
-					String field = filter.getField();
+					field = filter.getField();
 					if (field.contains("VALUE")) {
 						if (filter.getValueFrom() != null) {
 							valueFrom = filter.getValueFrom().getConstant();
@@ -287,7 +289,10 @@ public class CohortManager {
 					}
 				} // next Filter
 
-				patientObservations = getRuleObservations(1, queryResults, Long.parseLong(organisationInCohort.getId()));
+				Integer ruleId = getRuleForTest(libraryItem, field);
+
+				patientObservations = getRuleObservations(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
+
 				Integer i = 0;
 				for (ObservationEntity observationEntity : patientObservations) {
 					if (!valueFrom.equals("") && !valueTo.equals("")) {
@@ -313,20 +318,40 @@ public class CohortManager {
 				patientObservations = new ArrayList<ObservationEntity>(patientObservations2);
 
 			} else {
-				TypedQuery<ObservationEntity> query = entityManager.
-						createQuery(patientWhere, ObservationEntity.class)
-						.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+				if (patientWhere.contains("JOIN ObservationEntity")) {
+					TypedQuery<ObservationEntity> query = entityManager.
+							createQuery(patientWhere, ObservationEntity.class)
+							.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
 
-				if (baselineCohortId == null)
-					query
-							.setParameter("baseline", baselineDate);
-				else
-					query
-							.setParameter("runDate", runDate)
-							.setParameter("baselineCohortId", baselineCohortId);
+					if (baselineCohortId == null)
+						query
+								.setParameter("baseline", baselineDate);
+					else
+						query
+								.setParameter("runDate", runDate)
+								.setParameter("baselineCohortId", baselineCohortId);
 
-				patientObservations = query
-						.getResultList();
+					patientObservations = query
+							.getResultList();
+
+				} else
+				if (patientWhere.contains("JOIN PatientEntity")) {
+					TypedQuery<PatientEntity> query = entityManager.
+							createQuery(patientWhere, PatientEntity.class)
+							.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+
+					if (baselineCohortId == null)
+						query
+								.setParameter("baseline", baselineDate);
+					else
+						query
+								.setParameter("runDate", runDate)
+								.setParameter("baselineCohortId", baselineCohortId);
+
+					patients = query
+							.getResultList();
+
+				}
 			}
 
 
@@ -337,9 +362,17 @@ public class CohortManager {
 			queryResult.setOnPass(rule.getOnPass());
 			queryResult.setOnFail(rule.getOnFail());
 			List<Long> queryPatients = new ArrayList<>();
-			for (ObservationEntity observationEntity : patientObservations) {
-				if (queryPatients.indexOf(observationEntity.getPatientId())<0) // only add distinct patients
-					queryPatients.add(observationEntity.getPatientId());
+			if (patientWhere.contains("JOIN PatientEntity")) {
+				for (PatientEntity patientEntity : patients) {
+					if (queryPatients.indexOf(patientEntity.getId())<0) // only add distinct patients
+						queryPatients.add(patientEntity.getId());
+				}
+			} else
+			if (patientObservations.size()>0) {
+				for (ObservationEntity observationEntity : patientObservations) {
+					if (queryPatients.indexOf(observationEntity.getPatientId())<0) // only add distinct patients
+						queryPatients.add(observationEntity.getPatientId());
+				}
 			}
 			queryResult.setPatients(queryPatients);
 			queryResult.setObservations(patientObservations);
@@ -536,45 +569,45 @@ public class CohortManager {
 		q.dataTable = "PatientEntity";
 		if ((parentType.equals("Sex") && term.equals("Male")) ||
 				(term.equals("Sex") && valueFrom.equals("Male"))) {
-			q.sqlWhere += " and d.patientGenderId = '0'";
+			q.sqlWhere += " and p.patientGenderId = '0'";
 		} else if ((parentType.equals("Sex") && term.equals("Female")) ||
 				(term.equals("Sex") && valueFrom.equals("Female"))) {
-			q.sqlWhere += " and d.patientGenderId = '1'";
+			q.sqlWhere += " and p.patientGenderId = '1'";
 		} else if (term.equals("Post Code Prefix")) {
-			q.sqlWhere += " and d.postcodePrefix like '" + valueFrom + "%'";
+			q.sqlWhere += " and p.postcodePrefix like '" + valueFrom + "%'";
 		} else if (term.equals("Age Years")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.ageYears between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.ageYears between '" + valueFrom + "' and '" + valueTo + "'";
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and d.ageYears >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.ageYears >= '" + valueFrom + "'";
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.ageYears <= '" + valueTo + "'";
+				q.sqlWhere += " and p.ageYears <= '" + valueTo + "'";
 
 		} else if (term.equals("Age Months")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.ageMonths between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.ageMonths between '" + valueFrom + "' and '" + valueTo + "'";
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and d.ageMonths >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.ageMonths >= '" + valueFrom + "'";
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.ageMonths <= '" + valueTo + "'";
+				q.sqlWhere += " and p.ageMonths <= '" + valueTo + "'";
 		} else if (term.equals("Age Weeks")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.ageWeeks between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.ageWeeks between '" + valueFrom + "' and '" + valueTo + "'";
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and d.ageWeeks >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.ageWeeks >= '" + valueFrom + "'";
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.ageWeeks <= '" + valueTo + "'";
+				q.sqlWhere += " and p.ageWeeks <= '" + valueTo + "'";
 		} else if (term.equals("LSOA Code")) {
-			q.sqlWhere += " and d.lsoaCode like '" + valueFrom + "%'";
+			q.sqlWhere += " and p.lsoaCode like '" + valueFrom + "%'";
 		} else if (term.equals("MSOA Code")) {
-			q.sqlWhere += " and d.msoaCode like '" + valueFrom + "%'";
+			q.sqlWhere += " and p.msoaCode like '" + valueFrom + "%'";
 		} else if (term.equals("Date of Death")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.dateOfDeath between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.dateOfDeath between '" + valueFrom + "' and '" + valueTo + "'";
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and d.dateOfDeath >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.dateOfDeath >= '" + valueFrom + "'";
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and d.dateOfDeath <= '" + valueTo + "'";
+				q.sqlWhere += " and p.dateOfDeath <= '" + valueTo + "'";
 		}
 	}
 
@@ -688,22 +721,35 @@ public class CohortManager {
 					"and c.queryItemUuid = :baselineCohortId " +
 					"and c.runDate = :runDate " + q.sqlWhere;
 		} else if (cohortPopulation.equals("0")) { // currently registered
-			return "select d " +
-					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
-					"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-					"where p.dateOfDeath IS NULL and p.organizationId = :organizationId " +
-					"and e.registrationTypeId = 2 " +
-					"and e.dateRegistered <= :baseline " +
-					"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere+
-					"  and d.clinicalEffectiveDate = ("+
-					"select max(d.clinicalEffectiveDate) " +
-					"from PatientEntity p2 JOIN EpisodeOfCareEntity e on e.patientId = p2.id " +
-					"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p2.id " +
-					"where p2.dateOfDeath IS NULL and p2.organizationId = :organizationId " +
-					"and e.registrationTypeId = 2 " +
-					"and e.dateRegistered <= :baseline " +
-					"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
-					" and p2.id = p.id)";
+			String sql = "";
+			if (q.dataTable.equals("PatientEntity")) {
+				sql = "select d " +
+						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
+						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
+						"where p.dateOfDeath IS NULL and p.organizationId = :organizationId " +
+						"and e.registrationTypeId = 2 " +
+						"and e.dateRegistered <= :baseline " +
+						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere;
+			} else
+			if (q.dataTable.equals("ObservationEntity")) {
+				sql = "select d " +
+						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
+						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
+						"where p.dateOfDeath IS NULL and p.organizationId = :organizationId " +
+						"and e.registrationTypeId = 2 " +
+						"and e.dateRegistered <= :baseline " +
+						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
+						"  and d.clinicalEffectiveDate = (" +
+						"select max(d.clinicalEffectiveDate) " +
+						"from PatientEntity p2 JOIN EpisodeOfCareEntity e on e.patientId = p2.id " +
+						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p2.id " +
+						"where p2.dateOfDeath IS NULL and p2.organizationId = :organizationId " +
+						"and e.registrationTypeId = 2 " +
+						"and e.dateRegistered <= :baseline " +
+						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
+						" and p2.id = p.id)";
+			}
+			return sql;
 		} else if (cohortPopulation.equals("1")) { // all patients
 			return "select distinct p " +
 					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
@@ -715,4 +761,21 @@ public class CohortManager {
 
 		return "";
 	}
+
+	private static Integer getRuleForTest(LibraryItem libraryItem, String fieldToMatch) throws Exception {
+		Integer ruleId = 0;
+		for (Rule rule : libraryItem.getQuery().getRule()) {
+			if (rule.getTest().getRestriction()!=null) {
+				String prefix = rule.getTest().getRestriction().getPrefix();
+				fieldToMatch = fieldToMatch.split("-")[0];
+				if (prefix.equals(fieldToMatch)) {
+					ruleId = rule.getId();
+					break;
+				}
+			}
+		}
+
+		return ruleId;
+	}
+
 }

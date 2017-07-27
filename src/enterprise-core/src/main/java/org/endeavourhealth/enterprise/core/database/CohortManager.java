@@ -369,13 +369,20 @@ public class CohortManager {
 				}
 			} else
 			if (patientObservations.size()>0) {
+				Long patientId = 0L;
+				Long lastPatientId = 0L;
 				for (ObservationEntity observationEntity : patientObservations) {
-					if (queryPatients.indexOf(observationEntity.getPatientId())<0) // only add distinct patients
+					patientId = observationEntity.getPatientId();
+					if (queryPatients.indexOf(patientId)<0) // only add distinct patients
 						queryPatients.add(observationEntity.getPatientId());
+					if (!patientId.equals(lastPatientId)) {
+						patientObservations2.add(observationEntity);
+					}
+					lastPatientId = patientId;
 				}
 			}
 			queryResult.setPatients(queryPatients);
-			queryResult.setObservations(patientObservations);
+			queryResult.setObservations(patientObservations2);
 			queryResults.add(queryResult);
 
 		} // next organisation in cohort
@@ -739,15 +746,7 @@ public class CohortManager {
 						"and e.registrationTypeId = 2 " +
 						"and e.dateRegistered <= :baseline " +
 						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
-						"  and d.clinicalEffectiveDate = (" +
-						"select max(d.clinicalEffectiveDate) " +
-						"from PatientEntity p2 JOIN EpisodeOfCareEntity e on e.patientId = p2.id " +
-						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p2.id " +
-						"where p2.dateOfDeath IS NULL and p2.organizationId = :organizationId " +
-						"and e.registrationTypeId = 2 " +
-						"and e.dateRegistered <= :baseline " +
-						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
-						" and p2.id = p.id)";
+						" order by p.id, d.clinicalEffectiveDate desc";
 			}
 			return sql;
 		} else if (cohortPopulation.equals("1")) { // all patients

@@ -83,24 +83,22 @@ public class CohortManager {
 
 	private static void getResultsForOrganisation(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, JsonOrganisation organisationInCohort, String baselineCohortId) throws Exception {
 		// calculate cohort denominator count
-		String where = getPatientResultWhereClause(cohortRun.getPopulation(), baselineCohortId);
+		String denominatorSQL = getDenominatorSQL(cohortRun.getPopulation(), baselineCohortId);
 
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 		Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
 
 		TypedQuery<PatientEntity> query = entityManager.
-				createQuery(where, PatientEntity.class)
+				createQuery(denominatorSQL, PatientEntity.class)
 				.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
 
 		if (baselineCohortId == null)
 			query.setParameter("baseline", baselineDate);
 		else
-			query
-					.setParameter("runDate", runDate)
-					.setParameter("baselineCohortId", baselineCohortId);
+			query.setParameter("runDate", runDate)
+				.setParameter("baselineCohortId", baselineCohortId);
 
-		List<PatientEntity> patients = query
-				.getResultList();
+		List<PatientEntity> patients = query.getResultList();
 
 		// For each organisation - get the denominator list of patients (needed for FAILED rule conditions)
 		List<Long> denominatorPatients = new ArrayList<>();
@@ -115,13 +113,13 @@ public class CohortManager {
 
 		Integer i = 0;
 
-		List<Long> finalPatients = loopThroughRules(queryResults, organisationInCohort, denominatorPatients, ruleId, i);
+		List<Long> finalPatients = calculateCohortFromRules(queryResults, organisationInCohort, denominatorPatients, ruleId, i);
 
 		saveIdentifiedPatientsIntoCohortPatientTable(cohortRun, runDate, organisationInCohort, finalPatients);
 		saveQueryCountsToCohortSummaryTable(cohortRun, userUuid, runDate, organisationInCohort, baselineDate, denominatorPatients, finalPatients);
 	}
 
-	private static String getPatientResultWhereClause(String cohortPopulation, String baselineCohortId) {
+	private static String getDenominatorSQL(String cohortPopulation, String baselineCohortId) {
 		if (baselineCohortId != null)	// Cohort subset
 			return "select distinct p " +
 					"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
@@ -175,7 +173,7 @@ public class CohortManager {
 		}
 	}
 
-	private static List<Long> loopThroughRules(List<QueryResult> queryResults, JsonOrganisation organisationInCohort, List<Long> denominatorPatients, Integer ruleId, Integer i) throws Exception {
+	private static List<Long> calculateCohortFromRules(List<QueryResult> queryResults, JsonOrganisation organisationInCohort, List<Long> denominatorPatients, Integer ruleId, Integer i) throws Exception {
 		List<Long> finalPatients = new ArrayList<>();
 
 		while (true) { // loop through all the rules
@@ -184,7 +182,7 @@ public class CohortManager {
 			RuleAction rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
 			RuleAction ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
 
-			List<Long> patients1 = getRulePatients(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));  // get patients in rule
+			List<Long> patients1 = getPatientsInRule(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));  // get patients in rule
 
 			if (i == 1 && ruleFailIncludeGoto(ruleFailAction)) {
 
@@ -207,7 +205,7 @@ public class CohortManager {
 
 				ruleId = getNextRuleIds(rulePassAction, ruleFailAction).get(0);
 
-				List<Long> patients2 = getRulePatients(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));  // get patients in rule
+				List<Long> patients2 = getPatientsInRule(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));  // get patients in rule
 
 				rulePassAction = getRuleAction(true, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
 				ruleFailAction = getRuleAction(false, ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
@@ -263,14 +261,18 @@ public class CohortManager {
 		String cohortPopulation = cohortRun.getPopulation();
 		Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
 
-		String patientWhere = getPatientWhereClause(baselineCohortId, cohortPopulation, q);
+		String ruleSQL = getRuleSQL(baselineCohortId, cohortPopulation, q);
 
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
 		for (JsonOrganisation organisationInCohort : organisations) {
 			List<PatientEntity> patients = null;
-			List<ObservationEntity> patientObservations = null;
+			List<ObservationEntity> patientObservations = new ArrayList<>();
 			List<ObservationEntity> patientObservations2 = new ArrayList<>();
+			List<MedicationStatementEntity> patientMedicationStatements = new ArrayList<>();
+			List<AllergyIntoleranceEntity> patientAllergyIntolerances = new ArrayList<>();
+			List<ReferralRequestEntity> patientReferralRequests = new ArrayList<>();
+			List<EncounterEntity> patientEncounters = new ArrayList<>();
 
 			if (rule.getType()==3) { // Test rule
 				String field = "";
@@ -317,39 +319,84 @@ public class CohortManager {
 				}
 				patientObservations = new ArrayList<ObservationEntity>(patientObservations2);
 
-			} else {
-				if (patientWhere.contains("JOIN ObservationEntity")) {
+			} else if (rule.getType()==1) { // Feature rule
+				if (ruleSQL.contains("JOIN ObservationEntity")) {
 					TypedQuery<ObservationEntity> query = entityManager.
-							createQuery(patientWhere, ObservationEntity.class)
+						createQuery(ruleSQL, ObservationEntity.class)
+						.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+
+					if (baselineCohortId == null)
+						query.setParameter("baseline", baselineDate);
+					else
+						query.setParameter("runDate", runDate)
+						.setParameter("baselineCohortId", baselineCohortId);
+
+					patientObservations = query.getResultList();
+
+				} else if (ruleSQL.contains("JOIN MedicationStatementEntity")) {
+					TypedQuery<MedicationStatementEntity> query = entityManager.
+						createQuery(ruleSQL, MedicationStatementEntity.class)
+						.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+
+					if (baselineCohortId == null)
+						query.setParameter("baseline", baselineDate);
+					else
+						query.setParameter("runDate", runDate)
+						.setParameter("baselineCohortId", baselineCohortId);
+
+					patientMedicationStatements = query.getResultList();
+
+				} else if (ruleSQL.contains("JOIN AllergyIntoleranceEntity")) {
+					TypedQuery<AllergyIntoleranceEntity> query = entityManager.
+							createQuery(ruleSQL, AllergyIntoleranceEntity.class)
 							.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query
-								.setParameter("baseline", baselineDate);
+						query.setParameter("baseline", baselineDate);
 					else
-						query
-								.setParameter("runDate", runDate)
+						query.setParameter("runDate", runDate)
 								.setParameter("baselineCohortId", baselineCohortId);
 
-					patientObservations = query
-							.getResultList();
+					patientAllergyIntolerances = query.getResultList();
 
-				} else
-				if (patientWhere.contains("JOIN PatientEntity")) {
+				} else if (ruleSQL.contains("JOIN ReferralRequestEntity")) {
+					TypedQuery<ReferralRequestEntity> query = entityManager.
+							createQuery(ruleSQL, ReferralRequestEntity.class)
+							.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+
+					if (baselineCohortId == null)
+						query.setParameter("baseline", baselineDate);
+					else
+						query.setParameter("runDate", runDate)
+								.setParameter("baselineCohortId", baselineCohortId);
+
+					patientReferralRequests = query.getResultList();
+
+				} else if (ruleSQL.contains("JOIN EncounterEntity")) {
+					TypedQuery<EncounterEntity> query = entityManager.
+							createQuery(ruleSQL, EncounterEntity.class)
+							.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+
+					if (baselineCohortId == null)
+						query.setParameter("baseline", baselineDate);
+					else
+						query.setParameter("runDate", runDate)
+								.setParameter("baselineCohortId", baselineCohortId);
+
+					patientEncounters = query.getResultList();
+
+				} else if (ruleSQL.contains("JOIN PatientEntity")) {
 					TypedQuery<PatientEntity> query = entityManager.
-							createQuery(patientWhere, PatientEntity.class)
-							.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+						createQuery(ruleSQL, PatientEntity.class)
+						.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query
-								.setParameter("baseline", baselineDate);
+						query.setParameter("baseline", baselineDate);
 					else
-						query
-								.setParameter("runDate", runDate)
-								.setParameter("baselineCohortId", baselineCohortId);
+						query.setParameter("runDate", runDate)
+						.setParameter("baselineCohortId", baselineCohortId);
 
-					patients = query
-							.getResultList();
+					patients = query.getResultList();
 
 				}
 			}
@@ -362,13 +409,12 @@ public class CohortManager {
 			queryResult.setOnPass(rule.getOnPass());
 			queryResult.setOnFail(rule.getOnFail());
 			List<Long> queryPatients = new ArrayList<>();
-			if (patientWhere.contains("JOIN PatientEntity")) {
+			if (ruleSQL.contains("JOIN PatientEntity")) {
 				for (PatientEntity patientEntity : patients) {
 					if (queryPatients.indexOf(patientEntity.getId())<0) // only add distinct patients
 						queryPatients.add(patientEntity.getId());
 				}
-			} else
-			if (patientObservations.size()>0) {
+			} else if (patientObservations.size()>0) {
 				Long patientId = 0L;
 				Long lastPatientId = 0L;
 				for (ObservationEntity observationEntity : patientObservations) {
@@ -378,6 +424,54 @@ public class CohortManager {
 					if (!patientId.equals(lastPatientId)) {
 						patientObservations2.add(observationEntity);
 					}
+					lastPatientId = patientId;
+				}
+			} else if (patientMedicationStatements.size()>0) {
+				Long patientId = 0L;
+				Long lastPatientId = 0L;
+				for (MedicationStatementEntity medicationStatementEntity : patientMedicationStatements) {
+					patientId = medicationStatementEntity.getPatientId();
+					if (queryPatients.indexOf(patientId)<0) // only add distinct patients
+						queryPatients.add(medicationStatementEntity.getPatientId());
+					//if (!patientId.equals(lastPatientId)) {
+						//patientObservations2.add(medicationOrderEntity);
+					//}
+					lastPatientId = patientId;
+				}
+			} else if (patientAllergyIntolerances.size()>0) {
+				Long patientId = 0L;
+				Long lastPatientId = 0L;
+				for (AllergyIntoleranceEntity allergyIntoleranceEntity : patientAllergyIntolerances) {
+					patientId = allergyIntoleranceEntity.getPatientId();
+					if (queryPatients.indexOf(patientId)<0) // only add distinct patients
+						queryPatients.add(allergyIntoleranceEntity.getPatientId());
+					//if (!patientId.equals(lastPatientId)) {
+					//patientObservations2.add(medicationOrderEntity);
+					//}
+					lastPatientId = patientId;
+				}
+			} else if (patientReferralRequests.size()>0) {
+				Long patientId = 0L;
+				Long lastPatientId = 0L;
+				for (ReferralRequestEntity referralRequestEntity : patientReferralRequests) {
+					patientId = referralRequestEntity.getPatientId();
+					if (queryPatients.indexOf(patientId)<0) // only add distinct patients
+						queryPatients.add(referralRequestEntity.getPatientId());
+					//if (!patientId.equals(lastPatientId)) {
+					//patientObservations2.add(medicationOrderEntity);
+					//}
+					lastPatientId = patientId;
+				}
+			} else if (patientEncounters.size()>0) {
+				Long patientId = 0L;
+				Long lastPatientId = 0L;
+				for (EncounterEntity encounterEntity : patientEncounters) {
+					patientId = encounterEntity.getPatientId();
+					if (queryPatients.indexOf(patientId)<0) // only add distinct patients
+						queryPatients.add(encounterEntity.getPatientId());
+					//if (!patientId.equals(lastPatientId)) {
+					//patientObservations2.add(medicationOrderEntity);
+					//}
 					lastPatientId = patientId;
 				}
 			}
@@ -635,7 +729,7 @@ public class CohortManager {
 		return ruleAction;
 	}
 
-	public static List<Long> getRulePatients(Integer ruleId, List<QueryResult> queryResults, Long organisationId) throws Exception {
+	public static List<Long> getPatientsInRule(Integer ruleId, List<QueryResult> queryResults, Long organisationId) throws Exception {
 
 		List<Long> patients = null;
 
@@ -719,14 +813,26 @@ public class CohortManager {
 		return result;
 	}
 
-	public static String getPatientWhereClause(String baselineCohortId, String cohortPopulation, QueryMeta q) {
+	public static String getRuleSQL(String baselineCohortId, String cohortPopulation, QueryMeta q) {
 		if (baselineCohortId != null) { // Cohort subset
-			return "select distinct p " +
-					"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
-					"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-					"where p.organizationId = :organizationId " +
-					"and c.queryItemUuid = :baselineCohortId " +
-					"and c.runDate = :runDate " + q.sqlWhere;
+			String sql = "";
+			if (q.dataTable.equals("PatientEntity")) {
+				sql = "select d " +
+						"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
+						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
+						"where p.organizationId = :organizationId " +
+						"and c.queryItemUuid = :baselineCohortId " +
+						"and c.runDate = :runDate " + q.sqlWhere;
+			} else {
+				sql = "select d " +
+						"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
+						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
+						"where p.organizationId = :organizationId " +
+						"and c.queryItemUuid = :baselineCohortId " +
+						"and c.runDate = :runDate " + q.sqlWhere+
+						" order by p.id, d.clinicalEffectiveDate desc";
+			}
+			return sql;
 		} else if (cohortPopulation.equals("0")) { // currently registered
 			String sql = "";
 			if (q.dataTable.equals("PatientEntity")) {
@@ -737,8 +843,7 @@ public class CohortManager {
 						"and e.registrationTypeId = 2 " +
 						"and e.dateRegistered <= :baseline " +
 						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere;
-			} else
-			if (q.dataTable.equals("ObservationEntity")) {
+			} else {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
@@ -750,12 +855,24 @@ public class CohortManager {
 			}
 			return sql;
 		} else if (cohortPopulation.equals("1")) { // all patients
-			return "select distinct p " +
-					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
-					"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-					"where p.organizationId = :organizationId " +
-					"and e.dateRegistered <= :baseline " +
-					"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere;
+			String sql = "";
+			if (q.dataTable.equals("PatientEntity")) {
+				sql = "select d " +
+						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
+						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
+						"where p.organizationId = :organizationId " +
+						"and e.dateRegistered <= :baseline " +
+						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere;
+			} else {
+				sql = "select d " +
+						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
+						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
+						"where p.organizationId = :organizationId " +
+						"and e.dateRegistered <= :baseline " +
+						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
+						" order by p.id, d.clinicalEffectiveDate desc";
+			}
+			return sql;
 		}
 
 		return "";

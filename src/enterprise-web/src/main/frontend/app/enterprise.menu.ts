@@ -5,7 +5,7 @@ import {MenuOption} from "eds-common-js/dist/layout/models/MenuOption";
 @Injectable()
 export class EnterpriseMenuService implements  MenuService {
 	getApplicationTitle(): string {
-		return 'Enterprise';
+		return 'Discovery: ➷ Compass';
 	}
 	getMenuOptions():MenuOption[] {
 		return [

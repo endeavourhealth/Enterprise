@@ -11,6 +11,7 @@ export class EnterpriseMenuService implements  MenuService {
 		return [
 			{caption: 'Dashboard', state: 'app.dashboard', icon: 'fa fa-tachometer'},
 			{caption: 'Library', state: 'app.library', icon: 'fa fa-book'},
+			{caption: 'Utilities', state: 'app.utilities', icon: 'fa fa-wrench'}
 		];
 	}
 }

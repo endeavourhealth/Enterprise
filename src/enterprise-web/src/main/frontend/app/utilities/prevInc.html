@@ -1,0 +1,49 @@
+<style>
+	.form-group {
+		margin-bottom: 10px;
+	}
+</style>
+<div class="modal-header">
+	<button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+	<h4 class="modal-title">Prevalence and Incidence - Select Denominator Population</h4>
+</div>
+<div class="modal-body">
+	<form role="form">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="row">
+					<div class="form-group col-md-12">
+						<label>Organisations: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgTT }}"></span>
+						<select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)">
+							<option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
+						</select>
+					</div>
+					<div class="form-group col-md-12">
+						<label>Patient Population: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
+						<select class="form-control" style="width:300px" (change)="setSelectedPopulation($event.target)">
+							<option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
+						</select>
+					</div>
+					<div class="form-group col-md-12">
+						<label>Code Set: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
+						<select class="form-control" style="width:300px" (change)="setCodeSet($event.target)">
+							<option *ngFor="let set of codeset" value="{{set.id}}">{{set.name}}</option>
+						</select>
+					</div>
+					<div class="form-group col-md-12">
+						<label>Time Period: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
+						<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." >
+						<select class="form-control" style="width:100px"  >
+							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
+	<button type="button" class="btn btn-primary" (click)="run();">Run</button>
+</div>

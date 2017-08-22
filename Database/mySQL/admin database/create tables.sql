@@ -1,9 +1,11 @@
+
 DROP TABLE IF EXISTS enterprise_admin.ActiveItem;
 DROP TABLE IF EXISTS enterprise_admin.Audit;
 DROP TABLE IF EXISTS enterprise_admin.DependencyType;
 DROP TABLE IF EXISTS enterprise_admin.Item;
 DROP TABLE IF EXISTS enterprise_admin.ItemDependency;
 DROP TABLE IF EXISTS enterprise_admin.ItemType;
+DROP TABLE IF EXISTS enterprise_admin.CodeSet;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortPatients;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.CohortResult;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportSchedule;
@@ -53,6 +55,13 @@ CREATE TABLE enterprise_admin.ItemType (
 	Description varchar(100) NOT NULL,
 	PRIMARY KEY (ItemTypeId)
 );
+
+CREATE TABLE enterprise_admin.CodeSet (
+	ItemUuid char(36) NOT NULL,
+	SnomedConceptId bigint NOT NULL,
+	PRIMARY KEY (ItemUuid, SnomedConceptId)
+);
+
 CREATE TABLE enterprise_data_pseudonymised.`CohortPatients` (
   `CohortPatientId` int(11) NOT NULL AUTO_INCREMENT,
   `RunDate` timestamp(3) NULL DEFAULT NULL,

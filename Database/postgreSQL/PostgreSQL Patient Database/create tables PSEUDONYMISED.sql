@@ -180,6 +180,7 @@ INSERT INTO referral_request_type (id, value) VALUES (8, 'Performance of a proce
 INSERT INTO referral_request_type (id, value) VALUES (9, 'Community Care');
 INSERT INTO referral_request_type (id, value) VALUES (10, 'Admission');
 INSERT INTO referral_request_type (id, value) VALUES (11, 'Day Care');
+INSERT INTO referral_request_type (id, value) VALUES (12, 'Assessment & Education');
 
 -- Table: public.medication_statement_authorisation_type
 

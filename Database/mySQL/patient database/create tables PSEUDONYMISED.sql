@@ -154,6 +154,7 @@ INSERT INTO referral_request_type (id, value) VALUES (8, 'Performance of a proce
 INSERT INTO referral_request_type (id, value) VALUES (9, 'Community Care');
 INSERT INTO referral_request_type (id, value) VALUES (10, 'Admission');
 INSERT INTO referral_request_type (id, value) VALUES (11, 'Day Care');
+INSERT INTO referral_request_type (id, value) VALUES (12, 'Assessment & Education');
 
 -- Table: medication_statement_authorisation_type
 
@@ -392,7 +393,7 @@ CREATE TABLE appointment
   patient_id bigint NOT NULL,
   person_id bigint NOT NULL,
   practitioner_id bigint,
-  schedule_id bigint NOT NULL,
+  schedule_id bigint,
   start_date date,
   planned_duration integer NOT NULL,
   actual_duration integer,

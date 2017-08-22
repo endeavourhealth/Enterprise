@@ -10,7 +10,10 @@ import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.json.JsonDeleteResponse;
 import org.endeavourhealth.enterprise.core.json.JsonMoveItem;
 import org.endeavourhealth.enterprise.core.json.JsonMoveItems;
+import org.endeavourhealth.enterprise.core.querydocument.CodeSetHelper;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
+import org.endeavourhealth.enterprise.core.querydocument.models.CodeSet;
+import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.QueryDocument;
 
 import javax.ws.rs.BadRequestException;
@@ -245,8 +248,38 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         //we can now commit to the DB
         DataManager db = new DataManager();
         db.saveItems(audit, item, activeItem, itemdependencyEntities);
+
+        //if the document contains a code set, then populate the CodeSet table accordingly
+        populateCodeSets(queryDocument, itemUuid);
     }
 
+    private void populateCodeSets(QueryDocument queryDocument, String itemUuid) throws Exception {
+
+        List<CodeSet> codeSets = new ArrayList<>();
+
+        for (LibraryItem item: queryDocument.getLibraryItem()) {
+            CodeSet codeSet = item.getCodeSet();
+            if (codeSet != null) {
+                codeSets.add(codeSet);
+            }
+        }
+
+        if (codeSets.isEmpty()) {
+            return;
+        }
+
+        if (codeSets.size() > 1) {
+            throw new Exception("Cannot support query document with multiple code sets (item " + itemUuid + ")");
+        }
+
+        CodeSet codeSet = codeSets.get(0);
+
+        try {
+            CodeSetHelper.populateCodeSet(codeSet, itemUuid);
+        } catch (Exception ex) {
+            throw new Exception("Failed to populate code set for item " + itemUuid, ex);
+        }
+    }
 
     /**
      * when a libraryItem or report is saved, process the query document to find all UUIDs that it requires to be run

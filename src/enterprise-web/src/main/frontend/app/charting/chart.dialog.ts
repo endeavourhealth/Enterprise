@@ -23,6 +23,10 @@ export class ChartDialog implements OnInit {
 	ngOnInit(): void {
 	}
 
+	export() {
+		this.chartData.export();
+	}
+
 	cancel() {
 		this.$uibModalInstance.close(null);
 	}

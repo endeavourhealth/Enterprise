@@ -23,6 +23,10 @@ export class TableDialog implements OnInit {
 	ngOnInit(): void {
 	}
 
+	export() {
+		this.tableData.export();
+	}
+
 	cancel() {
 		this.$uibModalInstance.close(null);
 	}

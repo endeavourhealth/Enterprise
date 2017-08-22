@@ -29,4 +29,15 @@ export class Chart {
 		this.series.push(series);
 		return this;
 	}
+
+	public export() {
+		let header = 'Series,' + this.categories.join(',');
+
+		let rows = this.series.map(
+			series => series.name + ',' + series.data.join(',')
+		).join('\n');
+
+		let blob = new Blob([header, '\n', rows], { type: 'text/plain' });
+		window['saveAs'](blob, this.title + '.csv');
+	}
 }

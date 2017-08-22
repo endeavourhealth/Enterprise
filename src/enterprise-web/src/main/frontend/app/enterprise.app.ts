@@ -22,11 +22,13 @@ import {FlowchartModule} from "./flowchart/flowchart.module";
 import {EnterpriseMenuService} from "./enterprise.menu";
 import {ReportEditComponent} from "./report/reportEditor.component";
 import {ReportModule} from "./report/report.module";
+import {ChartModule} from "./charting/chart.module";
 
 @NgModule(
 	Application.Define({
 		modules: [
 			FlowchartModule,
+			ChartModule,
 			DashboardModule,
 			UtilitiesModule,
 			EnterpriseLibraryModule,

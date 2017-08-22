@@ -5,12 +5,14 @@ import {UtilitiesService} from "./utilities.service";
 import {UtilitiesComponent} from "./utilities.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {PrevIncDialog} from "./prevInc.dialog";
+import {ChartModule} from "../charting/chart.module";
 
 @NgModule({
 	imports : [
 		BrowserModule,
 		FormsModule,
-		NgbModule
+		NgbModule,
+		ChartModule,
 	],
 	declarations : [
 		UtilitiesComponent,

@@ -1,0 +1,22 @@
+<style>
+	.form-group {
+		margin-bottom: 10px;
+	}
+</style>
+<div class="modal-header">
+	<button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+	<h4 class="modal-title">Prevalence and Incidence - Select Denominator Population</h4>
+</div>
+<div class="modal-body">
+	<form role="form">
+		<div class="row">
+			<div class="col-md-12">
+				<chart [data]="chartData"></chart>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" (click)="cancel()">Close</button>
+</div>

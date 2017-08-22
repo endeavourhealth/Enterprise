@@ -1,0 +1,32 @@
+import {Series} from "./Series";
+
+export class Chart {
+	title : string;
+	categories : string[];
+	series : Series[];
+
+	public setTitle(title : string) : Chart {
+		this.title = title;
+		return this;
+	}
+
+	public setCategories(categories : string[]) : Chart {
+		this.categories = categories;
+		return this;
+	}
+
+	public addCategory(category : string) : Chart {
+		this.categories.push(category);
+		return this;
+	}
+
+	public setSeries(series : Series[]) : Chart {
+		this.series = series;
+		return this;
+	}
+
+	public addSeries(series : Series) : Chart {
+		this.series.push(series);
+		return this;
+	}
+}

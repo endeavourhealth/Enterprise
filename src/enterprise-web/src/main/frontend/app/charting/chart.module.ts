@@ -4,6 +4,8 @@ import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {ChartComponent} from "./chart.component";
 import {ChartDialog} from "./chart.dialog";
+import {TableDialog} from "./table.dialog";
+import {TableComponent} from "./table.component";
 
 @NgModule({
 	imports : [
@@ -13,14 +15,19 @@ import {ChartDialog} from "./chart.dialog";
 	],
 	declarations : [
 		ChartComponent,
-		ChartDialog
+		TableComponent,
+		ChartDialog,
+		TableDialog
 	],
 	exports : [
 		ChartComponent,
-		ChartDialog
+		TableComponent,
+		ChartDialog,
+		TableDialog
 	],
 	entryComponents : [
-		ChartDialog
+		ChartDialog,
+		TableDialog
 	]
 })
 export class ChartModule {}

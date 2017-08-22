@@ -8,6 +8,7 @@ import {PrevInc} from "./models/PrevInc";
 import {Chart} from "../charting/models/Chart";
 import {Series} from "../charting/models/Series";
 import {ChartDialog} from "../charting/chart.dialog";
+import {TableDialog} from "../charting/table.dialog";
 
 @Component({
 	template : require('./utilities.html')
@@ -36,7 +37,7 @@ export class UtilitiesComponent {
 
 	chart () {
 		let chartData = new Chart()
-			.setTitle('Results')
+			.setTitle('Prevalence and Incidence')
 			.setCategories(['2001', '2002', '2003', '2004', '2005'])
 			.setSeries([
 				new Series()
@@ -50,19 +51,32 @@ export class UtilitiesComponent {
 				new Series()
 					.setType('spline')
 					.setName('T')
-					.setData([3, 2.67, 3, 6.33, 3.33]),
-				new Series()
-					.setType('pie')
-					.setName('Prevalence')
-					.setSize(100)
-					.setCenter(100,80)
-					.setData([
-						{name: 'Male', y: 13,},
-						{name: 'Female', y: 23,}
-					])
+					.setData([3, 2.67, 3, 6.33, 3.33])
 			]);
 
 		ChartDialog.open(this.$modal, chartData);
+	}
+
+	table() {
+		let tableData = new Chart()
+			.setTitle('Prevalence and Incidence')
+			.setCategories(['2001', '2002', '2003', '2004', '2005'])
+			.setSeries([
+				new Series()
+					.setType('column')
+					.setName('Male')
+					.setData([3, 2, 1, 3, 4]),
+				new Series()
+					.setType('column')
+					.setName('Female')
+					.setData([2, 3, 5, 7, 6]),
+				new Series()
+					.setType('spline')
+					.setName('T')
+					.setData([3, 2.67, 3, 6.33, 3.33])
+			]);
+
+		TableDialog.open(this.$modal, tableData);
 	}
 }
 

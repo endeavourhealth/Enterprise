@@ -1,5 +1,6 @@
 import {Component} from "@angular/core";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {Transition} from "ui-router-ng2";
 import {StateService} from "ui-router-ng2";
 import {UtilitiesService} from "./utilities.service";
 import {LoggerService} from "eds-common-js";
@@ -16,16 +17,33 @@ import {TableDialog} from "../charting/table.dialog";
 export class UtilitiesComponent {
 
 	constructor(private utilitiesService:UtilitiesService,
+							private transition: Transition,
 							private logger:LoggerService,
 							private $modal: NgbModal,
 							private $state : StateService) {
+
+		this.performAction(transition.params()['utilId']);
+
 	}
+
+	private performAction(utilId: string) {
+		switch (utilId) {
+			case "prev-inc":
+				this.pi();
+				break;
+			default:
+		}
+	}
+
 
 	pi () {
 		let vm = this;
 		let prevInc: PrevInc = {
 			organisation: [],
-			population: ""
+			population: "0",
+			codeSet: "0",
+			timePeriodNo: "10",
+			timePeriod: "YEARS"
 		};
 		PrevIncDialog.open(vm.$modal, prevInc).result.then(
 			(result) => {

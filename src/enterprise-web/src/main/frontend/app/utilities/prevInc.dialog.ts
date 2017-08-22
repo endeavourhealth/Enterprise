@@ -21,10 +21,14 @@ export class PrevIncDialog implements OnInit {
 	@Input() resultData;
 
 	organisation: Organisation = <any>[];
-	population: string = "";
+	population: string = "0";
+	codeSet: string = "0";
+	timePeriodNo: string = "10";
+	timePeriod: string = "YEARS";
 
 	orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
 	ppTT: string = "Please select a patient population as the denominator.";
+	ppTM: string = "Please select the time period to trend.";
 
 	populations = [
 		{id: -1, type: ''},
@@ -69,15 +73,13 @@ export class PrevIncDialog implements OnInit {
 		}
 	}
 
-	setSelectedPopulation(selectElement) {
-		var vm = this;
-		vm.resultData.population = "";
-		if (selectElement.selectedOptions.length > 0)
-			vm.resultData.population = selectElement.selectedOptions[0].value;
-	}
-
 	run() {
 		var vm = this;
+		vm.resultData.population = vm.population;
+		vm.resultData.codeSet = vm.codeSet;
+		vm.resultData.timePeriodNo = vm.timePeriodNo;
+		vm.resultData.timePeriod = vm.timePeriod;
+
 		this.ok();
 	}
 

@@ -39,6 +39,7 @@ import {ChartModule} from "./charting/chart.module";
 		states: [
 			{ name: 'app.dashboard', url: '/dashboard', component: DashboardComponent },
 			{ name : 'app.library', url: '/library', component : LibraryComponent },
+			{ name : 'app.utilityId', url: '/utilities/:utilId', component : UtilitiesComponent },
 			{ name : 'app.utilities', url: '/utilities', component : UtilitiesComponent },
 			{ name : 'app.codeSetEdit', url : '/codeSetEdit/:itemAction/:itemUuid', component : CodeSetEditComponent },
 			{ name: 'app.queryEdit', url: '/queryEdit/:itemAction/:itemUuid', component: QueryEditComponent },

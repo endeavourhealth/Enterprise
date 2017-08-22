@@ -14,28 +14,31 @@
 				<div class="row">
 					<div class="form-group col-md-12">
 						<label>Organisations: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgTT }}"></span>
-						<select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)">
+						All GP Practices <input type="checkbox" checked="checked" disabled>
+						<select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)" disabled>
 							<option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
 						</select>
 					</div>
 					<div class="form-group col-md-12">
 						<label>Patient Population: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
-						<select class="form-control" style="width:300px" (change)="setSelectedPopulation($event.target)">
+						<select class="form-control" style="width:300px" [(ngModel)]="population" [ngModelOptions]="{standalone: true}">
 							<option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
 						</select>
 					</div>
 					<div class="form-group col-md-12">
-						<label>Code Set: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
-						<select class="form-control" style="width:300px" (change)="setCodeSet($event.target)">
+						<label>Code Set: </label> <span style="cursor: pointer" ></span>
+						<select class="form-control" style="width:300px" [(ngModel)]="codeSet" [ngModelOptions]="{standalone: true}">
 							<option *ngFor="let set of codeset" value="{{set.id}}">{{set.name}}</option>
 						</select>
 					</div>
 					<div class="form-group col-md-12">
-						<label>Time Period: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
-						<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." >
-						<select class="form-control" style="width:100px"  >
-							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>
+						<label>Time Period: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTM }}"></span>
+						<div class="input-group">
+							<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." [(ngModel)]="timePeriodNo" [ngModelOptions]="{standalone: true}">
+							<select class="form-control" style="width:100px"  [(ngModel)]="timePeriod" [ngModelOptions]="{standalone: true}">
+								<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+							</select>
+						</div>
 					</div>
 				</div>
 			</div>

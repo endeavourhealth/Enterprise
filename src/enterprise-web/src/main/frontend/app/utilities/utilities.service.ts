@@ -13,5 +13,9 @@ export class UtilitiesService extends BaseHttp2Service {
 		return this.httpGet('api/library/getCodeSets');
 	}
 
+    runDiabetesReport():Observable<any> {
+		console.log('running report');
+        return this.httpGet('api/utility/diabetes');
+    }
 
 }

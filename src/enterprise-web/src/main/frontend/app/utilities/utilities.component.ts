@@ -53,6 +53,17 @@ export class UtilitiesComponent {
 		);
 	}
 
+	test() {
+		let vm = this;
+		vm.utilitiesService.runDiabetesReport()
+			.subscribe(
+				(result) => {
+					console.log('got it')
+				},
+				(data) => vm.logger.error('Error loading', data, 'Error')
+			);
+	}
+
 	chart () {
 		let chartData = new Chart()
 			.setTitle('Prevalence and Incidence')

@@ -4,12 +4,16 @@ import {PrevInc} from "./models/PrevInc";
 import {Organisation} from "../report/models/Organisation";
 import {LoggerService, MessageBoxDialog} from "eds-common-js";
 import {CohortService} from "../cohort/cohort.service";
+import {UtilitiesService} from "./utilities.service";
+import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 
 @Component({
 	selector: 'ngbd-modal-content',
 	template: require('./prevInc.html')
 })
 export class PrevIncDialog implements OnInit {
+
+	codeSets:FolderItem[];
 
 	public static open(modalService: NgbModal, prevInc: PrevInc) {
 		const modalRef = modalService.open(PrevIncDialog, { backdrop : "static", size : "lg"});
@@ -22,7 +26,7 @@ export class PrevIncDialog implements OnInit {
 
 	organisation: Organisation = <any>[];
 	population: string = "0";
-	codeSet: string = "0";
+	codeSet: string = "";
 	timePeriodNo: string = "10";
 	timePeriod: string = "YEARS";
 
@@ -36,16 +40,11 @@ export class PrevIncDialog implements OnInit {
 		{id: 1, type: 'All patients'},
 	];
 
-	codeset = [
-		{id: -1, name: ''},
-		{id: 0, name: 'Diabetes Code Set'},
-		{id: 1, name: 'Asthma Code Set'}
-	];
-
 	organisations = <any>[];
 	periods = ['','MONTHS','YEARS'];
 
 	constructor(protected cohortService: CohortService,
+							private utilitiesService:UtilitiesService,
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
@@ -59,6 +58,18 @@ export class PrevIncDialog implements OnInit {
 				(data) => {
 					vm.organisations = data;
 				});
+
+		vm.getCodeSets();
+	}
+
+	getCodeSets() {
+		var vm = this;
+
+		vm.codeSets = null;
+		vm.utilitiesService.getCodeSets()
+			.subscribe(
+				(data:FolderItem[]) => vm.codeSets = data
+			);
 	}
 
 	setSelectedOrganisations(selectElement) {

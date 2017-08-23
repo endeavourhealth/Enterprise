@@ -464,4 +464,36 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 .entity(results)
                 .build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getCodeSets")
+    public Response getCodeSets(@Context SecurityContext sc) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        String userUuid = SecurityUtils.getCurrentUserId(sc).toString();
+
+        String orgUuid = "B6FF900D-8FCD-43D8-AF37-5DB3A87A6EF6";
+
+        List<JsonFolderContent> ret = new ArrayList<>();
+
+        ActiveItemEntity aI = new ActiveItemEntity();
+
+        List<ActiveItemEntity> activeItems = aI.retrieveActiveItemCodeSets(userUuid, orgUuid);
+        for (ActiveItemEntity activeItem: activeItems) {
+            ItemEntity item = ItemEntity.retrieveForActiveItem(activeItem);
+            AuditEntity audit = AuditEntity.retrieveForUuid(item.getAuditUuid());
+
+            JsonFolderContent content = new JsonFolderContent(activeItem, item, audit, null);
+            ret.add(content);
+        }
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(ret)
+                .build();
+    }
 }

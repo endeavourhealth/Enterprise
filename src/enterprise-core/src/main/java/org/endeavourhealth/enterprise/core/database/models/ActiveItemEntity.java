@@ -168,6 +168,33 @@ public class ActiveItemEntity {
 
     }
 
+    public List<ActiveItemEntity> retrieveActiveItemCodeSets(String endUserUuid, String organisationUuid) throws Exception {
+        String where = "SELECT a from ActiveItemEntity a"
+                + " INNER JOIN ItemEntity i"
+                + " ON i.itemUuid = a.itemUuid"
+                + " AND i.auditUuid = a.auditUuid"
+                + " AND a.isDeleted = 0"
+                + " INNER JOIN AuditEntity ae"
+                + " ON ae.auditUuid = i.auditUuid"
+                + " AND ae.endUserUuid = :endUserUuid"
+                + " WHERE a.itemTypeId = 5"
+                + " AND a.organisationUuid = :organisationUuid"
+                + " ORDER BY ae.timeStamp DESC";
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
+
+        List<ActiveItemEntity> ent = entityManager.createQuery(where, ActiveItemEntity.class)
+                .setParameter("endUserUuid", endUserUuid)
+                .setParameter("organisationUuid", organisationUuid)
+                .getResultList();
+
+        entityManager.close();
+        //PersistenceManager.INSTANCE.close();
+
+        return ent;
+
+    }
+
 
     public static int retrieveCountDependencies(String dependentItemUuid, Short dependencyTypeId) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();

@@ -28,7 +28,7 @@
 					<div class="form-group col-md-12">
 						<label>Code Set: </label> <span style="cursor: pointer" ></span>
 						<select class="form-control" style="width:300px" [(ngModel)]="codeSet" [ngModelOptions]="{standalone: true}">
-							<option *ngFor="let set of codeset" value="{{set.id}}">{{set.name}}</option>
+							<option *ngFor="let set of codeSets" value="{{set.uuid}}">{{set.name}}</option>
 						</select>
 					</div>
 					<div class="form-group col-md-12">

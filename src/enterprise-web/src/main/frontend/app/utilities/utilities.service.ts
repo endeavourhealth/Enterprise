@@ -8,7 +8,10 @@ import {BaseHttp2Service} from "eds-common-js";
 export class UtilitiesService extends BaseHttp2Service {
 	constructor(http : Http) { super(http); }
 
+	getCodeSets():Observable<FolderItem[]> {
 
+		return this.httpGet('api/library/getCodeSets');
+	}
 
 
 }

@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportSchedule;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResult;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultQuery;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultOrganisation;
+DROP TABLE IF EXISTS enterprise_admin.incidence_prevalence_result;
 
 CREATE TABLE enterprise_admin.ActiveItem (
 	ActiveItemUuid char(36) NOT NULL,
@@ -131,3 +132,20 @@ CREATE TABLE enterprise_data_pseudonymised.ReportSchedule (
     PRIMARY KEY (`ReportScheduleId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
+CREATE TABLE enterprise_admin.incidence_prevalence_result (
+	query_id char(36) not null,
+	min_date date not null, 
+	max_date date not null, 
+	incidence_total int null, 
+	incidence_male int null, 
+	incidence_female int null, 
+	incidence_other int null, 
+	population_total int null, 
+	population_male int null, 
+	population_female int null,
+	population_other int null,  
+	prevalence_total int null, 
+	prevalence_male int null, 
+	prevalence_female int null, 
+	prevalence_other int null
+);

@@ -1,17 +1,23 @@
 package org.endeavourhealth.enterprise.core.database;
 
+import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class UtilityManager {
 
-    public boolean runDiabetesReport() throws Exception {
+    public boolean runDiabetesReport(JsonPrevInc options) throws Exception {
 
         cleanUpDatabase();
+        initialiseReportResultTable(options);
         createPopulationTable();
-        createRawDataTable(1);
+        createRawDataTable(options.getCodeSet());
         createDataTable();
         removeDuplicates();
         runIncidenceQueries();
@@ -19,6 +25,53 @@ public class UtilityManager {
         runPopulationQueries();
 
         return true;
+    }
+
+    private void initialiseReportResultTable(JsonPrevInc options) throws Exception {
+        List<String> initialiseScripts = new ArrayList<>();
+
+        initialiseScripts.add("delete from enterprise_admin.incidence_prevalence_result;");
+
+        Date currentDate = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(currentDate);
+
+        Date beginning;
+        Date end;
+
+        Integer number = Integer.parseInt(options.getTimePeriodNo());
+
+        String insert = "insert into enterprise_admin.incidence_prevalence_result (query_id, min_date, max_date)\n" +
+                "values ('70134d14-8402-11e7-a9c9-0a0027000012', '%s', '%s')";
+
+        int precision = Calendar.DAY_OF_YEAR;
+        int substractionPrecision = Calendar.YEAR;
+
+        if (options.getTimePeriod().equals("MONTHS")) {
+            precision = Calendar.DAY_OF_MONTH;
+            substractionPrecision = Calendar.MONTH;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Integer i = 0; i < number; i++) {
+            // get the first day of the month/year
+            c.set(precision, c.getActualMinimum(precision));
+            beginning = c.getTime();
+            // get the last day of the month/year
+            c.set(precision, c.getActualMaximum(precision));
+            end = c.getTime();
+
+            initialiseScripts.add(String.format(insert, dateFormat.format(beginning).toString(),dateFormat.format(end).toString()));
+
+            c.add(substractionPrecision, -1);
+        }
+
+        for (String script : initialiseScripts) {
+            System.out.println(script);
+            runScript(script);
+        }
+
     }
 
     private void cleanUpDatabase() throws Exception {
@@ -66,7 +119,7 @@ public class UtilityManager {
 
     }
 
-    private void createRawDataTable(Integer codeSetId) throws Exception {
+    private void createRawDataTable(String codeSetUuid) throws Exception {
 
         List<String> rawTableScripts = new ArrayList<>();
 
@@ -84,11 +137,11 @@ public class UtilityManager {
                 "FROM enterprise_admin.incidence_prevalence_population p \n" +
                 "JOIN enterprise_data_pseudonymised.observation d \n" +
                 "\tON d.person_id = p.person_id and d.organization_id = p.organization_id\n" +
-                "JOIN enterprise_admin.code_set c \n" +
-                "\tON c.snomed_concept_id = d.snomed_concept_id\n" +
+                "JOIN enterprise_admin.CodeSet c \n" +
+                "\tON c.SnomedConceptId = d.snomed_concept_id\n" +
                 "WHERE \n" +
-                "\tc.code_set_type_id = %d",
-                codeSetId));
+                "\tc.ItemUuid = '%s'",
+        codeSetUuid));
 
 
 

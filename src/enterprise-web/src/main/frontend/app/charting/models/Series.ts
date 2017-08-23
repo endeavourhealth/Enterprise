@@ -14,7 +14,7 @@
 
 	public setName(name : string) : Series {
 		this.name = name;
-		this.showInLegend = (name != null);
+		this.showInLegend = (name != null && name != '');
 		return this;
 	}
 

@@ -6,8 +6,8 @@
 
 
 /* internal css */
-@import "endeavour.css";
 @import "bootstrap-extensions.css";
 @import "font-awesome-extensions.css";
 @import "query.flowchart.css";
 @import "ui-tree-extensions.css";
+@import "endeavour.css";

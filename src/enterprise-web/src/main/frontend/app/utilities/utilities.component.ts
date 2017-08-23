@@ -173,7 +173,7 @@ export class UtilitiesComponent {
 					.setData(incidence_total),
 				new Series()
 					.setType('column')
-					.setName(null)
+					.setName('')
 					.setData(spacer),
 				new Series()
 					.setType('column')

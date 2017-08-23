@@ -4,20 +4,20 @@ import {Chart} from "./models/Chart";
 
 @Component({
 	selector: 'ngbd-modal-content',
-	template: require('./table-dialog.html')
+	template: require('./dual-dialog.html')
 })
-export class TableDialog implements OnInit {
+export class DualDialog implements OnInit {
 
-	public static open(modalService: NgbModal, title : string, tableData : any) {
-		const modalRef = modalService.open(TableDialog, { backdrop : "static", size : "lg"});
+	public static open(modalService: NgbModal, title : string, chartData: Chart) {
+		const modalRef = modalService.open(DualDialog, { backdrop : "static", size : "lg"});
 		modalRef.componentInstance.title = title;
-		modalRef.componentInstance.tableData = tableData;
+		modalRef.componentInstance.chartData = chartData;
 
 		return modalRef;
 	}
 
 	@Input() title;
-	@Input() tableData;
+	@Input() chartData;
 
 	constructor(protected $uibModalInstance : NgbActiveModal) {
 	}
@@ -26,7 +26,7 @@ export class TableDialog implements OnInit {
 	}
 
 	export() {
-		this.tableData.export();
+		this.chartData.export();
 	}
 
 	cancel() {

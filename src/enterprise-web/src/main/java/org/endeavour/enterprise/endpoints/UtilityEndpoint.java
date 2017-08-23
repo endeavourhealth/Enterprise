@@ -32,4 +32,22 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
                 .entity(success)
                 .build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/incprev")
+    public Response getIncPrevResults(@Context SecurityContext sc) throws Exception {
+        System.out.println("Retrieving Incidence & Prevalence results");
+        super.setLogbackMarkers(sc);
+
+        List results = new UtilityManager().getIncPrevResults();
+
+        clearLogbackMarkers();
+
+        return Response
+            .ok()
+            .entity(results)
+            .build();
+    }
 }

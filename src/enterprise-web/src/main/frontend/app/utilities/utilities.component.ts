@@ -10,11 +10,14 @@ import {Chart} from "../charting/models/Chart";
 import {Series} from "../charting/models/Series";
 import {ChartDialog} from "../charting/chart.dialog";
 import {TableDialog} from "../charting/table.dialog";
+import {DualDialog} from "../charting/dual.dialog";
 
 @Component({
 	template : require('./utilities.html')
 })
 export class UtilitiesComponent {
+
+	incPrevRunning : boolean = false;
 
 	constructor(private utilitiesService:UtilitiesService,
 							private transition: Transition,
@@ -48,7 +51,10 @@ export class UtilitiesComponent {
 		PrevIncDialog.open(vm.$modal, prevInc).result.then(
 			(result) => {
 				console.log(result);
-				vm.runReport(result);
+				if (result)
+					vm.runReport(result);
+				else
+					console.log('Cancelled');
 			},
 			(error) => vm.logger.error("Error running utility", error)
 		);
@@ -56,9 +62,11 @@ export class UtilitiesComponent {
 
 	runReport(options: PrevInc) {
 		let vm = this;
+		vm.incPrevRunning = true;
 		vm.utilitiesService.runPrevIncReport(options)
 			.subscribe(
 				(result) => {
+					vm.incPrevRunning = false;
 					console.log('report complete')
 				},
 				(data) => vm.logger.error('Error loading', data, 'Error')
@@ -84,7 +92,7 @@ export class UtilitiesComponent {
 					.setData([3, 2.67, 3, 6.33, 3.33])
 			]);
 
-		ChartDialog.open(this.$modal, chartData);
+		ChartDialog.open(this.$modal, 'Prevalence and Incidence', chartData);
 	}
 
 	table() {
@@ -106,7 +114,51 @@ export class UtilitiesComponent {
 					.setData([3, 2.67, 3, 6.33, 3.33])
 			]);
 
-		TableDialog.open(this.$modal, tableData);
+		TableDialog.open(this.$modal, 'Prevalence and Incidence', tableData);
+	}
+
+	showResults() {
+		let vm = this;
+		vm.utilitiesService.getIncPrevResults()
+			.subscribe(
+				(result) => vm.graphIncPrev(result),
+				(error) => console.error(error)
+			);
+	}
+
+	graphIncPrev(results : any) {
+		console.log(results);
+
+		let categories : string[] = [];
+		let incidence_total : number[] = [];
+		let incidence_male : number[] = [];
+		let incidence_female : number[] = [];
+
+		for(let row of results) {
+			categories.push(row[1].substring(0,4));
+			incidence_total.push(row[3]);
+			incidence_male.push(row[4]);
+			incidence_female.push(row[5]);
+		}
+
+		let chartData = new Chart()
+			.setCategories(categories)
+			.setSeries([
+				new Series()
+					.setType('column')
+					.setName('Male')
+					.setData(incidence_male),
+				new Series()
+					.setType('column')
+					.setName('Female')
+					.setData(incidence_female),
+				new Series()
+					.setType('spline')
+					.setName('Total')
+					.setData(incidence_total)
+			]);
+
+		DualDialog.open(this.$modal, 'Prevalence and Incidence', chartData);
 	}
 }
 

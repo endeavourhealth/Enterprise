@@ -19,4 +19,7 @@ export class UtilitiesService extends BaseHttp2Service {
         return this.httpPost('api/utility/prevInc', options);
     }
 
+    getIncPrevResults() : Observable<any> {
+			return this.httpGet('api/utility/incprev');
+		}
 }

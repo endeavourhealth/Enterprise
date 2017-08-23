@@ -6,6 +6,7 @@ import {ChartComponent} from "./chart.component";
 import {ChartDialog} from "./chart.dialog";
 import {TableDialog} from "./table.dialog";
 import {TableComponent} from "./table.component";
+import {DualDialog} from "./dual.dialog";
 
 @NgModule({
 	imports : [
@@ -17,17 +18,20 @@ import {TableComponent} from "./table.component";
 		ChartComponent,
 		TableComponent,
 		ChartDialog,
-		TableDialog
+		TableDialog,
+		DualDialog,
 	],
 	exports : [
 		ChartComponent,
 		TableComponent,
 		ChartDialog,
-		TableDialog
+		TableDialog,
+		DualDialog
 	],
 	entryComponents : [
 		ChartDialog,
-		TableDialog
+		TableDialog,
+		DualDialog
 	]
 })
 export class ChartModule {}

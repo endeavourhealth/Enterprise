@@ -331,4 +331,18 @@ public class UtilityManager {
         entityManager.close();
 
     }
+
+    public List getIncPrevResults() {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        Query q = entityManager.createNativeQuery("SELECT * FROM enterprise_admin.incidence_prevalence_result ORDER BY min_date ASC");
+
+        List resultList = q.getResultList();
+
+        System.out.println(resultList.size() + " rows affected");
+
+        entityManager.close();
+
+        return resultList;
+    }
 }

@@ -8,13 +8,15 @@ import {Chart} from "./models/Chart";
 })
 export class ChartDialog implements OnInit {
 
-	public static open(modalService: NgbModal, chartData: Chart) {
+	public static open(modalService: NgbModal, title:string, chartData: Chart) {
 		const modalRef = modalService.open(ChartDialog, { backdrop : "static", size : "lg"});
+		modalRef.componentInstance.title = title;
 		modalRef.componentInstance.chartData = chartData;
 
 		return modalRef;
 	}
 
+	@Input() title;
 	@Input() chartData;
 
 	constructor(protected $uibModalInstance : NgbActiveModal) {

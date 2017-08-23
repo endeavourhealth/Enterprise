@@ -1,14 +1,26 @@
 <div class="module">
-	<div class="module-heading">
-		<i class="fa fa-wrench"></i> Utilities
-	</div>
-	<div class="module-body">
-		<div class="row">
-			<div class="col-md-8">
-				<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-bar-chart"></i> Prevalence and Incidence</button>
-				<button class="btn btn-success btn-sm pull-left" (click)="chart()"><i class="fa fa-bar-chart"></i> Test chart</button>
-				<button class="btn btn-success btn-sm pull-left" (click)="table()"><i class="fa fa-bar-chart"></i> Test table</button>
-			</div>
+	<div class="container-fluid">
+		<div class="module-heading">
+			<i class="fa fa-wrench"></i> Utilities
+		</div>
+		<div class="module-body">
+			<form>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-md-8">
+							<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-bar-chart"></i> Prevalence and Incidence</button>
+							<button class="btn btn-success btn-sm pull-left" (click)="showResults()" [disabled]="incPrevRunning"><i class="fa fa-bar-chart"></i> Show Results</button>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-md-8">
+							<button class="btn btn-success btn-sm pull-left" (click)="chart()"><i class="fa fa-bar-chart"></i> Test chart</button>
+							<button class="btn btn-success btn-sm pull-left" (click)="table()"><i class="fa fa-bar-chart"></i> Test table</button>
+						</div>
+					</div>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

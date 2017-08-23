@@ -19,12 +19,11 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/diabetes")
+    @Path("/prevInc")
     public Response reportResult(@Context SecurityContext sc, JsonPrevInc options) throws Exception {
-        System.out.println("in endpoint");
         super.setLogbackMarkers(sc);
 
-        boolean success = new UtilityManager().runDiabetesReport(options);
+        boolean success = new UtilityManager().runPrevIncReport(options);
 
         clearLogbackMarkers();
 

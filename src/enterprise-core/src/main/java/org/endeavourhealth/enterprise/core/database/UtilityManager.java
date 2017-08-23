@@ -12,7 +12,7 @@ import java.util.List;
 
 public class UtilityManager {
 
-    public boolean runDiabetesReport(JsonPrevInc options) throws Exception {
+    public boolean runPrevIncReport(JsonPrevInc options) throws Exception {
 
         cleanUpDatabase();
         initialiseReportResultTable(options);

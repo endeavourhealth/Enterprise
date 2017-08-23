@@ -56,7 +56,7 @@ export class UtilitiesComponent {
 
 	runReport(options: PrevInc) {
 		let vm = this;
-		vm.utilitiesService.runDiabetesReport(options)
+		vm.utilitiesService.runPrevIncReport(options)
 			.subscribe(
 				(result) => {
 					console.log('report complete')

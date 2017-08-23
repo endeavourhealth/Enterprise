@@ -2,8 +2,9 @@ import {Series} from "./Series";
 
 export class Chart {
 	title : string;
-	categories : string[];
-	series : Series[];
+	categories : string[] = [];
+	series : Series[] = [];
+	yAxis : any[] = [];
 
 	public setTitle(title : string) : Chart {
 		this.title = title;
@@ -39,5 +40,16 @@ export class Chart {
 
 		let blob = new Blob([header, '\n', rows], { type: 'text/plain' });
 		window['saveAs'](blob, this.title + '.csv');
+	}
+
+	public addYAxis(title : string, showRight : boolean) : Chart {
+		this.yAxis.push(
+			{
+				title: {text : title},
+				opposite: showRight
+			}
+		);
+
+		return this;
 	}
 }

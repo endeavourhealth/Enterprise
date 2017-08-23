@@ -127,38 +127,85 @@ export class UtilitiesComponent {
 	}
 
 	graphIncPrev(results : any) {
-		console.log(results);
-
 		let categories : string[] = [];
 		let incidence_total : number[] = [];
 		let incidence_male : number[] = [];
 		let incidence_female : number[] = [];
+
+		let spacer : number[] = [];
+
+		let prevalence_total : number[] = [];
+		let prevalence_male : number[] = [];
+		let prevalence_female : number[] = [];
+		let prevalence_other : number[] = [];
+
 
 		for(let row of results) {
 			categories.push(row[1].substring(0,4));
 			incidence_total.push(row[3]);
 			incidence_male.push(row[4]);
 			incidence_female.push(row[5]);
+
+			spacer.push(null);
+
+			prevalence_total.push(this.calcPercentage(row[11],row[7]));
+			prevalence_male.push(this.calcPercentage(row[12], row[8]));
+			prevalence_female.push(this.calcPercentage(row[13], row[9]));
+			prevalence_other.push(this.calcPercentage(row[14], row[10]));
 		}
 
 		let chartData = new Chart()
 			.setCategories(categories)
+			.addYAxis('Incidence', false)
+			.addYAxis('Prevalence (%)', true)
 			.setSeries([
 				new Series()
 					.setType('column')
-					.setName('Male')
+					.setName('Male (I)')
 					.setData(incidence_male),
 				new Series()
 					.setType('column')
-					.setName('Female')
+					.setName('Female (I)')
 					.setData(incidence_female),
 				new Series()
 					.setType('spline')
-					.setName('Total')
-					.setData(incidence_total)
+					.setName('Total (I)')
+					.setData(incidence_total),
+				new Series()
+					.setType('column')
+					.setName(null)
+					.setData(spacer),
+				new Series()
+					.setType('column')
+					.setName('Male (P)')
+					.setData(prevalence_male)
+					.setyAxis(1),
+				new Series()
+					.setType('column')
+					.setName('Female (P)')
+					.setData(prevalence_female)
+					.setyAxis(1),
+				new Series()
+					.setType('column')
+					.setName('Other (P)')
+					.setData(prevalence_other)
+					.setyAxis(1),
+				new Series()
+					.setType('spline')
+					.setName('Total (P)')
+					.setData(prevalence_total)
+					.setyAxis(1)
 			]);
 
 		DualDialog.open(this.$modal, 'Prevalence and Incidence', chartData);
+	}
+
+	calcPercentage(incidence, population : number) : number {
+		if (population == 0)
+			return 0;
+
+		// Leading '+' causes result to be number rather than string
+		return +((100 * incidence) / population).toFixed(3);
 	}
 }
 

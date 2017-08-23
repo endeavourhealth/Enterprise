@@ -17,6 +17,7 @@ export class ChartComponent {
 		let config = {
 			title : { text : data.title },
 			xAxis : { categories : data.categories },
+			yAxis : data.yAxis,
 			series : data.series
 		};
 

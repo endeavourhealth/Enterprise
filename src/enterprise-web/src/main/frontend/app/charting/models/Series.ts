@@ -1,9 +1,11 @@
  export class Series {
 	type : string;
 	name : string;
-	data : any[];
+	data : any[] = [];
 	size : number;
-	center: number[];
+	center: number[] = [];
+	yAxis : number;
+	showInLegend : boolean;
 
 	public setType(type : string) : Series {
 		this.type = type;
@@ -12,6 +14,7 @@
 
 	public setName(name : string) : Series {
 		this.name = name;
+		this.showInLegend = (name != null);
 		return this;
 	}
 
@@ -32,6 +35,11 @@
 
 	public setCenter(x, y : number) : Series {
 		this.center = [x,y];
+		return this;
+	}
+
+	public setyAxis(yAxis : number) : Series {
+		this.yAxis = yAxis;
 		return this;
 	}
  }

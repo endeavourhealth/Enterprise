@@ -6,6 +6,7 @@ import {UtilitiesComponent} from "./utilities.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {PrevIncDialog} from "./prevInc.dialog";
 import {ChartModule} from "../charting/chart.module";
+import {ControlsModule} from "eds-common-js";
 
 @NgModule({
 	imports : [
@@ -13,6 +14,7 @@ import {ChartModule} from "../charting/chart.module";
 		FormsModule,
 		NgbModule,
 		ChartModule,
+		ControlsModule
 	],
 	declarations : [
 		UtilitiesComponent,

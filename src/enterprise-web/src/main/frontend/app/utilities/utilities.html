@@ -8,15 +8,11 @@
 				<div class="form-group">
 					<div class="row">
 						<div class="col-md-8">
-							<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-bar-chart"></i> Prevalence and Incidence</button>
-							<button class="btn btn-success btn-sm pull-left" (click)="showResults()" [disabled]="incPrevRunning"><i class="fa fa-bar-chart"></i> Show Results</button>
-						</div>
-					</div>
-					<br>
-					<div class="row">
-						<div class="col-md-8">
-							<button class="btn btn-success btn-sm pull-left" (click)="chart()"><i class="fa fa-bar-chart"></i> Test chart</button>
-							<button class="btn btn-success btn-sm pull-left" (click)="table()"><i class="fa fa-bar-chart"></i> Test table</button>
+							<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-bar-chart"></i> Run Prevalence and Incidence</button>
+							<span class="pull-left" style="width:10px;">&nbsp;</span>
+							<loadingIndicator [done]="!incPrevRunning" [text]="'Processing...'">
+								<button class="btn btn-success btn-sm pull-left" (click)="showResults()"><i class="fa fa-bar-chart"></i> Last Run Results</button>
+							</loadingIndicator>
 						</div>
 					</div>
 				</div>

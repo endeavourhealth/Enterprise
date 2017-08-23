@@ -174,10 +174,6 @@ export class UtilitiesComponent {
 					.setName('Other (I)')
 					.setData(incidence_other),
 				new Series()
-					.setType('spline')
-					.setName('Total (I)')
-					.setData(incidence_total),
-				new Series()
 					.setType('column')
 					.setName('')
 					.setData(spacer),
@@ -196,6 +192,10 @@ export class UtilitiesComponent {
 					.setName('Other (P)')
 					.setData(prevalence_other)
 					.setyAxis(1),
+				new Series()
+					.setType('spline')
+					.setName('Total (I)')
+					.setData(incidence_total),
 				new Series()
 					.setType('spline')
 					.setName('Total (P)')

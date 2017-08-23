@@ -11,8 +11,18 @@
 	<form role="form">
 		<div class="row">
 			<div class="col-md-12">
-				<chart [data]="chartData"></chart>
-				<chart-table [data]="chartData"></chart-table>
+				<ngb-tabset>
+					<ngb-tab title="Graph">
+						<template ngbTabContent>
+							<chart [data]="chartData"></chart>
+						</template>
+					</ngb-tab>
+					<ngb-tab title="Table">
+						<template ngbTabContent>
+							<chart-table [data]="chartData"></chart-table>
+						</template>
+					</ngb-tab>
+				</ngb-tabset>
 			</div>
 		</div>
 	</form>

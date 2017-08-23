@@ -140,20 +140,26 @@ export class UtilitiesComponent {
 		let prevalence_female : number[] = [];
 		let prevalence_other : number[] = [];
 
+		let population_total : number[] = [];
+		let population_male : number[] = [];
+		let population_female : number[] = [];
+		let population_other : number[] = [];
 
 		for(let row of results) {
+			spacer.push(null);
 			categories.push(row[0].substring(0,4));
 			incidence_total.push(row[1]);
 			incidence_male.push(row[2]);
 			incidence_female.push(row[3]);
 			incidence_other.push(row[4]);
-
-			spacer.push(null);
-
 			prevalence_total.push(this.calcPercentage(row[9],row[5]));
 			prevalence_male.push(this.calcPercentage(row[10], row[6]));
 			prevalence_female.push(this.calcPercentage(row[11], row[7]));
 			prevalence_other.push(this.calcPercentage(row[12], row[8]));
+			population_total.push(row[9]);
+			population_male.push(row[10]);
+			population_female.push(row[11]);
+			population_other.push(row[12]);
 		}
 
 		let chartData = new Chart()
@@ -161,25 +167,28 @@ export class UtilitiesComponent {
 			.setColors([
 				'LightBlue', 'Plum', 'Yellow', 'LightSalmon',									// Male, Female, Other, Total (Incidence)
 				'Black',																											// Spacer
-				'CornflowerBlue', 'MediumOrchid', 'LightGreen', 'Crimson'])		// Male, Female, Other, Total (Prevalence)
+				'CornflowerBlue', 'MediumOrchid', 'LightGreen', 'Crimson',		// Male, Female, Other, Total (Prevalence)
+				'Black',																											// Spacer
+				'DarkBlue', 'DarkOrchid', 'DarkGreen', 'DarkRed'])						// Male, Female, Other, Total (Population)
 			.addYAxis('Incidence', false)
 			.addYAxis('Prevalence (%)', true)
+			.addYAxis('Population', false)
 			.setSeries([
 				new Series()
 					.setType('column')
-					.setName('Male (I)')
+					.setName('Male Incidence')
 					.setData(incidence_male),
 				new Series()
 					.setType('column')
-					.setName('Female (I)')
+					.setName('Female Incidence')
 					.setData(incidence_female),
 				new Series()
 					.setType('column')
-					.setName('Other (I)')
+					.setName('Other Incidence')
 					.setData(incidence_other),
 				new Series()
 					.setType('spline')
-					.setName('Total (I)')
+					.setName('Total Incidence')
 					.setData(incidence_total),
 				new Series()
 					.setType('column')
@@ -187,24 +196,48 @@ export class UtilitiesComponent {
 					.setData(spacer),
 				new Series()
 					.setType('column')
-					.setName('Male (P)')
+					.setName('Male Prevalence (%)')
 					.setData(prevalence_male)
 					.setyAxis(1),
 				new Series()
 					.setType('column')
-					.setName('Female (P)')
+					.setName('Female Prevalence (%)')
 					.setData(prevalence_female)
 					.setyAxis(1),
 				new Series()
 					.setType('column')
-					.setName('Other (P)')
+					.setName('Other Prevalence (%)')
 					.setData(prevalence_other)
 					.setyAxis(1),
 				new Series()
 					.setType('spline')
-					.setName('Total (P)')
+					.setName('Total Prevalence (%)')
 					.setData(prevalence_total)
-					.setyAxis(1)
+					.setyAxis(1),
+				new Series()
+					.setType('column')
+					.setName('')
+					.setData(spacer),
+				new Series()
+					.setType('column')
+					.setName('Male Population')
+					.setData(population_male)
+					.setyAxis(2),
+				new Series()
+					.setType('column')
+					.setName('Female Population')
+					.setData(population_female)
+					.setyAxis(2),
+				new Series()
+					.setType('column')
+					.setName('Other Population')
+					.setData(population_other)
+					.setyAxis(2),
+				new Series()
+					.setType('spline')
+					.setName('Total Population')
+					.setData(population_total)
+					.setyAxis(2)
 			]);
 
 		DualDialog.open(this.$modal, 'Prevalence and Incidence', chartData);

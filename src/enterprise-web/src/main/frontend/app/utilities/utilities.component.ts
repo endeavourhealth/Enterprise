@@ -131,6 +131,7 @@ export class UtilitiesComponent {
 		let incidence_total : number[] = [];
 		let incidence_male : number[] = [];
 		let incidence_female : number[] = [];
+		let incidence_other : number[] = [];
 
 		let spacer : number[] = [];
 
@@ -141,17 +142,18 @@ export class UtilitiesComponent {
 
 
 		for(let row of results) {
-			categories.push(row[1].substring(0,4));
-			incidence_total.push(row[3]);
-			incidence_male.push(row[4]);
-			incidence_female.push(row[5]);
+			categories.push(row[0].substring(0,4));
+			incidence_total.push(row[1]);
+			incidence_male.push(row[2]);
+			incidence_female.push(row[3]);
+			incidence_other.push(row[4]);
 
 			spacer.push(null);
 
-			prevalence_total.push(this.calcPercentage(row[11],row[7]));
-			prevalence_male.push(this.calcPercentage(row[12], row[8]));
-			prevalence_female.push(this.calcPercentage(row[13], row[9]));
-			prevalence_other.push(this.calcPercentage(row[14], row[10]));
+			prevalence_total.push(this.calcPercentage(row[9],row[5]));
+			prevalence_male.push(this.calcPercentage(row[10], row[6]));
+			prevalence_female.push(this.calcPercentage(row[11], row[7]));
+			prevalence_other.push(this.calcPercentage(row[12], row[8]));
 		}
 
 		let chartData = new Chart()
@@ -167,6 +169,10 @@ export class UtilitiesComponent {
 					.setType('column')
 					.setName('Female (I)')
 					.setData(incidence_female),
+				new Series()
+					.setType('column')
+					.setName('Other (I)')
+					.setData(incidence_other),
 				new Series()
 					.setType('spline')
 					.setName('Total (I)')

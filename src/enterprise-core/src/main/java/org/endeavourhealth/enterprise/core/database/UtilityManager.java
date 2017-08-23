@@ -335,7 +335,12 @@ public class UtilityManager {
     public List getIncPrevResults() {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        Query q = entityManager.createNativeQuery("SELECT * FROM enterprise_admin.incidence_prevalence_result ORDER BY min_date ASC");
+        Query q = entityManager.createNativeQuery("SELECT "+
+            "min_date, "+
+            "incidence_total, incidence_male, incidence_female, incidence_other, "+
+            "population_total, population_male, population_female, population_other, "+
+            "prevalence_total, prevalence_male, prevalence_female, prevalence_other "+
+            "FROM enterprise_admin.incidence_prevalence_result ORDER BY min_date ASC");
 
         List resultList = q.getResultList();
 

@@ -158,6 +158,10 @@ export class UtilitiesComponent {
 
 		let chartData = new Chart()
 			.setCategories(categories)
+			.setColors([
+				'LightBlue', 'Plum', 'Yellow', 'LightSalmon',									// Male, Female, Other, Total (Incidence)
+				'Black',																											// Spacer
+				'CornflowerBlue', 'MediumOrchid', 'LightGreen', 'Crimson'])		// Male, Female, Other, Total (Prevalence)
 			.addYAxis('Incidence', false)
 			.addYAxis('Prevalence (%)', true)
 			.setSeries([
@@ -173,6 +177,10 @@ export class UtilitiesComponent {
 					.setType('column')
 					.setName('Other (I)')
 					.setData(incidence_other),
+				new Series()
+					.setType('spline')
+					.setName('Total (I)')
+					.setData(incidence_total),
 				new Series()
 					.setType('column')
 					.setName('')
@@ -192,10 +200,6 @@ export class UtilitiesComponent {
 					.setName('Other (P)')
 					.setData(prevalence_other)
 					.setyAxis(1),
-				new Series()
-					.setType('spline')
-					.setName('Total (I)')
-					.setData(incidence_total),
 				new Series()
 					.setType('spline')
 					.setName('Total (P)')

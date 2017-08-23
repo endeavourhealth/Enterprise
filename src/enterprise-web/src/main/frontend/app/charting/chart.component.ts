@@ -15,6 +15,7 @@ export class ChartComponent {
 	set data(data : Chart) {
 
 		let config = {
+			colors: data.colors,
 			title : { text : data.title },
 			xAxis : { categories : data.categories },
 			yAxis : data.yAxis,

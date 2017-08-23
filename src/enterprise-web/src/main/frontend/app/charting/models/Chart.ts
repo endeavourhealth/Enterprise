@@ -5,6 +5,7 @@ export class Chart {
 	categories : string[] = [];
 	series : Series[] = [];
 	yAxis : any[] = [];
+	colors : string[];
 
 	public setTitle(title : string) : Chart {
 		this.title = title;
@@ -50,6 +51,11 @@ export class Chart {
 			}
 		);
 
+		return this;
+	}
+
+	public setColors(colors : string[]) : Chart {
+		this.colors = colors;
 		return this;
 	}
 }

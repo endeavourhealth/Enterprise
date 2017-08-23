@@ -48,13 +48,13 @@ export class UtilitiesComponent {
 		PrevIncDialog.open(vm.$modal, prevInc).result.then(
 			(result) => {
 				console.log(result);
-				vm.test(result);
+				vm.runReport(result);
 			},
 			(error) => vm.logger.error("Error running utility", error)
 		);
 	}
 
-	test(options: PrevInc) {
+	runReport(options: PrevInc) {
 		let vm = this;
 		vm.utilitiesService.runDiabetesReport(options)
 			.subscribe(

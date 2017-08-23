@@ -205,7 +205,7 @@ export class UtilitiesComponent {
 			return 0;
 
 		// Leading '+' causes result to be number rather than string
-		return +((100 * incidence) / population).toFixed(3);
+		return +((100 * incidence) / population).toFixed(1);
 	}
 }
 

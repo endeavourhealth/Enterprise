@@ -113,18 +113,20 @@ export class UtilitiesComponent {
 
 		for (let row of results) {
 			chartData.categories.push(row[0].substring(0, monthly ? 7 : 4));
-			chartData.incidence_total.push(row[1]);
-			chartData.incidence_male.push(row[2]);
-			chartData.incidence_female.push(row[3]);
-			chartData.incidence_other.push(row[4]);
-			chartData.prevalence_total.push(this.calcPercentage(row[9], row[5]));
-			chartData.prevalence_male.push(this.calcPercentage(row[10], row[6]));
-			chartData.prevalence_female.push(this.calcPercentage(row[11], row[7]));
-			chartData.prevalence_other.push(this.calcPercentage(row[12], row[8]));
-			chartData.population_total.push(row[5]);
-			chartData.population_male.push(row[6]);
-			chartData.population_female.push(row[7]);
-			chartData.population_other.push(row[8]);
+			chartData.incidence_male.push(row[1]);
+			chartData.incidence_female.push(row[2]);
+			chartData.incidence_other.push(row[3]);
+			chartData.incidence_total.push(row[1] + row[2] + row[3]);
+
+			chartData.prevalence_male.push(this.calcPercentage(row[4], row[7]));
+			chartData.prevalence_female.push(this.calcPercentage(row[5], row[8]));
+			chartData.prevalence_other.push(this.calcPercentage(row[6], row[9]));
+			chartData.prevalence_total.push(this.calcPercentage(row[4]+row[5]+row[6], row[7]+row[8]+row[9]));
+
+			chartData.population_male.push(row[7]);
+			chartData.population_female.push(row[8]);
+			chartData.population_other.push(row[9]);
+			chartData.population_total.push(row[7]+row[8]+row[9]);
 		}
 
 		return chartData;

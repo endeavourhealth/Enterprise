@@ -125,12 +125,11 @@ public class UtilityManager {
                         "\tDISTINCT\n" +
                         "    p.patient_id,\n" +
                         "\tp.person_id, \n" +
-                        "    ANY_VALUE(p.patient_gender_id) as patient_gender_id,\n" +
-                        "    ANY_VALUE(p.date_of_death) as date_of_death, \n" +
-                        "    ANY_VALUE(p.registration_type_id) as registration_type_id,  \n" +
-                        "    ANY_VALUE(p.date_registered) as date_registered, \n" +
-                        "    ANY_VALUE(p.date_registered_end) as date_registered_end, \n" +
-                        "    ANY_VALUE(d.snomed_concept_id) as snomed_concept_id,\n" +
+                        "    p.patient_gender_id as patient_gender_id,\n" +
+                        "    p.date_of_death as date_of_death, \n" +
+                        "    p.registration_type_id as registration_type_id,  \n" +
+                        "    p.date_registered as date_registered, \n" +
+                        "    p.date_registered_end as date_registered_end, \n" +
                         "    min(coalesce(clinical_effective_date, '1000-01-01')) as clinical_effective_date,\n" +
                         "    min(d.id) as id\n" +
                         "FROM enterprise_admin.incidence_prevalence_population p \n" +
@@ -140,7 +139,8 @@ public class UtilityManager {
                         "\tON c.SnomedConceptId = d.snomed_concept_id\n" +
                         "WHERE " +
                         "\tc.ItemUuid = '%s'\n" +
-                        "group by person_id;",
+                        "group by p.patient_id, p.person_id, p.patient_gender_id, p.date_of_death, p.registration_type_id, \n" +
+                        " p.date_registered, p.date_registered_end;",
                 codeSetUuid));
 
         dataTableScripts.add("CREATE INDEX ix_incidence_prevalence_data\n" +
@@ -159,7 +159,7 @@ public class UtilityManager {
                 "(select \n" +
                 "\tr.min_date,\n" +
                 "    r.max_date,\n" +
-                "    count(d.clinical_effective_date) total\n" +
+                "    count(d.person_id) total\n" +
                 "from enterprise_admin.incidence_prevalence_result r\n" +
                 "left outer join enterprise_admin.incidence_prevalence_data d on d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date %s\n" +
                 "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +

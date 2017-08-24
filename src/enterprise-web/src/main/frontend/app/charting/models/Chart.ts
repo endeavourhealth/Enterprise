@@ -6,6 +6,8 @@ export class Chart {
 	series : Series[] = [];
 	yAxis : any[] = [];
 	colors : string[];
+	height : number;
+	legend : any = {};
 
 	public setTitle(title : string) : Chart {
 		this.title = title;
@@ -32,14 +34,22 @@ export class Chart {
 		return this;
 	}
 
-	public export() {
-		let header = 'Series,' + this.categories.join(',');
+	public getRowData() : string [] {
+		let header : string = 'Series,' + this.categories.join(',');
 
-		let rows = this.series.map(
+		let rows : string[] = this.series.map(
 			series => series.name + ',' + series.data.join(',')
-		).join('\n');
+		);
 
-		let blob = new Blob([header, '\n', rows], { type: 'text/plain' });
+		rows = [header].concat(rows);
+
+		return rows;
+	}
+
+	public export() {
+		let data = this.getRowData().join('\n');
+
+		let blob = new Blob([data], { type: 'text/plain' });
 		window['saveAs'](blob, this.title + '.csv');
 	}
 
@@ -56,6 +66,16 @@ export class Chart {
 
 	public setColors(colors : string[]) : Chart {
 		this.colors = colors;
+		return this;
+	}
+
+	public setHeight(height : number) : Chart {
+		this.height = height;
+		return this;
+	}
+
+	public setLegend(legend : any) : Chart {
+		this.legend = legend;
 		return this;
 	}
 }

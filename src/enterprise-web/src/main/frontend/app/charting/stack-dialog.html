@@ -1,0 +1,40 @@
+<style>
+	.form-group {
+		margin-bottom: 10px;
+	}
+</style>
+<div class="modal-header">
+	<button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+	<h4 class="modal-title">{{title}}</h4>
+</div>
+<div class="modal-body">
+	<form role="form">
+				<ngb-tabset>
+					<ngb-tab title="Graph">
+						<template ngbTabContent>
+							<div *ngFor="let chart of chartData">
+								<div class="row">
+									<div class="col-md-12">
+								<chart [data]="chart"></chart>
+									</div>
+								</div>
+							</div>
+						</template>
+					</ngb-tab>
+					<ngb-tab title="Table">
+						<template ngbTabContent>
+							<div *ngFor="let chart of chartData">
+								<chart-table [data]="chart"></chart-table>
+							</div>
+						</template>
+					</ngb-tab>
+				</ngb-tabset>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-primary" (click)="export()">Export</button>
+	<button type="button" class="btn btn-default" (click)="cancel()">Close</button>
+</div>
+
+

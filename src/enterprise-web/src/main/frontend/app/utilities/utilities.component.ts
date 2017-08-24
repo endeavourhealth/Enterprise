@@ -47,7 +47,8 @@ export class UtilitiesComponent {
 			population: "0",
 			codeSet: "0",
 			timePeriodNo: "10",
-			timePeriod: "YEARS"
+			timePeriod: "YEARS",
+			title: 'Incidence and Prevalence'
 		};
 		PrevIncDialog.open(vm.$modal, prevInc).result.then(
 			(result) => {
@@ -251,7 +252,7 @@ export class UtilitiesComponent {
 				])
 		];
 
-		StackDialog.open(this.$modal, 'Prevalence and Incidence', chartData);
+		StackDialog.open(this.$modal, results[0][13], chartData);
 	}
 
 	calcPercentage(incidence, population : number) : number {

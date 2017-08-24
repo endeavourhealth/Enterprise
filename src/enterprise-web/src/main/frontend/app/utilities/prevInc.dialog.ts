@@ -29,6 +29,7 @@ export class PrevIncDialog implements OnInit {
 	codeSet: string = "";
 	timePeriodNo: string = "10";
 	timePeriod: string = "YEARS";
+	title: string = "Incidence and Prevalence";
 
 	orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
 	ppTT: string = "Please select a patient population as the denominator.";
@@ -90,6 +91,7 @@ export class PrevIncDialog implements OnInit {
 		vm.resultData.codeSet = vm.codeSet;
 		vm.resultData.timePeriodNo = vm.timePeriodNo;
 		vm.resultData.timePeriod = vm.timePeriod;
+		vm.resultData.title = vm.title;
 
 		this.ok();
 	}

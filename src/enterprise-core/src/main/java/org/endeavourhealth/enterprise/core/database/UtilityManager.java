@@ -41,8 +41,8 @@ public class UtilityManager {
 
         Integer number = Integer.parseInt(options.getTimePeriodNo());
 
-        String insert = "insert into enterprise_admin.incidence_prevalence_result (query_id, min_date, max_date)\n" +
-                "values ('70134d14-8402-11e7-a9c9-0a0027000012', '%s', '%s')";
+        String insert = "insert into enterprise_admin.incidence_prevalence_result (query_id, query_title, min_date, max_date)\n" +
+                "values ('70134d14-8402-11e7-a9c9-0a0027000012', '%s', '%s', '%s')";
 
         int precision = Calendar.DAY_OF_YEAR;
         int substractionPrecision = Calendar.YEAR;
@@ -62,7 +62,7 @@ public class UtilityManager {
             c.set(precision, c.getActualMaximum(precision));
             end = c.getTime();
 
-            initialiseScripts.add(String.format(insert, dateFormat.format(beginning).toString(),dateFormat.format(end).toString()));
+            initialiseScripts.add(String.format(insert, options.getTitle(), dateFormat.format(beginning).toString(),dateFormat.format(end).toString()));
 
             c.add(substractionPrecision, -1);
         }
@@ -339,7 +339,7 @@ public class UtilityManager {
             "min_date, "+
             "incidence_total, incidence_male, incidence_female, incidence_other, "+
             "population_total, population_male, population_female, population_other, "+
-            "prevalence_total, prevalence_male, prevalence_female, prevalence_other "+
+            "prevalence_total, prevalence_male, prevalence_female, prevalence_other, query_title "+
             "FROM enterprise_admin.incidence_prevalence_result ORDER BY min_date ASC");
 
         List resultList = q.getResultList();

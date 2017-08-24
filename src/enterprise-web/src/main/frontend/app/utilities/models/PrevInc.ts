@@ -5,4 +5,5 @@ export class PrevInc {
 	codeSet: string;
 	timePeriodNo: string;
 	timePeriod: string;
+	title: string;
 }

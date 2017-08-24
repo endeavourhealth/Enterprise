@@ -11,6 +11,7 @@ public class JsonPrevInc {
     private String codeSet;
     private String timePeriodNo;
     private String timePeriod;
+    private String title;
 
     public List<JsonOrganisation> getOrganisation() {
         return organisation;
@@ -50,5 +51,13 @@ public class JsonPrevInc {
 
     public void setTimePeriod(String timePeriod) {
         this.timePeriod = timePeriod;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

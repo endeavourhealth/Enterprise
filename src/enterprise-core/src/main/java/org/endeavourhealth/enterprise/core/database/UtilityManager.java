@@ -174,8 +174,6 @@ public class UtilityManager {
         incidenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 1", "incidence_female"));
         // Other
         incidenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id not in (0, 1)", "incidence_other"));
-        // total
-        incidenceScripts.add(String.format(incidenceQuery, " ", "incidence_total"));
 
         for (String script : incidenceScripts) {
             runScript(script);
@@ -208,8 +206,6 @@ public class UtilityManager {
         prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 1", "prevalence_female"));
         // Other
         prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id not in (0, 1)", "prevalence_other"));
-        // total
-        prevalenceScripts.add(String.format(incidenceQuery, " ", "prevalence_total"));
 
         for (String script : prevalenceScripts) {
             runScript(script);
@@ -243,8 +239,6 @@ public class UtilityManager {
         prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 1", "population_female"));
         // Other
         prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id not in (0, 1)", "population_other"));
-        // total
-        prevalenceScripts.add(String.format(incidenceQuery, " ", "population_total"));
 
         for (String script : prevalenceScripts) {
             runScript(script);

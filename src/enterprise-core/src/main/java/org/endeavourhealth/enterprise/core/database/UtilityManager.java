@@ -91,6 +91,7 @@ public class UtilityManager {
 
         populationTableScripts.add("CREATE TABLE enterprise_admin.incidence_prevalence_population\n" +
                 "SELECT\n" +
+                "\tp.id as patient_id," +
                 "\tp.person_id, \n" +
                 "    p.patient_gender_id,\n" +
                 "    p.date_of_death, \n" +
@@ -122,21 +123,22 @@ public class UtilityManager {
         dataTableScripts.add(String.format("CREATE TABLE enterprise_admin.incidence_prevalence_data\n" +
                         "SELECT\n" +
                         "\tDISTINCT\n" +
+                        "    p.patient_id,\n" +
                         "\tp.person_id, \n" +
-                        "    p.patient_gender_id,\n" +
-                        "    p.date_of_death, \n" +
-                        "    p.registration_type_id,  \n" +
-                        "    p.date_registered, \n" +
-                        "    p.date_registered_end, \n" +
-                        "    d.snomed_concept_id,\n" +
+                        "    ANY_VALUE(p.patient_gender_id) as patient_gender_id,\n" +
+                        "    ANY_VALUE(p.date_of_death) as date_of_death, \n" +
+                        "    ANY_VALUE(p.registration_type_id) as registration_type_id,  \n" +
+                        "    ANY_VALUE(p.date_registered) as date_registered, \n" +
+                        "    ANY_VALUE(p.date_registered_end) as date_registered_end, \n" +
+                        "    ANY_VALUE(d.snomed_concept_id) as snomed_concept_id,\n" +
                         "    min(coalesce(clinical_effective_date, '1000-01-01')) as clinical_effective_date,\n" +
-                        "    d.id\n" +
+                        "    min(d.id) as id\n" +
                         "FROM enterprise_admin.incidence_prevalence_population p \n" +
                         "JOIN enterprise_data_pseudonymised.observation d \n" +
                         "\tON d.person_id = p.person_id and d.organization_id = p.organization_id\n" +
                         "JOIN enterprise_admin.CodeSet c \n" +
                         "\tON c.SnomedConceptId = d.snomed_concept_id\n" +
-                        "WHERE \n" +
+                        "WHERE " +
                         "\tc.ItemUuid = '%s'\n" +
                         "group by person_id;",
                 codeSetUuid));

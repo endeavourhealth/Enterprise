@@ -105,8 +105,14 @@ export class UtilitiesComponent {
 			population_other: []
 		};
 
+		// Determine if year or month
+		let monthly : boolean = false;
+		if (results.length > 1)
+			monthly = results[0][0].substring(5, 7) != results[1][0].substring(5, 7);
+
+
 		for (let row of results) {
-			chartData.categories.push(row[0].substring(0, 4));
+			chartData.categories.push(row[0].substring(0, monthly ? 7 : 4));
 			chartData.incidence_total.push(row[1]);
 			chartData.incidence_male.push(row[2]);
 			chartData.incidence_female.push(row[3]);

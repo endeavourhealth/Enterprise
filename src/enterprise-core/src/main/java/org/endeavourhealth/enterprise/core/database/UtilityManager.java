@@ -17,9 +17,7 @@ public class UtilityManager {
         cleanUpDatabase();
         initialiseReportResultTable(options);
         createPopulationTable();
-        createRawDataTable(options.getCodeSet());
-        createDataTable();
-        removeDuplicates();
+        createDataTable(options.getCodeSet());
         runIncidenceQueries();
         runPrevalenceQueries();
         runPopulationQueries();
@@ -79,9 +77,7 @@ public class UtilityManager {
         List<String> deleteScripts = new ArrayList<>();
 
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_population;");
-        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_data_raw;");
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_data;");
-        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_data_duplicates;");
 
         for (String script : deleteScripts) {
             runScript(script);
@@ -119,98 +115,36 @@ public class UtilityManager {
 
     }
 
-    private void createRawDataTable(String codeSetUuid) throws Exception {
-
-        List<String> rawTableScripts = new ArrayList<>();
-
-        rawTableScripts.add(String.format("CREATE TABLE enterprise_admin.incidence_prevalence_data_raw\n" +
-                "SELECT\n" +
-                "\tp.person_id, \n" +
-                "    p.patient_gender_id,\n" +
-                "    p.date_of_death, \n" +
-                "    p.registration_type_id,  \n" +
-                "    p.date_registered, \n" +
-                "    p.date_registered_end, \n" +
-                "    d.snomed_concept_id,\n" +
-                "    d.clinical_effective_date,\n" +
-                "    d.id\n" +
-                "FROM enterprise_admin.incidence_prevalence_population p \n" +
-                "JOIN enterprise_data_pseudonymised.observation d \n" +
-                "\tON d.person_id = p.person_id and d.organization_id = p.organization_id\n" +
-                "JOIN enterprise_admin.CodeSet c \n" +
-                "\tON c.SnomedConceptId = d.snomed_concept_id\n" +
-                "WHERE \n" +
-                "\tc.ItemUuid = '%s'",
-        codeSetUuid));
-
-
-
-        rawTableScripts.add("CREATE INDEX ix_incidence_prevalence_data_raw\n" +
-                "ON enterprise_admin.incidence_prevalence_data_raw (person_id, clinical_effective_date);");
-
-        for (String script : rawTableScripts) {
-            runScript(script);
-        }
-    }
-
-    private void createDataTable() throws Exception {
+    private void createDataTable(String codeSetUuid) throws Exception {
 
         List<String> dataTableScripts = new ArrayList<>();
 
-        dataTableScripts.add("CREATE TABLE enterprise_admin.incidence_prevalence_data\n" +
-                "SELECT DISTINCT\n" +
-                "\tperson_id, \n" +
-                "    patient_gender_id,\n" +
-                "    date_of_death, \n" +
-                "    registration_type_id,  \n" +
-                "    date_registered, \n" +
-                "    date_registered_end, \n" +
-                "    snomed_concept_id,\n" +
-                "    clinical_effective_date,\n" +
-                "    id\n" +
-                "FROM enterprise_admin.incidence_prevalence_data_raw earliest\n" +
-                "WHERE\n" +
-                "\tNOT EXISTS (\n" +
-                "\t\tSELECT 1 \n" +
-                "        FROM enterprise_admin.incidence_prevalence_data_raw later\n" +
-                "        WHERE \n" +
-                "\t\t\tlater.person_id = earliest.person_id\n" +
-                "            AND ((later.clinical_effective_date < earliest.clinical_effective_date)\n" +
-                "\t\t\t\tOR (later.clinical_effective_date IS NULL AND earliest.clinical_effective_date IS NOT NULL))\n" +
-                "    );");
-
-        //No need for the raw table now.
-        dataTableScripts.add("DROP TABLE enterprise_admin.incidence_prevalence_data_raw;");
+        dataTableScripts.add(String.format("CREATE TABLE enterprise_admin.incidence_prevalence_data\n" +
+                        "SELECT\n" +
+                        "\tDISTINCT\n" +
+                        "\tp.person_id, \n" +
+                        "    p.patient_gender_id,\n" +
+                        "    p.date_of_death, \n" +
+                        "    p.registration_type_id,  \n" +
+                        "    p.date_registered, \n" +
+                        "    p.date_registered_end, \n" +
+                        "    d.snomed_concept_id,\n" +
+                        "    min(coalesce(clinical_effective_date, '1000-01-01')) as clinical_effective_date,\n" +
+                        "    d.id\n" +
+                        "FROM enterprise_admin.incidence_prevalence_population p \n" +
+                        "JOIN enterprise_data_pseudonymised.observation d \n" +
+                        "\tON d.person_id = p.person_id and d.organization_id = p.organization_id\n" +
+                        "JOIN enterprise_admin.CodeSet c \n" +
+                        "\tON c.SnomedConceptId = d.snomed_concept_id\n" +
+                        "WHERE \n" +
+                        "\tc.ItemUuid = '%s'\n" +
+                        "group by person_id;",
+                codeSetUuid));
 
         dataTableScripts.add("CREATE INDEX ix_incidence_prevalence_data\n" +
                 "ON enterprise_admin.incidence_prevalence_data (clinical_effective_date, patient_gender_id);");
 
         for (String script : dataTableScripts) {
-            runScript(script);
-        }
-    }
-
-    private void removeDuplicates() throws Exception {
-
-        List<String> duplicateRemovalScripts = new ArrayList<>();
-
-        duplicateRemovalScripts.add("CREATE TABLE enterprise_admin.incidence_prevalence_data_duplicates \n" +
-                "SELECT\n" +
-                "\tperson_id, MIN(id) as id_to_keep\n" +
-                "FROM enterprise_admin.incidence_prevalence_data\n" +
-                "GROUP BY person_id\n" +
-                "HAVING COUNT(1) > 1;");
-
-
-        duplicateRemovalScripts.add("DELETE r FROM enterprise_admin.incidence_prevalence_data r \n" +
-                "inner JOIN enterprise_admin.incidence_prevalence_data_duplicates  duplicates\n" +
-                "ON \n" +
-                "\tduplicates.person_id = r.person_id\n" +
-                "    AND duplicates.id_to_keep != r.id;");
-
-        duplicateRemovalScripts.add("DROP TABLE enterprise_admin.incidence_prevalence_data_duplicates;");
-
-        for (String script : duplicateRemovalScripts) {
             runScript(script);
         }
     }

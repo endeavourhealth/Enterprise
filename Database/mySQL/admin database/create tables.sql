@@ -134,6 +134,7 @@ CREATE TABLE enterprise_data_pseudonymised.ReportSchedule (
 
 CREATE TABLE enterprise_admin.incidence_prevalence_result (
 	query_id char(36) not null,
+    query_title varchar(100) null,
 	min_date date not null, 
 	max_date date not null, 
 	incidence_total int null, 

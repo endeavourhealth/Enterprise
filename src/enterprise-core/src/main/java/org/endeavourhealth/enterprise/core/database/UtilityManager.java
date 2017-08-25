@@ -16,7 +16,6 @@ public class UtilityManager {
 
         cleanUpDatabase();
         initialiseReportResultTable(options);
-        createPopulationTable();
         createDataTable(options.getCodeSet());
         runIncidenceQueries();
         runPrevalenceQueries();
@@ -85,37 +84,6 @@ public class UtilityManager {
 
     }
 
-    private void createPopulationTable() throws Exception {
-
-        List<String> populationTableScripts = new ArrayList<>();
-
-        populationTableScripts.add("CREATE TABLE enterprise_admin.incidence_prevalence_population\n" +
-                "SELECT\n" +
-                "\tp.id as patient_id," +
-                "\tp.person_id, \n" +
-                "    p.patient_gender_id,\n" +
-                "    p.date_of_death, \n" +
-                "    e.registration_type_id,  \n" +
-                "    e.date_registered, \n" +
-                "    e.date_registered_end,\n" +
-                "    p.organization_id\n" +
-                "from enterprise_data_pseudonymised.patient p \n" +
-                "JOIN enterprise_data_pseudonymised.episode_of_care e \n" +
-                "\tON e.person_id = p.person_id and e.organization_id = p.organization_id;");
-
-        populationTableScripts.add("CREATE INDEX ix_incidence_prevalence_population\n" +
-                "ON enterprise_admin.incidence_prevalence_population (person_id);");
-
-        populationTableScripts.add("CREATE INDEX ix2_incidence_prevalence_population\n" +
-                "ON enterprise_admin.incidence_prevalence_population (patient_gender_id, date_registered, date_registered_end, date_of_death);");
-
-
-        for (String script : populationTableScripts) {
-            runScript(script);
-        }
-
-    }
-
     private void createDataTable(String codeSetUuid) throws Exception {
 
         List<String> dataTableScripts = new ArrayList<>();
@@ -123,28 +91,21 @@ public class UtilityManager {
         dataTableScripts.add(String.format("CREATE TABLE enterprise_admin.incidence_prevalence_data\n" +
                         "SELECT\n" +
                         "\tDISTINCT\n" +
-                        "    p.patient_id,\n" +
-                        "\tp.person_id, \n" +
-                        "    p.patient_gender_id as patient_gender_id,\n" +
-                        "    p.date_of_death as date_of_death, \n" +
-                        "    p.registration_type_id as registration_type_id,  \n" +
-                        "    p.date_registered as date_registered, \n" +
-                        "    p.date_registered_end as date_registered_end, \n" +
-                        "    min(coalesce(clinical_effective_date, '1000-01-01')) as clinical_effective_date,\n" +
-                        "    min(d.id) as id\n" +
-                        "FROM enterprise_admin.incidence_prevalence_population p \n" +
+                        "    d.patient_id, \n" +
+                        "    min(coalesce(d.clinical_effective_date, '1000-01-01')) as clinical_effective_date\n" +
+                        "FROM enterprise_admin.CodeSet c\n" +
                         "JOIN enterprise_data_pseudonymised.observation d \n" +
-                        "\tON d.person_id = p.person_id and d.organization_id = p.organization_id\n" +
-                        "JOIN enterprise_admin.CodeSet c \n" +
-                        "\tON c.SnomedConceptId = d.snomed_concept_id\n" +
-                        "WHERE " +
-                        "\tc.ItemUuid = '%s'\n" +
-                        "group by p.patient_id, p.person_id, p.patient_gender_id, p.date_of_death, p.registration_type_id, \n" +
-                        " p.date_registered, p.date_registered_end;",
+                        "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
+                        "WHERE \n" +
+                        "    c.ItemUuid = '%s'\n" +
+                        "group by d.patient_id;",
                 codeSetUuid));
 
-        dataTableScripts.add("CREATE INDEX ix_incidence_prevalence_data\n" +
-                "ON enterprise_admin.incidence_prevalence_data (clinical_effective_date, patient_gender_id);");
+        dataTableScripts.add("CREATE INDEX ix_incidence_prevalence_data_clinical_date\n" +
+                "ON enterprise_admin.incidence_prevalence_data (clinical_effective_date);");
+
+        dataTableScripts.add("CREATE UNIQUE INDEX ix_incidence_prevalence_data_patient_id\n" +
+                "ON enterprise_admin.incidence_prevalence_data (patient_id);");
 
         for (String script : dataTableScripts) {
             runScript(script);
@@ -159,9 +120,13 @@ public class UtilityManager {
                 "(select \n" +
                 "\tr.min_date,\n" +
                 "    r.max_date,\n" +
-                "    count(d.person_id) total\n" +
+                "    count(DISTINCT p.person_id) total\n" +
                 "from enterprise_admin.incidence_prevalence_result r\n" +
-                "left outer join enterprise_admin.incidence_prevalence_data d on d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date %s\n" +
+                "left outer join enterprise_admin.incidence_prevalence_data d \n" +
+                "\ton d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date \n" +
+                "left outer join enterprise_data_pseudonymised.patient p \n" +
+                "\ton p.id = d.patient_id\n" +
+                "    %s\n" +
                 "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
                 "group by r.min_date, r.max_date) gru\n" +
                 "set res.%s = gru.total\n" +
@@ -169,11 +134,11 @@ public class UtilityManager {
                 "and res.query_id = '70134d14-8402-11e7-a9c9-0a0027000012';";
 
         // Male
-        incidenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 0", "incidence_male"));
+        incidenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 0", "incidence_male"));
         // Female
-        incidenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 1", "incidence_female"));
+        incidenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 1", "incidence_female"));
         // Other
-        incidenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id not in (0, 1)", "incidence_other"));
+        incidenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id not in (0, 1)", "incidence_other"));
 
         for (String script : incidenceScripts) {
             runScript(script);
@@ -188,24 +153,26 @@ public class UtilityManager {
                 "(select \n" +
                 "\tr.min_date,\n" +
                 "    r.max_date,\n" +
-                "    COUNT(DISTINCT d.person_id) total -- DL changed to count distinct persons\n" +
+                "    COUNT(DISTINCT p.person_id) total \n" +
                 "from enterprise_admin.incidence_prevalence_result r\n" +
                 "left outer join enterprise_admin.incidence_prevalence_data d \n" +
-                "\ton d.clinical_effective_date <= r.max_date \n" +
+                "\ton d.clinical_effective_date <= r.max_date\n" +
+                "left outer join enterprise_data_pseudonymised.patient p \n" +
+                "\ton p.id = d.patient_id\n" +
                 "\t%s\n" +
-                "    AND (d.date_of_death IS NULL OR d.date_of_death > r.max_date) -- DL factor in date of death into this query\n" +
-                "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
+                "    AND (p.date_of_death IS NULL OR p.date_of_death > r.max_date)\n" +
+                "    where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
                 "group by r.min_date, r.max_date) gru\n" +
                 "set res.%s = gru.total\n" +
                 "where res.min_date = gru.min_date\n" +
                 "and res.query_id = '70134d14-8402-11e7-a9c9-0a0027000012';";
 
         // Male
-        prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 0", "prevalence_male"));
+        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 0", "prevalence_male"));
         // Female
-        prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 1", "prevalence_female"));
+        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 1", "prevalence_female"));
         // Other
-        prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id not in (0, 1)", "prevalence_other"));
+        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id not in (0, 1)", "prevalence_other"));
 
         for (String script : prevalenceScripts) {
             runScript(script);
@@ -220,13 +187,15 @@ public class UtilityManager {
                 "(select \n" +
                 "\tr.min_date,\n" +
                 "    r.max_date,\n" +
-                "    COUNT(DISTINCT d.person_id) total -- DL changed to count distinct persons\n" +
+                "    COUNT(DISTINCT e.person_id) total -- DL changed to count distinct persons\n" +
                 "from enterprise_admin.incidence_prevalence_result r\n" +
-                "left outer join enterprise_admin.incidence_prevalence_population d -- DL changed to use population table, not diabetes population\n" +
-                "\ton d.date_registered <= r.max_date \n" +
-                "    and (d.date_registered_end is null or d.date_registered_end >= r.min_date) \n" +
+                "left outer join enterprise_data_pseudonymised.patient p\n" +
+                "    on (p.date_of_death IS NULL OR p.date_of_death > r.max_date)\n" +
                 "    %s\n" +
-                "    AND (d.date_of_death IS NULL OR d.date_of_death > r.max_date) -- DL factor in date of death into this query\n" +
+                "left outer join enterprise_data_pseudonymised.episode_of_care e \n" +
+                "\tON e.person_id = p.person_id and e.organization_id = p.organization_id AND e.patient_id = p.id  \n" +
+                "    and e.date_registered <= r.max_date \n" +
+                "    and (e.date_registered_end is null or e.date_registered_end >= r.min_date) \n" +
                 "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
                 "group by r.min_date, r.max_date) gru\n" +
                 "set res.%s = gru.total\n" +
@@ -234,11 +203,11 @@ public class UtilityManager {
                 "and res.query_id = '70134d14-8402-11e7-a9c9-0a0027000012';";
 
         // Male
-        prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 0", "population_male"));
+        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 0", "population_male"));
         // Female
-        prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id = 1", "population_female"));
+        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 1", "population_female"));
         // Other
-        prevalenceScripts.add(String.format(incidenceQuery, " and d.patient_gender_id not in (0, 1)", "population_other"));
+        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id not in (0, 1)", "population_other"));
 
         for (String script : prevalenceScripts) {
             runScript(script);

@@ -16,7 +16,7 @@ export class PrevIncDialog implements OnInit {
 	codeSets:FolderItem[];
 
 	public static open(modalService: NgbModal, prevInc: PrevInc) {
-		const modalRef = modalService.open(PrevIncDialog, { backdrop : "static", size : "md"});
+		const modalRef = modalService.open(PrevIncDialog, { backdrop : "static", size : "lg"});
 		modalRef.componentInstance.resultData = prevInc;
 
 		return modalRef;

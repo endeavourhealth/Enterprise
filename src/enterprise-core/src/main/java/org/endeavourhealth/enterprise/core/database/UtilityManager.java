@@ -122,9 +122,9 @@ public class UtilityManager {
                 "    r.max_date,\n" +
                 "    count(DISTINCT p.person_id) total\n" +
                 "from enterprise_admin.incidence_prevalence_result r\n" +
-                "left outer join enterprise_admin.incidence_prevalence_data d \n" +
+                "inner join enterprise_admin.incidence_prevalence_data d \n" +
                 "\ton d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date \n" +
-                "left outer join enterprise_data_pseudonymised.patient p \n" +
+                "inner join enterprise_data_pseudonymised.patient p \n" +
                 "\ton p.id = d.patient_id\n" +
                 "    %s\n" +
                 "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
@@ -155,9 +155,9 @@ public class UtilityManager {
                 "    r.max_date,\n" +
                 "    COUNT(DISTINCT p.person_id) total \n" +
                 "from enterprise_admin.incidence_prevalence_result r\n" +
-                "left outer join enterprise_admin.incidence_prevalence_data d \n" +
+                "inner join enterprise_admin.incidence_prevalence_data d \n" +
                 "\ton d.clinical_effective_date <= r.max_date\n" +
-                "left outer join enterprise_data_pseudonymised.patient p \n" +
+                "inner join enterprise_data_pseudonymised.patient p \n" +
                 "\ton p.id = d.patient_id\n" +
                 "\t%s\n" +
                 "    AND (p.date_of_death IS NULL OR p.date_of_death > r.max_date)\n" +
@@ -184,19 +184,19 @@ public class UtilityManager {
         List<String> prevalenceScripts = new ArrayList<>();
 
         String incidenceQuery = "update enterprise_admin.incidence_prevalence_result res, \n" +
-                "(select \n" +
-                "\tr.min_date,\n" +
+                "(select\n" +
+                "    r.min_date,\n" +
                 "    r.max_date,\n" +
-                "    COUNT(DISTINCT e.person_id) total -- DL changed to count distinct persons\n" +
-                "from enterprise_admin.incidence_prevalence_result r\n" +
-                "left outer join enterprise_data_pseudonymised.patient p\n" +
-                "    on (p.date_of_death IS NULL OR p.date_of_death > r.max_date)\n" +
-                "    %s\n" +
-                "left outer join enterprise_data_pseudonymised.episode_of_care e \n" +
-                "\tON e.person_id = p.person_id and e.organization_id = p.organization_id AND e.patient_id = p.id  \n" +
-                "    and e.date_registered <= r.max_date \n" +
-                "    and (e.date_registered_end is null or e.date_registered_end >= r.min_date) \n" +
+                "    COUNT(DISTINCT e.person_id) total \n" +
+                "from enterprise_data_pseudonymised.patient p\n" +
+                "inner join enterprise_data_pseudonymised.episode_of_care e\n" +
+                "    ON e.person_id = p.person_id and e.organization_id = p.organization_id  and p.id = e.patient_id\n" +
+                "inner join enterprise_admin.incidence_prevalence_result r    \n" +
+                "   on IFNULL(p.date_of_death, '9999-12-31') > r.max_date\n" +
                 "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
+                "%s  \n" +
+                "and e.date_registered <= r.max_date \n" +
+                "and IFNULL(e.date_registered_end, '9999-12-31') >= r.min_date\n" +
                 "group by r.min_date, r.max_date) gru\n" +
                 "set res.%s = gru.total\n" +
                 "where res.min_date = gru.min_date\n" +

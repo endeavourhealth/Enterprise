@@ -91,21 +91,21 @@ public class UtilityManager {
         dataTableScripts.add(String.format("CREATE TABLE enterprise_admin.incidence_prevalence_data\n" +
                         "SELECT\n" +
                         "\tDISTINCT\n" +
-                        "    d.patient_id, \n" +
+                        "    d.person_id, \n" +
                         "    min(coalesce(d.clinical_effective_date, '1000-01-01')) as clinical_effective_date\n" +
                         "FROM enterprise_admin.CodeSet c\n" +
                         "JOIN enterprise_data_pseudonymised.observation d \n" +
                         "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
                         "WHERE \n" +
                         "    c.ItemUuid = '%s'\n" +
-                        "group by d.patient_id;",
+                        "group by d.person_id;",
                 codeSetUuid));
 
         dataTableScripts.add("CREATE INDEX ix_incidence_prevalence_data_clinical_date\n" +
                 "ON enterprise_admin.incidence_prevalence_data (clinical_effective_date);");
 
-        dataTableScripts.add("CREATE UNIQUE INDEX ix_incidence_prevalence_data_patient_id\n" +
-                "ON enterprise_admin.incidence_prevalence_data (patient_id);");
+        dataTableScripts.add("CREATE UNIQUE INDEX ix_incidence_prevalence_data_person_id\n" +
+                "ON enterprise_admin.incidence_prevalence_data (person_id);");
 
         for (String script : dataTableScripts) {
             runScript(script);
@@ -125,7 +125,7 @@ public class UtilityManager {
                 "inner join enterprise_admin.incidence_prevalence_data d \n" +
                 "\ton d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date \n" +
                 "inner join enterprise_data_pseudonymised.patient p \n" +
-                "\ton p.id = d.patient_id\n" +
+                "\ton p.person_id = d.person_id\n" +
                 "    %s\n" +
                 "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
                 "group by r.min_date, r.max_date) gru\n" +
@@ -158,7 +158,7 @@ public class UtilityManager {
                 "inner join enterprise_admin.incidence_prevalence_data d \n" +
                 "\ton d.clinical_effective_date <= r.max_date\n" +
                 "inner join enterprise_data_pseudonymised.patient p \n" +
-                "\ton p.id = d.patient_id\n" +
+                "\ton p.person_id = d.person_id\n" +
                 "\t%s\n" +
                 "    AND (p.date_of_death IS NULL OR p.date_of_death > r.max_date)\n" +
                 "    where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +

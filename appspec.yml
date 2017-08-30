@@ -1,0 +1,18 @@
+version: 0.0
+os: linux
+files:
+  - source: //enterprise-web/target/enterprise-web-*.war
+    destination: //opt/tomcat/webapps/
+hooks:
+  ApplicationStop:
+    - location: aws_scripts/stop_servers
+      timeout: 300
+      runas: root
+  BeforeInstall:
+    - location: aws_scripts/cleanup
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: aws_scripts/start_servers
+      timeout: 300
+      runas: root

@@ -1,7 +1,7 @@
 version: 0.0
 os: linux
 files:
-  - source: //enterprise-web/target/enterprise-web-*.war
+  - source: //src/enterprise-web/target/enterprise-web-*.war
     destination: //opt/tomcat/webapps/
 hooks:
   ApplicationStop:

@@ -1,3 +1,4 @@
+use enterprise_pseudo;
 
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;
@@ -291,6 +292,7 @@ CREATE TABLE person
   household_id bigint,
   lsoa_code character varying(50),
   msoa_code character varying(50),
+  ethnic_code character(1),
   CONSTRAINT pk_person_id PRIMARY KEY (id)
 );
 
@@ -323,7 +325,7 @@ CREATE TABLE patient
   household_id bigint,
   lsoa_code character varying(50),
   msoa_code character varying(50),
-  ethnicity_snomed_concept_id bigint,
+  ethnic_code character(1),
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id)
 );
 

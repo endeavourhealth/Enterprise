@@ -339,7 +339,7 @@ CREATE UNIQUE INDEX schedule_id
 
 -- DROP TABLE public.person;
 
-CREATE TABLE public.person
+CREATE TABLE person
 (
   id bigint NOT NULL,
   patient_gender_id smallint NOT NULL,
@@ -350,6 +350,7 @@ CREATE TABLE public.person
   household_id bigint,
   lsoa_code character varying(50),
   msoa_code character varying(50),
+  ethnic_code character(1),
   CONSTRAINT pk_person_id PRIMARY KEY (id)
 )
 WITH (
@@ -388,7 +389,7 @@ CREATE TABLE patient
   household_id bigint,
   lsoa_code character varying(50),
   msoa_code character varying(50),
-  ethnicity_snomed_concept_id bigint,
+  ethnic_code character(1),
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id)
 )
 WITH (

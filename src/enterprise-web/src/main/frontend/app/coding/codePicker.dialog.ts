@@ -11,6 +11,7 @@ import {LoggerService} from "eds-common-js";
 	template: require('./codePicker.html')
 })
 export class CodePickerDialog {
+
 	public static open(modalService: NgbModal,   selection : CodeSetValue[]) {
 		const modalRef = modalService.open(CodePickerDialog, { backdrop : "static", size : "lg"});
 		modalRef.componentInstance.resultData = selection;
@@ -42,6 +43,21 @@ export class CodePickerDialog {
 			childrenField : 'children',
 			idField : 'code'
 		};
+
+		this.loadInitialCodeSet();
+	}
+
+	loadInitialCodeSet() {
+		const SNOMED_ROOT_CONCEPT_ID : string = '138875005';
+
+		let vm = this;
+		vm.codingService.getCodeChildren(SNOMED_ROOT_CONCEPT_ID)
+			.subscribe(
+				(result) => {
+					vm.searchResults = result;
+					vm.parents = [];
+					vm.children = [];
+				});
 	}
 
 	search() {

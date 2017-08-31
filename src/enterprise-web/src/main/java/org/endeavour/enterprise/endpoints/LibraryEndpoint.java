@@ -372,8 +372,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             String baseTypeId = conceptEntity[5]==null?"":conceptEntity[5].toString();
             String dataTypeId = conceptEntity[6].toString();
             String conceptTypeId = conceptEntity[7].toString();
-            String parentConceptTypeId = conceptEntity[8].toString();
-            String present = conceptEntity[9].toString();
+            String parentConceptTypeId = conceptEntity[8]==null?"":conceptEntity[8].toString();
+            String present = conceptEntity[9]==null?"":conceptEntity[9].toString();
             String units = conceptEntity[10]==null?"":conceptEntity[10].toString();
 
 

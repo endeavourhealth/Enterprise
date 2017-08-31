@@ -323,6 +323,7 @@ CREATE TABLE patient
   household_id bigint,
   lsoa_code character varying(50),
   msoa_code character varying(50),
+  ethnicity_snomed_concept_id bigint,
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id)
 );
 
@@ -582,6 +583,7 @@ CREATE TABLE observation
   is_problem boolean NOT NULL,
   original_term character varying(1000),
   is_review boolean NOT NULL,
+  problem_end_date date,
   CONSTRAINT pk_observation_id PRIMARY KEY (id)                
 );
 

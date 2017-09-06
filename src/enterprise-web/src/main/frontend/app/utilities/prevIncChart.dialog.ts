@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {Chart} from "../charting/models/Chart";
 import {UtilitiesService} from "./utilities.service";
+import {MinLengthValidator} from "@angular/forms";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -61,6 +62,8 @@ export class PrevIncChartDialog implements OnInit {
 		this.breakdownOptions.push(this.getOptionList(3, 'Postcode', 'postcode_prefix'));
 		this.breakdownOptions.push(this.getOptionList(4, 'LSOA', 'lsoa_code'));
 		this.breakdownOptions.push(this.getOptionList(5, 'MSOA', 'msoa_code'));
+		this.breakdownOptions.push(this.getAgeBands(6,'Age band (5 yrs)', 0, 90, 5));
+		this.breakdownOptions.push(this.getAgeBands(6,'Age band (10 yrs)', 0, 90, 10));
 	}
 
 	getOptionList(id : any, title : string, fieldName : string) {
@@ -75,6 +78,27 @@ export class PrevIncChartDialog implements OnInit {
 							entry.filters.push({id : filter, name: filter.toString()});
 				}
 			);
+
+		return entry;
+	}
+
+	getAgeBands(id : any, title : string, min : number, max : number, step : number) {
+		let entry = { id : id, name : title, filters : [] };
+
+		let i = min;
+		while (i <= max) {
+			let band = '';
+
+			if (i==min)
+				band = '< '+min;
+			else if (i + step > max)
+				band = '> '+ i;
+			else
+				band = i + '-' + (i+step);
+
+			entry.filters.push({id : band, name: band});
+			i+= step;
+		}
 
 		return entry;
 	}

@@ -3,9 +3,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.database.CohortManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
-import org.endeavourhealth.enterprise.core.database.models.data.OrganizationEntity;
-import org.endeavourhealth.enterprise.core.database.models.data.CohortPatientsEntity;
-import org.endeavourhealth.enterprise.core.database.models.data.CohortResultEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.*;
 import org.endeavourhealth.enterprise.core.json.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
@@ -44,6 +42,66 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 			org.setName(name);
 
 			results.add(org);
+		}
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(results)
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getMsoaCodes")
+	public Response getMsoaCodes(@Context SecurityContext sc) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List<Object[]> msoaCodes = MsoaLookupEntity.getMsoaCodes();
+
+		List<JsonMsoa> results = new ArrayList<>();
+
+		for (Object[] msoaEntity : msoaCodes) {
+			String code = msoaEntity[0].toString();
+			String name = msoaEntity[1].toString();
+
+			JsonMsoa msoa = new JsonMsoa();
+			msoa.setMsoaCode(code);
+			msoa.setMsoaName(name);
+
+			results.add(msoa);
+		}
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(results)
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getLsoaCodes")
+	public Response getLsoaCodes(@Context SecurityContext sc) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List<Object[]> lsoaCodes = LsoaLookupEntity.getLsoaCodes();
+
+		List<JsonLsoa> results = new ArrayList<>();
+
+		for (Object[] lsoaEntity : lsoaCodes) {
+			String code = lsoaEntity[0].toString();
+			String name = lsoaEntity[1].toString();
+
+			JsonLsoa lsoa = new JsonLsoa();
+			lsoa.setLsoaCode(code);
+			lsoa.setLsoaName(name);
+
+			results.add(lsoa);
 		}
 
 		clearLogbackMarkers();

@@ -2,6 +2,8 @@ import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {PrevInc} from "./models/PrevInc";
 import {Organisation} from "../report/models/Organisation";
+import {Msoa} from "../cohort/models/Msoa";
+import {Lsoa} from "../cohort/models/Lsoa";
 import {LoggerService, MessageBoxDialog} from "eds-common-js";
 import {CohortService} from "../cohort/cohort.service";
 import {UtilitiesService} from "./utilities.service";
@@ -30,19 +32,84 @@ export class PrevIncDialog implements OnInit {
 	timePeriodNo: string = "10";
 	timePeriod: string = "YEARS";
 	title: string = "Incidence and Prevalence";
+	diseaseCategory: string = "0";
+	postCodePrefix: string = "";
+	lsoaCode: Lsoa = <any>[];
+	msoaCode: Msoa = <any>[];
+	sex: string = "-1";
+	ethnicity: string = <any>[];
+	orgType: string = "";
+	ageFrom: string = "";
+	ageTo: string = "";
 
-	orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
-	ppTT: string = "Please select a patient population as the denominator.";
-	ppTM: string = "Please select the time period to trend.";
-
-	populations = [
-		{id: -1, type: ''},
-		{id: 0, type: 'Currently registered'},
-		{id: 1, type: 'All patients'},
-	];
+	orgTT: string = "To select multiples please use Shift and Click.";
+	ppTT: string = "Please select a patient population as the denominator";
+	ppTM: string = "Please select the time period over which prevalence and incidence trend is to be measured. NOTE: Older population counts are skewed due to missing historical data.";
+	ppCT: string = "In chronic disease incidence is measured as the “first occurrence” of that disease in the record. "+
+	"In acute disease, prevalence cannot be practically measured because illnesses are short lived and their end date is not recorded. Incidence is measured by the presence of an entry that is not marked as a review/end.";
+	ppPC: string = "Please select a major post code area";
+	ppLSOA: string = "Please select a Lower layer Super Output Area";
+	ppMSOA: string = "Please select a Middle layer Super Output Area";
+	orgEG: string = "Please select one or more ethnic groups. To select multiple groups please use Shift and Click.";
 
 	organisations = <any>[];
+	msoas = <any>[];
+	lsoas = <any>[];
 	periods = ['','MONTHS','YEARS'];
+
+	diseaseCategories = [
+		{id: -1, name: ''},
+		{id: 0, name: 'Chronic Disease'},
+		{id: 1, name: 'Acute Disease'}
+	];
+
+	genders = [
+		{id: -1, name: 'All'},
+		{id: 0, name: 'Males'},
+		{id: 1, name: 'Females'}
+	];
+
+	ccgs = [
+		{id: 0, name: 'City and Hackney CCG'},
+		{id: 1, name: 'Newham CCG'},
+		{id: 2, name: 'Tower Hamlets CCG'},
+		{id: 3, name: 'Waltham Forest CCG'}
+	];
+
+	organisationTypes = [
+		{id: 0, name: 'General Practice'},
+		{id: 1, name: 'Acute Trust'},
+		{id: 2, name: 'Mental Health'}
+	];
+
+	orgTypes = [
+		{id: 0, type: 'Patients registered with any General Practice surgery'},
+		{id: 1, type: 'STPs'},
+		{id: 2, type: 'CCGs'},
+		{id: 3, type: 'Organisation Types'},
+		{id: 4, type: 'Defined List'},
+		{id: 5, type: 'Choose Organisations'}
+	];
+
+	ethnicGroups = [
+		{code: "A", name: 'British'},
+		{code: "B", name: 'Irish'},
+		{code: "C", name: 'Any other White background'},
+		{code: "D", name: 'White and Black Caribbean'},
+		{code: "E", name: 'White and Black African'},
+		{code: "F", name: 'White and Asian'},
+		{code: "G", name: 'Any other mixed background'},
+		{code: "H", name: 'Indian'},
+		{code: "J", name: 'Pakistani'},
+		{code: "K", name: 'Bangladeshi'},
+		{code: "L", name: 'Any other Asian background'},
+		{code: "M", name: 'Caribbean'},
+		{code: "N", name: 'African'},
+		{code: "P", name: 'Any other Black background'},
+		{code: "R", name: 'Chinese'},
+		{code: "S", name: 'Any other ethnic group'},
+		{code: "Z", name: 'Not stated'},
+	];
 
 	constructor(protected cohortService: CohortService,
 							private utilitiesService:UtilitiesService,
@@ -58,6 +125,18 @@ export class PrevIncDialog implements OnInit {
 			.subscribe(
 				(data) => {
 					vm.organisations = data;
+				});
+
+		vm.cohortService.getLsoaCodes()
+			.subscribe(
+				(data) => {
+					vm.lsoas = data;
+				});
+
+		vm.cohortService.getMsoaCodes()
+			.subscribe(
+				(data) => {
+					vm.msoas = data;
 				});
 
 		vm.getCodeSets();
@@ -85,6 +164,59 @@ export class PrevIncDialog implements OnInit {
 		}
 	}
 
+	setSelectedLsoas(selectElement) {
+		var vm = this;
+		vm.resultData.lsoaCode = <any>[];
+		for (let optionElement of selectElement.selectedOptions) {
+			let lsoa = {
+				lsoaCode: optionElement.value,
+				lsoaName: optionElement.text
+			};
+			vm.resultData.lsoaCode.push(lsoa);
+		}
+	}
+
+	setSelectedMsoas(selectElement) {
+		var vm = this;
+		vm.resultData.msoaCode = <any>[];
+		for (let optionElement of selectElement.selectedOptions) {
+			let msoa = {
+				msoaCode: optionElement.value,
+				msoaName: optionElement.text
+			};
+			vm.resultData.msoaCode.push(msoa);
+		}
+	}
+
+	setSelectedEthnicGroups(selectElement) {
+		var vm = this;
+		vm.resultData.ethnicity = <any>[];
+		for (let optionElement of selectElement.selectedOptions) {
+			vm.resultData.ethnicity.push(optionElement.value);
+		}
+	}
+
+	setSelectedOrgType(selectElement) {
+		var vm = this;
+		switch (vm.orgType) {
+			case "1":
+			case "2":
+				vm.organisations = vm.ccgs;
+				break;
+			case "3":
+				vm.organisations = vm.organisationTypes;
+				break;
+			case "4":
+			case "5":
+				vm.cohortService.getOrganisations()
+					.subscribe(
+						(data) => {
+							vm.organisations = data;
+						});
+				break;
+		}
+	}
+
 	run() {
 		var vm = this;
 		vm.resultData.population = vm.population;
@@ -92,6 +224,12 @@ export class PrevIncDialog implements OnInit {
 		vm.resultData.timePeriodNo = vm.timePeriodNo;
 		vm.resultData.timePeriod = vm.timePeriod;
 		vm.resultData.title = vm.title;
+		vm.resultData.diseaseCategory = vm.diseaseCategory;
+		vm.resultData.postCodePrefix = vm.postCodePrefix;
+		vm.resultData.sex = vm.sex;
+		vm.resultData.ageFrom = vm.ageFrom;
+		vm.resultData.ageTo = vm.ageTo;
+		vm.resultData.orgType = vm.orgType;
 
 		this.ok();
 	}

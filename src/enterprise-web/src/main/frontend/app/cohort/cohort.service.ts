@@ -2,6 +2,8 @@ import {Injectable} from "@angular/core";
 import {Http, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {Organisation} from "./models/Organisation";
+import {Lsoa} from "./models/Lsoa";
+import {Msoa} from "./models/Msoa";
 import {CohortResult} from "./models/CohortResult";
 import {CohortRun} from "./models/CohortRun";
 import {BaseHttp2Service} from "eds-common-js";
@@ -13,6 +15,16 @@ export class CohortService extends BaseHttp2Service {
 	getOrganisations():Observable<Organisation> {
 
 		return this.httpGet('api/cohort/getOrganisations');
+	}
+
+	getMsoaCodes():Observable<Msoa> {
+
+		return this.httpGet('api/cohort/getMsoaCodes');
+	}
+
+	getLsoaCodes():Observable<Lsoa> {
+
+		return this.httpGet('api/cohort/getLsoaCodes');
 	}
 
 	getCohortResults(queryItemUuid : string, runDate):Observable<CohortResult[]> {

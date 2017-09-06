@@ -52,7 +52,16 @@ export class UtilitiesComponent {
 			codeSet: "0",
 			timePeriodNo: "10",
 			timePeriod: "YEARS",
-			title: 'Incidence and Prevalence'
+			title: 'Incidence and Prevalence',
+			diseaseCategory: "0",
+			postCodePrefix: "",
+			lsoaCode: [],
+			msoaCode: [],
+			sex: "-1",
+			ethnicity: [],
+			orgType: "",
+			ageFrom: "",
+			ageTo: ""
 		};
 		PrevIncDialog.open(vm.$modal, prevInc).result.then(
 			(result) => {

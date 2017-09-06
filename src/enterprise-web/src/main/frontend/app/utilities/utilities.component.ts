@@ -21,6 +21,9 @@ export class UtilitiesComponent {
 
 	incPrevRunning: boolean = false;
 
+	colName: string;
+	distinctValues: string[];
+
 	constructor(private utilitiesService: UtilitiesService,
 							private transition: Transition,
 							private logger: LoggerService,
@@ -215,6 +218,15 @@ export class UtilitiesComponent {
 
 		// Leading '+' causes result to be number rather than string
 		return +((100 * incidence) / population).toFixed(1);
+	}
+
+    getDistinctValues() {
+        let vm = this;
+        vm.utilitiesService.getDistinctValues(vm.colName)
+            .subscribe(
+                (result) => vm.distinctValues = result,
+                (error) => console.error(error)
+            );
 	}
 }
 

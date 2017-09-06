@@ -50,4 +50,23 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
             .entity(results)
             .build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/distinctValues")
+    public Response getIncPrevResults(@Context SecurityContext sc,
+                                      @QueryParam("columnName") String columnName) throws Exception {
+        System.out.println("Retrieving distinct values for " + columnName);
+        super.setLogbackMarkers(sc);
+
+        List results = new UtilityManager().getDistinctValuesForGraphing(columnName);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
 }

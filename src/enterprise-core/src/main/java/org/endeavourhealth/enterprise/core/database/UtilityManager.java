@@ -249,4 +249,20 @@ public class UtilityManager {
 
         return resultList;
     }
+
+    public List getDistinctValuesForGraphing(String columnName) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        Query q = entityManager.createNativeQuery("SELECT DISTINCT " +
+                columnName +
+                " FROM enterprise_admin.incidence_prevalence_raw_data ORDER BY " +
+                columnName +
+                " ASC");
+
+        List resultList = q.getResultList();
+
+        entityManager.close();
+
+        return resultList;
+    }
 }

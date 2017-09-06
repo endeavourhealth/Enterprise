@@ -20,6 +20,12 @@ export class UtilitiesService extends BaseHttp2Service {
     }
 
     getIncPrevResults() : Observable<any> {
-			return this.httpGet('api/utility/incprev');
-		}
+		return this.httpGet('api/utility/incprev');
+	}
+
+    getDistinctValues(columnName: string) : Observable<any> {
+        var params : URLSearchParams = new URLSearchParams();
+        params.append('columnName', columnName);
+        return this.httpGet('api/utility/distinctValues', { search : params });
+    }
 }

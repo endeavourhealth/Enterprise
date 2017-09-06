@@ -9,6 +9,7 @@ import {PrevInc} from "./models/PrevInc";
 import {Chart} from "../charting/models/Chart";
 import {Series} from "../charting/models/Series";
 import {StackDialog} from "../charting/stack.dialog";
+import {PrevIncChartDialog} from "./prevIncChart.dialog";
 
 @Component({
 	template : require('./utilities.html')
@@ -16,7 +17,7 @@ import {StackDialog} from "../charting/stack.dialog";
 export class UtilitiesComponent {
 
 	private colors = ['LightBlue', 'Plum', 'Yellow', 'LightSalmon'];						// Male, Female, Other, Total
-	private height = 210;
+	private height = 500;
 	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 100};
 
 	incPrevRunning: boolean = false;
@@ -148,14 +149,9 @@ export class UtilitiesComponent {
 
 		let chartData = this.getChartData(results);
 
+		let chart = this.createIncidenceChart(chartData);
 
-		let charts = [
-			this.createIncidenceChart(chartData),
-			this.createPrevalenceChart(chartData),
-			this.createPopulationChart(chartData)
-		];
-
-		StackDialog.open(this.$modal, results[0][13], charts);
+		PrevIncChartDialog.open(this.$modal, "Results", chart);
 	}
 
 	private createIncidenceChart(chartData: any): Chart {

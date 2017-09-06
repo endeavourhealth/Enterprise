@@ -11,7 +11,7 @@ export class ChartDialog implements OnInit {
 	public static open(modalService: NgbModal, title:string, chartData: Chart) {
 		const modalRef = modalService.open(ChartDialog, { backdrop : "static", size : "lg"});
 		modalRef.componentInstance.title = title;
-		modalRef.componentInstance.chartData = chartData;
+		modalRef.componentInstance.chart = chartData;
 
 		return modalRef;
 	}

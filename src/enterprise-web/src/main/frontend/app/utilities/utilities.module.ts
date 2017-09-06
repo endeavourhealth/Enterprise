@@ -7,6 +7,8 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {PrevIncDialog} from "./prevInc.dialog";
 import {ChartModule} from "../charting/chart.module";
 import {ControlsModule} from "eds-common-js";
+import {PrevIncChartDialog} from "./prevIncChart.dialog";
+import {MultiselectDropdownModule} from "angular-2-dropdown-multiselect";
 
 @NgModule({
 	imports : [
@@ -14,14 +16,17 @@ import {ControlsModule} from "eds-common-js";
 		FormsModule,
 		NgbModule,
 		ChartModule,
-		ControlsModule
+		ControlsModule,
+		MultiselectDropdownModule
 	],
 	declarations : [
 		UtilitiesComponent,
-		PrevIncDialog
+		PrevIncDialog,
+		PrevIncChartDialog
 	],
 	entryComponents : [
-		PrevIncDialog
+		PrevIncDialog,
+		PrevIncChartDialog
 	],
 	providers : [
 		UtilitiesService

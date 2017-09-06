@@ -12,7 +12,7 @@
 				<ngb-tabset>
 					<ngb-tab title="Graph">
 						<template ngbTabContent>
-							<div *ngFor="let chart of chartData">
+							<div *ngFor="let chart of chart">
 								<div class="row">
 									<div class="col-md-12">
 								<chart [data]="chart"></chart>
@@ -23,7 +23,7 @@
 					</ngb-tab>
 					<ngb-tab title="Table">
 						<template ngbTabContent>
-							<div *ngFor="let chart of chartData">
+							<div *ngFor="let chart of chart">
 								<chart-table [data]="chart"></chart-table>
 							</div>
 						</template>

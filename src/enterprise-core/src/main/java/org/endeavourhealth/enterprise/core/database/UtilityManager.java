@@ -1,5 +1,7 @@
 package org.endeavourhealth.enterprise.core.database;
 
+import org.endeavourhealth.enterprise.core.json.JsonLsoa;
+import org.endeavourhealth.enterprise.core.json.JsonMsoa;
 import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
 
 import javax.persistence.EntityManager;
@@ -16,10 +18,13 @@ public class UtilityManager {
 
         cleanUpDatabase();
         initialiseReportResultTable(options);
-        createDataTable(options.getCodeSet());
-        runIncidenceQueries();
-        runPrevalenceQueries();
-        runPopulationQueries();
+        createTemporaryTables();
+        populatePatientTable(options);
+        populateClinicalData(options.getCodeSet());
+        updatePersonData();
+        //runIncidenceQueries();
+        //runPrevalenceQueries();
+        //runPopulationQueries();
 
         return true;
     }
@@ -75,8 +80,9 @@ public class UtilityManager {
 
         List<String> deleteScripts = new ArrayList<>();
 
-        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_population;");
-        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_data;");
+        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_raw_data;");
+        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_patient_list;");
+        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_organisation_list;");
 
         for (String script : deleteScripts) {
             runScript(script);
@@ -84,32 +90,156 @@ public class UtilityManager {
 
     }
 
-    private void createDataTable(String codeSetUuid) throws Exception {
+    private void createTemporaryTables() throws Exception {
 
-        List<String> dataTableScripts = new ArrayList<>();
+        List<String> tempTableScripts = new ArrayList<>();
 
-        dataTableScripts.add(String.format("CREATE TABLE enterprise_admin.incidence_prevalence_data\n" +
-                        "SELECT\n" +
-                        "\tDISTINCT\n" +
-                        "    d.person_id, \n" +
-                        "    min(coalesce(d.clinical_effective_date, '1000-01-01')) as clinical_effective_date\n" +
-                        "FROM enterprise_admin.CodeSet c\n" +
-                        "JOIN enterprise_data_pseudonymised.observation d \n" +
-                        "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
-                        "WHERE \n" +
-                        "    c.ItemUuid = '%s'\n" +
-                        "group by d.person_id;",
-                codeSetUuid));
+        tempTableScripts.add("create table enterprise_admin.incidence_prevalence_raw_data (\n" +
+                "\tperson_id bigint(20) not null primary key,\n" +
+                "    patient_gender_id smallint(6) null,\n" +
+                "    age_years int(11) null,\n" +
+                "    postcode_prefix varchar(20) null,\n" +
+                "    clinical_effective_date date null,\n" +
+                "    clinical_effective_year int(4) null,\n" +
+                "    clinical_effective_month int(4) null,\n" +
+                "    lsoa_code varchar(50) null,\n" +
+                "    msoa_code varchar(50) null,\n" +
+                "    ethnic_code char(1) null,\n" +
+                "    organisation_id bigint(20) null,\n" +
+                "    \n" +
+                "    index ix_incidence_prevalence_raw_data_clinical_effective_date (clinical_effective_date),    \n" +
+                "    index ix_incidence_prevalence_raw_data_patient_gender_id (patient_gender_id),    \n" +
+                "    index ix_incidence_prevalence_raw_data_postcode_prefix (postcode_prefix),\n" +
+                "    index ix_incidence_prevalence_raw_data_age_years (age_years)      \n" +
+                "    \n" +
+                ");");
 
-        dataTableScripts.add("CREATE INDEX ix_incidence_prevalence_data_clinical_date\n" +
-                "ON enterprise_admin.incidence_prevalence_data (clinical_effective_date);");
+        tempTableScripts.add("create table enterprise_admin.incidence_prevalence_patient_list (\n" +
+                "\tpatient_id bigint(20) not null primary key\n" +
+                ");");
 
-        dataTableScripts.add("CREATE UNIQUE INDEX ix_incidence_prevalence_data_person_id\n" +
-                "ON enterprise_admin.incidence_prevalence_data (person_id);");
+        tempTableScripts.add("create table enterprise_admin.incidence_prevalence_organisation_list (\n" +
+                "\torganisation_id bigint(20) not null primary key\n" +
+                ");");
 
-        for (String script : dataTableScripts) {
+        for (String script : tempTableScripts) {
             runScript(script);
         }
+    }
+
+
+
+    private void populatePatientTable(JsonPrevInc options) throws Exception {
+
+        List<String> populateScripts = new ArrayList<>();
+        List<String> whereClauses = new ArrayList<>();
+
+        if (options.getLsoaCode() != null && options.getLsoaCode().size() > 0) {
+            String lsoaCodes = "";
+            for (JsonLsoa lsoa : options.getLsoaCode()) {
+                lsoaCodes += "'" + lsoa.getLsoaCode() + "',";
+            }
+            lsoaCodes =  lsoaCodes.substring(0, lsoaCodes.length() - 1);
+            whereClauses.add(" p.lsoa_code in (" + lsoaCodes + ")");
+        }
+
+        if (options.getMsoaCode() != null && options.getMsoaCode().size() > 0) {
+            String msoaCodes = "";
+            for (JsonMsoa msoa : options.getMsoaCode()) {
+                msoaCodes += "'" + msoa.getMsoaCode() + "',";
+            }
+            msoaCodes =  msoaCodes.substring(0, msoaCodes.length() - 1);
+            whereClauses.add(" p.msoa_code in (" + msoaCodes + ")");
+        }
+
+        if (options.getEthnicity() != null && options.getEthnicity().size() > 0) {
+            String ethnicityCodes = "";
+            for (String ethnicity : options.getEthnicity()) {
+                ethnicityCodes += "'" + ethnicity + "',";
+            }
+            ethnicityCodes =  ethnicityCodes.substring(0, ethnicityCodes.length() - 1);
+            whereClauses.add(" p.ethnic_code in (" + ethnicityCodes + ")");
+        }
+
+        if (options.getPostCodePrefix() != null && !options.getPostCodePrefix().equals("")) {
+
+            whereClauses.add(" p.postcode_prefix = '" + options.getPostCodePrefix() + "'");
+        }
+
+        if (options.getAgeFrom() != null && !options.getAgeFrom().equals("")) {
+            whereClauses.add(" p.age_years >= " + options.getAgeFrom());
+        }
+
+        if (options.getAgeTo() != null && !options.getAgeTo().equals("")) {
+            whereClauses.add(" p.age_years <= " + options.getAgeTo());
+        }
+
+        if (options.getSex() != null && !options.getSex().equals("-1")) {
+            whereClauses.add(" p.patient_gender_id = " + options.getSex());
+        }
+        String allWhereClauses = "";
+        String prefix = " where ";
+        for (String where : whereClauses) {
+            allWhereClauses += prefix + where;
+            prefix = " and ";
+        }
+
+
+        populateScripts.add(String.format("insert into enterprise_admin.incidence_prevalence_patient_list (patient_id)\n" +
+                "select \n" +
+                "\tid \n" +
+                "from enterprise_data_pseudonymised.patient p" +
+                "%s", allWhereClauses));
+
+        for (String script : populateScripts) {
+            System.out.println(script);
+            runScript(script);
+        }
+
+    }
+
+    private void populateClinicalData(String codeSetId) throws Exception {
+
+        List<String> clinicalScripts = new ArrayList<>();
+
+        clinicalScripts.add(String.format("insert into enterprise_admin.incidence_prevalence_raw_data (person_id, clinical_effective_date)\n" +
+                "SELECT\n" +
+                "\tDISTINCT\n" +
+                "    d.person_id, \n" +
+                "    min(IFNULL(d.clinical_effective_date, '1000-01-01')) as clinical_effective_date\n" +
+                "FROM enterprise_admin.incidence_prevalence_patient_list p \n" +
+                "JOIN enterprise_data_pseudonymised.observation d \n" +
+                "\tON p.patient_id = d.patient_id\n" +
+                "JOIN enterprise_admin.CodeSet c\n" +
+                "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
+                "WHERE \n" +
+                "    c.ItemUuid = '%s'\n" +
+                "group by d.person_id;", codeSetId));
+
+        for (String script : clinicalScripts) {
+            runScript(script);
+        }
+    }
+
+    private void updatePersonData() throws Exception {
+
+        List<String> personScripts = new ArrayList<>();
+
+        personScripts.add("update enterprise_admin.incidence_prevalence_raw_data r\n" +
+                "inner join enterprise_data_pseudonymised.patient p on p.person_id = r.person_id\n" +
+                "set r.patient_gender_id = p.patient_gender_id,\n" +
+                "\tr.age_years = p.age_years,\n" +
+                "    r.postcode_prefix = p.postcode_prefix,\n" +
+                "    r.clinical_effective_year = YEAR(r.clinical_effective_date),\n" +
+                "    r.clinical_effective_month = MONTH(r.clinical_effective_date),\n" +
+                "    r.lsoa_code = p.lsoa_code,\n" +
+                "    r.msoa_code = p.msoa_code,\n" +
+                "    r.ethnic_code =  p.ethnic_code;");
+
+        for (String script : personScripts) {
+            runScript(script);
+        }
+
     }
 
     private void runIncidenceQueries() throws Exception {

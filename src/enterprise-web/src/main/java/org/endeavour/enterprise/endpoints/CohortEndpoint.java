@@ -65,6 +65,8 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 
 		for (Object[] msoaEntity : msoaCodes) {
 			String code = msoaEntity[0].toString();
+			if (msoaEntity[1] == null)
+				continue;
 			String name = msoaEntity[1].toString();
 
 			JsonMsoa msoa = new JsonMsoa();

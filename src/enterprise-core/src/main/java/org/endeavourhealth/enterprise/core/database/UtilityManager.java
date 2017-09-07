@@ -2,6 +2,7 @@ package org.endeavourhealth.enterprise.core.database;
 
 import org.endeavourhealth.enterprise.core.json.JsonLsoa;
 import org.endeavourhealth.enterprise.core.json.JsonMsoa;
+import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
 
 import javax.persistence.EntityManager;
@@ -14,11 +15,14 @@ import java.util.List;
 
 public class UtilityManager {
 
+    private boolean includeOrganisationQuery = false;
+
     public boolean runPrevIncReport(JsonPrevInc options) throws Exception {
 
         cleanUpDatabase();
         initialiseReportResultTable(options);
         createTemporaryTables();
+        populateOrganisationTable(options);
         populatePatientTable(options);
         populateClinicalData(options.getCodeSet());
         updatePersonData();
@@ -78,6 +82,8 @@ public class UtilityManager {
 
     private void cleanUpDatabase() throws Exception {
 
+        includeOrganisationQuery = false;
+
         List<String> deleteScripts = new ArrayList<>();
 
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_raw_data;");
@@ -87,7 +93,6 @@ public class UtilityManager {
         for (String script : deleteScripts) {
             runScript(script);
         }
-
     }
 
     private void createTemporaryTables() throws Exception {
@@ -127,12 +132,43 @@ public class UtilityManager {
         }
     }
 
+    private String createStandardOrganisationInsert(List<JsonOrganisation> organisations) throws Exception {
+        String orgList = "";
+        String prefix = " select ";
+        for (JsonOrganisation org : organisations) {
+            orgList += prefix + org.getId();
+            prefix = " union select ";
+        }
 
+        String query = String.format("insert into enterprise_admin.incidence_prevalence_organisation_list (organisation_id) %s",
+                orgList);
+
+
+        return query;
+    }
+
+    private void populateOrganisationTable(JsonPrevInc options) throws Exception {
+
+        List<String> orgScripts = new ArrayList<>();
+
+        if (options.getOrgType() != null && options.getOrgType().equals("5")) {
+            if (options.getOrganisation() != null && options.getOrganisation().size() > 0) {
+                includeOrganisationQuery = true;
+                orgScripts.add(createStandardOrganisationInsert(options.getOrganisation()));
+            }
+        }
+
+        for (String script : orgScripts) {
+            runScript(script);
+        }
+
+    }
 
     private void populatePatientTable(JsonPrevInc options) throws Exception {
 
         List<String> populateScripts = new ArrayList<>();
         List<String> whereClauses = new ArrayList<>();
+        String orgJoin = "";
 
         if (options.getLsoaCode() != null && options.getLsoaCode().size() > 0) {
             String lsoaCodes = "";
@@ -177,6 +213,12 @@ public class UtilityManager {
         if (options.getSex() != null && !options.getSex().equals("-1")) {
             whereClauses.add(" p.patient_gender_id = " + options.getSex());
         }
+
+        if (includeOrganisationQuery) {
+            orgJoin = " join enterprise_admin.incidence_prevalence_organisation_list o " +
+                    " on o.organisation_id = p.organization_id ";
+        }
+
         String allWhereClauses = "";
         String prefix = " where ";
         for (String where : whereClauses) {
@@ -189,7 +231,8 @@ public class UtilityManager {
                 "select \n" +
                 "\tid \n" +
                 "from enterprise_data_pseudonymised.patient p" +
-                "%s", allWhereClauses));
+                "%s" +
+                "%s", orgJoin, allWhereClauses));
 
         for (String script : populateScripts) {
             System.out.println(script);
@@ -234,7 +277,8 @@ public class UtilityManager {
                 "    r.clinical_effective_month = MONTH(r.clinical_effective_date),\n" +
                 "    r.lsoa_code = p.lsoa_code,\n" +
                 "    r.msoa_code = p.msoa_code,\n" +
-                "    r.ethnic_code =  p.ethnic_code;");
+                "    r.ethnic_code =  p.ethnic_code," +
+                "    r.organisation_id = p.organization_id;");
 
         for (String script : personScripts) {
             runScript(script);

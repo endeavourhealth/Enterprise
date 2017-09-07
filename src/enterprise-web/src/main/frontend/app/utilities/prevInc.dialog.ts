@@ -38,7 +38,7 @@ export class PrevIncDialog implements OnInit {
 	msoaCode: Msoa = <any>[];
 	sex: string = "-1";
 	ethnicity: string = <any>[];
-	orgType: string = "";
+	orgType: string = "5";
 	ageFrom: string = "";
 	ageTo: string = "";
 

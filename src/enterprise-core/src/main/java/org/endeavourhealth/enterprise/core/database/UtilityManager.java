@@ -111,6 +111,8 @@ public class UtilityManager {
                 "    msoa_code varchar(50) null,\n" +
                 "    ethnic_code char(1) null,\n" +
                 "    organisation_id bigint(20) null,\n" +
+                "    date_of_death_year int(6) null,\n" +
+                "    date_of_death_month int(6) null,\n" +
                 "    \n" +
                 "    index ix_incidence_prevalence_raw_data_clinical_effective_date (clinical_effective_date),    \n" +
                 "    index ix_incidence_prevalence_raw_data_patient_gender_id (patient_gender_id),    \n" +
@@ -277,8 +279,10 @@ public class UtilityManager {
                 "    r.clinical_effective_month = MONTH(r.clinical_effective_date),\n" +
                 "    r.lsoa_code = p.lsoa_code,\n" +
                 "    r.msoa_code = p.msoa_code,\n" +
-                "    r.ethnic_code =  p.ethnic_code," +
-                "    r.organisation_id = p.organization_id;");
+                "    r.ethnic_code =  p.ethnic_code,\n" +
+                "    r.organisation_id = p.organization_id,\n" +
+                "    r.date_of_death_year = year(p.date_of_death),\n" +
+                "    r.date_of_death_month = month(p.date_of_death);");
 
         for (String script : personScripts) {
             runScript(script);

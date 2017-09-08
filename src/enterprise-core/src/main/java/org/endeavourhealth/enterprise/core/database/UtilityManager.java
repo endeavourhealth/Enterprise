@@ -16,16 +16,21 @@ import java.util.List;
 public class UtilityManager {
 
     private boolean includeOrganisationQuery = false;
+    private String orgJoin = " join enterprise_admin.incidence_prevalence_organisation_list o " +
+            " on o.organisation_id = p.organization_id ";
+    private String whereClauses = "";
 
     public boolean runPrevIncReport(JsonPrevInc options) throws Exception {
 
         cleanUpDatabase();
         initialiseReportResultTable(options);
+        generateWhereClausesFromOptions(options);
         createTemporaryTables();
         populateOrganisationTable(options);
-        populatePatientTable(options);
+        populatePatientTable();
         populateClinicalData(options.getCodeSet());
         updatePersonData();
+        runInitialPopulationQuery();
         //runIncidenceQueries();
         //runPrevalenceQueries();
         //runPopulationQueries();
@@ -83,12 +88,14 @@ public class UtilityManager {
     private void cleanUpDatabase() throws Exception {
 
         includeOrganisationQuery = false;
+        whereClauses = "";
 
         List<String> deleteScripts = new ArrayList<>();
 
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_raw_data;");
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_patient_list;");
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_organisation_list;");
+        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_population_list;");
 
         for (String script : deleteScripts) {
             runScript(script);
@@ -129,6 +136,33 @@ public class UtilityManager {
                 "\torganisation_id bigint(20) not null primary key\n" +
                 ");");
 
+        tempTableScripts.add("create table enterprise_admin.incidence_prevalence_population_list (\n" +
+                "\tepisode_id bigint(20) not null,\n" +
+                "\tperson_id bigint(20) not null,\n" +
+                "    date_registered date null,\n" +
+                "    date_registered_year int(4) null,\n" +
+                "    date_registered_month int(4) null,\n" +
+                "    date_registered_end date null,\n" +
+                "    date_registered_end_year int(4) null,\n" +
+                "    date_registered_end_month int(4) null,\n" +
+                "    patient_gender_id smallint(6) null,\n" +
+                "    age_years int(11) null,\n" +
+                "    organisation_id bigint(20) null,\n" +
+                "    date_of_death date null,\n" +
+                "    date_of_death_year int(4) null,\n" +
+                "    date_of_death_month int(4) null,\n" +
+                "     \n" +
+                "\tprimary key (episode_id, person_id),\n" +
+                "    index ix_bigdata_results_date_registered_year (date_registered_year),  \n" +
+                "    index ix_bigdata_results_date_registered_month (date_registered_month), \n" +
+                "    index ix_bigdata_results_patient_gender_id (patient_gender_id),    \n" +
+                "    index ix_bigdata_results_date_registered_end_year (date_registered_end_year),\n" +
+                "    index ix_bigdata_results_date_registered_end_month (date_registered_end_month),\n" +
+                "    index ix_bigdata_results_date_of_death_year (date_of_death_year) ,\n" +
+                "    index ix_bigdata_results_date_of_death_month (date_of_death_month)       \n" +
+                "    \n" +
+                ");");
+
         for (String script : tempTableScripts) {
             runScript(script);
         }
@@ -164,11 +198,10 @@ public class UtilityManager {
 
     }
 
-    private void populatePatientTable(JsonPrevInc options) throws Exception {
+    private void generateWhereClausesFromOptions(JsonPrevInc options) throws Exception {
 
-        List<String> populateScripts = new ArrayList<>();
-        List<String> whereClauses = new ArrayList<>();
-        String orgJoin = "";
+        List<String> whereClauseList = new ArrayList<>();
+
 
         if (options.getLsoaCode() != null && options.getLsoaCode().size() > 0) {
             String lsoaCodes = "";
@@ -176,7 +209,7 @@ public class UtilityManager {
                 lsoaCodes += "'" + lsoa.getLsoaCode() + "',";
             }
             lsoaCodes =  lsoaCodes.substring(0, lsoaCodes.length() - 1);
-            whereClauses.add(" p.lsoa_code in (" + lsoaCodes + ")");
+            whereClauseList.add(" p.lsoa_code in (" + lsoaCodes + ")");
         }
 
         if (options.getMsoaCode() != null && options.getMsoaCode().size() > 0) {
@@ -185,7 +218,7 @@ public class UtilityManager {
                 msoaCodes += "'" + msoa.getMsoaCode() + "',";
             }
             msoaCodes =  msoaCodes.substring(0, msoaCodes.length() - 1);
-            whereClauses.add(" p.msoa_code in (" + msoaCodes + ")");
+            whereClauseList.add(" p.msoa_code in (" + msoaCodes + ")");
         }
 
         if (options.getEthnicity() != null && options.getEthnicity().size() > 0) {
@@ -194,45 +227,46 @@ public class UtilityManager {
                 ethnicityCodes += "'" + ethnicity + "',";
             }
             ethnicityCodes =  ethnicityCodes.substring(0, ethnicityCodes.length() - 1);
-            whereClauses.add(" p.ethnic_code in (" + ethnicityCodes + ")");
+            whereClauseList.add(" p.ethnic_code in (" + ethnicityCodes + ")");
         }
 
         if (options.getPostCodePrefix() != null && !options.getPostCodePrefix().equals("")) {
 
-            whereClauses.add(" p.postcode_prefix = '" + options.getPostCodePrefix() + "'");
+            whereClauseList.add(" p.postcode_prefix = '" + options.getPostCodePrefix() + "'");
         }
 
         if (options.getAgeFrom() != null && !options.getAgeFrom().equals("")) {
-            whereClauses.add(" p.age_years >= " + options.getAgeFrom());
+            whereClauseList.add(" p.age_years >= " + options.getAgeFrom());
         }
 
         if (options.getAgeTo() != null && !options.getAgeTo().equals("")) {
-            whereClauses.add(" p.age_years <= " + options.getAgeTo());
+            whereClauseList.add(" p.age_years <= " + options.getAgeTo());
         }
 
         if (options.getSex() != null && !options.getSex().equals("-1")) {
-            whereClauses.add(" p.patient_gender_id = " + options.getSex());
-        }
-
-        if (includeOrganisationQuery) {
-            orgJoin = " join enterprise_admin.incidence_prevalence_organisation_list o " +
-                    " on o.organisation_id = p.organization_id ";
+            whereClauseList.add(" p.patient_gender_id = " + options.getSex());
         }
 
         String allWhereClauses = "";
         String prefix = " where ";
-        for (String where : whereClauses) {
+        for (String where : whereClauseList) {
             allWhereClauses += prefix + where;
             prefix = " and ";
         }
 
+        whereClauses = allWhereClauses;
+    }
+
+    private void populatePatientTable() throws Exception {
+
+        List<String> populateScripts = new ArrayList<>();
 
         populateScripts.add(String.format("insert into enterprise_admin.incidence_prevalence_patient_list (patient_id)\n" +
                 "select \n" +
                 "\tid \n" +
                 "from enterprise_data_pseudonymised.patient p" +
                 "%s" +
-                "%s", orgJoin, allWhereClauses));
+                "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
         for (String script : populateScripts) {
             System.out.println(script);
@@ -355,38 +389,35 @@ public class UtilityManager {
         }
     }
 
-    private void runPopulationQueries() throws Exception {
+    private void runInitialPopulationQuery() throws Exception {
 
-        List<String> prevalenceScripts = new ArrayList<>();
+        List<String> populationScripts = new ArrayList<>();
 
-        String incidenceQuery = "update enterprise_admin.incidence_prevalence_result res, \n" +
-                "(select\n" +
-                "    r.min_date,\n" +
-                "    r.max_date,\n" +
-                "    COUNT(DISTINCT e.person_id) total \n" +
-                "from enterprise_data_pseudonymised.patient p\n" +
-                "inner join enterprise_data_pseudonymised.episode_of_care e\n" +
-                "    ON e.person_id = p.person_id and e.organization_id = p.organization_id  and p.id = e.patient_id\n" +
-                "inner join enterprise_admin.incidence_prevalence_result r    \n" +
-                "   on IFNULL(p.date_of_death, '9999-12-31') > r.max_date\n" +
-                "where r.query_id = '70134d14-8402-11e7-a9c9-0a0027000012'\n" +
-                "%s  \n" +
-                "and e.date_registered <= r.max_date \n" +
-                "and IFNULL(e.date_registered_end, '9999-12-31') >= r.min_date\n" +
-                "group by r.min_date, r.max_date) gru\n" +
-                "set res.%s = gru.total\n" +
-                "where res.min_date = gru.min_date\n" +
-                "and res.query_id = '70134d14-8402-11e7-a9c9-0a0027000012';";
+        populationScripts.add(String.format("insert into enterprise_admin.incidence_prevalence_population_list\n" +
+                "select \n" +
+                "\te.id,\n" +
+                "\te.person_id,\n" +
+                "    e.date_registered,\n" +
+                "    YEAR(e.date_registered),\n" +
+                "    MONTH(e.date_registered),\n" +
+                "    IFNULL(e.date_registered_end, '9999-12-31'),\n" +
+                "    YEAR(IFNULL(e.date_registered_end, '9999-12-31')),\n" +
+                "    MONTH(IFNULL(e.date_registered_end, '9999-12-31')),\n" +
+                "    p.patient_gender_id,\n" +
+                "    p.age_years,\n" +
+                "    p.organization_id,\n" +
+                "    IFNULL(p.date_of_death, '9999-12-31'),\n" +
+                "    YEAR(IFNULL(p.date_of_death, '9999-12-31')),\n" +
+                "    MONTH(IFNULL(p.date_of_death, '9999-12-31'))    \n" +
+                "from enterprise_data_pseudonymised.episode_of_care e\n" +
+                "join enterprise_data_pseudonymised.patient p \n" +
+                "\ton p.id = e.patient_id and e.organization_id = p.organization_id and e.person_id = p.person_id" +
+                "%s" +
+                "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
-        // Male
-        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 0", "population_male"));
-        // Female
-        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id = 1", "population_female"));
-        // Other
-        prevalenceScripts.add(String.format(incidenceQuery, " and p.patient_gender_id not in (0, 1)", "population_other"));
-
-        for (String script : prevalenceScripts) {
+        for (String script : populationScripts) {
             runScript(script);
+            System.out.println(script);
         }
     }
 

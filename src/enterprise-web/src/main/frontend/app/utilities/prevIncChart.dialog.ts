@@ -115,110 +115,76 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	drawGraph(results : any) {
-		let chartData = this.getChartData(results);
-		this.chart = this.createIncidenceChart(chartData);
+		this.chart = this.getChartData(results);
 	}
 
 	//---------------------------
 
 	getChartData(results: any) {
+		if (results[0].length == 3)
+			return this.getGroupedChartData(results);
 
-		let chartData: any = {
-			categories: [],
-			incidence_total: [],
-			incidence_male: [],
-			incidence_female: [],
-			incidence_other: [],
+		return this.getTotalChartData(results);
+	}
 
-			prevalence_total: [],
-			prevalence_male: [],
-			prevalence_female: [],
-			prevalence_other: [],
-
-			population_total: [],
-			population_male: [],
-			population_female: [],
-			population_other: []
-		};
-
-		// Determine if year or month
-		let monthly : boolean = false;
-		if (results.length > 1)
-			monthly = results[0][0].substring(5, 7) != results[1][0].substring(5, 7);
-
+	getTotalChartData(results : any) {
+		let categories : string[] = [];
+		let data : string[] = [];
 
 		for (let row of results) {
-			chartData.categories.push(row[0].substring(0, monthly ? 7 : 4));
-			chartData.incidence_male.push(row[1]);
-			chartData.incidence_female.push(row[2]);
-			chartData.incidence_other.push(row[3]);
-			chartData.incidence_total.push(row[1] + row[2] + row[3]);
-
-			chartData.prevalence_male.push(this.calcPercentage(row[4], row[7]));
-			chartData.prevalence_female.push(this.calcPercentage(row[5], row[8]));
-			chartData.prevalence_other.push(this.calcPercentage(row[6], row[9]));
-			chartData.prevalence_total.push(this.calcPercentage(row[4]+row[5]+row[6], row[7]+row[8]+row[9]));
-
-			chartData.population_male.push(row[7]);
-			chartData.population_female.push(row[8]);
-			chartData.population_other.push(row[9]);
-			chartData.population_total.push(row[7]+row[8]+row[9]);
+			categories.push(row[0]);
+			data.push(row[1]);
 		}
 
-		return chartData;
-	}
-
-	private createIncidenceChart(chartData: any): Chart {
-		return this.createChart(
-			chartData.categories,
-			'Incidence',
-			chartData.incidence_male,
-			chartData.incidence_female,
-			chartData.incidence_other,
-			chartData.incidence_total
-		);
-	}
-
-	private createChart(categories: string[], title: string, male: number[], female: number[], other: number[], total: number[]) {
 		return new Chart()
 			.setCategories(categories)
 			.setColors(this.colors)
 			.setHeight(this.height)
 			.setLegend(this.legend)
-			.setTitle(title)
-			.addYAxis(title, false)
-			.addYAxis('Total', true)
+			.setTitle(this.title)
+			.addYAxis(this.title, false)
 			.setSeries([
 				new Series()
-					.setType('column')
-					.setName('Male')
-					.setData(male),
-				new Series()
-					.setType('column')
-					.setName('Female')
-					.setData(female),
-				new Series()
-					.setType('column')
-					.setName('Other')
-					.setData(other),
-				new Series()
-					.setType('spline')
 					.setName('Total')
-					.setData(total)
-					.setyAxis(1)
+					.setType('spline')
+					.setData(data)
 			]);
 	}
 
-	calcPercentage(incidence, population: number): number {
-		if (population == 0)
-			return 0;
+	getGroupedChartData(results : any) {
+		let currSeriesName : string = null;
+		let series : Series = null;
+		let seriesList : Series[] = [];
+		let categories : string[] = [];
 
-		// Leading '+' causes result to be number rather than string
-		return +((100 * incidence) / population).toFixed(1);
+		for (let row of results) {
+			let rowSeriesName = row[2] == null ? 'Unknown' : row[2].toString();
+			if (currSeriesName != rowSeriesName) {
+				currSeriesName = rowSeriesName;
+				series = new Series()
+					.setName(rowSeriesName)
+					.setType('column')
+					.setData([]);
+				seriesList.push(series);
+			}
+
+			if(seriesList.length == 1)
+				categories.push(row[0]);
+
+			series.data.push(row[1]);
+		}
+
+		return new Chart()
+			.setCategories(categories)
+			.setColors(this.colors)
+			.setHeight(this.height)
+			.setLegend(this.legend)
+			.setTitle(this.title)
+			.addYAxis(this.title, false)
+			.setSeries(seriesList);
 	}
 
 	//----------------------------
-
 
 	export() {
 

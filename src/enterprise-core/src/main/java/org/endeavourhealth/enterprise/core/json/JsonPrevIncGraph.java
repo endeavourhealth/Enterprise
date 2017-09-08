@@ -1,4 +1,4 @@
-package org.endeavour.enterprise.endpoints.models;
+package org.endeavourhealth.enterprise.core.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

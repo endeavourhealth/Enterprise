@@ -1,9 +1,6 @@
 package org.endeavourhealth.enterprise.core.database;
 
-import org.endeavourhealth.enterprise.core.json.JsonLsoa;
-import org.endeavourhealth.enterprise.core.json.JsonMsoa;
-import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
-import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
+import org.endeavourhealth.enterprise.core.json.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -438,15 +435,34 @@ public class UtilityManager {
 
     }
 
-    public List getIncPrevResults() {
+    public List getIncPrevResults(JsonPrevIncGraph params) {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        Query q = entityManager.createNativeQuery("SELECT "+
-            "min_date, "+
-            "incidence_male, incidence_female, incidence_other, "+
-            "prevalence_male, prevalence_female, prevalence_other, "+
-            "population_male, population_female, population_other, query_title "+
-            "FROM enterprise_admin.incidence_prevalence_result ORDER BY min_date ASC");
+        System.out.printf("Breakdown : %s\n", params.breakdown);
+        System.out.printf("Gender : %s\n", params.gender);
+        System.out.printf("Ethnicity : %s\n", params.ethnicity);
+        System.out.printf("Postcode : %s\n", params.postcode);
+        System.out.printf("LSOA : %s\n", params.lsoa);
+        System.out.printf("MSOA : %s\n", params.msoa);
+        System.out.printf("Age x10 : %s\n", params.agex10);
+
+        String select = "clinical_effective_year, count(*)";
+        String from = "enterprise_admin.incidence_prevalence_raw_data";
+        String where = "";
+        String group = "clinical_effective_year";
+        String order = "clinical_effective_year";
+
+        if (params.breakdown != null && !params.breakdown.isEmpty()) {
+            select += ", " + params.breakdown;
+            group += ", " + params.breakdown;
+            order = params.breakdown + ", " + order;
+        }
+
+        Query q = entityManager.createNativeQuery(
+            "SELECT " + select +
+                " FROM " + from +
+                " GROUP BY " + group +
+                " ORDER BY " + order);
 
         List resultList = q.getResultList();
 

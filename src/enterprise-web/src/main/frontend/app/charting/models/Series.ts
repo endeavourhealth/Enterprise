@@ -6,6 +6,7 @@
 	center: number[] = [];
 	yAxis : number;
 	showInLegend : boolean;
+	visible : boolean;
 
 	public setType(type : string) : Series {
 		this.type = type;
@@ -40,6 +41,11 @@
 
 	public setyAxis(yAxis : number) : Series {
 		this.yAxis = yAxis;
+		return this;
+	}
+
+	public setVisible(visible : boolean) : Series {
+		this.visible = visible;
 		return this;
 	}
  }

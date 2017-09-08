@@ -164,7 +164,8 @@ export class PrevIncChartDialog implements OnInit {
 				series = new Series()
 					.setName(rowSeriesName)
 					.setType('column')
-					.setData([]);
+					.setData([])
+					.setVisible(row[2] != null);
 				seriesList.push(series);
 			}
 

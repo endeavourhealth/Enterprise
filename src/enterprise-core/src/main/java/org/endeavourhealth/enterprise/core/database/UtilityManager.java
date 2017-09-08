@@ -136,13 +136,13 @@ public class UtilityManager {
 
     private String createStandardOrganisationInsert(List<JsonOrganisation> organisations) throws Exception {
         String orgList = "";
-        String prefix = " select ";
         for (JsonOrganisation org : organisations) {
-            orgList += prefix + org.getId();
-            prefix = " union select ";
+            orgList += "(" + org.getId() + "),";
         }
+        orgList =  orgList.substring(0, orgList.length() - 1);
 
-        String query = String.format("insert into enterprise_admin.incidence_prevalence_organisation_list (organisation_id) %s",
+        String query = String.format("insert into enterprise_admin.incidence_prevalence_organisation_list (organisation_id)" +
+                        " values %s",
                 orgList);
 
 
@@ -153,11 +153,9 @@ public class UtilityManager {
 
         List<String> orgScripts = new ArrayList<>();
 
-        if (options.getOrgType() != null && options.getOrgType().equals("5")) {
-            if (options.getOrganisation() != null && options.getOrganisation().size() > 0) {
-                includeOrganisationQuery = true;
-                orgScripts.add(createStandardOrganisationInsert(options.getOrganisation()));
-            }
+        if (options.getOrganisation() != null && options.getOrganisation().size() > 0) {
+            includeOrganisationQuery = true;
+            orgScripts.add(createStandardOrganisationInsert(options.getOrganisation()));
         }
 
         for (String script : orgScripts) {

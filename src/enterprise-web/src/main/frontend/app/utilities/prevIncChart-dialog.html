@@ -18,7 +18,10 @@
 			</div>
 			<div class="form-group col-md-4" [hidden]="breakdown.filters.length == 0">
 				<label>Filter: </label> <span style="cursor: pointer" ></span>
-				<ss-multiselect-dropdown [options]="breakdown.filters" [settings]="multiSelectSettings" [(ngModel)]="filter" (ngModelChange)="onChange($event)" name="multiFilter" ></ss-multiselect-dropdown>
+				<ss-multiselect-dropdown [options]="breakdown.filters" [settings]="multiSelectSettings" [(ngModel)]="filter" name="multiFilter" ></ss-multiselect-dropdown>
+			</div>
+			<div class="form-group col-md-4">
+				<button (click)="refresh()">Refresh</button>
 			</div>
 		</div>
 		<div class="row">

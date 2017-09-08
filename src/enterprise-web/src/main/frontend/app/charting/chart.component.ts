@@ -16,19 +16,21 @@ export class ChartComponent {
 	@Input()
 	set data(data : Chart) {
 
-		let config = {
-			chart : { height: data.height },
-			colors : data.colors,
-			title : { text : data.title },
-			xAxis : { categories : data.categories },
-			yAxis : data.yAxis,
-			series : data.series,
-			legend : data.legend
-		};
+		if (data) {
+			let config = {
+				chart: {height: data.height},
+				colors: data.colors,
+				title: {text: data.title},
+				xAxis: {categories: data.categories},
+				yAxis: data.yAxis,
+				series: data.series,
+				legend: data.legend
+			};
 
-		this.chart = Highcharts.chart(this.chartPlaceholder.nativeElement, config);
+			this.chart = Highcharts.chart(this.chartPlaceholder.nativeElement, config);
 
-		let vm = this;
-		setTimeout(() => vm.chart.reflow(), 1);
+			let vm = this;
+			setTimeout(() => vm.chart.reflow(), 1);
+		}
 	}
 }

@@ -279,8 +279,8 @@ public class UtilityManager {
                 "    r.msoa_code = p.msoa_code,\n" +
                 "    r.ethnic_code =  p.ethnic_code,\n" +
                 "    r.organisation_id = p.organization_id,\n" +
-                "    r.date_of_death_year = year(p.date_of_death),\n" +
-                "    r.date_of_death_month = month(p.date_of_death);");
+                "    r.date_of_death_year = year(ifnull(p.date_of_death, '9999-01-01')),\n" +
+                "    r.date_of_death_month = month(ifnull(p.date_of_death, '9999-01-01'));");
 
         for (String script : personScripts) {
             runScript(script);

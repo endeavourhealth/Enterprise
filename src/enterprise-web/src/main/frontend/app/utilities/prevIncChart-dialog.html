@@ -10,18 +10,44 @@
 <div class="modal-body">
 	<form role="form">
 		<div class="row">
-			<div class="form-group col-md-4">
-				<label>Breakdown: </label> <span style="cursor: pointer" ></span>
-				<select class="form-control" [(ngModel)]="breakdown" name="breakdown" (ngModelChange)="setBreakdown()">
+			<div class="form-group col-md-1 col-sm-3">
+				<label>Breakdown: </label>
+				<select class="form-control" [(ngModel)]="breakdown" name="breakdown">
 					<option *ngFor="let set of breakdownOptions" [ngValue]="set">{{set.name}}</option>
 				</select>
 			</div>
-			<div class="form-group col-md-4" [hidden]="breakdown.filters.length == 0">
-				<label>Filter: </label> <span style="cursor: pointer" ></span>
-				<ss-multiselect-dropdown [options]="breakdown.filters" [settings]="multiSelectSettings" [(ngModel)]="filter" name="multiFilter" ></ss-multiselect-dropdown>
+			<div class="form-group col-md-1 col-sm-0">
 			</div>
-			<div class="form-group col-md-4">
-				<button (click)="refresh()">Refresh</button>
+			<div class="form-group col-md-1 col-sm-3">
+				<label>Gender: </label>
+				<ss-multiselect-dropdown [options]="filterGender" [settings]="multiSelectSettings" [(ngModel)]="genders" name="genderFilter" ></ss-multiselect-dropdown>
+			</div>
+			<div class="form-group col-md-1 col-sm-3">
+				<label>Ethnicity: </label>
+				<ss-multiselect-dropdown [options]="filterEthnicity" [settings]="multiSelectSettings" [(ngModel)]="ethnicity" name="ethnicityFilter" ></ss-multiselect-dropdown>
+			</div>
+			<div class="form-group col-md-1 col-sm-3">
+				<label>Postcode: </label>
+				<ss-multiselect-dropdown [options]="filterPostcode" [settings]="multiSelectSettings" [(ngModel)]="postcode" name="postcodeFilter" ></ss-multiselect-dropdown>
+			</div>
+			<div class="form-group col-md-1 col-sm-3">
+				<label>LSOA: </label>
+				<ss-multiselect-dropdown [options]="filterLsoa" [settings]="multiSelectSettings" [(ngModel)]="lsoa" name="lsoaFilter" ></ss-multiselect-dropdown>
+			</div>
+			<div class="form-group col-md-1 col-sm-3">
+				<label>MSOA: </label>
+				<ss-multiselect-dropdown [options]="filterMsoa" [settings]="multiSelectSettings" [(ngModel)]="msoa" name="msoaFilter" ></ss-multiselect-dropdown>
+			</div>
+			<div class="form-group col-md-1 col-sm-3">
+				<label>Age: </label>
+				<ss-multiselect-dropdown [options]="filterAgex10" [settings]="multiSelectSettings" [(ngModel)]="agex10" name="agex10Filter" ></ss-multiselect-dropdown>
+			</div>
+			<div class="form-group col-md-2 col-sm-3">
+				<label>Filters: </label>
+				<div>
+					<button class="btn btn-sm btn-warning" (click)="refresh()">Clear</button>
+					<button class="btn btn-sm btn-primary" (click)="refresh()">Apply</button>
+				</div>
 			</div>
 		</div>
 		<div class="row">

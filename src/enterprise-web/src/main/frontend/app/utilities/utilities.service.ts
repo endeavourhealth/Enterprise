@@ -19,11 +19,17 @@ export class UtilitiesService extends BaseHttp2Service {
         return this.httpPost('api/utility/prevInc', options);
     }
 
-    getIncPrevResults(breakdown : string, filter : string[]) : Observable<any> {
-			var params : URLSearchParams = new URLSearchParams();
-			params.append('breakdown', breakdown);
-			params.append('filter', JSON.stringify(filter));
-		return this.httpGet('api/utility/incprev', { search : params });
+    getIncPrevResults(breakdown : string, gender : string[], ethnicity : string[], postcode : string[], lsoa : string[], msoa : string[], agex10 : string[]) : Observable<any> {
+			let body = {
+				breakdown : breakdown,
+				gender : gender,
+				ethnicity : ethnicity,
+				postcode : postcode,
+				lsoa : lsoa,
+				msoa : msoa,
+				agex10: agex10
+		};
+		return this.httpPost('api/utility/incprev', body);
 	}
 
     getDistinctValues(columnName: string) : Observable<any> {
@@ -31,4 +37,10 @@ export class UtilitiesService extends BaseHttp2Service {
         params.append('columnName', columnName);
         return this.httpGet('api/utility/distinctValues', { search : params });
     }
+
+    addArrayParameter(params : URLSearchParams, name : string, values : string[]) {
+			if (values != null && values.length > 0)
+				for (let value of values)
+					params.append(name, value);
+		}
 }

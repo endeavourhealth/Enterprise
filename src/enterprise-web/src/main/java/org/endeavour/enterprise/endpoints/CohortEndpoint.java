@@ -36,10 +36,12 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 		for (Object[] orgEntity : organisations) {
 			String id = orgEntity[0].toString();
 			String name = orgEntity[1].toString();
+			String odsCode = orgEntity[2]==null?"":orgEntity[2].toString();
 
 			JsonOrganisation org = new JsonOrganisation();
 			org.setId(id);
 			org.setName(name);
+			org.setOdsCode(odsCode);
 
 			results.add(org);
 		}
@@ -104,6 +106,100 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 			lsoa.setLsoaName(name);
 
 			results.add(lsoa);
+		}
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(results)
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getRegions")
+	public Response getRegions(@Context SecurityContext sc) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List<Object[]> regions = RegionEntity.getRegions();
+
+		List<JsonRegion> results = new ArrayList<>();
+
+		for (Object[] regionEntity : regions) {
+			String uuid = regionEntity[0].toString();
+			String name = regionEntity[1].toString();
+
+			JsonRegion region = new JsonRegion();
+			region.setUuid(uuid);
+			region.setName(name);
+
+			results.add(region);
+		}
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(results)
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getOrgsForRegion")
+	public Response getOrgsForRegion(@Context SecurityContext sc, @QueryParam("uuid") String uuid) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List<Object[]> orgsForRegion = RegionEntity.getOrgsForRegion(uuid);
+
+		List<JsonOrganisation> results = new ArrayList<>();
+
+		for (Object[] regionEntity : orgsForRegion) {
+			String id = regionEntity[0].toString();
+			String name = regionEntity[1].toString();
+			String odsCode = regionEntity[2].toString();
+
+			JsonOrganisation orgForRegion = new JsonOrganisation();
+			orgForRegion.setId(id);
+			orgForRegion.setName(name);
+			orgForRegion.setOdsCode(odsCode);
+
+			results.add(orgForRegion);
+		}
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(results)
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getOrgsForParentOdsCode")
+	public Response getOrgsForParentOdsCode(@Context SecurityContext sc, @QueryParam("odsCode") String odsCode) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List<Object[]> ParentOdsCode = RegionEntity.getOrgsForParentOdsCode(odsCode);
+
+		List<JsonOrganisation> results = new ArrayList<>();
+
+		for (Object[] regionEntity : ParentOdsCode) {
+			String id = regionEntity[0].toString();
+			String name = regionEntity[1].toString();
+			String odsCode1 = regionEntity[2].toString();
+
+			JsonOrganisation orgForRegion = new JsonOrganisation();
+			orgForRegion.setId(id);
+			orgForRegion.setName(name);
+			orgForRegion.setOdsCode(odsCode1);
+
+			results.add(orgForRegion);
 		}
 
 		clearLogbackMarkers();

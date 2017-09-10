@@ -1,16 +1,13 @@
 package org.endeavourhealth.enterprise.core.database.models.data;
 
-import org.endeavourhealth.enterprise.core.database.PersistenceManager;
-
 import javax.persistence.*;
-import java.util.List;
 
 /**
- * Created by darren on 23/03/17.
+ * Created by darren on 09/09/2017.
  */
 @Entity
-@Table(name = "organization", schema = "enterprise_data_pseudonymised", catalog = "")
-public class OrganizationEntity {
+@Table(name = "organization_view", schema = "data_sharing_manager", catalog = "")
+public class OrganizationViewEntity {
     private long id;
     private String odsCode;
     private String name;
@@ -94,7 +91,7 @@ public class OrganizationEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        OrganizationEntity that = (OrganizationEntity) o;
+        OrganizationViewEntity that = (OrganizationViewEntity) o;
 
         if (id != that.id) return false;
         if (odsCode != null ? !odsCode.equals(that.odsCode) : that.odsCode != null) return false;
@@ -118,20 +115,5 @@ public class OrganizationEntity {
         result = 31 * result + (postcode != null ? postcode.hashCode() : 0);
         result = 31 * result + (parentOrganizationId != null ? parentOrganizationId.hashCode() : 0);
         return result;
-    }
-
-    public static List<Object[]> getOrganisations() throws Exception {
-        String where = "select distinct o.id, o.name, o.odsCode " +
-                "from PatientEntity p join OrganizationEntity o on o.id = p.organizationId";
-
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-
-        List<Object[]> ent = entityManager.createQuery(where)
-                .getResultList();
-
-        entityManager.close();
-
-        return ent;
-
     }
 }

@@ -18,15 +18,19 @@ public enum PersistenceManager {
 
     private EntityManagerFactory emEnterpriseAdmin;
     private EntityManagerFactory emEnterpriseData;
+	private EntityManagerFactory emDataSharingManagerData;
 
     PersistenceManager() {
 
 		Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");
+
 		emEnterpriseAdmin = Persistence.createEntityManagerFactory("enterprise_admin", override);
 
 		override = getHibernateOverridesFromConfig("patient_database");
 		emEnterpriseData = Persistence.createEntityManagerFactory("enterprise_data", override);
 
+		override = getHibernateOverridesFromConfig("data_sharing_manager");
+		emDataSharingManagerData = Persistence.createEntityManagerFactory("data_sharing_manager", override);
 	}
 
 	public EntityManager getEmEnterpriseAdmin() {
@@ -37,9 +41,14 @@ public enum PersistenceManager {
         return emEnterpriseData.createEntityManager();
     }
 
+	public EntityManager getEmDataSharingManagerData() {
+		return emDataSharingManagerData.createEntityManager();
+	}
+
     public void close() {
         emEnterpriseAdmin.close();
         emEnterpriseData.close();
+		emDataSharingManagerData.close();
 
     }
 

@@ -38,7 +38,7 @@ export class PrevIncDialog implements OnInit {
 	msoaCode: Msoa = <any>[];
 	sex: string = "-1";
 	ethnicity: string = <any>[];
-	orgType: string = "5";
+	orgType: string = "";
 	ageFrom: string = "";
 	ageTo: string = "";
 
@@ -54,7 +54,7 @@ export class PrevIncDialog implements OnInit {
 
 	organisations = <any>[];
 	msoas = <any>[];
-	lsoas = <any>[];
+	lsoas = <any>[]
 	periods = ['','MONTHS','YEARS'];
 
 	diseaseCategories = [
@@ -69,27 +69,13 @@ export class PrevIncDialog implements OnInit {
 		{id: 1, name: 'Females'}
 	];
 
-	ccgs = [
-		{id: 0, name: 'City and Hackney CCG'},
-		{id: 1, name: 'Newham CCG'},
-		{id: 2, name: 'Tower Hamlets CCG'},
-		{id: 3, name: 'Waltham Forest CCG'}
-	];
-
 	organisationTypes = [
 		{id: 0, name: 'General Practice'},
 		{id: 1, name: 'Acute Trust'},
 		{id: 2, name: 'Mental Health'}
 	];
 
-	orgTypes = [
-		{id: 0, type: 'Patients registered with any General Practice surgery'},
-		{id: 1, type: 'STPs'},
-		{id: 2, type: 'CCGs'},
-		{id: 3, type: 'Organisation Types'},
-		{id: 4, type: 'Defined List'},
-		{id: 5, type: 'Choose Organisations'}
-	];
+	orgTypes = <any>[];
 
 	ethnicGroups = [
 		{code: "A", name: 'British'},
@@ -121,12 +107,6 @@ export class PrevIncDialog implements OnInit {
 	ngOnInit(): void {
 		var vm = this;
 
-		vm.cohortService.getOrganisations()
-			.subscribe(
-				(data) => {
-					vm.organisations = data;
-				});
-
 		vm.cohortService.getLsoaCodes()
 			.subscribe(
 				(data) => {
@@ -140,6 +120,16 @@ export class PrevIncDialog implements OnInit {
 				});
 
 		vm.getCodeSets();
+
+		vm.cohortService.getRegions()
+			.subscribe(
+				(data) => {
+					vm.orgTypes = data;
+					let t = {uuid: '1', name: 'Choose Organisations'};
+					vm.orgTypes.unshift(t);
+					t = {uuid: '0', name: 'Organisation Types'};
+					vm.orgTypes.unshift(t);
+				});
 	}
 
 	getCodeSets() {
@@ -156,10 +146,26 @@ export class PrevIncDialog implements OnInit {
 		var vm = this;
 		vm.resultData.organisation = <any>[];
 		for (let optionElement of selectElement.selectedOptions) {
+			let odscode = optionElement.value.split('~')[1];
 			let org = {
-				id: optionElement.value,
-				name: optionElement.text
+				id: optionElement.value.split('~')[0],
+				name: optionElement.text,
+				odsCode: odscode
 			};
+			vm.cohortService.getOrgsForParentOdsCode(odscode)
+				.subscribe(
+					(data) => {
+						let orgs = <any>[];
+						orgs = data;
+						for (let org of orgs) {
+							let o = {
+								id: org.id,
+								name: org.name,
+								odsCode: org.odsCode
+							};
+							vm.resultData.organisation.push(o);
+						}
+					});
 			vm.resultData.organisation.push(org);
 		}
 	}
@@ -198,22 +204,20 @@ export class PrevIncDialog implements OnInit {
 
 	setSelectedOrgType(selectElement) {
 		var vm = this;
-		switch (vm.orgType) {
-			case "1":
-			case "2":
-				vm.organisations = vm.ccgs;
-				break;
-			case "3":
-				vm.organisations = vm.organisationTypes;
-				break;
-			case "4":
-			case "5":
-				vm.cohortService.getOrganisations()
-					.subscribe(
-						(data) => {
-							vm.organisations = data;
-						});
-				break;
+		if (vm.orgType === "0") {
+			vm.organisations = vm.organisationTypes;
+		} else if (vm.orgType === "1") {
+			vm.cohortService.getOrganisations()
+				.subscribe(
+					(data) => {
+						vm.organisations = data;
+					});
+		} else {
+			vm.cohortService.getOrgsForRegion(vm.orgType)
+				.subscribe(
+					(data) => {
+						vm.organisations = data;
+					});
 		}
 	}
 

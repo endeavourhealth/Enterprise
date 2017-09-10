@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {Organisation} from "./models/Organisation";
 import {Lsoa} from "./models/Lsoa";
 import {Msoa} from "./models/Msoa";
+import {Region} from "./models/Region";
 import {CohortResult} from "./models/CohortResult";
 import {CohortRun} from "./models/CohortRun";
 import {BaseHttp2Service} from "eds-common-js";
@@ -25,6 +26,25 @@ export class CohortService extends BaseHttp2Service {
 	getLsoaCodes():Observable<Lsoa> {
 
 		return this.httpGet('api/cohort/getLsoaCodes');
+	}
+
+	getRegions():Observable<Region> {
+
+		return this.httpGet('api/cohort/getRegions');
+	}
+
+	getOrgsForRegion(uuid: string):Observable<Organisation> {
+		var params : URLSearchParams = new URLSearchParams();
+		params.append('uuid', uuid);
+
+		return this.httpGet('api/cohort/getOrgsForRegion', {search : params});
+	}
+
+	getOrgsForParentOdsCode(odsCode: string):Observable<Organisation> {
+		var params : URLSearchParams = new URLSearchParams();
+		params.append('odsCode', odsCode);
+
+		return this.httpGet('api/cohort/getOrgsForParentOdsCode', {search : params});
 	}
 
 	getCohortResults(queryItemUuid : string, runDate):Observable<CohortResult[]> {

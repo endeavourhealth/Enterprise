@@ -62,10 +62,10 @@
 						<label>Patients with episodes of care at the following organisations: </label>
 						<span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgTT }}"></span>
 						<select class="form-control" style="width:400px" (change)="setSelectedOrgType($event.target)" [(ngModel)]="orgType" [ngModelOptions]="{standalone: true}">
-							<option *ngFor="let org of orgTypes" value="{{org.id}}">{{org.type}}</option>
+							<option *ngFor="let org of orgTypes" value="{{org.uuid}}">{{org.name}}</option>
 						</select>
 						<select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)" >
-							<option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
+							<option *ngFor="let organisation of organisations" value="{{organisation.id}}~{{organisation.odsCode}}">{{organisation.name}}</option>
 						</select>
 					</div>
 					<div class="form-group">

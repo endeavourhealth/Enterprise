@@ -7,6 +7,7 @@ public final class JsonOrganisation {
 
     private String id = null;
     private String name = null;
+    private String odsCode = null;
 
     public JsonOrganisation() {
     }
@@ -28,6 +29,14 @@ public final class JsonOrganisation {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getOdsCode() {
+        return odsCode;
+    }
+
+    public void setOdsCode(String odsCode) {
+        this.odsCode = odsCode;
     }
 
 

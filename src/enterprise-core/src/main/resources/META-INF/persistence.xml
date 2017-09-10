@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
 
+    <persistence-unit name="data_sharing_manager">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>org.endeavourhealth.enterprise.core.database.models.data.MasterMappingEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.data.OrganisationEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.data.RegionEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.data.OrganizationViewEntity</class>
+        <properties>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/data_sharing_manager"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+            <property name="hibernate.connection.username" value=""/>
+            <property name="hibernate.connection.password" value=""/>
+            <property name="hibernate.archive.autodetection" value="class"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.jdbc.time_zone" value="UTC"/>
+            <property name="hbm2ddl.auto" value="update"/>
+        </properties>
+    </persistence-unit>
     <persistence-unit name="enterprise_admin">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity</class>
@@ -11,7 +29,7 @@
         <class>org.endeavourhealth.enterprise.core.database.models.ItemTypeEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.CodeSetEntity</class>
         <properties>
-            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/enterprise_data_pseudonymised"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/enterprise_admin"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.connection.username" value=""/>
             <property name="hibernate.connection.password" value=""/>

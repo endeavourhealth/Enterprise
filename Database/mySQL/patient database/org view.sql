@@ -1,0 +1,2 @@
+create view data_sharing_manager.organization_view as
+select * from enterprise_data_pseudonymised.organization;

@@ -52,6 +52,18 @@ export class PrevIncChartDialog implements OnInit {
 		closeOnClickOutside: true
 	};
 
+	private multiSelectTexts = {
+		checkAll: 'Select all',
+		uncheckAll: 'Unselect all',
+		checked: 'item',
+		checkedPlural: 'items',
+		searchPlaceholder: 'Find',
+		searchEmptyResult: 'Nothing found...',
+		searchNoRenderText: 'Type in search box to see results...',
+		defaultTitle: 'Select',
+		allSelected: 'All',
+	};
+
 	private colors = ['LightBlue', 'Plum', 'Yellow', 'LightSalmon'];						// Male, Female, Other, Total
 	private height = 200;
 	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 100};

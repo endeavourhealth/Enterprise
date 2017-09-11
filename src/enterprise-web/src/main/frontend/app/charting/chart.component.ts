@@ -19,7 +19,7 @@ export class ChartComponent {
 		if (data) {
 			let config = {
 				chart: {height: data.height},
-				colors: data.colors,
+//				colors: data.colors,
 				title: {text: data.title},
 				xAxis: {categories: data.categories},
 				yAxis: data.yAxis,

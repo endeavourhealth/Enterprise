@@ -38,7 +38,8 @@ export class PrevIncChartDialog implements OnInit {
 	private filterAgex10 : Filter[] = [];
 	private agex10 : string[];
 
-	private chart: Chart;
+	private incChart: Chart;
+	private prevChart: Chart;
 
 	private multiSelectSettings = {
 		enableSearch: true,
@@ -50,8 +51,9 @@ export class PrevIncChartDialog implements OnInit {
 		showUncheckAll: true,
 		closeOnClickOutside: true
 	};
+
 	private colors = ['LightBlue', 'Plum', 'Yellow', 'LightSalmon'];						// Male, Female, Other, Total
-	private height = 400;
+	private height = 200;
 	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 100};
 
 	constructor(protected $uibModalInstance : NgbActiveModal, protected utilService : UtilitiesService) {
@@ -118,29 +120,32 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	refresh() {
-		this.chart = null;
+		this.incChart = null;
+		this.prevChart = null;
 		let vm = this;
-		vm.utilService.getIncPrevResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.agex10)
+		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.agex10)
 			.subscribe(
-				(results) => vm.drawGraph(results),
+				(results) => vm.incChart = this.getChartData('Incidence', results),
+				(error) => console.log(error)
+			);
+
+		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.agex10)
+			.subscribe(
+				(results) => vm.prevChart = this.getChartData('Prevalence', results),
 				(error) => console.log(error)
 			);
 	}
 
-	drawGraph(results : any) {
-		this.chart = this.getChartData(results);
-	}
-
 	//---------------------------
 
-	getChartData(results: any) {
+	getChartData(title : string, results: any) {
 		if (results[0].length == 3)
-			return this.getGroupedChartData(results);
+			return this.getGroupedChartData(title, results);
 
-		return this.getTotalChartData(results);
+		return this.getTotalChartData(title, results);
 	}
 
-	getTotalChartData(results : any) {
+	getTotalChartData(title : string, results : any) {
 		let categories : string[] = linq(results).Select(row => row[0]).ToArray();
 		let data : string[] = linq(results).Select(row => row[1]).ToArray();
 
@@ -149,8 +154,8 @@ export class PrevIncChartDialog implements OnInit {
 			.setColors(this.colors)
 			.setHeight(this.height)
 			.setLegend(this.legend)
-			.setTitle(this.title)
-			.addYAxis(this.title, false)
+			.setTitle(title)
+			.addYAxis(title, false)
 			.setSeries([
 				new Series()
 					.setName('Total')
@@ -159,7 +164,7 @@ export class PrevIncChartDialog implements OnInit {
 			]);
 	}
 
-	getGroupedChartData(results : any) {
+	getGroupedChartData(title : string, results : any) {
 		let categories : string[] = linq(results)
 			.Select(row => row[0])
 			.Distinct()
@@ -178,8 +183,8 @@ export class PrevIncChartDialog implements OnInit {
 			.setColors(this.colors)
 			.setHeight(this.height)
 			.setLegend(this.legend)
-			.setTitle(this.title)
-			.addYAxis(this.title, false)
+			.setTitle(title)
+			.addYAxis(title, false)
 			.setSeries(chartSeries);
 	}
 
@@ -209,8 +214,8 @@ export class PrevIncChartDialog implements OnInit {
 
 		let rowData = [];
 
-		rowData.push(this.chart.title);
-		rowData = rowData.concat(this.chart.getRowData())
+		rowData.push(this.incChart.title);
+		rowData = rowData.concat(this.incChart.getRowData())
 
 		let blob = new Blob([rowData.join('\n')], { type: 'text/plain' });
 		window['saveAs'](blob, this.title + '.csv');

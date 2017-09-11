@@ -50,21 +50,27 @@
 				</div>
 			</div>
 		</div>
-		<div class="row" style="height: 450px;">
-			<loadingIndicator [done]="chart">
+		<div class="row">
+			<loadingIndicator [done]="incChart && prevChart">
 				<ngb-tabset>
 					<ngb-tab title="Graph">
 						<template ngbTabContent>
 							<div class="row">
 								<div class="col-md-12">
-									<chart [data]="chart"></chart>
+									<chart [data]="incChart"></chart>
+									<chart [data]="prevChart"></chart>
 								</div>
 							</div>
 						</template>
 					</ngb-tab>
 					<ngb-tab title="Table">
 						<template ngbTabContent>
-							<chart-table [data]="chart"></chart-table>
+							<div class="row">
+								<div class="col-md-12">
+									<chart-table [data]="incChart"></chart-table>
+									<chart-table [data]="prevChart"></chart-table>
+								</div>
+							</div>
 						</template>
 					</ngb-tab>
 				</ngb-tabset>

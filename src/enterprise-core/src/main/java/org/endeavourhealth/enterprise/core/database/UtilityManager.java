@@ -382,7 +382,7 @@ public class UtilityManager {
 
     }
 
-    public List getIncPrevResults(JsonPrevIncGraph params) {
+    public List getIncidenceResults(JsonPrevIncGraph params) {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         String select = "r.min_date, count(distinct d.person_id)";

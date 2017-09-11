@@ -34,13 +34,13 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/incprev")
-    public Response getIncPrevResults(@Context SecurityContext sc, JsonPrevIncGraph params) throws Exception {
-        System.out.println("Retrieving Incidence & Prevalence results");
+    @Path("/incidence")
+    public Response getIncidenceResults(@Context SecurityContext sc, JsonPrevIncGraph params) throws Exception {
+        System.out.println("Retrieving Incidence results");
         super.setLogbackMarkers(sc);
 
 
-        List results = new UtilityManager().getIncPrevResults(params);
+        List results = new UtilityManager().getIncidenceResults(params);
 
         clearLogbackMarkers();
 

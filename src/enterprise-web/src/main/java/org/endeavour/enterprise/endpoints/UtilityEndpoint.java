@@ -45,9 +45,28 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         clearLogbackMarkers();
 
         return Response
-            .ok()
-            .entity(results)
-            .build();
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/prevalence")
+    public Response getPrevanlenceResults(@Context SecurityContext sc, JsonPrevIncGraph params) throws Exception {
+        System.out.println("Retrieving Prevalence results");
+        super.setLogbackMarkers(sc);
+
+
+        List results = new UtilityManager().getPrevalenceResults(params);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
     }
 
     @GET

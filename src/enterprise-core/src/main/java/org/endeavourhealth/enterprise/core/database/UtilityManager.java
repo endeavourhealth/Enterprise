@@ -118,6 +118,7 @@ public class UtilityManager {
                 "    msoa_code varchar(50) null,\n" +
                 "    ethnic_code char(1) null,\n" +
                 "    organisation_id bigint(20) null,\n" +
+                "    date_of_death date null,\n" +
                 "    date_of_death_year int(6) null,\n" +
                 "    date_of_death_month int(6) null,\n" +
                 "    \n" +
@@ -322,6 +323,7 @@ public class UtilityManager {
                 "    r.msoa_code = p.msoa_code,\n" +
                 "    r.ethnic_code =  p.ethnic_code,\n" +
                 "    r.organisation_id = p.organization_id,\n" +
+                "    r.date_of_death = ifnull(p.date_of_death, '9999-01-01'),\n" +
                 "    r.date_of_death_year = year(ifnull(p.date_of_death, '9999-01-01')),\n" +
                 "    r.date_of_death_month = month(ifnull(p.date_of_death, '9999-01-01'));");
 
@@ -387,7 +389,8 @@ public class UtilityManager {
         String from = " enterprise_admin.incidence_prevalence_date_range r" +
                 " left outer join enterprise_admin.incidence_prevalence_raw_data d  " +
                 "   on d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date";
-        List<String> where = new ArrayList<>();
+        List<String> where = getWhereClausesForIncAndPrev(params);
+
         String group = "r.min_date";
         String order = "r.min_date";
 
@@ -397,6 +400,30 @@ public class UtilityManager {
             group += ", IFNULL(" + params.breakdown+", 'Unknown')";
             order = params.breakdown + ", " + order;
         }
+
+        String sql = " SELECT " + select +
+            " FROM " + from ;
+        if (where.size() > 0)
+            sql += " WHERE " + StringUtils.join(where, "\nAND ");
+        sql += " GROUP BY " + group +
+            " ORDER BY " + order;
+
+        System.out.println(sql);
+
+        Query q = entityManager.createNativeQuery(sql);
+
+        List resultList = q.getResultList();
+
+        System.out.println(resultList.size() + " rows affected");
+
+        entityManager.close();
+
+        return resultList;
+    }
+
+    public List<String> getWhereClausesForIncAndPrev(JsonPrevIncGraph params) {
+
+        List<String> where = new ArrayList<>();
 
         // FILTERING
         if (params.gender != null && params.gender.size() > 0)
@@ -430,12 +457,36 @@ public class UtilityManager {
             where.add("(" + StringUtils.join(ageWhere, "\nOR ") + ")");
         }
 
+        return where;
+    }
+
+    public List getPrevalenceResults(JsonPrevIncGraph params) {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        String select = "r.min_date, count(distinct d.person_id)";
+        String from = " enterprise_admin.incidence_prevalence_date_range r" +
+                " left outer join enterprise_admin.incidence_prevalence_raw_data d  " +
+                "   on d.clinical_effective_date <= r.max_date";
+        List<String> where = getWhereClausesForIncAndPrev(params);
+
+        String group = "r.min_date";
+        String order = "r.min_date";
+
+        where.add(" d.date_of_death > r.max_date ");
+
+        // GROUPING
+        if (params.breakdown != null && !params.breakdown.isEmpty()) {
+            select += ", IFNULL(" + params.breakdown+", 'Unknown')";
+            group += ", IFNULL(" + params.breakdown+", 'Unknown')";
+            order = params.breakdown + ", " + order;
+        }
+
         String sql = " SELECT " + select +
-            " FROM " + from ;
+                " FROM " + from ;
         if (where.size() > 0)
             sql += " WHERE " + StringUtils.join(where, "\nAND ");
         sql += " GROUP BY " + group +
-            " ORDER BY " + order;
+                " ORDER BY " + order;
 
         System.out.println(sql);
 

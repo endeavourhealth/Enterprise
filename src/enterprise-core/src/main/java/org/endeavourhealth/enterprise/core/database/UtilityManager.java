@@ -383,11 +383,13 @@ public class UtilityManager {
     public List getIncPrevResults(JsonPrevIncGraph params) {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        String select = "clinical_effective_year, count(*)";
-        String from = "enterprise_admin.incidence_prevalence_raw_data";
+        String select = "r.min_date, count(distinct d.person_id)";
+        String from = " enterprise_admin.incidence_prevalence_date_range r" +
+                " left outer join enterprise_admin.incidence_prevalence_raw_data d  " +
+                "   on d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date";
         List<String> where = new ArrayList<>();
-        String group = "clinical_effective_year";
-        String order = "clinical_effective_year";
+        String group = "r.min_date";
+        String order = "r.min_date";
 
         // GROUPING
         if (params.breakdown != null && !params.breakdown.isEmpty()) {

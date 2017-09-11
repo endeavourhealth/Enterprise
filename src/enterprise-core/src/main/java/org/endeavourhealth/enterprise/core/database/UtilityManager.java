@@ -1,5 +1,7 @@
 package org.endeavourhealth.enterprise.core.database;
 
+import net.sf.saxon.expr.instruct.ForEach;
+import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.enterprise.core.json.*;
 
 import javax.persistence.EntityManager;
@@ -438,31 +440,61 @@ public class UtilityManager {
     public List getIncPrevResults(JsonPrevIncGraph params) {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        System.out.printf("Breakdown : %s\n", params.breakdown);
-        System.out.printf("Gender : %s\n", params.gender);
-        System.out.printf("Ethnicity : %s\n", params.ethnicity);
-        System.out.printf("Postcode : %s\n", params.postcode);
-        System.out.printf("LSOA : %s\n", params.lsoa);
-        System.out.printf("MSOA : %s\n", params.msoa);
-        System.out.printf("Age x10 : %s\n", params.agex10);
-
         String select = "clinical_effective_year, count(*)";
         String from = "enterprise_admin.incidence_prevalence_raw_data";
-        String where = "";
+        List<String> where = new ArrayList<>();
         String group = "clinical_effective_year";
         String order = "clinical_effective_year";
 
+        // GROUPING
         if (params.breakdown != null && !params.breakdown.isEmpty()) {
-            select += ", " + params.breakdown;
-            group += ", " + params.breakdown;
+            select += ", IFNULL(" + params.breakdown+", 'Unknown')";
+            group += ", IFNULL(" + params.breakdown+", 'Unknown')";
             order = params.breakdown + ", " + order;
         }
 
-        Query q = entityManager.createNativeQuery(
-            "SELECT " + select +
-                " FROM " + from +
-                " GROUP BY " + group +
-                " ORDER BY " + order);
+        // FILTERING
+        if (params.gender != null && params.gender.size() > 0)
+            where.add("patient_gender_id in (" + StringUtils.join(params.gender, ',') + ")\n");
+
+        if (params.ethnicity != null && params.ethnicity.size() > 0)
+            where.add("ethnic_code in ('" + StringUtils.join(params.ethnicity, "','") + "')\n");
+
+        if (params.postcode != null && params.postcode.size() > 0)
+            where.add("postcode_prefix in ('" + StringUtils.join(params.postcode, "','") + "')\n");
+
+        if (params.lsoa != null && params.lsoa.size() > 0)
+            where.add("lsoa_code in ('" + StringUtils.join(params.lsoa, "','") + "')\n");
+
+        if (params.msoa != null && params.msoa.size() > 0)
+            where.add("msoa_code in ('" + StringUtils.join(params.msoa, "','") + "')\n");
+
+        if (params.agex10 != null && params.agex10.size() > 0) {
+            List<String> ageWhere = new ArrayList<>();
+
+            for(int i = 0; i < params.agex10.size(); i++) {
+                String agex10 = params.agex10.get(i);
+                if(agex10.equals("< 10"))
+                    ageWhere.add("age_years < 10");
+                else if (agex10.equals("> 90"))
+                    ageWhere.add("age_years > 90");
+                else
+                    ageWhere.add("(age_years >= "+agex10.substring(0,2) + " AND age_years < "+agex10.substring(3,5) + ")");
+            }
+
+            where.add("(" + StringUtils.join(ageWhere, "\nOR ") + ")");
+        }
+
+        String sql = " SELECT " + select +
+            " FROM " + from ;
+        if (where.size() > 0)
+            sql += " WHERE " + StringUtils.join(where, "\nAND ");
+        sql += " GROUP BY " + group +
+            " ORDER BY " + order;
+
+        System.out.println(sql);
+
+        Query q = entityManager.createNativeQuery(sql);
 
         List resultList = q.getResultList();
 

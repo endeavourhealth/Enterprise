@@ -5,6 +5,7 @@ import {UtilitiesService} from "./utilities.service";
 import {Breakdown} from "./models/Breakdown";
 import {Series} from "../charting/models/Series";
 import {Filter} from "./models/Filter";
+import {linq} from "eds-common-js";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -68,7 +69,7 @@ export class PrevIncChartDialog implements OnInit {
 		this.getOptionList(3, 'Postcode', 'postcode_prefix', this.filterPostcode);
 		this.getOptionList(4, 'LSOA', 'lsoa_code', this.filterLsoa);
 		this.getOptionList(5, 'MSOA', 'msoa_code', this.filterMsoa);
-		this.getAgeBands(6,'Age band (10 yrs)', 'age', 0, 90, 10, this.filterAgex10);
+		this.getAgeBands(6,'Age band (10 yrs)', 'FLOOR(age_years/10)', 0, 90, 10, this.filterAgex10);
 		this.breakdown = this.breakdownOptions[0];
 	}
 
@@ -94,18 +95,30 @@ export class PrevIncChartDialog implements OnInit {
 			let band = '';
 
 			if (i==min)
-				band = '< '+min;
+				band = '< '+ (min + step);
 			else if (i + step > max)
 				band = '> '+ i;
 			else
-				band = i + '-' + (i+step);
+				band = i + '-' + (i+step-1);
 
 			filter.push({id : band, name: band});
 			i+= step;
 		}
 	}
 
+	clear() {
+		this.breakdown = this.breakdownOptions[0];
+		this.genders = [];
+		this.ethnicity = [];
+		this.postcode = [];
+		this.lsoa = [];
+		this.msoa = [];
+		this.agex10 = [];
+		this.refresh();
+	}
+
 	refresh() {
+		this.chart = null;
 		let vm = this;
 		vm.utilService.getIncPrevResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.agex10)
 			.subscribe(
@@ -128,13 +141,8 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	getTotalChartData(results : any) {
-		let categories : string[] = [];
-		let data : string[] = [];
-
-		for (let row of results) {
-			categories.push(row[0]);
-			data.push(row[1]);
-		}
+		let categories : string[] = linq(results).Select(row => row[0]).ToArray();
+		let data : string[] = linq(results).Select(row => row[1]).ToArray();
 
 		return new Chart()
 			.setCategories(categories)
@@ -152,28 +160,18 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	getGroupedChartData(results : any) {
-		let currSeriesName : string = null;
-		let series : Series = null;
-		let seriesList : Series[] = [];
-		let categories : string[] = [];
+		let categories : string[] = linq(results)
+			.Select(row => row[0])
+			.Distinct()
+			.ToArray()
+			.sort();
 
-		for (let row of results) {
-			let rowSeriesName = row[2] == null ? 'Unknown' : row[2].toString();
-			if (currSeriesName != rowSeriesName) {
-				currSeriesName = rowSeriesName;
-				series = new Series()
-					.setName(rowSeriesName)
-					.setType('column')
-					.setData([])
-					.setVisible(row[2] != null);
-				seriesList.push(series);
-			}
+		let groupedResults = linq(results)
+			.GroupBy(r => r[2], r => r);
 
-			if(seriesList.length == 1)
-				categories.push(row[0]);
-
-			series.data.push(row[1]);
-		}
+		let chartSeries : Series[] = linq(Object.keys(groupedResults))
+			.Select(key => this.createSeriesChart(key, categories, groupedResults[key]))
+			.ToArray();
 
 		return new Chart()
 			.setCategories(categories)
@@ -182,7 +180,27 @@ export class PrevIncChartDialog implements OnInit {
 			.setLegend(this.legend)
 			.setTitle(this.title)
 			.addYAxis(this.title, false)
-			.setSeries(seriesList);
+			.setSeries(chartSeries);
+	}
+
+	createSeriesChart(series : string, categories : string[], results : any) : Series {
+		let chartSeries : Series = new Series()
+			.setName(series)
+			.setType('column');
+
+		let data : string[] = [];
+
+		for (let category of categories) {
+			let result = linq(results).Where(r => category == r[0]).SingleOrDefault();
+			if (result)
+				data.push(result[1]);
+			else
+				data.push(null);
+		}
+
+		chartSeries.setData(data);
+
+		return chartSeries;
 	}
 
 	//----------------------------

@@ -45,12 +45,13 @@
 			<div class="form-group col-md-2 col-sm-3">
 				<label>Filters: </label>
 				<div>
-					<button class="btn btn-sm btn-warning" (click)="refresh()">Clear</button>
+					<button class="btn btn-sm btn-warning" (click)="clear()">Clear</button>
 					<button class="btn btn-sm btn-primary" (click)="refresh()">Apply</button>
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" style="height: 450px;">
+			<loadingIndicator [done]="chart">
 				<ngb-tabset>
 					<ngb-tab title="Graph">
 						<template ngbTabContent>
@@ -67,6 +68,7 @@
 						</template>
 					</ngb-tab>
 				</ngb-tabset>
+			</loadingIndicator>
 		</div>
 	</form>
 </div>

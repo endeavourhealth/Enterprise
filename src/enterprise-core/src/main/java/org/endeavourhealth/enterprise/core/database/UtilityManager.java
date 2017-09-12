@@ -551,13 +551,13 @@ public class UtilityManager {
         return resultList;
     }
 
-    public List getDistinctValuesForGraphing(String columnName) throws Exception {
+    public List getDistinctValuesForGraphingNoLookup(String columnName) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         Query q = entityManager.createNativeQuery("SELECT DISTINCT " +
                 columnName +
-                " FROM enterprise_admin.incidence_prevalence_raw_data ORDER BY " +
-                columnName +
+                " FROM enterprise_admin.incidence_prevalence_raw_data d " +
+                " ORDER BY " + columnName +
                 " ASC");
 
         List resultList = q.getResultList();
@@ -565,5 +565,83 @@ public class UtilityManager {
         entityManager.close();
 
         return resultList;
+    }
+
+    public List getDistinctValuesForGraphing(String columnName) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        if (columnName.equals("postcode_prefix")
+                || columnName.equals("ethnic_code")) {
+            return getDistinctValuesForGraphingNoLookup(columnName);
+
+        }
+
+        String joinTable = getJoinTableForDistinctValues(columnName);
+        String joinColumn = getJoinColumnForDistinctValues(columnName);
+        String lookupColumn = getLookupColumnForDistinctValues(columnName);
+
+        Query q = entityManager.createNativeQuery("SELECT DISTINCT " +
+                " j." + lookupColumn +
+                " FROM enterprise_admin.incidence_prevalence_raw_data d " +
+                " join " + joinTable + " j on d." + columnName + " =  j." + joinColumn + " ORDER BY " +
+                " j." + lookupColumn +
+                " ASC");
+
+        List resultList = q.getResultList();
+
+        entityManager.close();
+
+        return resultList;
+    }
+
+    private String getJoinTableForDistinctValues(String column) {
+        switch (column) {
+            case "patient_gender_id":
+                return "patient_gender";
+            case "lsoa_code":
+                return "lsoa_lookup";
+            case "msoa_code":
+                return "msoa_lookup";
+            case "ethnic_code":
+                return "msoa_lookup";
+            case "organisation_id":
+                return "organization";
+        }
+
+        return "";
+    }
+
+    private String getJoinColumnForDistinctValues(String column) {
+        switch (column) {
+            case "patient_gender_id":
+                return "id";
+            case "lsoa_code":
+                return "lsoa_code";
+            case "msoa_code":
+                return "msoa_code";
+            case "ethnic_code":
+                return "msoa_code";
+            case "organisation_id":
+                return "id";
+        }
+
+        return "";
+    }
+
+    private String getLookupColumnForDistinctValues(String column) {
+        switch (column) {
+            case "patient_gender_id":
+                return "value";
+            case "lsoa_code":
+                return "lsoa_name";
+            case "msoa_code":
+                return "msoa_name";
+            case "ethnic_code":
+                return "msoa_name";
+            case "organisation_id":
+                return "name";
+        }
+
+        return "";
     }
 }

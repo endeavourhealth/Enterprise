@@ -92,14 +92,16 @@ export class PrevIncChartDialog implements OnInit {
 
 	getOptionList(id : any, title : string, fieldName : string, filter : Filter[]) {
 		let vm = this;
-		this.breakdownOptions.push({id: id, name: title, field: fieldName, filters: []});
+		let breakdown = {id: id, name: title, field: fieldName, filters: []};
+		this.breakdownOptions.push(breakdown);
 
 		vm.utilService.getDistinctValues(fieldName)
 			.subscribe(
 				(result) => {
 					for (let value of result)
 						if (value != null)
-							filter.push({id: value, name: value.toString()});
+							filter.push({id: value[0], name: value[1]});
+					breakdown.filters = filter;
 				}
 			);
 	}
@@ -205,8 +207,12 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	createSeriesChart(series : string, categories : string[], results : any) : Series {
+		let filter = this.breakdown.filters.find(f => f.id == series);
+
+		let title = (filter == null) ? 'Unknown' : filter.name;
+
 		let chartSeries : Series = new Series()
-			.setName(series)
+			.setName(title)
 			.setType('spline');
 
 		let data : string[] = [];

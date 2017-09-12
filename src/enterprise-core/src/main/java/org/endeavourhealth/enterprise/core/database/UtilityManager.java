@@ -554,7 +554,7 @@ public class UtilityManager {
     public List getDistinctValuesForGraphingNoLookup(String columnName) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        Query q = entityManager.createNativeQuery("SELECT DISTINCT " +
+        Query q = entityManager.createNativeQuery("SELECT DISTINCT " + columnName + " as id, " +
                 columnName +
                 " FROM enterprise_admin.incidence_prevalence_raw_data d " +
                 " ORDER BY " + columnName +
@@ -578,7 +578,7 @@ public class UtilityManager {
         String joinColumn = getJoinColumnForDistinctValues(columnName);
         String lookupColumn = getLookupColumnForDistinctValues(columnName);
 
-        Query q = entityManager.createNativeQuery("SELECT DISTINCT " +
+            Query q = entityManager.createNativeQuery("SELECT DISTINCT d." + columnName + ", " +
                 " j." + lookupColumn +
                 " FROM enterprise_admin.incidence_prevalence_raw_data d " +
                 " join " + joinTable + " j on d." + columnName + " =  j." + joinColumn + " ORDER BY " +

@@ -570,10 +570,8 @@ public class UtilityManager {
     public List getDistinctValuesForGraphing(String columnName) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        if (columnName.equals("postcode_prefix")
-                || columnName.equals("ethnic_code")) {
+        if (columnName.equals("postcode_prefix")) {
             return getDistinctValuesForGraphingNoLookup(columnName);
-
         }
 
         String joinTable = getJoinTableForDistinctValues(columnName);
@@ -603,7 +601,7 @@ public class UtilityManager {
             case "msoa_code":
                 return "msoa_lookup";
             case "ethnic_code":
-                return "msoa_lookup";
+                return "ethnicity_lookup";
             case "organisation_id":
                 return "organization";
         }
@@ -620,7 +618,7 @@ public class UtilityManager {
             case "msoa_code":
                 return "msoa_code";
             case "ethnic_code":
-                return "msoa_code";
+                return "ethnic_code";
             case "organisation_id":
                 return "id";
         }
@@ -637,7 +635,7 @@ public class UtilityManager {
             case "msoa_code":
                 return "msoa_name";
             case "ethnic_code":
-                return "msoa_name";
+                return "ethnic_name";
             case "organisation_id":
                 return "name";
         }

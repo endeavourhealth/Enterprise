@@ -151,6 +151,9 @@ public class UtilityManager {
                 "    date_of_death date null,\n" +
                 "    date_of_death_year int(4) null,\n" +
                 "    date_of_death_month int(4) null,\n" +
+                "    lsoa_code varchar(50) null,\n" +
+                "    msoa_code varchar(50) null,\n" +
+                "    ethnic_code char(1) null,\n" +
                 "     \n" +
                 "\tprimary key (episode_id, person_id),\n" +
                 "    index ix_bigdata_results_date_registered_year (date_registered_year),  \n" +
@@ -351,7 +354,10 @@ public class UtilityManager {
                 "    p.organization_id,\n" +
                 "    IFNULL(p.date_of_death, '9999-12-31'),\n" +
                 "    YEAR(IFNULL(p.date_of_death, '9999-12-31')),\n" +
-                "    MONTH(IFNULL(p.date_of_death, '9999-12-31'))    \n" +
+                "    MONTH(IFNULL(p.date_of_death, '9999-12-31')),    \n" +
+                "    p.lsoa_code, \n " +
+                "    p.msoa_code, \n " +
+                "    p.ethnic_code \n " +
                 "from enterprise_data_pseudonymised.episode_of_care e\n" +
                 "join enterprise_data_pseudonymised.patient p \n" +
                 "\ton p.id = e.patient_id and e.organization_id = p.organization_id and e.person_id = p.person_id" +
@@ -359,8 +365,8 @@ public class UtilityManager {
                 "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
         for (String script : populationScripts) {
-            runScript(script);
             System.out.println(script);
+            runScript(script);
         }
     }
 
@@ -475,6 +481,48 @@ public class UtilityManager {
         String order = "r.min_date";
 
         joinAnd.add(" d.date_of_death > r.max_date ");
+
+        // GROUPING
+        if (params.breakdown != null && !params.breakdown.isEmpty()) {
+            select += ", IFNULL(" + params.breakdown+", 'Unknown')";
+            group += ", IFNULL(" + params.breakdown+", 'Unknown')";
+            order = params.breakdown + ", " + order;
+        }
+
+        String sql = " SELECT " + select +
+                " FROM " + from ;
+        if (joinAnd.size() > 0)
+            sql += " AND " + StringUtils.join(joinAnd, "\nAND ");
+        sql += " GROUP BY " + group +
+                " ORDER BY " + order;
+
+        System.out.println(sql);
+
+        Query q = entityManager.createNativeQuery(sql);
+
+        List resultList = q.getResultList();
+
+        System.out.println(resultList.size() + " rows affected");
+
+        entityManager.close();
+
+        return resultList;
+    }
+
+    public List getPopulationResults(JsonPrevIncGraph params) {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        String select = "r.min_date, count(distinct d.person_id)";
+        String from = " enterprise_admin.incidence_prevalence_date_range r" +
+                " left outer join enterprise_admin.incidence_prevalence_population_list d  " +
+                "   on d.date_of_death > r.max_date " +
+                "   and d.date_registered <= r.max_date " +
+                "   and d.date_registered_end >= r.min_date";
+
+        List<String> joinAnd = getAndJoinClauseForIncidence(params);
+
+        String group = "r.min_date";
+        String order = "r.min_date";
 
         // GROUPING
         if (params.breakdown != null && !params.breakdown.isEmpty()) {

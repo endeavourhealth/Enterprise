@@ -1,6 +1,5 @@
 package org.endeavourhealth.enterprise.core.database;
 
-import net.sf.saxon.expr.instruct.ForEach;
 import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.enterprise.core.json.*;
 
@@ -389,7 +388,7 @@ public class UtilityManager {
         String from = " enterprise_admin.incidence_prevalence_date_range r" +
                 " left outer join enterprise_admin.incidence_prevalence_raw_data d  " +
                 "   on d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date";
-        List<String> where = getWhereClausesForIncAndPrev(params);
+        List<String> andJoin = getAndJoinClauseForIncidence(params);
 
         String group = "r.min_date";
         String order = "r.min_date";
@@ -403,8 +402,8 @@ public class UtilityManager {
 
         String sql = " SELECT " + select +
             " FROM " + from ;
-        if (where.size() > 0)
-            sql += " WHERE " + StringUtils.join(where, "\nAND ");
+        if (andJoin.size() > 0)
+            sql += " AND " + StringUtils.join(andJoin, "\nAND ");
         sql += " GROUP BY " + group +
             " ORDER BY " + order;
 
@@ -421,7 +420,7 @@ public class UtilityManager {
         return resultList;
     }
 
-    public List<String> getWhereClausesForIncAndPrev(JsonPrevIncGraph params) {
+    public List<String> getAndJoinClauseForIncidence(JsonPrevIncGraph params) {
 
         List<String> where = new ArrayList<>();
 
@@ -467,12 +466,12 @@ public class UtilityManager {
         String from = " enterprise_admin.incidence_prevalence_date_range r" +
                 " left outer join enterprise_admin.incidence_prevalence_raw_data d  " +
                 "   on d.clinical_effective_date <= r.max_date";
-        List<String> where = getWhereClausesForIncAndPrev(params);
+        List<String> joinAnd = getAndJoinClauseForIncidence(params);
 
         String group = "r.min_date";
         String order = "r.min_date";
 
-        where.add(" d.date_of_death > r.max_date ");
+        joinAnd.add(" d.date_of_death > r.max_date ");
 
         // GROUPING
         if (params.breakdown != null && !params.breakdown.isEmpty()) {
@@ -483,8 +482,8 @@ public class UtilityManager {
 
         String sql = " SELECT " + select +
                 " FROM " + from ;
-        if (where.size() > 0)
-            sql += " WHERE " + StringUtils.join(where, "\nAND ");
+        if (joinAnd.size() > 0)
+            sql += " AND " + StringUtils.join(joinAnd, "\nAND ");
         sql += " GROUP BY " + group +
                 " ORDER BY " + order;
 

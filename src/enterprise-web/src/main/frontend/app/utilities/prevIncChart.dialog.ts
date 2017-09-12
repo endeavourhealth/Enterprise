@@ -203,7 +203,7 @@ export class PrevIncChartDialog implements OnInit {
 	createSeriesChart(series : string, categories : string[], results : any) : Series {
 		let chartSeries : Series = new Series()
 			.setName(series)
-			.setType('column');
+			.setType('spline');
 
 		let data : string[] = [];
 

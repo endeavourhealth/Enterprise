@@ -12,5 +12,6 @@ public class JsonPrevIncGraph {
     public List<String> postcode;
     public List<String> lsoa;
     public List<String> msoa;
+    public List<String> orgs;
     public List<String> agex10;
 }

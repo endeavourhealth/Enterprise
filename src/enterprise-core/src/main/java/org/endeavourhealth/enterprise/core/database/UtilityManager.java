@@ -440,6 +440,9 @@ public class UtilityManager {
         if (params.msoa != null && params.msoa.size() > 0)
             where.add("msoa_code in ('" + StringUtils.join(params.msoa, "','") + "')\n");
 
+        if (params.orgs != null && params.orgs.size() > 0)
+            where.add("organisation_id in (" + StringUtils.join(params.orgs, ",") + ")\n");
+
         if (params.agex10 != null && params.agex10.size() > 0) {
             List<String> ageWhere = new ArrayList<>();
 

@@ -37,6 +37,8 @@ export class PrevIncChartDialog implements OnInit {
 	private msoa : string[];
 	private filterAgex10 : Filter[] = [];
 	private agex10 : string[];
+	private filterOrgs : Filter[] = [];
+	private orgs : string[];
 
 	private incChart: Chart;
 	private prevChart: Chart;
@@ -83,7 +85,8 @@ export class PrevIncChartDialog implements OnInit {
 		this.getOptionList(3, 'Postcode', 'postcode_prefix', this.filterPostcode);
 		this.getOptionList(4, 'LSOA', 'lsoa_code', this.filterLsoa);
 		this.getOptionList(5, 'MSOA', 'msoa_code', this.filterMsoa);
-		this.getAgeBands(6,'Age band (10 yrs)', 'FLOOR(age_years/10)', 0, 90, 10, this.filterAgex10);
+		this.getOptionList(6, 'Organisation', 'organisation_id', this.filterOrgs);
+		this.getAgeBands(7,'Age band (10 yrs)', 'FLOOR(age_years/10)', 0, 90, 10, this.filterAgex10);
 		this.breakdown = this.breakdownOptions[0];
 	}
 
@@ -127,6 +130,7 @@ export class PrevIncChartDialog implements OnInit {
 		this.postcode = [];
 		this.lsoa = [];
 		this.msoa = [];
+		this.orgs = [];
 		this.agex10 = [];
 		this.refresh();
 	}
@@ -135,13 +139,13 @@ export class PrevIncChartDialog implements OnInit {
 		this.incChart = null;
 		this.prevChart = null;
 		let vm = this;
-		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.agex10)
+		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
 			.subscribe(
 				(results) => vm.incChart = this.getChartData('Incidence', results),
 				(error) => console.log(error)
 			);
 
-		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.agex10)
+		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
 			.subscribe(
 				(results) => vm.prevChart = this.getChartData('Prevalence', results),
 				(error) => console.log(error)

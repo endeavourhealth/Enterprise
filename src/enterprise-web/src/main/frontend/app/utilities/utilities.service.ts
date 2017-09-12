@@ -21,7 +21,7 @@ export class UtilitiesService extends BaseHttp2Service {
 		return this.httpPost('api/utility/prevInc', options);
 	}
 
-	getIncidenceResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], agex10: string[]): Observable<any> {
+	getIncidenceResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], orgs: string[],  agex10: string[]): Observable<any> {
 		let body = {
 			breakdown: breakdown,
 			gender: gender,
@@ -29,12 +29,13 @@ export class UtilitiesService extends BaseHttp2Service {
 			postcode: postcode,
 			lsoa: lsoa,
 			msoa: msoa,
+			orgs: orgs,
 			agex10: agex10
 		};
 		return this.httpPost('api/utility/incidence', body);
 	}
 
-	getPrevalenceResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], agex10: string[]): Observable<any> {
+	getPrevalenceResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], orgs: string[], agex10: string[]): Observable<any> {
 		let body = {
 			breakdown: breakdown,
 			gender: gender,
@@ -42,6 +43,7 @@ export class UtilitiesService extends BaseHttp2Service {
 			postcode: postcode,
 			lsoa: lsoa,
 			msoa: msoa,
+			orgs: orgs,
 			agex10: agex10
 		};
 		return this.httpPost('api/utility/prevalence', body);

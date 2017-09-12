@@ -216,7 +216,7 @@ export class PrevIncChartDialog implements OnInit {
 			if (result)
 				data.push(result[1]);
 			else
-				data.push(null);
+				data.push('0');
 		}
 
 		chartSeries.setData(data);

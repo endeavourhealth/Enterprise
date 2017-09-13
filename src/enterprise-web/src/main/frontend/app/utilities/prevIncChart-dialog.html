@@ -11,7 +11,7 @@
 		<div class="show-child-on-hover">
 			<div class="panel panel-default show-child-on-hover">
 				<div class="panel-heading" (click)="showFilter = !showFilter">Breakdown / filter options <i class="fa fa-caret-down"></i> </div>
-				<div class="panel-body" [hidden]="!showFilter">
+				<div class="panel-body bordered-box" style="z-index: 10; position: absolute; width: 98%; background: white" [hidden]="!showFilter">
 					<div class="row">
 						<div class="form-group col-md-2 col-sm-3">
 							<label>Breakdown: </label>
@@ -45,6 +45,12 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-md-2 col-sm-3">
+							<label>Graph as: </label>
+							<select class="form-control" [ngModel]="graphAs" (ngModelChange)="setGraph($event)" name="breakdown">
+								<option value="count">Count</option>
+								<option value="per1k">Per 1000</option>
+								<option value="percent">Percentage</option>
+							</select>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
 							<label>LSOA: </label>
@@ -72,6 +78,7 @@
 									<div class="col-md-12">
 										<chart [data]="incChart"></chart>
 										<chart [data]="prevChart"></chart>
+										<chart [data]="popChart"></chart>
 									</div>
 								</div>
 							</template>
@@ -82,6 +89,7 @@
 									<div class="col-md-12">
 										<chart-table [data]="incChart"></chart-table>
 										<chart-table [data]="prevChart"></chart-table>
+										<chart-table [data]="popChart"></chart-table>
 									</div>
 								</div>
 							</template>

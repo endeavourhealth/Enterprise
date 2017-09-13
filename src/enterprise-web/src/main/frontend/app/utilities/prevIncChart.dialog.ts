@@ -24,6 +24,10 @@ export class PrevIncChartDialog implements OnInit {
 
 	private breakdown : Breakdown;
 	private breakdownOptions : Breakdown[] = [];
+	private graphAs : string = "count";
+	private populationCounts : any[];
+	private incidenceResults : any[];
+	private prevalenceResults : any[];
 
 	private filterGender : Filter[] = [];
 	private genders : string[];
@@ -42,29 +46,7 @@ export class PrevIncChartDialog implements OnInit {
 
 	private incChart: Chart;
 	private prevChart: Chart;
-
-	private multiSelectSettings = {
-		enableSearch: true,
-		checkedStyle: 'fontawesome',
-		buttonClasses: 'form-control text-left',
-		dynamicTitleMaxItems: 1,
-		displayAllSelectedText: true,
-		showCheckAll: true,
-		showUncheckAll: true,
-		closeOnClickOutside: true
-	};
-
-	private multiSelectTexts = {
-		checkAll: 'Select all',
-		uncheckAll: 'Unselect all',
-		checked: 'item',
-		checkedPlural: 'items',
-		searchPlaceholder: 'Find',
-		searchEmptyResult: 'Nothing found...',
-		searchNoRenderText: 'Type in search box to see results...',
-		defaultTitle: 'Select',
-		allSelected: 'All',
-	};
+	private popChart: Chart;
 
 	private colors = ['LightBlue', 'Plum', 'Yellow', 'LightSalmon'];						// Male, Female, Other, Total
 	private height = 200;
@@ -78,7 +60,57 @@ export class PrevIncChartDialog implements OnInit {
 		this.refresh();
 	}
 
-	getOptions() {
+	//---------------------------
+
+	setGraph(graphAs : string) {
+		this.graphAs = graphAs;
+		this.incChart = this.getChartData('Incidence', this.incidenceResults, graphAs);
+		this.prevChart = this.getChartData('Prevalence', this.prevalenceResults, graphAs);
+	}
+
+	clear() {
+		this.breakdown = this.breakdownOptions[0];
+		this.genders = [];
+		this.ethnicity = [];
+		this.postcode = [];
+		this.lsoa = [];
+		this.msoa = [];
+		this.orgs = [];
+		this.agex10 = [];
+		this.refresh();
+	}
+
+	refresh() {
+		this.incChart = null;
+		this.prevChart = null;
+		this.popChart = null;
+		let vm = this;
+
+		vm.utilService.getPopulationResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+			.subscribe(
+				(results) => {
+					// Only load Inc/Prev AFTER we have population (to allow per1k and percentage calculations)
+					this.populationCounts = results;
+					vm.popChart = this.getChartData('Population', this.populationCounts, 'count');
+					vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+						.subscribe(
+							(results) => {vm.incidenceResults = results; vm.incChart = this.getChartData('Incidence', results, vm.graphAs)},
+							(error) => console.log(error)
+						);
+
+					vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+						.subscribe(
+							(results) => {vm.prevalenceResults = results; vm.prevChart = this.getChartData('Prevalence', results, vm.graphAs)},
+							(error) => console.log(error)
+						);
+				},
+				(error) => console.log(error)
+			);
+	}
+
+	//---------------------------
+
+	private getOptions() {
 		this.breakdownOptions = [{ id : 0, name : 'None', field : null, filters : [] }];
 		this.getOptionList(1, 'Gender', 'patient_gender_id', this.filterGender);
 		this.getOptionList(2, 'Ethnicity', 'ethnic_code', this.filterEthnicity);
@@ -90,7 +122,7 @@ export class PrevIncChartDialog implements OnInit {
 		this.breakdown = this.breakdownOptions[0];
 	}
 
-	getOptionList(id : any, title : string, fieldName : string, filter : Filter[]) {
+	private getOptionList(id : any, title : string, fieldName : string, filter : Filter[]) {
 		let vm = this;
 		let breakdown = {id: id, name: title, field: fieldName, filters: []};
 		this.breakdownOptions.push(breakdown);
@@ -106,7 +138,7 @@ export class PrevIncChartDialog implements OnInit {
 			);
 	}
 
-	getAgeBands(id : any, title : string, field : string, min : number, max : number, step : number, filter : Filter[]) {
+	private getAgeBands(id : any, title : string, field : string, min : number, max : number, step : number, filter : Filter[]) {
 		let breakdown = { id : id, name : title, field : field, filters : [] };
 		this.breakdownOptions.push(breakdown);
 
@@ -127,64 +159,42 @@ export class PrevIncChartDialog implements OnInit {
 		breakdown.filters = filter;
 	}
 
-	clear() {
-		this.breakdown = this.breakdownOptions[0];
-		this.genders = [];
-		this.ethnicity = [];
-		this.postcode = [];
-		this.lsoa = [];
-		this.msoa = [];
-		this.orgs = [];
-		this.agex10 = [];
-		this.refresh();
-	}
-
-	refresh() {
-		this.incChart = null;
-		this.prevChart = null;
-		let vm = this;
-		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
-			.subscribe(
-				(results) => vm.incChart = this.getChartData('Incidence', results),
-				(error) => console.log(error)
-			);
-
-		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
-			.subscribe(
-				(results) => vm.prevChart = this.getChartData('Prevalence', results),
-				(error) => console.log(error)
-			);
-	}
-
-	//---------------------------
-
-	getChartData(title : string, results: any) {
+	private getChartData(title : string, results: any, graphAs : string) {
 		if (results[0].length == 3)
-			return this.getGroupedChartData(title, results);
+			return this.getGroupedChartData(title, results, graphAs);
 
-		return this.getTotalChartData(title, results);
+		return this.getTotalChartData(title, results, graphAs);
 	}
 
-	getTotalChartData(title : string, results : any) {
+	private getTotalChartData(title : string, results : any, graphAs : string) {
 		let categories : string[] = linq(results).Select(row => row[0]).ToArray();
-		let data : string[] = linq(results).Select(row => row[1]).ToArray();
+		let data : number[] = this.getSeriesData(categories, results, graphAs);
 
 		return new Chart()
 			.setCategories(categories)
 			.setColors(this.colors)
 			.setHeight(this.height)
 			.setLegend(this.legend)
-			.setTitle(title)
-			.addYAxis(title, false)
+			//.setTitle(title)
+			.addYAxis(title + this.getGraphAsSuffix(graphAs), false)
 			.setSeries([
 				new Series()
-					.setName('Total')
+					.setName('Total '+this.getGraphAsSuffix(graphAs))
 					.setType('spline')
 					.setData(data)
 			]);
 	}
 
-	getGroupedChartData(title : string, results : any) {
+	private getGraphAsSuffix(graphAs : string) {
+		if (graphAs == 'percent')
+			return ' (%)';
+		else if (graphAs == 'per1k')
+			return ' (/1k)';
+		else
+			return '';
+	}
+
+	private getGroupedChartData(title : string, results : any, graphAs : string) {
 		let categories : string[] = linq(results)
 			.Select(row => row[0])
 			.Distinct()
@@ -192,10 +202,11 @@ export class PrevIncChartDialog implements OnInit {
 			.sort();
 
 		let groupedResults = linq(results)
+			.Where(r => r[2] != 'Unknown')
 			.GroupBy(r => r[2], r => r);
 
 		let chartSeries : Series[] = linq(Object.keys(groupedResults))
-			.Select(key => this.createSeriesChart(key, categories, groupedResults[key]))
+			.Select(key => this.createSeriesChart(key, categories, groupedResults[key], graphAs))
 			.ToArray();
 
 		return new Chart()
@@ -203,12 +214,12 @@ export class PrevIncChartDialog implements OnInit {
 			.setColors(this.colors)
 			.setHeight(this.height)
 			.setLegend(this.legend)
-			.setTitle(title)
-			.addYAxis(title, false)
+			//.setTitle(title)
+			.addYAxis(title + this.getGraphAsSuffix(graphAs), false)
 			.setSeries(chartSeries);
 	}
 
-	createSeriesChart(series : string, categories : string[], results : any) : Series {
+	private createSeriesChart(series : string, categories : string[], results : any, graphAs : string) : Series {
 		let filter = this.breakdown.filters.find(f => f.id == series);
 
 		let title = (filter == null) ? 'Unknown' : filter.name;
@@ -217,19 +228,47 @@ export class PrevIncChartDialog implements OnInit {
 			.setName(title)
 			.setType('spline');
 
-		let data : number[] = [];
-
-		for (let category of categories) {
-			let result = linq(results).Where(r => category == r[0]).SingleOrDefault();
-			if (result && result[1] != null)
-				data.push(result[1]);
-			else
-				data.push(0);
-		}
+		let data : number[] = this.getSeriesData(categories, results, graphAs, series);
 
 		chartSeries.setData(data);
 
 		return chartSeries;
+	}
+
+	private getSeriesData(categories : string[], results : any, graphAs : string, series? : string) {
+		let data : number[] = [];
+
+		for (let category of categories) {
+			let result = linq(results).Where(r => category == r[0]).SingleOrDefault();
+			if (!result || result[1] == null)
+				data.push(0);
+			else {
+				if (graphAs == 'count')
+					data.push(result[1]);
+				else {
+					let population = linq(this.populationCounts).Where(r => category == r[0] && (!series || (series == r[2] || r[2]==null))).SingleOrDefault();
+
+					if (!population || population.length == 0) {
+						console.log("Error!!!!");
+					}
+
+					if (graphAs == 'per1k')
+						data.push(this.round(result[1] * 1000 / population[1],2));
+					else if (graphAs == 'percent')
+						data.push(this.round(result[1] * 100 / population[1],2));
+				}
+			}
+		}
+
+		return data;
+	}
+
+	private round(n : number, dp : number) {
+		if (dp == 0)
+			return n;
+
+		let factor = Math.pow(10,dp);
+		return Math.round(n * factor) / factor;
 	}
 
 	//----------------------------

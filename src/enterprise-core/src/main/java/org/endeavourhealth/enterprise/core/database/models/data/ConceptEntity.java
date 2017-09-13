@@ -202,16 +202,16 @@ public class ConceptEntity {
         String where = "select c.conceptId,c.definition, "+
                 "c2.definition as parentType,c2.conceptId as parentTypeId, "+
                 "c3.definition as baseType,c3.conceptId as baseTypeId, "+
-                "c.dataTypeId,c.conceptTypeId,c2.conceptTypeId as parentConceptTypeId,c2.present,o.units "+
+                "c.dataTypeId,c.conceptTypeId,c2.conceptTypeId as parentConceptTypeId,c2.present,' ' as units "+
                 "from ConceptEntity c "+
                 "left join ConceptEntity c2 on c2.conceptId = c.parentTypeConceptId "+
                 "left join ConceptEntity c3 on c3.conceptId = c.baseTypeConceptId "+
-                "left join ObservationEntity o on o.snomedConceptId = c2.conceptId "+
+                //"left join ObservationEntity o on o.snomedConceptId = c2.conceptId "+
                 "WHERE c.conceptId = :id "+
                 "group by c.conceptId,c.definition," +
                 "c2.definition,c2.conceptId," +
                 "c3.definition,c3.conceptId," +
-                "c.dataTypeId,c.conceptTypeId,c2.conceptTypeId,c2.present,o.units "+
+                "c.dataTypeId,c.conceptTypeId,c2.conceptTypeId,c2.present "+
                 "order by c2.present desc, c2.definition";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
@@ -234,16 +234,16 @@ public class ConceptEntity {
         String where = "select c.conceptId,c.definition, "+
                 "c2.definition as parentType,c2.conceptId as parentTypeId, "+
                 "c3.definition as baseType,c3.conceptId as baseTypeId, "+
-                "c.dataTypeId,c.conceptTypeId,c.present,o.units "+
+                "c.dataTypeId,c.conceptTypeId,c.present,' ' as units "+
                 "from ConceptEntity c "+
                 "left join ConceptEntity c2 on c2.conceptId = c.parentTypeConceptId "+
                 "left join ConceptEntity c3 on c3.conceptId = c.baseTypeConceptId "+
-                "left join ObservationEntity o on o.snomedConceptId = c.conceptId "+
+                //"left join ObservationEntity o on o.snomedConceptId = c.conceptId "+
                 "WHERE c.parentTypeConceptId = :id "+
                 "group by c.conceptId,c.definition," +
                 "c2.definition,c2.conceptId," +
                 "c3.definition,c3.conceptId," +
-                "c.dataTypeId,c.conceptTypeId,c.present,o.units "+
+                "c.dataTypeId,c.conceptTypeId,c.present "+
                 "order by c.present desc, c.definition";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();

@@ -467,13 +467,13 @@ public class UtilityManager {
             List<String> ageWhere = new ArrayList<>();
 
             for(int i = 0; i < params.agex10.size(); i++) {
-                String agex10 = params.agex10.get(i);
-                if(agex10.equals("< 10"))
+                int agex10 = Integer.parseInt(params.agex10.get(i)) * 10;
+                if(agex10 == 0)
                     ageWhere.add("age_years < 10");
-                else if (agex10.equals("> 90"))
+                else if (agex10 == 90)
                     ageWhere.add("age_years > 90");
                 else
-                    ageWhere.add("(age_years >= "+agex10.substring(0,2) + " AND age_years < "+agex10.substring(3,5) + ")");
+                    ageWhere.add("(age_years >= "+String.valueOf(agex10) + " AND age_years < "+String.valueOf(agex10 + 9) + ")");
             }
 
             where.add("(" + StringUtils.join(ageWhere, "\nOR ") + ")");

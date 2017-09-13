@@ -107,7 +107,8 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	getAgeBands(id : any, title : string, field : string, min : number, max : number, step : number, filter : Filter[]) {
-		this.breakdownOptions.push({ id : id, name : title, field : field, filters : [] });
+		let breakdown = { id : id, name : title, field : field, filters : [] };
+		this.breakdownOptions.push(breakdown);
 
 		let i = min;
 		while (i <= max) {
@@ -120,9 +121,10 @@ export class PrevIncChartDialog implements OnInit {
 			else
 				band = i + '-' + (i+step-1);
 
-			filter.push({id : band, name: band});
+			filter.push({id : (i/step).toString(), name: band});
 			i+= step;
 		}
+		breakdown.filters = filter;
 	}
 
 	clear() {
@@ -215,14 +217,14 @@ export class PrevIncChartDialog implements OnInit {
 			.setName(title)
 			.setType('spline');
 
-		let data : string[] = [];
+		let data : number[] = [];
 
 		for (let category of categories) {
 			let result = linq(results).Where(r => category == r[0]).SingleOrDefault();
-			if (result)
+			if (result && result[1] != null)
 				data.push(result[1]);
 			else
-				data.push('0');
+				data.push(0);
 		}
 
 		chartSeries.setData(data);

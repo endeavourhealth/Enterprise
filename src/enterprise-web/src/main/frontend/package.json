@@ -28,7 +28,6 @@
     "@angular/router": "3.4.1",
     "@angular/upgrade": "2.4.1",
     "@ng-bootstrap/ng-bootstrap": "1.0.0-alpha.10",
-    "angular-2-dropdown-multiselect": "1.0.8",
     "angular2-logger": "0.5.1",
     "angular2-moment": "0.8.2",
     "angular2-tree-component": "2.6.0",

@@ -1,0 +1,19 @@
+<style>
+	.dropdown-item {
+		width: 100%;
+		padding: 4px 20px 4px 20px;
+		cursor: pointer;
+	}
+	.dropdown-item:hover {
+		background: #d3e9f6 !important;
+	}
+</style>
+<div ngbDropdown #myDrop="ngbDropdown">
+	<div class="btn btn-secondary bordered-box" id="dropdownMenu3" ngbDropdownToggle style="width: 100%"><span class="pull-left">{{getCaption()}}</span><i class="fa fa-caret-down pull-right"></i></div>
+	<div class="dropdown-menu" aria-labelledby="dropdownMenu3" (mouseleave)="myDrop.close()">
+		<div class="dropdown-item" (click)="selectAll()"><i class="fa fa-check"></i> Select all</div>
+		<div class="dropdown-item" (click)="selectNone()"><i class="fa fa-times"></i> Unselect all</div>
+		<hr>
+		<div *ngFor="let item of data" class="dropdown-item" (click)="toggle(item)"><i [ngClass]="getIcon(item)"></i> {{item.name}}</div>
+	</div>
+</div>

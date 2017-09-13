@@ -55,7 +55,8 @@ export class UtilitiesComponent {
 			ethnicity: [],
 			orgType: "",
 			ageFrom: "",
-			ageTo: ""
+			ageTo: "",
+			dateType: "absolute"
 		};
 		PrevIncDialog.open(vm.$modal, prevInc).result.then(
 			(result) => {

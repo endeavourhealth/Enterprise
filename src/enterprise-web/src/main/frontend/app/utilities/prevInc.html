@@ -18,7 +18,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-2">
 				<div style="padding: 10px">
 					<label>Trend Time Period: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTM }}"></span>
 					<div class="input-group">
@@ -26,6 +26,20 @@
 						<select class="form-control" style="width:100px"  [(ngModel)]="timePeriod" [ngModelOptions]="{standalone: true}">
 							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
 						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div style="padding: 10px">
+					<label></label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ absoluteTT }}"></span>
+					<div class="form-group">
+						<div class="input-group">
+							<span for="relative">Use relative dates</span>&nbsp;&nbsp;
+							<input id="relative" type="radio" name="dateType" [(ngModel)]="dateType" value="relative" name="dateRelative">
+							&nbsp;
+							<span for="absolute">or absolute dates</span>&nbsp;&nbsp;
+							<input id="absolute" type="radio" name="dateType" [(ngModel)]="dateType" value="absolute" name="dateAbsolute">
+						</div>
 					</div>
 				</div>
 			</div>

@@ -64,16 +64,30 @@ public class UtilityManager {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         for (Integer i = 0; i < number; i++) {
-            // get the first day of the month/year
-            c.set(precision, c.getActualMinimum(precision));
-            beginning = c.getTime();
+
             // get the last day of the month/year
-            c.set(precision, c.getActualMaximum(precision));
+            if (options.getDateType().equals("absolute"))
+                c.set(precision, c.getActualMaximum(precision));
             end = c.getTime();
 
-            initialiseScripts.add(String.format(insert, dateFormat.format(beginning).toString(),dateFormat.format(end).toString()));
+
+            // get the first day of the month/year
+            if (options.getDateType().equals("absolute")) {
+                c.set(precision, c.getActualMinimum(precision));
+                beginning = c.getTime();
+            } else {
+                Calendar b = Calendar.getInstance();
+                b.setTime(c.getTime());
+                b.add(substractionPrecision, -1);
+                //Make sure same date isnt counted twice
+                b.add(Calendar.DAY_OF_MONTH, 1);
+                beginning = b.getTime();
+            }
 
             c.add(substractionPrecision, -1);
+            initialiseScripts.add(String.format(insert, dateFormat.format(beginning).toString(),dateFormat.format(end).toString()));
+
+
         }
 
         for (String script : initialiseScripts) {
@@ -555,7 +569,7 @@ public class UtilityManager {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         Query q = entityManager.createNativeQuery("SELECT DISTINCT " + columnName + " as id, " +
-                columnName +
+                " ifnull(" + columnName + ", 'Unknown') " +
                 " FROM enterprise_admin.incidence_prevalence_raw_data d " +
                 " ORDER BY " + columnName +
                 " ASC");
@@ -579,7 +593,7 @@ public class UtilityManager {
         String lookupColumn = getLookupColumnForDistinctValues(columnName);
 
             Query q = entityManager.createNativeQuery("SELECT DISTINCT d." + columnName + ", " +
-                " j." + lookupColumn +
+                " ifnull(j." + lookupColumn + ", 'Unknown') " +
                 " FROM enterprise_admin.incidence_prevalence_raw_data d " +
                 " join " + joinTable + " j on d." + columnName + " =  j." + joinColumn + " ORDER BY " +
                 " j." + lookupColumn +

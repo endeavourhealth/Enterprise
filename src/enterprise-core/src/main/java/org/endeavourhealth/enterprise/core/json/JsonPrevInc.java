@@ -21,6 +21,7 @@ public class JsonPrevInc {
     private String orgType = null;
     private String ageFrom = null;
     private String ageTo = null;
+    private String dateType = null;
 
     public List<JsonOrganisation> getOrganisation() {
         return organisation;
@@ -140,5 +141,13 @@ public class JsonPrevInc {
 
     public void setAgeTo(String ageTo) {
         this.ageTo = ageTo;
+    }
+
+    public String getDateType() {
+        return dateType;
+    }
+
+    public void setDateType(String dateType) {
+        this.dateType = dateType;
     }
 }

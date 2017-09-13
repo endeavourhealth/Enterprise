@@ -17,4 +17,5 @@ export class PrevInc {
 	orgType: string;
 	ageFrom: string;
 	ageTo: string;
+    dateType: string;
 }

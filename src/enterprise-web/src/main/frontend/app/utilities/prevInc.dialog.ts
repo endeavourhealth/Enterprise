@@ -41,6 +41,7 @@ export class PrevIncDialog implements OnInit {
 	orgType: string = "";
 	ageFrom: string = "";
 	ageTo: string = "";
+    dateType: string = "absolute";
 
 	orgTT: string = "To select multiples please use Shift and Click.";
 	ppTT: string = "Please select a patient population as the denominator";
@@ -51,6 +52,7 @@ export class PrevIncDialog implements OnInit {
 	ppLSOA: string = "Please select a Lower layer Super Output Area";
 	ppMSOA: string = "Please select a Middle layer Super Output Area";
 	orgEG: string = "Please select one or more ethnic groups. To select multiple groups please use Shift and Click.";
+	absoluteTT: string = "Please choose whether to base the time relative to today's date or using absolute dates (start of year or month)";
 
 	organisations = <any>[];
 	msoas = <any>[];
@@ -234,6 +236,7 @@ export class PrevIncDialog implements OnInit {
 		vm.resultData.ageFrom = vm.ageFrom;
 		vm.resultData.ageTo = vm.ageTo;
 		vm.resultData.orgType = vm.orgType;
+		vm.resultData.dateType = vm.dateType;
 
 		this.ok();
 	}

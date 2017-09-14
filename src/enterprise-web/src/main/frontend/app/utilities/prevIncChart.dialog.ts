@@ -22,13 +22,14 @@ export class PrevIncChartDialog implements OnInit {
 
 	@Input() title;
 
-	private breakdown : Breakdown;
-	private breakdownOptions : Breakdown[] = [];
+	// Graph style - count/per1k/percent
 	private graphAs : string = "count";
-	private populationCounts : any[];
-	private incidenceResults : any[];
-	private prevalenceResults : any[];
 
+	// Breakdown options and current selection
+	private breakdownOptions : Breakdown[] = [];
+	private breakdown : Breakdown;
+
+	// Filter options and current selection
 	private filterGender : Filter[] = [];
 	private genders : string[];
 	private filterEthnicity : Filter[] = [];
@@ -44,11 +45,17 @@ export class PrevIncChartDialog implements OnInit {
 	private filterOrgs : Filter[] = [];
 	private orgs : string[];
 
+	// Result data
+	private populationCounts : any[];
+	private incidenceResults : any[];
+	private prevalenceResults : any[];
+
+	// Chart data
 	private incChart: Chart;
 	private prevChart: Chart;
 	private popChart: Chart;
 
-	private colors = ['LightBlue', 'Plum', 'Yellow', 'LightSalmon'];						// Male, Female, Other, Total
+	// Chrt config
 	private height = 200;
 	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 100};
 
@@ -84,26 +91,40 @@ export class PrevIncChartDialog implements OnInit {
 		this.incChart = null;
 		this.prevChart = null;
 		this.popChart = null;
-		let vm = this;
 
+		// Get the populations first (per1k and percent charts need this data)
+		this.loadPopulationResults();
+	}
+
+	private loadPopulationResults() {
+		let vm = this;
 		vm.utilService.getPopulationResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
 			.subscribe(
 				(results) => {
 					// Only load Inc/Prev AFTER we have population (to allow per1k and percentage calculations)
-					this.populationCounts = results;
-					vm.popChart = this.getChartData('Population', this.populationCounts, 'count');
-					vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
-						.subscribe(
-							(results) => {vm.incidenceResults = results; vm.incChart = this.getChartData('Incidence', results, vm.graphAs)},
-							(error) => console.log(error)
-						);
-
-					vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
-						.subscribe(
-							(results) => {vm.prevalenceResults = results; vm.prevChart = this.getChartData('Prevalence', results, vm.graphAs)},
-							(error) => console.log(error)
-						);
+					vm.populationCounts = results;
+					vm.popChart = vm.getChartData('Population', results, 'count');
+					vm.loadIncidenceResults();
+					vm.loadPrevalenceResults();
 				},
+				(error) => console.log(error)
+			);
+	}
+
+	private loadIncidenceResults() {
+		let vm = this;
+		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+			.subscribe(
+				(results) => {vm.incidenceResults = results; vm.incChart = this.getChartData('Incidence', results, vm.graphAs)},
+				(error) => console.log(error)
+			);
+	}
+
+	private loadPrevalenceResults() {
+		let vm = this;
+		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+			.subscribe(
+				(results) => {vm.prevalenceResults = results; vm.prevChart = this.getChartData('Prevalence', results, vm.graphAs)},
 				(error) => console.log(error)
 			);
 	}
@@ -159,6 +180,8 @@ export class PrevIncChartDialog implements OnInit {
 		breakdown.filters = filter;
 	}
 
+	//---------------------------
+
 	private getChartData(title : string, results: any, graphAs : string) {
 		if (results[0].length == 3)
 			return this.getGroupedChartData(title, results, graphAs);
@@ -172,7 +195,6 @@ export class PrevIncChartDialog implements OnInit {
 
 		return new Chart()
 			.setCategories(categories)
-			.setColors(this.colors)
 			.setHeight(this.height)
 			.setLegend(this.legend)
 			//.setTitle(title)
@@ -211,7 +233,6 @@ export class PrevIncChartDialog implements OnInit {
 
 		return new Chart()
 			.setCategories(categories)
-			.setColors(this.colors)
 			.setHeight(this.height)
 			.setLegend(this.legend)
 			//.setTitle(title)
@@ -243,24 +264,29 @@ export class PrevIncChartDialog implements OnInit {
 			if (!result || result[1] == null)
 				data.push(0);
 			else {
-				if (graphAs == 'count')
-					data.push(result[1]);
-				else {
-					let population = linq(this.populationCounts).Where(r => category == r[0] && (!series || (series == r[2] || r[2]==null))).SingleOrDefault();
-
-					if (!population || population.length == 0) {
-						console.log("Error!!!!");
-					}
-
-					if (graphAs == 'per1k')
-						data.push(this.round(result[1] * 1000 / population[1],2));
-					else if (graphAs == 'percent')
-						data.push(this.round(result[1] * 100 / population[1],2));
-				}
+				data.push(this.getSeriesDataGraphAsValue(graphAs, result, category, series));
 			}
 		}
 
 		return data;
+	}
+
+	private getSeriesDataGraphAsValue(graphAs: string, result: any, category, series: string) {
+		if (graphAs == 'count')
+			return result[1];
+
+		let population = this.getPopulationForCategoryAndSeries(category, series);
+
+		if (graphAs == 'per1k')
+			return (this.round(result[1] * 1000 / population[1], 2));
+		else if (graphAs == 'percent')
+			return (this.round(result[1] * 100 / population[1], 2));
+	}
+
+	private getPopulationForCategoryAndSeries(category, series : string) {
+		return linq(this.populationCounts)
+			.Where(r => category == r[0] && (!series || (series == r[2] || r[2] == null)))
+			.SingleOrDefault();
 	}
 
 	private round(n : number, dp : number) {

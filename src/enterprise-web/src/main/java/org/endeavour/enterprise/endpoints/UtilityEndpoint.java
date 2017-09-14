@@ -74,7 +74,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/population")
     public Response getPopulationResults(@Context SecurityContext sc, JsonPrevIncGraph params) throws Exception {
-        System.out.println("Retrieving Prevalence results");
+        System.out.println("Retrieving Population results");
         super.setLogbackMarkers(sc);
 
 

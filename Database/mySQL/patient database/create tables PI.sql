@@ -1,3 +1,5 @@
+-- create database enterprise_pi;
+
 use enterprise_pi;
 
 DROP TABLE IF EXISTS medication_order;
@@ -31,7 +33,32 @@ DROP TABLE IF EXISTS patient_gender;
 DROP TABLE IF EXISTS registration_type;
 DROP TABLE IF EXISTS lsoa_lookup;
 DROP TABLE IF EXISTS msoa_lookup;
+DROP TABLE IF EXISTS ethnicity_lookup;
 
+CREATE TABLE ethnicity_lookup
+(
+  ethnic_code character(1) NOT NULL,
+  ethnic_name character varying(100),
+  CONSTRAINT pk_ethnicity_lookup PRIMARY KEY (ethnic_code)
+);
+
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('A', 'British');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('B', 'Irish');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('C', 'Any other White background');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('D', 'White and Black Caribbean');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('E', 'White and Black African');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('F', 'White and Asian');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('G', 'Any other mixed background');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('H', 'Indian');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('J', 'Pakistani');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('K', 'Bangladeshi');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('L', 'Any other Asian background');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('M', 'Caribbean');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('N', 'African');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('P', 'Any other Black background');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('R', 'Chinese');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('S', 'Any other ethnic group');
+INSERT INTO ethnicity_lookup (ethnic_code, ethnic_name) VALUES ('Z', 'Not stated');
 
 -- Table: lsoa_lookup
 
@@ -57,6 +84,7 @@ CREATE TABLE lsoa_lookup
   living_environment_decile integer,  
   CONSTRAINT pk_lsoa_lookup PRIMARY KEY (lsoa_code)
 );
+
 -- Table: msoa_lookup
 
 CREATE TABLE msoa_lookup
@@ -216,17 +244,9 @@ CREATE TABLE organization
   CONSTRAINT pk_organization_id PRIMARY KEY (id)
 );
 
--- Index: fki_organization_parent_organization_id
-
--- DROP INDEX fki_organization_parent_organization_id;
-
 CREATE INDEX fki_organization_parent_organization_id
   ON organization
   (parent_organization_id);
-
--- Index: organization_id
-
--- DROP INDEX organization_id;
 
 CREATE UNIQUE INDEX organization_id
   ON organization
@@ -249,14 +269,9 @@ CREATE TABLE practitioner
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Index: practitioner_id
-
--- DROP INDEX practitioner_id;
-
 CREATE UNIQUE INDEX practitioner_id
   ON practitioner
   (id);
-
 
 -- Table: schedule
 
@@ -282,10 +297,10 @@ CREATE UNIQUE INDEX schedule_id
   ON schedule
   (id);
   
-  
--- Table: public.person
 
--- DROP TABLE public.person;
+-- Table: person
+
+-- DROP TABLE person;
 
 CREATE TABLE person
 (
@@ -305,15 +320,12 @@ CREATE TABLE person
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Index: public.person_id
-
--- DROP INDEX public.person_id;
-
 CREATE UNIQUE INDEX person_id
   ON person
-  (id);
-  
+  (id);  
 
+
+  
 -- Table: patient
 
 -- DROP TABLE patient;
@@ -332,7 +344,7 @@ CREATE TABLE patient
   lsoa_code character varying(50),
   msoa_code character varying(50),
   ethnic_code character(1),
-  CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
+  CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
       REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -341,13 +353,14 @@ CREATE TABLE patient
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Index: patient_id
-
--- DROP INDEX patient_id;
-
 CREATE UNIQUE INDEX patient_id
   ON patient
   (id);
+  
+CREATE UNIQUE INDEX patient_person_id
+  ON patient
+  (person_id);
+
 
 -- Table: episode_of_care
 
@@ -363,7 +376,7 @@ CREATE TABLE episode_of_care
   date_registered date,
   date_registered_end date,
   usual_gp_practitioner_id bigint,
-  CONSTRAINT pk_episode_of_care_id PRIMARY KEY (id),
+  CONSTRAINT pk_episode_of_care_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_episode_of_care_patient_id_organisation_id FOREIGN KEY (patient_id, organization_id)
       REFERENCES patient (id, organization_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -375,13 +388,33 @@ CREATE TABLE episode_of_care
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Index: episode_of_care_id
-
--- DROP INDEX episode_of_care_id;
-
 CREATE UNIQUE INDEX episode_of_care_id
   ON episode_of_care
   (id);
+  
+CREATE INDEX episode_of_care_patient_id
+  ON episode_of_care
+  (patient_id);
+  
+CREATE INDEX episode_of_care_registration_type_id
+  ON episode_of_care
+  (registration_type_id);
+
+CREATE INDEX episode_of_care_date_registered
+  ON episode_of_care
+  (date_registered);
+  
+CREATE INDEX episode_of_care_date_registered_end
+  ON episode_of_care
+  (date_registered_end);
+  
+CREATE INDEX episode_of_care_person_id
+  ON episode_of_care
+  (person_id);
+  
+CREATE INDEX episode_of_care_organization_id
+  ON episode_of_care
+  (organization_id);
 
 -- Table: appointment
 
@@ -401,7 +434,7 @@ CREATE TABLE appointment
   patient_delay integer,
   sent_in date,
   `left` date,
-  CONSTRAINT pk_appointment_id PRIMARY KEY (id),
+  CONSTRAINT pk_appointment_id PRIMARY KEY (organization_id,person_id,id),
   CONSTRAINT fk_appointment_appointment_status_id FOREIGN KEY (appointment_status_id)
       REFERENCES appointment_status (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -413,22 +446,13 @@ CREATE TABLE appointment
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Index: appointment_id
-
--- DROP INDEX appointment_id;
-
 CREATE UNIQUE INDEX appointment_id
   ON appointment
   (id);
 
--- Index: appointment_patient_id
-
--- DROP INDEX appointment_patient_id;
-
 CREATE INDEX appointment_patient_id
   ON appointment
   (patient_id);
-
 
 -- Table: encounter
 
@@ -447,7 +471,7 @@ CREATE TABLE encounter
   original_term character varying(1000),
   episode_of_care_id bigint,
   service_provider_organization_id bigint,
-  CONSTRAINT pk_encounter_id PRIMARY KEY (id),
+  CONSTRAINT pk_encounter_id PRIMARY KEY (organization_id,person_id,id),
   CONSTRAINT fk_encounter_appointment_id FOREIGN KEY (appointment_id)
       REFERENCES appointment (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -468,37 +492,25 @@ CREATE TABLE encounter
       ON UPDATE NO ACTION ON DELETE NO ACTION		  
 );
 
--- Index: encounter_id
-
--- DROP INDEX encounter_id;
-
 CREATE UNIQUE INDEX encounter_id
   ON encounter
   (id);
-
--- Index: encounter_patient_id
-
--- DROP INDEX encounter_patient_id;
 
 CREATE INDEX encounter_patient_id
   ON encounter
   (patient_id);
 
--- Index: fki_encounter_appointment_id
-
--- DROP INDEX fki_encounter_appointment_id;
-
 CREATE INDEX fki_encounter_appointment_id
   ON encounter
   (appointment_id);
-
--- Index: fki_encounter_patient_id_organization_id
-
--- DROP INDEX fki_encounter_patient_id_organization_id;
-
+  
 CREATE INDEX fki_encounter_patient_id_organization_id
   ON encounter
   (patient_id, organization_id);
+  
+CREATE INDEX encounter_snomed_concept_id
+  ON encounter
+  (snomed_concept_id);
 
 -- Table: allergy_intolerance
 
@@ -516,7 +528,7 @@ CREATE TABLE allergy_intolerance
   original_code character varying(20),
   original_term character varying(1000),
   is_review boolean NOT NULL,
-  CONSTRAINT pk_allergy_intolerance_id PRIMARY KEY (id),
+  CONSTRAINT pk_allergy_intolerance_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_allergy_intolerance_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -531,22 +543,17 @@ CREATE TABLE allergy_intolerance
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Index: allergy_intolerance_id
-
--- DROP INDEX allergy_intolerance_id;
-
 CREATE UNIQUE INDEX allergy_intolerance_id
   ON allergy_intolerance
   (id);
-
--- Index: allergy_intolerance_patient_id
-
--- DROP INDEX allergy_intolerance_patient_id;
 
 CREATE INDEX allergy_intolerance_patient_id
   ON allergy_intolerance
   (patient_id);
 
+CREATE INDEX allergy_intolerance_snomed_concept_id
+  ON allergy_intolerance
+  (snomed_concept_id);  
 
 -- Table: medication_statement
 
@@ -568,7 +575,7 @@ CREATE TABLE medication_statement
   quantity_unit character varying(255),
   medication_statement_authorisation_type_id smallint NOT NULL,
   original_term character varying(1000),
-  CONSTRAINT pk_medication_statement_id PRIMARY KEY (id),
+  CONSTRAINT pk_medication_statement_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_medication_statement_date_precision FOREIGN KEY (date_precision_id)
       REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -586,23 +593,18 @@ CREATE TABLE medication_statement
       ON UPDATE NO ACTION ON DELETE NO ACTION                
 );
 
--- Index: medication_statement_id
-
--- DROP INDEX medication_statement_id;
-
 CREATE UNIQUE INDEX medication_statement_id
   ON medication_statement
   (id);
-
--- Index: medication_statement_patient_id
-
--- DROP INDEX medication_statement_patient_id;
 
 CREATE INDEX medication_statement_patient_id
   ON medication_statement
   (patient_id);
 
-
+CREATE INDEX medication_statement_dmd_id
+  ON medication_statement
+  (patient_id);
+  
 -- Table: medication_order
 
 CREATE TABLE medication_order
@@ -623,7 +625,7 @@ CREATE TABLE medication_order
   estimated_cost real,
   medication_statement_id bigint,
   original_term character varying(1000),
-  CONSTRAINT pk_medication_order_id PRIMARY KEY (id),
+  CONSTRAINT pk_medication_order_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_medication_order_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -641,23 +643,18 @@ CREATE TABLE medication_order
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 );
 
--- Index: medication_order_id
-
--- DROP INDEX medication_order_id;
-
 CREATE UNIQUE INDEX medication_order_id
   ON medication_order
   (id);
-
--- Index: medication_order_patient_id
-
--- DROP INDEX medication_order_patient_id;
 
 CREATE INDEX medication_order_patient_id
   ON medication_order
   (patient_id);
 
-
+CREATE INDEX medication_order_dmd_id
+  ON medication_order
+  (dmd_id);
+  
 -- Table: observation
 
 CREATE TABLE observation
@@ -678,7 +675,7 @@ CREATE TABLE observation
   original_term character varying(1000),
   is_review boolean NOT NULL,
   problem_end_date date,
-  CONSTRAINT pk_observation_id PRIMARY KEY (id),
+  CONSTRAINT pk_observation_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_observation_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -693,24 +690,30 @@ CREATE TABLE observation
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 );
 
--- Index: observation_id
-
--- DROP INDEX observation_id;
-
 CREATE UNIQUE INDEX observation_id
   ON observation
   (id);
-
--- Index: observation_patient_id
-
--- DROP INDEX observation_patient_id;
 
 CREATE INDEX observation_patient_id
   ON observation
   (patient_id);
 
+CREATE INDEX observation_snomed_concept_id
+  ON observation
+  (snomed_concept_id);
 
+CREATE INDEX observation_snomed_concept_id_is_problem
+  ON observation
+  (`snomed_concept_id`,`is_problem`);
 
+CREATE INDEX observation_snomed_concept_id_value
+  ON observation
+  (`snomed_concept_id`,`value`);
+
+CREATE INDEX observation_original_code
+  ON observation
+  (original_code);
+    
 -- Table: procedure_request
 
 CREATE TABLE procedure_request
@@ -727,7 +730,7 @@ CREATE TABLE procedure_request
   procedure_request_status_id smallint,
   original_code character varying(20),
   original_term character varying(1000),
-  CONSTRAINT pk_procedure_request_id PRIMARY KEY (id),
+  CONSTRAINT pk_procedure_request_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_procedure_request_encounter_id FOREIGN KEY (encounter_id)
       REFERENCES encounter (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -745,17 +748,9 @@ CREATE TABLE procedure_request
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 );
 
--- Index: procedure_request_id
-
--- DROP INDEX procedure_request_id;
-
 CREATE UNIQUE INDEX procedure_request_id
   ON procedure_request
   (id);
-
--- Index: procedure_request_patient_id
-
--- DROP INDEX procedure_request_patient_id;
 
 CREATE INDEX procedure_request_patient_id
   ON procedure_request
@@ -786,7 +781,7 @@ CREATE TABLE referral_request
   original_code character varying(20),
   original_term character varying(1000),
   is_review boolean NOT NULL,
-  CONSTRAINT pk_referral_request_id PRIMARY KEY (id),
+  CONSTRAINT pk_referral_request_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_referral_request_date_precision FOREIGN KEY (date_precision_id)
       REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -813,19 +808,15 @@ CREATE TABLE referral_request
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
--- Index: referral_request_id
-
--- DROP INDEX referral_request_id;
-
 CREATE UNIQUE INDEX referral_request_id
   ON referral_request
   (id);
-
--- Index: referral_request_patient_id
-
--- DROP INDEX referral_request_patient_id;
 
 CREATE INDEX referral_request_patient_id
   ON referral_request
   (patient_id);
 
+CREATE INDEX referral_request_snomed_concept_id
+  ON referral_request
+  (snomed_concept_id);
+  

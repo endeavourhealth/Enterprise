@@ -261,7 +261,12 @@ public class CohortManager {
 		String cohortPopulation = cohortRun.getPopulation();
 		Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
 
-		String ruleSQL = getRuleSQL(baselineCohortId, cohortPopulation, q);
+		String restriction = "LATEST";
+
+		if (rule.getTest().getRestriction()!=null)
+			restriction = rule.getTest().getRestriction().getRestriction();
+
+		String ruleSQL = getRuleSQL(baselineCohortId, cohortPopulation, q, restriction);
 
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
@@ -269,6 +274,7 @@ public class CohortManager {
 			List<PatientEntity> patients = null;
 			List<ObservationEntity> patientObservations = new ArrayList<>();
 			List<ObservationEntity> patientObservations2 = new ArrayList<>();
+			List<ObservationEntity> patientObservationsCompare = new ArrayList<>();
 			List<MedicationStatementEntity> patientMedicationStatements = new ArrayList<>();
 			List<AllergyIntoleranceEntity> patientAllergyIntolerances = new ArrayList<>();
 			List<ReferralRequestEntity> patientReferralRequests = new ArrayList<>();
@@ -278,40 +284,124 @@ public class CohortManager {
 				String field = "";
 				String valueFrom = "";
 				String valueTo = "";
+				Date dateFrom = null;
+				Date dateTo = null;
+				String testField = "";
+				String relativeUnit = "";
 
 				for (Filter filter : filters) {
 					field = filter.getField();
-					if (field.contains("VALUE")) {
+					if (field.contains("VALUE")||field.contains("CLINICAL_DATE")) {
 						if (filter.getValueFrom() != null) {
 							valueFrom = filter.getValueFrom().getConstant();
+							testField = filter.getValueFrom().getTestField();
+							if (filter.getValueFrom().getRelativeUnit() != null) {
+								relativeUnit = filter.getValueFrom().getRelativeUnit().value();
+								valueFrom = "-" + valueFrom;
+								dateFrom = getRelativeDateFromBaseline(relativeUnit,baselineDate,valueFrom);
+							}
 						}
 						if (filter.getValueTo() != null) {
 							valueTo = filter.getValueTo().getConstant();
+							testField = filter.getValueTo().getTestField();
+							if (filter.getValueTo().getRelativeUnit() != null) {
+								relativeUnit = filter.getValueTo().getRelativeUnit().value();
+								valueTo = "-" + valueTo;
+								dateTo = getRelativeDateFromBaseline(relativeUnit,baselineDate,valueTo);
+							}
 						}
 					}
 				} // next Filter
 
 				Integer ruleId = getRuleForTest(libraryItem, field);
-
 				patientObservations = getRuleObservations(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
+
+				if (!testField.equals("BASELINE_DATE") && !testField.equals("")) {
+					ruleId = getRuleForTest(libraryItem, testField);
+					patientObservationsCompare = getRuleObservations(ruleId, queryResults, Long.parseLong(organisationInCohort.getId()));
+				}
 
 				Integer i = 0;
 				for (ObservationEntity observationEntity : patientObservations) {
 					if (!valueFrom.equals("") && !valueTo.equals("")) {
-						if (observationEntity.getValue()!=null &&
-								observationEntity.getValue() >= Double.parseDouble(valueFrom) &&
-								observationEntity.getValue() <= Double.parseDouble(valueTo)) {
-							patientObservations2.add(observationEntity);
+						if (field.contains("CLINICAL_DATE")) {
+							if (!testField.equals("BASELINE_DATE")) {
+								Long patientId = observationEntity.getPatientId();
+								dateFrom = null;
+								dateTo = null;
+								for (ObservationEntity observationCompareEntity : patientObservationsCompare) {
+									if (observationCompareEntity.getPatientId()==patientId) {
+										Date compareDate = observationCompareEntity.getClinicalEffectiveDate();
+										if (compareDate!=null) {
+											dateFrom = getRelativeDateFromBaseline(relativeUnit,compareDate,valueFrom);
+											dateTo = getRelativeDateFromBaseline(relativeUnit,compareDate,valueTo);
+										}
+										break;
+									}
+								}
+							}
+							if (observationEntity.getClinicalEffectiveDate()!=null &&
+									dateFrom!=null && dateTo!=null &&
+									observationEntity.getClinicalEffectiveDate().after(dateFrom) &&
+									observationEntity.getClinicalEffectiveDate().before(dateTo)) {
+								patientObservations2.add(observationEntity);
+							}
+						} else if (field.contains("VALUE")) {
+							if (observationEntity.getValue()!=null &&
+									observationEntity.getValue() >= Double.parseDouble(valueFrom) &&
+									observationEntity.getValue() <= Double.parseDouble(valueTo)) {
+								patientObservations2.add(observationEntity);
+							}
 						}
 					} else if (!valueFrom.equals("") && valueTo.equals("")) {
-						if (observationEntity.getValue()!=null &&
-								observationEntity.getValue() >= Double.parseDouble(valueFrom)) {
-							patientObservations2.add(observationEntity);
+						if (field.contains("CLINICAL_DATE")) {
+							if (!testField.equals("BASELINE_DATE")) {
+								Long patientId = observationEntity.getPatientId();
+								dateFrom = null;
+								for (ObservationEntity observationCompareEntity : patientObservationsCompare) {
+									if (observationCompareEntity.getPatientId()==patientId) {
+										Date compareDate = observationCompareEntity.getClinicalEffectiveDate();
+										if (compareDate!=null)
+											dateFrom = getRelativeDateFromBaseline(relativeUnit,compareDate,valueFrom);
+										break;
+									}
+								}
+							}
+							if (observationEntity.getClinicalEffectiveDate()!=null &&
+									dateFrom!=null &&
+									observationEntity.getClinicalEffectiveDate().after(dateFrom)) {
+								patientObservations2.add(observationEntity);
+							}
+						} else if (field.contains("VALUE")) {
+							if (observationEntity.getValue()!=null &&
+									observationEntity.getValue() >= Double.parseDouble(valueFrom)) {
+								patientObservations2.add(observationEntity);
+							}
 						}
 					} else if (valueFrom.equals("") && !valueTo.equals("")) {
-						if (observationEntity.getValue()!=null &&
-								observationEntity.getValue() <= Double.parseDouble(valueTo)) {
-							patientObservations2.add(observationEntity);
+						if (field.contains("CLINICAL_DATE")) {
+							if (!testField.equals("BASELINE_DATE")) {
+								Long patientId = observationEntity.getPatientId();
+								dateTo = null;
+								for (ObservationEntity observationCompareEntity : patientObservationsCompare) {
+									if (observationCompareEntity.getPatientId()==patientId) {
+										Date compareDate = observationCompareEntity.getClinicalEffectiveDate();
+										if (compareDate!=null)
+											dateTo = getRelativeDateFromBaseline(relativeUnit,compareDate,valueTo);
+										break;
+									}
+								}
+							}
+							if (observationEntity.getClinicalEffectiveDate()!=null &&
+									dateTo!=null &&
+									observationEntity.getClinicalEffectiveDate().before(dateTo)) {
+								patientObservations2.add(observationEntity);
+							}
+						} else if (field.contains("VALUE")) {
+							if (observationEntity.getValue()!=null &&
+									observationEntity.getValue() <= Double.parseDouble(valueTo)) {
+								patientObservations2.add(observationEntity);
+							}
 						}
 					}
 
@@ -483,7 +573,7 @@ public class CohortManager {
 		entityManager.close();
 	}
 
-	private static void buildFilters(JsonCohortRun cohortRun, List<Filter> filters, QueryMeta q) {
+	private static void buildFilters(JsonCohortRun cohortRun, List<Filter> filters, QueryMeta q) throws Exception {
 		for (Filter filter : filters) { // build the SQL for each filter
 			String field = filter.getField();
 
@@ -530,35 +620,19 @@ public class CohortManager {
 		q.sqlWhere += ")";
 	}
 
-	private static void buildEffectiveDateFilter(JsonCohortRun cohortRun, QueryMeta q, Filter filter) {
+	private static void buildEffectiveDateFilter(JsonCohortRun cohortRun, QueryMeta q, Filter filter) throws Exception {
 		if (filter.getValueFrom() != null) {
 			String dateFrom = filter.getValueFrom().getConstant();
 			if (filter.getValueFrom().getRelativeUnit() != null) {
 				dateFrom = "-" + dateFrom;
-				String relativeUnit = filter.getValueFrom().getRelativeUnit().value();
-				Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				Calendar calDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
-				dateFormat.setCalendar(calDate);
-				calDate.setTime(baselineDate);
-
-				adjustCalendar(dateFrom, relativeUnit, calDate);
-				dateFrom = dateFormat.format(calDate.getTime());
+				dateFrom = getRelativeDateFromBaselineAsString(filter.getValueFrom().getRelativeUnit().value(),convertToDate(cohortRun.getBaselineDate()),dateFrom);
 			}
 			q.sqlWhere += " and d.clinicalEffectiveDate >= '" + dateFrom + "'";
 		} else if (filter.getValueTo() != null) {
 			String dateTo = filter.getValueTo().getConstant();
 			if (filter.getValueTo().getRelativeUnit() != null) {
 				dateTo = "-" + dateTo;
-				String relativeUnit = filter.getValueTo().getRelativeUnit().value();
-				Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				Calendar calDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
-				dateFormat.setCalendar(calDate);
-				calDate.setTime(baselineDate);
-
-				adjustCalendar(dateTo, relativeUnit, calDate);
-				dateTo = dateFormat.format(calDate.getTime());
+				dateTo = getRelativeDateFromBaselineAsString(filter.getValueTo().getRelativeUnit().value(),convertToDate(cohortRun.getBaselineDate()),dateTo);
 			}
 			q.sqlWhere += " and d.clinicalEffectiveDate <= '" + dateTo + "'";
 		}
@@ -813,7 +887,13 @@ public class CohortManager {
 		return result;
 	}
 
-	public static String getRuleSQL(String baselineCohortId, String cohortPopulation, QueryMeta q) {
+	public static String getRuleSQL(String baselineCohortId, String cohortPopulation, QueryMeta q, String restriction) {
+		String order = "DESC";
+		if (restriction.equals("LATEST"))
+			order = "DESC";
+		else if (restriction.equals("EARLIEST"))
+			order = "ASC";
+
 		if (baselineCohortId != null) { // Cohort subset
 			String sql = "";
 			if (q.dataTable.equals("PatientEntity")) {
@@ -830,7 +910,7 @@ public class CohortManager {
 						"where p.organizationId = :organizationId " +
 						"and c.queryItemUuid = :baselineCohortId " +
 						"and c.runDate = :runDate " + q.sqlWhere+
-						" order by p.id, d.clinicalEffectiveDate desc";
+						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
 		} else if (cohortPopulation.equals("0")) { // currently registered
@@ -851,7 +931,7 @@ public class CohortManager {
 						"and e.registrationTypeId = 2 " +
 						"and e.dateRegistered <= :baseline " +
 						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
-						" order by p.id, d.clinicalEffectiveDate desc";
+						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
 		} else if (cohortPopulation.equals("1")) { // all patients
@@ -870,7 +950,7 @@ public class CohortManager {
 						"where p.organizationId = :organizationId " +
 						"and e.dateRegistered <= :baseline " +
 						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
-						" order by p.id, d.clinicalEffectiveDate desc";
+						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
 		}
@@ -893,5 +973,25 @@ public class CohortManager {
 
 		return ruleId;
 	}
+
+	private static Date getRelativeDateFromBaseline(String relativeUnit, Date baselineDate, String value) throws Exception {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar calDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
+		dateFormat.setCalendar(calDate);
+		calDate.setTime(baselineDate);
+		adjustCalendar(value, relativeUnit, calDate);
+		return calDate.getTime();
+	}
+
+	private static String getRelativeDateFromBaselineAsString(String relativeUnit, Date baselineDate, String value) throws Exception {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar calDate = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
+		dateFormat.setCalendar(calDate);
+		calDate.setTime(baselineDate);
+		adjustCalendar(value, relativeUnit, calDate);
+		return dateFormat.format(calDate.getTime());
+	}
+
+
 
 }

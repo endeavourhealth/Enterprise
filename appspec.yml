@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /src/enterprise-web/target/enterprise-web-1.0-SNAPSHOT
-    destination: /opt/tomcat/webapps/enterprise
+    destination: /opt/tomcat/webapps/ROOT
 hooks:
   ApplicationStop:
     - location: aws_scripts/stop_servers

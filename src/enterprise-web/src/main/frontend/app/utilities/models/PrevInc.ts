@@ -1,8 +1,8 @@
-import {Organisation} from "../../report/models/Organisation";
 import {Msoa} from "../../cohort/models/Msoa";
 import {Lsoa} from "../../cohort/models/Lsoa";
+
 export class PrevInc {
-	organisation: Organisation[];
+	organisationGroup: number;
 	population: string;
 	codeSet: string;
 	timePeriodNo: string;

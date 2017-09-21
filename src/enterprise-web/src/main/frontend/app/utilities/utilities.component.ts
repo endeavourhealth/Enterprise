@@ -10,6 +10,7 @@ import {Chart} from "../charting/models/Chart";
 import {Series} from "../charting/models/Series";
 import {StackDialog} from "../charting/stack.dialog";
 import {PrevIncChartDialog} from "./prevIncChart.dialog";
+import {OrgGroupPickerComponent} from "./orgGroupPicker.component";
 
 @Component({
 	template : require('./utilities.html')
@@ -41,7 +42,7 @@ export class UtilitiesComponent {
 	pi() {
 		let vm = this;
 		let prevInc: PrevInc = {
-			organisation: [],
+			organisationGroup: 0,
 			population: "0",
 			codeSet: "0",
 			timePeriodNo: "10",

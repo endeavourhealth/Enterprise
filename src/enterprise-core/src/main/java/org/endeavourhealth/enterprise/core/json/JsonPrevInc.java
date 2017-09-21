@@ -6,7 +6,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JsonPrevInc {
-    private List<JsonOrganisation> organisation = null;
+    private Integer organisationGroup = null;
     private String population = null;
     private String codeSet = null;
     private String timePeriodNo = null;
@@ -23,12 +23,12 @@ public class JsonPrevInc {
     private String ageTo = null;
     private String dateType = null;
 
-    public List<JsonOrganisation> getOrganisation() {
-        return organisation;
+    public Integer getOrganisationGroup() {
+        return organisationGroup;
     }
 
-    public void setOrganisation(List<JsonOrganisation> organisation) {
-        this.organisation = organisation;
+    public void setOrganisationGroup(Integer organisationGroup) {
+        this.organisationGroup = organisationGroup;
     }
 
     public String getPopulation() {

@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavourhealth.enterprise.core.json.JsonOrganisationGroup;
 import org.endeavourhealth.enterprise.core.json.JsonPrevIncGraph;
 import org.endeavourhealth.enterprise.core.database.UtilityManager;
 import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
@@ -104,6 +105,93 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         return Response
                 .ok()
                 .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/organisationGroups")
+    public Response organisationGroups(@Context SecurityContext sc) throws Exception {
+        System.out.println("Retrieving organisation groups ");
+        super.setLogbackMarkers(sc);
+
+        List results = new UtilityManager().getOrganisationGroups();
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/organisationsInGroup")
+    public Response organisationsInGroup(@Context SecurityContext sc,
+                                         @QueryParam("groupId") Integer groupId) throws Exception {
+        System.out.println("Retrieving organisations for group  " + groupId.toString());
+        super.setLogbackMarkers(sc);
+
+        List results = new UtilityManager().getOrganisationsInGroup(groupId);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/availableOrganisations")
+    public Response availableOrganisations(@Context SecurityContext sc) throws Exception {
+        System.out.println("Retrieving available organisations ");
+        super.setLogbackMarkers(sc);
+
+        List results = new UtilityManager().getAvailableOrganisations();
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/saveGroup")
+    public Response updateGroup(@Context SecurityContext sc,
+                                JsonOrganisationGroup group) throws Exception {
+        System.out.println("updating Group " + group.getName());
+        super.setLogbackMarkers(sc);
+
+        UtilityManager utilityManager = new UtilityManager();
+
+        Integer groupId = group.getId();
+
+        if (groupId.equals(0)) {
+            groupId = utilityManager.saveNewGroup(group);
+            group.setId(groupId);
+        } else {
+            utilityManager.updateGroup(group);
+        }
+
+        utilityManager.deleteOrganisationsInGroup(group);
+        if (group.getOrganisations().size() > 0)
+            utilityManager.insertGroupOrganisations(group);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(groupId)
                 .build();
     }
 }

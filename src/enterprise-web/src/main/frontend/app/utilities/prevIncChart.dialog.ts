@@ -44,6 +44,8 @@ export class PrevIncChartDialog implements OnInit {
 	private agex10 : string[];
 	private filterOrgs : Filter[] = [];
 	private orgs : string[];
+	private filterCcg: Filter[] = [];
+	private ccgs : string[];
 
 	// Result data
 	private populationCounts : any[];
@@ -84,6 +86,7 @@ export class PrevIncChartDialog implements OnInit {
 		this.msoa = [];
 		this.orgs = [];
 		this.agex10 = [];
+		this.ccgs = [];
 		this.refresh();
 	}
 
@@ -98,7 +101,7 @@ export class PrevIncChartDialog implements OnInit {
 
 	private loadPopulationResults() {
 		let vm = this;
-		vm.utilService.getPopulationResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+		vm.utilService.getPopulationResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
 			.subscribe(
 				(results) => {
 					// Only load Inc/Prev AFTER we have population (to allow per1k and percentage calculations)
@@ -113,7 +116,7 @@ export class PrevIncChartDialog implements OnInit {
 
 	private loadIncidenceResults() {
 		let vm = this;
-		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
 			.subscribe(
 				(results) => {vm.incidenceResults = results; vm.incChart = this.getChartData('Incidence', results, vm.graphAs)},
 				(error) => console.log(error)
@@ -122,7 +125,7 @@ export class PrevIncChartDialog implements OnInit {
 
 	private loadPrevalenceResults() {
 		let vm = this;
-		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10)
+		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
 			.subscribe(
 				(results) => {vm.prevalenceResults = results; vm.prevChart = this.getChartData('Prevalence', results, vm.graphAs)},
 				(error) => console.log(error)
@@ -140,6 +143,7 @@ export class PrevIncChartDialog implements OnInit {
 		this.getOptionList(5, 'MSOA', 'msoa_code', this.filterMsoa);
 		this.getOptionList(6, 'Organisation', 'organisation_id', this.filterOrgs);
 		this.getAgeBands(7,'Age band (10 yrs)', 'FLOOR(age_years/10)', 0, 90, 10, this.filterAgex10);
+        this.getOptionList(8, 'CCG', 'ccg', this.filterCcg);
 		this.breakdown = this.breakdownOptions[0];
 	}
 

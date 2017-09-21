@@ -9,6 +9,7 @@ import {ChartModule} from "../charting/chart.module";
 import {ControlsModule} from "eds-common-js";
 import {PrevIncChartDialog} from "./prevIncChart.dialog";
 import {MultiSelectDropdownComponent} from "./multiSelectDropdown.component";
+import {OrgGroupPickerComponent} from "./orgGroupPicker.component";
 
 @NgModule({
 	imports : [
@@ -22,11 +23,13 @@ import {MultiSelectDropdownComponent} from "./multiSelectDropdown.component";
 		UtilitiesComponent,
 		PrevIncDialog,
 		PrevIncChartDialog,
-		MultiSelectDropdownComponent
+		MultiSelectDropdownComponent,
+		OrgGroupPickerComponent
 	],
 	entryComponents : [
 		PrevIncDialog,
-		PrevIncChartDialog
+		PrevIncChartDialog,
+		OrgGroupPickerComponent
 	],
 	providers : [
 		UtilitiesService

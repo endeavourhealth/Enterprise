@@ -26,7 +26,7 @@ public class UtilityManager {
         generateWhereClausesFromOptions(options);
         populateOrganisationTable(options);
         populatePatientTable();
-        populateClinicalData(options.getCodeSet());
+        populateClinicalData(options);
         updatePersonData();
         runInitialPopulationQuery();
         //runIncidenceQueries();
@@ -91,7 +91,6 @@ public class UtilityManager {
         }
 
         for (String script : initialiseScripts) {
-            System.out.println(script);
             runScript(script);
         }
 
@@ -120,7 +119,7 @@ public class UtilityManager {
         List<String> tempTableScripts = new ArrayList<>();
 
         tempTableScripts.add("create table enterprise_admin.incidence_prevalence_raw_data (\n" +
-                "\tperson_id bigint(20) not null primary key,\n" +
+                "\tperson_id bigint(20) not null,\n" +
                 "    patient_gender_id smallint(6) null,\n" +
                 "    age_years int(11) null,\n" +
                 "    postcode_prefix varchar(20) null,\n" +
@@ -134,11 +133,13 @@ public class UtilityManager {
                 "    date_of_death date null,\n" +
                 "    date_of_death_year int(6) null,\n" +
                 "    date_of_death_month int(6) null,\n" +
+                "    ccg varchar(10) null, \n" +
                 "    \n" +
                 "    index ix_incidence_prevalence_raw_data_clinical_effective_date (clinical_effective_date),    \n" +
                 "    index ix_incidence_prevalence_raw_data_patient_gender_id (patient_gender_id),    \n" +
                 "    index ix_incidence_prevalence_raw_data_postcode_prefix (postcode_prefix),\n" +
-                "    index ix_incidence_prevalence_raw_data_age_years (age_years)      \n" +
+                "    index ix_incidence_prevalence_raw_data_age_years (age_years),      \n" +
+                "    index ix_incidence_prevalence_raw_data_person_id (person_id)      \n" +
                 "    \n" +
                 ");");
 
@@ -168,6 +169,8 @@ public class UtilityManager {
                 "    lsoa_code varchar(50) null,\n" +
                 "    msoa_code varchar(50) null,\n" +
                 "    ethnic_code char(1) null,\n" +
+                "    ccg varchar(10) null, \n" +
+                "    postcode_prefix varchar(20) null, \n" +
                 "     \n" +
                 "\tprimary key (episode_id, person_id),\n" +
                 "    index ix_bigdata_results_date_registered_year (date_registered_year),  \n" +
@@ -194,16 +197,14 @@ public class UtilityManager {
         }
     }
 
-    private String createStandardOrganisationInsert(List<JsonOrganisation> organisations) throws Exception {
-        String orgList = "";
-        for (JsonOrganisation org : organisations) {
-            orgList += "(" + org.getId() + "),";
-        }
-        orgList =  orgList.substring(0, orgList.length() - 1);
+    private String createStandardOrganisationInsert(Integer organisationGroup) throws Exception {
 
-        String query = String.format("insert into enterprise_admin.incidence_prevalence_organisation_list (organisation_id)" +
-                        " values %s",
-                orgList);
+        String query = String.format("insert into enterprise_admin.incidence_prevalence_organisation_list " +
+                        " select coalesce(child.id, o.id) \n" +
+                        "from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
+                        "join enterprise_data_pseudonymised.organization o on o.ods_code = l.ods_code\n" +
+                        "left outer join enterprise_data_pseudonymised.organization child on child.parent_organization_id = o.id and child.type_code = 'PR'\n" +
+                        "where l.group_id = %d;", organisationGroup);
 
 
         return query;
@@ -213,9 +214,9 @@ public class UtilityManager {
 
         List<String> orgScripts = new ArrayList<>();
 
-        if (options.getOrganisation() != null && options.getOrganisation().size() > 0) {
+        if (options.getOrgType() != null && !options.getOrganisationGroup().equals(0)) {
             includeOrganisationQuery = true;
-            orgScripts.add(createStandardOrganisationInsert(options.getOrganisation()));
+            orgScripts.add(createStandardOrganisationInsert(options.getOrganisationGroup()));
         }
 
         for (String script : orgScripts) {
@@ -295,17 +296,13 @@ public class UtilityManager {
                 "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
         for (String script : populateScripts) {
-            System.out.println(script);
             runScript(script);
         }
 
     }
 
-    private void populateClinicalData(String codeSetId) throws Exception {
-
-        List<String> clinicalScripts = new ArrayList<>();
-
-        clinicalScripts.add(String.format("insert into enterprise_admin.incidence_prevalence_raw_data (person_id, clinical_effective_date)\n" +
+    private String getChronicDataScript(JsonPrevInc options) throws Exception {
+        return String.format("insert into enterprise_admin.incidence_prevalence_raw_data (person_id, clinical_effective_date)\n" +
                 "SELECT\n" +
                 "\tDISTINCT\n" +
                 "    d.person_id, \n" +
@@ -317,7 +314,34 @@ public class UtilityManager {
                 "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
                 "WHERE \n" +
                 "    c.ItemUuid = '%s'\n" +
-                "group by d.person_id;", codeSetId));
+                "group by d.person_id;", options.getCodeSet());
+    }
+
+    private String getAcuteDataScript(JsonPrevInc options) throws Exception {
+        return String.format("insert into enterprise_admin.incidence_prevalence_raw_data (person_id, clinical_effective_date)\n" +
+                "SELECT\n" +
+                "\tDISTINCT\n" +
+                "    d.person_id, \n" +
+                "    IFNULL(d.clinical_effective_date, '1000-01-01') as clinical_effective_date\n" +
+                "FROM enterprise_admin.incidence_prevalence_patient_list p \n" +
+                "JOIN enterprise_data_pseudonymised.observation d \n" +
+                "\tON p.patient_id = d.patient_id\n" +
+                "JOIN enterprise_admin.CodeSet c\n" +
+                "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
+                "WHERE \n" +
+                "    c.ItemUuid = '%s'\n " +
+                "    and d.is_review = 0;", options.getCodeSet());
+    }
+
+    private void populateClinicalData(JsonPrevInc options) throws Exception {
+
+        List<String> clinicalScripts = new ArrayList<>();
+
+        if (options.getDiseaseCategory().equals("0")) {
+            clinicalScripts.add(getChronicDataScript(options));
+        } else {
+            clinicalScripts.add(getAcuteDataScript(options));
+        }
 
         for (String script : clinicalScripts) {
             runScript(script);
@@ -330,6 +354,8 @@ public class UtilityManager {
 
         personScripts.add("update enterprise_admin.incidence_prevalence_raw_data r\n" +
                 "inner join enterprise_data_pseudonymised.patient p on p.person_id = r.person_id\n" +
+                "inner JOIN enterprise_data_pseudonymised.organization org on org.id = p.organization_id \n" +
+                "inner JOIN enterprise_data_pseudonymised.organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
                 "set r.patient_gender_id = p.patient_gender_id,\n" +
                 "\tr.age_years = p.age_years,\n" +
                 "    r.postcode_prefix = p.postcode_prefix,\n" +
@@ -341,7 +367,8 @@ public class UtilityManager {
                 "    r.organisation_id = p.organization_id,\n" +
                 "    r.date_of_death = ifnull(p.date_of_death, '9999-01-01'),\n" +
                 "    r.date_of_death_year = year(ifnull(p.date_of_death, '9999-01-01')),\n" +
-                "    r.date_of_death_month = month(ifnull(p.date_of_death, '9999-01-01'));");
+                "    r.date_of_death_month = month(ifnull(p.date_of_death, '9999-01-01'))," +
+                "    r.ccg = parentOrg.ods_code;");
 
         for (String script : personScripts) {
             runScript(script);
@@ -371,33 +398,41 @@ public class UtilityManager {
                 "    MONTH(IFNULL(p.date_of_death, '9999-12-31')),    \n" +
                 "    p.lsoa_code, \n " +
                 "    p.msoa_code, \n " +
-                "    p.ethnic_code \n " +
+                "    p.ethnic_code, \n " +
+                "    parentOrg.ods_code, \n " +
+                "    p.postcode_prefix \n" +
                 "from enterprise_data_pseudonymised.episode_of_care e\n" +
                 "join enterprise_data_pseudonymised.patient p \n" +
-                "\ton p.id = e.patient_id and e.organization_id = p.organization_id and e.person_id = p.person_id" +
+                "\ton p.id = e.patient_id and e.organization_id = p.organization_id and e.person_id = p.person_id \n" +
+                "inner JOIN enterprise_data_pseudonymised.organization org on org.id = p.organization_id \n" +
+                "inner JOIN enterprise_data_pseudonymised.organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
                 "%s" +
                 "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
         for (String script : populationScripts) {
-            System.out.println(script);
             runScript(script);
         }
     }
 
     private void runScript(String script) throws Exception {
-
+        System.out.println(script);
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         entityManager.getTransaction().begin();
+        try {
+            Query q = entityManager.createNativeQuery(script);
 
-        Query q = entityManager.createNativeQuery(script);
+            int resultCount = q.executeUpdate();
 
-        int resultCount = q.executeUpdate();
+            System.out.println(resultCount + " rows affected");
+        } finally {
+            entityManager.getTransaction().commit();
 
-        System.out.println(resultCount + " rows affected");
-        entityManager.getTransaction().commit();
+            entityManager.close();
+        }
 
-        entityManager.close();
+
+
 
     }
 
@@ -570,7 +605,7 @@ public class UtilityManager {
 
         Query q = entityManager.createNativeQuery("SELECT DISTINCT " + columnName + " as id, " +
                 " ifnull(" + columnName + ", 'Unknown') " +
-                " FROM enterprise_admin.incidence_prevalence_raw_data d " +
+                " FROM enterprise_admin.incidence_prevalence_population_list d " +
                 " ORDER BY " + columnName +
                 " ASC");
 
@@ -583,25 +618,27 @@ public class UtilityManager {
 
     public List getDistinctValuesForGraphing(String columnName) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+        List resultList = new ArrayList();
+        try {
+            if (columnName.equals("postcode_prefix")) {
+                return getDistinctValuesForGraphingNoLookup(columnName);
+            }
 
-        if (columnName.equals("postcode_prefix")) {
-            return getDistinctValuesForGraphingNoLookup(columnName);
-        }
-
-        String joinTable = getJoinTableForDistinctValues(columnName);
-        String joinColumn = getJoinColumnForDistinctValues(columnName);
-        String lookupColumn = getLookupColumnForDistinctValues(columnName);
+            String joinTable = getJoinTableForDistinctValues(columnName);
+            String joinColumn = getJoinColumnForDistinctValues(columnName);
+            String lookupColumn = getLookupColumnForDistinctValues(columnName);
 
             Query q = entityManager.createNativeQuery("SELECT DISTINCT d." + columnName + ", " +
-                " ifnull(j." + lookupColumn + ", 'Unknown') " +
-                " FROM enterprise_admin.incidence_prevalence_raw_data d " +
-                " join " + joinTable + " j on d." + columnName + " =  j." + joinColumn + " ORDER BY " +
-                " j." + lookupColumn +
-                " ASC");
+                    " ifnull(j." + lookupColumn + ", 'Unknown') " +
+                    " FROM enterprise_admin.incidence_prevalence_population_list d " +
+                    " join " + joinTable + " j on d." + columnName + " =  j." + joinColumn + " ORDER BY " +
+                    " j." + lookupColumn +
+                    " ASC");
 
-        List resultList = q.getResultList();
-
-        entityManager.close();
+            resultList = q.getResultList();
+        } finally {
+            entityManager.close();
+        }
 
         return resultList;
     }
@@ -617,6 +654,8 @@ public class UtilityManager {
             case "ethnic_code":
                 return "ethnicity_lookup";
             case "organisation_id":
+                return "organization";
+            case "ccg":
                 return "organization";
         }
 
@@ -635,6 +674,8 @@ public class UtilityManager {
                 return "ethnic_code";
             case "organisation_id":
                 return "id";
+            case "ccg":
+                return "ods_code";
         }
 
         return "";
@@ -652,8 +693,145 @@ public class UtilityManager {
                 return "ethnic_name";
             case "organisation_id":
                 return "name";
+            case "ccg":
+                return "name";
         }
 
         return "";
     }
+
+    public List getOrganisationGroups() throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        Query q = entityManager.createNativeQuery("select group_id, group_name " +
+                " from enterprise_admin.incidence_prevalence_organisation_group" +
+                " order by group_name ASC ;");
+
+        List resultList = q.getResultList();
+
+        entityManager.close();
+
+        return resultList;
+    }
+
+    public List getOrganisationsInGroup(Integer groupId) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        String query = String.format(
+                "select distinct o.ods_code, o.name from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
+                        " join enterprise_data_pseudonymised.organization o on o.ods_code = l.ods_code " +
+                        "where l.group_id = %d;", groupId);
+        System.out.println(query);
+        Query q = entityManager.createNativeQuery(query);
+
+        List resultList = q.getResultList();
+
+        entityManager.close();
+
+        return resultList;
+    }
+
+    public List getAvailableOrganisations() throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        Query q = entityManager.createNativeQuery("select distinct o.name, o.ods_code, ifnull(o.type_code, 'PR') as type_code\n" +
+                "from enterprise_data_pseudonymised.organization o\n" +
+                "join enterprise_data_pseudonymised.episode_of_care e on e.organization_id = o.id\n" +
+                "union\n" +
+                "\n" +
+                "select distinct ccg.name, ccg.ods_code, ccg.type_code\n" +
+                "from enterprise_data_pseudonymised.organization o\n" +
+                "join enterprise_data_pseudonymised.episode_of_care e on e.organization_id = o.id\n" +
+                "join enterprise_data_pseudonymised.organization ccg on ccg.id = o.parent_organization_id\n" +
+                "order by type_code, name;");
+
+        List resultList = q.getResultList();
+
+        entityManager.close();
+
+        return resultList;
+    }
+
+    public void updateGroup(JsonOrganisationGroup group) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        String query = String.format(
+                "update enterprise_admin.incidence_prevalence_organisation_group \n" +
+                        " set group_name = '%s' " +
+                        "where group_id = %d;", group.getName(), group.getId());
+        System.out.println(query);
+        Query q = entityManager.createNativeQuery(query);
+
+        entityManager.getTransaction().begin();
+        q.executeUpdate();
+
+
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
+    public Integer saveNewGroup(JsonOrganisationGroup group) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        String query = String.format(
+                "insert into enterprise_admin.incidence_prevalence_organisation_group (group_name) \n" +
+                        " values ( '%s' )", group.getName());
+        System.out.println(query);
+        Query q = entityManager.createNativeQuery(query);
+
+        entityManager.getTransaction().begin();
+        q.executeUpdate();
+
+        q = entityManager.createNativeQuery("SELECT LAST_INSERT_ID();");
+
+        Integer groupId = Integer.parseInt(q.getSingleResult().toString());
+
+        entityManager.getTransaction().commit();
+        entityManager.close();
+
+        return groupId;
+    }
+
+    public void deleteOrganisationsInGroup(JsonOrganisationGroup group) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        entityManager.getTransaction().begin();
+
+        String query = String.format(
+                "delete from enterprise_admin.incidence_prevalence_organisation_group_lookup \n" +
+                        "where group_id = %d;", group.getId());
+        System.out.println(query);
+        Query q = entityManager.createNativeQuery(query);
+
+        q.executeUpdate();
+
+        entityManager.getTransaction().commit();
+
+        entityManager.close();
+
+    }
+
+    public void insertGroupOrganisations(JsonOrganisationGroup group) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        String orgList = "";
+        for (JsonOrganisation org : group.getOrganisations()) {
+            orgList += "(" + group.getId() + ", '" + org.getId() + "'),";
+        }
+        orgList =  orgList.substring(0, orgList.length() - 1);
+
+        String query = String.format("insert into enterprise_admin.incidence_prevalence_organisation_group_lookup (group_id, ods_code)" +
+                        " values %s",
+                orgList);
+
+        entityManager.getTransaction().begin();
+        Query q = entityManager.createNativeQuery(query);
+        System.out.println(query);
+        q.executeUpdate();
+
+
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
 }

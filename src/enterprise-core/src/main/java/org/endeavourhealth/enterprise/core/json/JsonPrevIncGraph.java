@@ -14,4 +14,5 @@ public class JsonPrevIncGraph {
     public List<String> msoa;
     public List<String> orgs;
     public List<String> agex10;
+    public List<String> ccgs;
 }

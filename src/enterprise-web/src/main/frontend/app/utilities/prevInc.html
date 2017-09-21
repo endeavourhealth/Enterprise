@@ -58,7 +58,7 @@
 			<div class="col-md-6">
 				<div style="padding: 10px">
 					<div class="form-group">
-						<label>Disease Group Code Set: </label>
+						<label>Disease Group Code Set <small class="text-danger">(mandatory)</small>:</label>
 						<select class="form-control" style="width:300px" [(ngModel)]="codeSet" [ngModelOptions]="{standalone: true}">
 							<option *ngFor="let set of codeSets" value="{{set.uuid}}">{{set.name}}</option>
 						</select>
@@ -131,5 +131,5 @@
 
 <div class="modal-footer">
 	<button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
-	<button type="button" class="btn btn-primary" (click)="run();">Run</button>
+	<button type="button" class="btn btn-primary" (click)="run();" [disabled]="!codeSet">Run</button>
 </div>

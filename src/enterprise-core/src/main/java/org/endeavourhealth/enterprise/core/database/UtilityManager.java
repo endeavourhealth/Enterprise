@@ -1,5 +1,6 @@
 package org.endeavourhealth.enterprise.core.database;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.enterprise.core.json.*;
 
@@ -23,6 +24,7 @@ public class UtilityManager {
         cleanUpDatabase();
         createTemporaryTables();
         initialiseReportResultTable(options);
+        saveReportOptions(options);
         generateWhereClausesFromOptions(options);
         populateOrganisationTable(options);
         populatePatientTable();
@@ -96,6 +98,41 @@ public class UtilityManager {
 
     }
 
+    private void saveReportOptions(JsonPrevInc options) throws Exception {
+
+        List<String> optionsScripts = new ArrayList<>();
+
+        ObjectMapper objMap = new ObjectMapper();
+
+
+        optionsScripts.add("insert into enterprise_admin.incidence_prevalence_options (options)\n" +
+                "values ('" + objMap.writerWithDefaultPrettyPrinter().writeValueAsString(options) + "');");
+
+        for (String script : optionsScripts) {
+            runScript(script);
+        }
+
+    }
+
+    public JsonPrevInc getReportOptions() throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        List<String> optionsScripts = new ArrayList<>();
+
+        ObjectMapper objMap = new ObjectMapper();
+
+        entityManager.getTransaction().begin();
+
+        Query q = entityManager.createNativeQuery("select options from enterprise_admin.incidence_prevalence_options;");
+
+        JsonPrevInc options = (JsonPrevInc)objMap.readValue(q.getSingleResult().toString(), JsonPrevInc.class);
+
+        entityManager.getTransaction().commit();
+        entityManager.close();
+
+        return options;
+    }
+
     private void cleanUpDatabase() throws Exception {
 
         includeOrganisationQuery = false;
@@ -108,6 +145,7 @@ public class UtilityManager {
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_organisation_list;");
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_population_list;");
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_date_range");
+        deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_options");
 
         for (String script : deleteScripts) {
             runScript(script);
@@ -173,13 +211,15 @@ public class UtilityManager {
                 "    postcode_prefix varchar(20) null, \n" +
                 "     \n" +
                 "\tprimary key (episode_id, person_id),\n" +
-                "    index ix_bigdata_results_date_registered_year (date_registered_year),  \n" +
-                "    index ix_bigdata_results_date_registered_month (date_registered_month), \n" +
-                "    index ix_bigdata_results_patient_gender_id (patient_gender_id),    \n" +
-                "    index ix_bigdata_results_date_registered_end_year (date_registered_end_year),\n" +
-                "    index ix_bigdata_results_date_registered_end_month (date_registered_end_month),\n" +
-                "    index ix_bigdata_results_date_of_death_year (date_of_death_year) ,\n" +
-                "    index ix_bigdata_results_date_of_death_month (date_of_death_month)       \n" +
+                "    index ix_population_list_date_registered_year (date_registered_year),  \n" +
+                "    index ix_population_list_date_registered_month (date_registered_month), \n" +
+                "    index ix_population_list_patient_gender_id (patient_gender_id),    \n" +
+                "    index ix_population_list_date_registered_end_year (date_registered_end_year),\n" +
+                "    index ix_population_list_date_registered_end_month (date_registered_end_month),\n" +
+                "    index ix_population_list_date_of_death_year (date_of_death_year) ,\n" +
+                "    index ix_population_list_date_of_death_month (date_of_death_month),       \n" +
+                "    index ix_population_list_msoa_code (msoa_code),       \n" +
+                "    index ix_population_list_lsoa_code (lsoa_code)       \n" +
                 "    \n" +
                 ");");
 
@@ -191,6 +231,9 @@ public class UtilityManager {
                 " index ix_incidence_prevalence_date_range_max_date (max_date)\n" +
                 " \n" +
                 ");");
+
+        tempTableScripts.add("create table enterprise_admin.incidence_prevalence_options (\n" +
+                " options varchar(5000)\n);");
 
         for (String script : tempTableScripts) {
             runScript(script);
@@ -618,7 +661,7 @@ public class UtilityManager {
 
     public List getDistinctValuesForGraphing(String columnName) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-        List resultList = new ArrayList();
+        List resultList;
         try {
             if (columnName.equals("postcode_prefix")) {
                 return getDistinctValuesForGraphingNoLookup(columnName);
@@ -628,14 +671,17 @@ public class UtilityManager {
             String joinColumn = getJoinColumnForDistinctValues(columnName);
             String lookupColumn = getLookupColumnForDistinctValues(columnName);
 
-            Query q = entityManager.createNativeQuery("SELECT DISTINCT d." + columnName + ", " +
+            String query = "SELECT DISTINCT d." + columnName + ", " +
                     " ifnull(j." + lookupColumn + ", 'Unknown') " +
                     " FROM enterprise_admin.incidence_prevalence_population_list d " +
                     " join " + joinTable + " j on d." + columnName + " =  j." + joinColumn + " ORDER BY " +
                     " j." + lookupColumn +
-                    " ASC");
-
+                    " ASC";
+            Query q = entityManager.createNativeQuery(query);
+            System.out.println(query);
+            entityManager.getTransaction().begin();
             resultList = q.getResultList();
+            entityManager.getTransaction().commit();
         } finally {
             entityManager.close();
         }
@@ -646,17 +692,17 @@ public class UtilityManager {
     private String getJoinTableForDistinctValues(String column) {
         switch (column) {
             case "patient_gender_id":
-                return "patient_gender";
+                return "enterprise_data_pseudonymised.patient_gender";
             case "lsoa_code":
-                return "lsoa_lookup";
+                return "enterprise_data_pseudonymised.lsoa_lookup";
             case "msoa_code":
-                return "msoa_lookup";
+                return "enterprise_data_pseudonymised.msoa_lookup";
             case "ethnic_code":
-                return "ethnicity_lookup";
+                return "enterprise_data_pseudonymised.ethnicity_lookup";
             case "organisation_id":
-                return "organization";
+                return "enterprise_data_pseudonymised.organization";
             case "ccg":
-                return "organization";
+                return "enterprise_data_pseudonymised.organization";
         }
 
         return "";

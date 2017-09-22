@@ -6,6 +6,7 @@ import {Breakdown} from "./models/Breakdown";
 import {Series} from "../charting/models/Series";
 import {Filter} from "./models/Filter";
 import {linq} from "eds-common-js";
+import {PrevInc} from "./models/PrevInc";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -22,8 +23,11 @@ export class PrevIncChartDialog implements OnInit {
 
 	@Input() title;
 
+	private prevIncOptions: PrevInc;
+
 	// Graph style - count/per1k/percent
 	private graphAs : string = "count";
+	private graphsLoaded: number = 0;
 
 	// Breakdown options and current selection
 	private breakdownOptions : Breakdown[] = [];
@@ -65,16 +69,31 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.getReportOptions();
 		this.getOptions();
 		this.refresh();
 	}
 
 	//---------------------------
 
+    getReportOptions() {
+        let vm = this;
+        vm.utilService.getReportOptions()
+            .subscribe(
+                (result) => {
+                    vm.prevIncOptions = result;
+                    vm.title = vm.prevIncOptions.title;
+                }
+            );
+    }
+
 	setGraph(graphAs : string) {
 		this.graphAs = graphAs;
 		this.incChart = this.getChartData('Incidence', this.incidenceResults, graphAs);
-		this.prevChart = this.getChartData('Prevalence', this.prevalenceResults, graphAs);
+		console.log(this.prevIncOptions.diseaseCategory);
+		if (this.prevIncOptions.diseaseCategory === "0") {
+            this.prevChart = this.getChartData('Prevalence', this.prevalenceResults, graphAs);
+        }
 	}
 
 	clear() {
@@ -94,6 +113,7 @@ export class PrevIncChartDialog implements OnInit {
 		this.incChart = null;
 		this.prevChart = null;
 		this.popChart = null;
+		this.graphsLoaded = 0;
 
 		// Get the populations first (per1k and percent charts need this data)
 		this.loadPopulationResults();
@@ -108,7 +128,9 @@ export class PrevIncChartDialog implements OnInit {
 					vm.populationCounts = results;
 					vm.popChart = vm.getChartData('Population', results, 'count');
 					vm.loadIncidenceResults();
-					vm.loadPrevalenceResults();
+                    if (this.prevIncOptions.diseaseCategory === "0") {
+                        vm.loadPrevalenceResults();
+                    }
 				},
 				(error) => console.log(error)
 			);
@@ -118,7 +140,19 @@ export class PrevIncChartDialog implements OnInit {
 		let vm = this;
 		vm.utilService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
 			.subscribe(
-				(results) => {vm.incidenceResults = results; vm.incChart = this.getChartData('Incidence', results, vm.graphAs)},
+				(results) => {
+					vm.incidenceResults = results;
+					vm.incChart = this.getChartData('Incidence', results, vm.graphAs);
+
+					console.log(this.prevIncOptions.diseaseCategory);
+                    if (this.prevIncOptions.diseaseCategory != "0") {
+                    	vm.graphsLoaded += 2;
+                    } else {
+                    	vm.graphsLoaded += 1;
+					}
+                    console.log(vm.graphsLoaded);
+
+				},
 				(error) => console.log(error)
 			);
 	}
@@ -127,7 +161,12 @@ export class PrevIncChartDialog implements OnInit {
 		let vm = this;
 		vm.utilService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
 			.subscribe(
-				(results) => {vm.prevalenceResults = results; vm.prevChart = this.getChartData('Prevalence', results, vm.graphAs)},
+				(results) => {
+					vm.prevalenceResults = results;
+					vm.prevChart = this.getChartData('Prevalence', results, vm.graphAs);
+                    vm.graphsLoaded += 1;
+                    console.log(vm.graphsLoaded);
+				},
 				(error) => console.log(error)
 			);
 	}

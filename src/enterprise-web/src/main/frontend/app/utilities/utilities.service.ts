@@ -91,4 +91,8 @@ export class UtilitiesService extends BaseHttp2Service {
 
         return this.httpPost('api/utility/saveGroup', group);
 	}
+
+    getReportOptions(): Observable<any> {
+        return this.httpGet('api/utility/getOptions');
+    }
 }

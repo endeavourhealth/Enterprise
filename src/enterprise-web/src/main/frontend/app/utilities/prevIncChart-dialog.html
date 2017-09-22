@@ -74,7 +74,7 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<loadingIndicator [done]="incChart && prevChart">
+				<loadingIndicator [done]="graphsLoaded === 2">
 					<ngb-tabset>
 						<ngb-tab title="Graph">
 							<template ngbTabContent>

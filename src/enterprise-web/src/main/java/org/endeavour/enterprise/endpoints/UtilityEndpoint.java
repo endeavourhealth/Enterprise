@@ -194,4 +194,22 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
                 .entity(groupId)
                 .build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getOptions")
+    public Response getOptions(@Context SecurityContext sc) throws Exception {
+        System.out.println("Retrieving JSON Options ");
+        super.setLogbackMarkers(sc);
+
+        JsonPrevInc options = new UtilityManager().getReportOptions();
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(options)
+                .build();
+    }
 }

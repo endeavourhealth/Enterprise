@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal, NgbActiveModal, NgbTabChangeEvent} from "@ng-bootstrap/ng-bootstrap";
 import {PrevInc} from "../models/PrevInc";
 import {Msoa} from "../../cohort/models/Msoa";
 import {Lsoa} from "../../cohort/models/Lsoa";
@@ -17,6 +17,7 @@ import {OrgGroupPickerComponent} from "../orgGroupPicker.component";
 export class PrevIncDialog implements OnInit {
 
 	codeSets:FolderItem[];
+	activeTab : string = 'tab-denominator';
 
 	public static open(modalService: NgbModal, prevInc: PrevInc) {
 		const modalRef = modalService.open(PrevIncDialog, { backdrop : "static", size : "lg"});
@@ -227,4 +228,9 @@ export class PrevIncDialog implements OnInit {
             (error) => vm.logger.error("Error running utility", error)
         );
     }
+
+    tabChange($event : NgbTabChangeEvent) {
+			this.activeTab = $event.nextId;
+			console.log(this.activeTab);
+		}
 }

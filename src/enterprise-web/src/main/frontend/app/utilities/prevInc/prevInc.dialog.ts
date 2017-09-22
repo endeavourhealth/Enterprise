@@ -1,15 +1,14 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {PrevInc} from "./models/PrevInc";
-import {Organisation} from "../report/models/Organisation";
-import {Msoa} from "../cohort/models/Msoa";
-import {Lsoa} from "../cohort/models/Lsoa";
-import {LoggerService, MessageBoxDialog} from "eds-common-js";
-import {CohortService} from "../cohort/cohort.service";
-import {UtilitiesService} from "./utilities.service";
+import {PrevInc} from "../models/PrevInc";
+import {Msoa} from "../../cohort/models/Msoa";
+import {Lsoa} from "../../cohort/models/Lsoa";
+import {LoggerService} from "eds-common-js";
+import {CohortService} from "../../cohort/cohort.service";
+import {UtilitiesService} from "../utilities.service";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
-import {OrganisationGroup} from "./models/OrganisationGroup";
-import {OrgGroupPickerComponent} from "./orgGroupPicker.component";
+import {OrganisationGroup} from "../models/OrganisationGroup";
+import {OrgGroupPickerComponent} from "../orgGroupPicker.component";
 
 @Component({
 	selector: 'ngbd-modal-content',

@@ -4,13 +4,9 @@ import {Transition} from "ui-router-ng2";
 import {StateService} from "ui-router-ng2";
 import {UtilitiesService} from "./utilities.service";
 import {LoggerService} from "eds-common-js";
-import {PrevIncDialog} from "./prevInc.dialog";
+import {PrevIncDialog} from "./prevInc/prevInc.dialog";
 import {PrevInc} from "./models/PrevInc";
-import {Chart} from "../charting/models/Chart";
-import {Series} from "../charting/models/Series";
-import {StackDialog} from "../charting/stack.dialog";
-import {PrevIncChartDialog} from "./prevIncChart.dialog";
-import {OrgGroupPickerComponent} from "./orgGroupPicker.component";
+import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
 
 @Component({
 	template : require('./utilities.html')

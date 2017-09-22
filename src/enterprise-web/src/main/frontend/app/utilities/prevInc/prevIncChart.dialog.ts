@@ -1,12 +1,12 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {Chart} from "../charting/models/Chart";
-import {UtilitiesService} from "./utilities.service";
-import {Breakdown} from "./models/Breakdown";
-import {Series} from "../charting/models/Series";
-import {Filter} from "./models/Filter";
+import {Chart} from "../../charting/models/Chart";
+import {UtilitiesService} from "../utilities.service";
+import {Breakdown} from "../models/Breakdown";
+import {Series} from "../../charting/models/Series";
+import {Filter} from "../models/Filter";
 import {linq} from "eds-common-js";
-import {PrevInc} from "./models/PrevInc";
+import {PrevInc} from "../models/PrevInc";
 
 @Component({
 	selector: 'ngbd-modal-content',

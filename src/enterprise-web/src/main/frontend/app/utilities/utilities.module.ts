@@ -4,12 +4,12 @@ import {FormsModule} from "@angular/forms";
 import {UtilitiesService} from "./utilities.service";
 import {UtilitiesComponent} from "./utilities.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
-import {PrevIncDialog} from "./prevInc.dialog";
+import {PrevIncDialog} from "./prevInc/prevInc.dialog";
 import {ChartModule} from "../charting/chart.module";
 import {ControlsModule} from "eds-common-js";
-import {PrevIncChartDialog} from "./prevIncChart.dialog";
-import {MultiSelectDropdownComponent} from "./multiSelectDropdown.component";
+import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
 import {OrgGroupPickerComponent} from "./orgGroupPicker.component";
+import {MultiselectModule} from "../multiselect/multiselect.module";
 
 @NgModule({
 	imports : [
@@ -17,13 +17,13 @@ import {OrgGroupPickerComponent} from "./orgGroupPicker.component";
 		FormsModule,
 		NgbModule,
 		ChartModule,
-		ControlsModule
+		ControlsModule,
+		MultiselectModule
 	],
 	declarations : [
 		UtilitiesComponent,
 		PrevIncDialog,
 		PrevIncChartDialog,
-		MultiSelectDropdownComponent,
 		OrgGroupPickerComponent
 	],
 	entryComponents : [

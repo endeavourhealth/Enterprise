@@ -42,7 +42,6 @@ export class TestEditDialog implements OnInit{
 
 	filterValueFrom : string;
 	filterValueTo : string;
-
 	dateEditor : boolean = false;
 	problemEditor : boolean = false;
 	problem : boolean;
@@ -66,11 +65,12 @@ export class TestEditDialog implements OnInit{
 	editMode : boolean = false;
 	showRestriction : boolean = false;
 	codeSelection : CodeSetValue[] = [];
+	codeCompareSelection : CodeSetValue[] = [];
 	fields = <any>[];
 
 	restrictionTypes = ['','ALL','LATEST','EARLIEST','HIGHEST','LOWEST'];
 	periods = ['','DAY','WEEK','MONTH','YEAR'];
-	keepFields = ['CLINICAL_DATE','VALUE','CODE','HCP'];
+	keepFields = ['CLINICAL_DATE','VALUE','CODE'];
 
 	libraryItem : EnterpriseLibraryItem;
 
@@ -99,7 +99,6 @@ export class TestEditDialog implements OnInit{
 		else if (this.type=="3")
 			this.title = "Test Editor";
 
-		console.log(this.restrictions);
 	}
 
 	initialiseEditMode(resultData : Test) {
@@ -211,6 +210,13 @@ export class TestEditDialog implements OnInit{
 								}
 							}
 						}
+						if (filter.codeSet) {
+							for (var i = vm.restrictions.length-1; i >= 0; --i) {
+								if (field==vm.restrictions[i].field) {
+									vm.restrictions[i].filter.codeSet = filter.codeSet;
+								}
+							}
+						}
 					}
 					break;
 			}
@@ -229,6 +235,88 @@ export class TestEditDialog implements OnInit{
 
 	formatDate(inputDate : Date) {
 		return this.zeroFill(inputDate.getDate(),2)  + "-" + this.zeroFill((inputDate.getMonth()+1),2) + "-" + inputDate.getFullYear();
+	}
+
+	pickCompareCodeSet(field) {
+		let querySelection: QuerySelection;
+		let vm = this;
+		QueryPickerDialog.open(this.$modal, querySelection)
+			.result.then(function (resultData: QuerySelection) {
+
+			vm.libraryService.getLibraryItem<EnterpriseLibraryItem>(resultData.id)
+				.subscribe(
+					(libraryItem) => {
+						vm.libraryItem = libraryItem;
+
+						var codeSet : CodeSet = {
+							codingSystem : "ENDEAVOUR",
+							codeSetValue : libraryItem.codeSet.codeSetValue
+						}
+
+						var filter: Filter = {
+							field: "CONCEPT",
+							valueFrom: null,
+							valueTo: null,
+							codeSet: null,
+							valueSet: null,
+							codeSetLibraryItemUuid: null,
+							negate: false
+						};
+
+						filter.codeSet = codeSet;
+
+						for (var i = 0; i < vm.restrictions.length; ++i) {
+							if (vm.restrictions[i].field == field) {
+								vm.restrictions[i].filter = filter;
+								break;
+							}
+						}
+					}
+				);
+		});
+	}
+
+	pickCompareCode(field) {
+		let vm = this;
+		vm.codeCompareSelection = [];
+
+		for (var i = 0; i < vm.restrictions.length; ++i) {
+			if (vm.restrictions[i].field == field) {
+				if (vm.restrictions[i].filter.codeSet!=null) {
+					vm.codeCompareSelection = vm.restrictions[i].filter.codeSet.codeSetValue;
+					break;
+				}
+			}
+		}
+
+		CodePickerDialog.open(this.$modal, vm.codeCompareSelection)
+			.result.then(function(result : CodeSetValue[]) {
+
+			var codeSet : CodeSet = {
+				codingSystem : "ENDEAVOUR",
+				codeSetValue : result
+			}
+
+			var filter: Filter = {
+				field: "CONCEPT",
+				valueFrom: null,
+				valueTo: null,
+				codeSet: null,
+				valueSet: null,
+				codeSetLibraryItemUuid: null,
+				negate: false
+			};
+
+			filter.codeSet = codeSet;
+
+			for (var i = 0; i < vm.restrictions.length; ++i) {
+				if (vm.restrictions[i].field == field) {
+					vm.restrictions[i].filter = filter;
+					break;
+				}
+			}
+
+		});
 	}
 
 	showCodeSetPicker() {
@@ -626,6 +714,33 @@ export class TestEditDialog implements OnInit{
 
 	}
 
+	filterCompareCodeChange(valueField : any, codeSet : any) {
+		var vm = this;
+
+		if (codeSet==null)
+			return;
+
+		var filter: Filter = {
+			field: valueField,
+			valueFrom: null,
+			valueTo: null,
+			codeSet: codeSet,
+			valueSet: null,
+			codeSetLibraryItemUuid: null,
+			negate: false
+		};
+
+		for (var i = 0; i < vm.resultData.filter.length; ++i) {
+			var flt = vm.resultData.filter[i];
+
+			if (flt.field==valueField) {
+				vm.resultData.filter.splice(i, 1);
+			}
+		}
+
+		vm.resultData.filter.push(filter);
+	}
+
 	problemChange(e) {
 		var vm = this;
 
@@ -681,6 +796,8 @@ export class TestEditDialog implements OnInit{
 				} else if (vm.restrictions[i].field.indexOf("VALUE") >= 0) {
 					vm.filterValueFromChange(f.valueFrom.constant, vm.restrictions[i].field, f.valueFrom.testField)
 					vm.filterValueToChange(f.valueTo.constant, vm.restrictions[i].field, f.valueTo.testField)
+				} else if (vm.restrictions[i].field.indexOf("CODE") >= 0) {
+					vm.filterCompareCodeChange(vm.restrictions[i].field, f.codeSet);
 				}
 			}
 		}

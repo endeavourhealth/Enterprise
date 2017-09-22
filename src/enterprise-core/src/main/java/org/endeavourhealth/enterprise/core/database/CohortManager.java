@@ -288,6 +288,7 @@ public class CohortManager {
 				Date dateTo = null;
 				String testField = "";
 				String relativeUnit = "";
+				String codes = "";
 
 				for (Filter filter : filters) {
 					field = filter.getField();
@@ -310,6 +311,9 @@ public class CohortManager {
 								dateTo = getRelativeDateFromBaseline(relativeUnit,baselineDate,valueTo);
 							}
 						}
+					}
+					else if (field.contains("CODE")) {
+						codes = buildConceptList(filter);
 					}
 				} // next Filter
 
@@ -403,6 +407,9 @@ public class CohortManager {
 								patientObservations2.add(observationEntity);
 							}
 						}
+					} else if (field.contains("CODE")) {
+						if (codes.contains(observationEntity.getSnomedConceptId().toString()+",")) // TODO: temp solution - need to join on child concepts, and calculate exclusions too
+							patientObservations2.add(observationEntity);
 					}
 
 					i++;
@@ -684,6 +691,22 @@ public class CohortManager {
 			q.sqlWhere = q.sqlWhere.replaceFirst("or d.dmdId", "and (d.dmdId");
 			q.sqlWhere += ")";
 		}
+	}
+
+	private static String buildConceptList(Filter filter) {
+		List<CodeSetValue> codeSetValues = filter.getCodeSet().getCodeSetValue();
+		String codes = "";
+		for (CodeSetValue codeSetValue : codeSetValues) {
+			String code = codeSetValue.getCode();
+			String term = codeSetValue.getTerm();
+			String parentType = codeSetValue.getParentType();
+			String baseType = codeSetValue.getBaseType();
+			String valueFrom = codeSetValue.getValueFrom();
+			String valueTo = codeSetValue.getValueTo();
+			Boolean includeChildren = codeSetValue.isIncludeChildren();
+			codes += code+","; // TODO: temp solution - need to join on child concepts, and calculate exclusions too
+		}
+		return codes;
 	}
 
 	private static void buildConceptTypeFilter(QueryMeta q, Integer c, String code, String term, String parentType, String baseType, String valueFrom, String valueTo) {

@@ -2,7 +2,7 @@ package org.endeavour.enterprise.endpoints;
 
 import org.endeavourhealth.enterprise.core.json.JsonOrganisationGroup;
 import org.endeavourhealth.enterprise.core.json.JsonPrevIncGraph;
-import org.endeavourhealth.enterprise.core.database.UtilityManager;
+import org.endeavourhealth.enterprise.core.database.IncidencePrevalenceUtilityManager;
 import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
 
 import javax.ws.rs.*;
@@ -12,8 +12,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 
-@Path("/utility")
-public final class UtilityEndpoint extends AbstractItemEndpoint {
+@Path("/incidencePrevalenceUtility")
+public final class IncidencePrevalenceUtilityEndpoint extends AbstractItemEndpoint {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -22,7 +22,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
     public Response reportResult(@Context SecurityContext sc, JsonPrevInc options) throws Exception {
         super.setLogbackMarkers(sc);
 
-        boolean success = new UtilityManager().runPrevIncReport(options);
+        boolean success = new IncidencePrevalenceUtilityManager().runPrevIncReport(options);
 
         clearLogbackMarkers();
 
@@ -41,7 +41,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
 
-        List results = new UtilityManager().getIncidenceResults(params);
+        List results = new IncidencePrevalenceUtilityManager().getIncidenceResults(params);
 
         clearLogbackMarkers();
 
@@ -60,7 +60,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
 
-        List results = new UtilityManager().getPrevalenceResults(params);
+        List results = new IncidencePrevalenceUtilityManager().getPrevalenceResults(params);
 
         clearLogbackMarkers();
 
@@ -79,7 +79,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
 
-        List results = new UtilityManager().getPopulationResults(params);
+        List results = new IncidencePrevalenceUtilityManager().getPopulationResults(params);
 
         clearLogbackMarkers();
 
@@ -98,7 +98,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         System.out.println("Retrieving distinct values for " + columnName);
         super.setLogbackMarkers(sc);
 
-        List results = new UtilityManager().getDistinctValuesForGraphing(columnName);
+        List results = new IncidencePrevalenceUtilityManager().getDistinctValuesForGraphing(columnName);
 
         clearLogbackMarkers();
 
@@ -116,7 +116,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         System.out.println("Retrieving organisation groups ");
         super.setLogbackMarkers(sc);
 
-        List results = new UtilityManager().getOrganisationGroups();
+        List results = new IncidencePrevalenceUtilityManager().getOrganisationGroups();
 
         clearLogbackMarkers();
 
@@ -135,7 +135,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         System.out.println("Retrieving organisations for group  " + groupId.toString());
         super.setLogbackMarkers(sc);
 
-        List results = new UtilityManager().getOrganisationsInGroup(groupId);
+        List results = new IncidencePrevalenceUtilityManager().getOrganisationsInGroup(groupId);
 
         clearLogbackMarkers();
 
@@ -153,7 +153,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         System.out.println("Retrieving available organisations ");
         super.setLogbackMarkers(sc);
 
-        List results = new UtilityManager().getAvailableOrganisations();
+        List results = new IncidencePrevalenceUtilityManager().getAvailableOrganisations();
 
         clearLogbackMarkers();
 
@@ -172,20 +172,20 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         System.out.println("updating Group " + group.getName());
         super.setLogbackMarkers(sc);
 
-        UtilityManager utilityManager = new UtilityManager();
+        IncidencePrevalenceUtilityManager incidencePrevalenceUtilityManager = new IncidencePrevalenceUtilityManager();
 
         Integer groupId = group.getId();
 
         if (groupId.equals(0)) {
-            groupId = utilityManager.saveNewGroup(group);
+            groupId = incidencePrevalenceUtilityManager.saveNewGroup(group);
             group.setId(groupId);
         } else {
-            utilityManager.updateGroup(group);
+            incidencePrevalenceUtilityManager.updateGroup(group);
         }
 
-        utilityManager.deleteOrganisationsInGroup(group);
+        incidencePrevalenceUtilityManager.deleteOrganisationsInGroup(group);
         if (group.getOrganisations().size() > 0)
-            utilityManager.insertGroupOrganisations(group);
+            incidencePrevalenceUtilityManager.insertGroupOrganisations(group);
 
         clearLogbackMarkers();
 
@@ -203,7 +203,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         System.out.println("Retrieving JSON Options ");
         super.setLogbackMarkers(sc);
 
-        JsonPrevInc options = new UtilityManager().getReportOptions();
+        JsonPrevInc options = new IncidencePrevalenceUtilityManager().getReportOptions();
 
         clearLogbackMarkers();
 

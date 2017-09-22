@@ -19,7 +19,7 @@ export class UtilitiesService extends BaseHttp2Service {
 
 	runPrevIncReport(options: PrevInc): Observable<any> {
 		console.log('sending options');
-		return this.httpPost('api/utility/prevInc', options);
+		return this.httpPost('api/incidencePrevalenceUtility/prevInc', options);
 	}
 
 	getIncidenceResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], orgs: string[],  agex10: string[], ccgs: string[]): Observable<any> {
@@ -34,7 +34,7 @@ export class UtilitiesService extends BaseHttp2Service {
 			agex10: agex10,
 			ccgs: ccgs
 		};
-		return this.httpPost('api/utility/incidence', body);
+		return this.httpPost('api/incidencePrevalenceUtility/incidence', body);
 	}
 
 	getPrevalenceResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], orgs: string[], agex10: string[], ccgs: string[]): Observable<any> {
@@ -49,7 +49,7 @@ export class UtilitiesService extends BaseHttp2Service {
 			agex10: agex10,
 			ccgs: ccgs
 		};
-		return this.httpPost('api/utility/prevalence', body);
+		return this.httpPost('api/incidencePrevalenceUtility/prevalence', body);
 	}
 
 	getPopulationResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], orgs: string[], agex10: string[], ccgs: string[]): Observable<any> {
@@ -64,35 +64,35 @@ export class UtilitiesService extends BaseHttp2Service {
 			agex10: agex10,
 			ccgs: ccgs
 		};
-		return this.httpPost('api/utility/population', body);
+		return this.httpPost('api/incidencePrevalenceUtility/population', body);
 	}
 
 	getDistinctValues(columnName: string): Observable<any> {
 		var params: URLSearchParams = new URLSearchParams();
 		params.append('columnName', columnName);
-		return this.httpGet('api/utility/distinctValues', {search: params});
+		return this.httpGet('api/incidencePrevalenceUtility/distinctValues', {search: params});
 	}
 
     getOrganisationGroups(): Observable<any> {
-        return this.httpGet('api/utility/organisationGroups');
+        return this.httpGet('api/incidencePrevalenceUtility/organisationGroups');
     }
 
     getAvailableOrganisation(): Observable<any> {
-        return this.httpGet('api/utility/availableOrganisations');
+        return this.httpGet('api/incidencePrevalenceUtility/availableOrganisations');
     }
 
     getOrganisationsInGroup(groupId: number): Observable<any> {
         var params: URLSearchParams = new URLSearchParams();
         params.append('groupId', groupId.toString());
-        return this.httpGet('api/utility/organisationsInGroup', {search: params});
+        return this.httpGet('api/incidencePrevalenceUtility/organisationsInGroup', {search: params});
     }
 
     updateOrganisationGroup(group: OrganisationGroup): Observable<any> {
 
-        return this.httpPost('api/utility/saveGroup', group);
+        return this.httpPost('api/incidencePrevalenceUtility/saveGroup', group);
 	}
 
     getReportOptions(): Observable<any> {
-        return this.httpGet('api/utility/getOptions');
+        return this.httpGet('api/incidencePrevalenceUtility/getOptions');
     }
 }

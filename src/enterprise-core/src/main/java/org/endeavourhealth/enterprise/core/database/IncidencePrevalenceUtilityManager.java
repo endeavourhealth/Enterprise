@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class UtilityManager {
+public class IncidencePrevalenceUtilityManager {
 
     private boolean includeOrganisationQuery = false;
     private String orgJoin = " join enterprise_admin.incidence_prevalence_organisation_list o " +

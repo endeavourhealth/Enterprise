@@ -39,12 +39,15 @@ export class HealthCareActivityDialog implements OnInit {
 	msoaCode: Msoa = <any>[];
 	sex: string = "-1";
 	ethnicity: string = <any>[];
+	encounterType: string = <any>[];
 	orgType: string = "";
 	ageFrom: string = "";
 	ageTo: string = "";
     dateType: string = "absolute";
     selectedGroupId: number = 1;
+	selectedServiceGroupId: number = 1;
     orgGroups: OrganisationGroup[] = [];
+	serviceGroups: OrganisationGroup[] = [];
 
 	orgTT: string = "To select multiples please use Shift and Click.";
 	ppTT: string = "Please select a patient population as the denominator";
@@ -124,12 +127,14 @@ export class HealthCareActivityDialog implements OnInit {
     getOrganisationGroups() {
         var vm = this;
         vm.orgGroups = [];
+		vm.serviceGroups = [];
         vm.organisationGroupService.getOrganisationGroups()
             .subscribe(
                 (result) => {
                     for (let value of result) {
                         if (value != null) {
                             vm.orgGroups.push({id: value[0], name: value[1]});
+							vm.serviceGroups.push({id: value[0], name: value[1]});
                         }
                     }
                 });
@@ -167,6 +172,14 @@ export class HealthCareActivityDialog implements OnInit {
 		}
 	}
 
+	setSelectedEncounterTypes(selectElement) {
+		var vm = this;
+		vm.resultData.encounterType = <any>[];
+		for (let optionElement of selectElement.selectedOptions) {
+			vm.resultData.encounterType.push(optionElement.value);
+		}
+	}
+
 	run() {
 		var vm = this;
 		vm.resultData.population = vm.population;
@@ -180,6 +193,7 @@ export class HealthCareActivityDialog implements OnInit {
 		vm.resultData.orgType = vm.orgType;
 		vm.resultData.dateType = vm.dateType;
 		vm.resultData.organisationGroup = vm.selectedGroupId;
+		vm.resultData.serviceGroup = vm.selectedServiceGroupId;
 
 		this.ok();
 	}
@@ -207,6 +221,22 @@ export class HealthCareActivityDialog implements OnInit {
             (error) => vm.logger.error("Error running utility", error)
         );
     }
+
+	serviceManager() {
+		var vm = this;
+		OrgGroupPickerComponent.open(this.$modal, vm.selectedServiceGroupId ).result.then(
+			(result) => {
+				if (result) {
+					vm.selectedServiceGroupId = result;
+					vm.getOrganisationGroups();
+					console.log(vm.selectedServiceGroupId);
+				}
+				else
+					console.log('Cancelled');
+			},
+			(error) => vm.logger.error("Error running utility", error)
+		);
+	}
 
     tabChange($event : NgbTabChangeEvent) {
 			this.activeTab = $event.nextId;

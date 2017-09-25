@@ -119,7 +119,9 @@ export class UtilitiesComponent {
 			ethnicity: [],
 			ageFrom: "",
 			ageTo: "",
-			dateType: "absolute"
+			dateType: "absolute",
+			serviceGroup: 0,
+			encounterType: []
 		};
 		HealthCareActivityDialog.open(vm.$modal, healthCareActivity).result.then(
 			(result) => {

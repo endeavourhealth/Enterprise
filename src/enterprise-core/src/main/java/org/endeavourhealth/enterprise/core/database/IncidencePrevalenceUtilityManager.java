@@ -240,26 +240,14 @@ public class IncidencePrevalenceUtilityManager {
         }
     }
 
-    private String createStandardOrganisationInsert(Integer organisationGroup) throws Exception {
-
-        String query = String.format("insert into enterprise_admin.incidence_prevalence_organisation_list " +
-                        " select coalesce(child.id, o.id) \n" +
-                        "from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
-                        "join enterprise_data_pseudonymised.organization o on o.ods_code = l.ods_code\n" +
-                        "left outer join enterprise_data_pseudonymised.organization child on child.parent_organization_id = o.id and child.type_code = 'PR'\n" +
-                        "where l.group_id = %d;", organisationGroup);
-
-
-        return query;
-    }
-
     private void populateOrganisationTable(JsonPrevInc options) throws Exception {
 
         List<String> orgScripts = new ArrayList<>();
 
-        if (options.getOrgType() != null && !options.getOrganisationGroup().equals(0)) {
+        if (options.getOrganisationGroup() != null && !options.getOrganisationGroup().equals(0)) {
             includeOrganisationQuery = true;
-            orgScripts.add(createStandardOrganisationInsert(options.getOrganisationGroup()));
+            orgScripts.add(UtilityManagerCommon.createStandardOrganisationInsert(options.getOrganisationGroup(),
+                    "enterprise_admin.incidence_prevalence_organisation_list"));
         }
 
         for (String script : orgScripts) {

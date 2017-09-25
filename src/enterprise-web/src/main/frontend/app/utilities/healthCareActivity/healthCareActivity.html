@@ -142,5 +142,5 @@
 <div class="modal-footer">
 	<button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
 	<button type="button" class="btn btn-primary" *ngIf="activeTab=='tab-denominator'" (click)="t.select('tab-enumerator')">Next ></button>
-	<button type="button" class="btn btn-primary" *ngIf="activeTab=='tab-enumerator'" (click)="run();" [disabled]="!codeSet">Run</button>
+	<button type="button" class="btn btn-primary" *ngIf="activeTab=='tab-enumerator'" (click)="run();" [disabled]="codeSet">Run</button>
 </div>

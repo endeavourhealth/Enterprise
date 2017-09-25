@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 
-@Path("/HealthcareActivityUtility")
+@Path("/healthCareActivityUtility")
 public class HealthcareActivityUtilityEndpoint extends AbstractItemEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)

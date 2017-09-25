@@ -42,6 +42,19 @@ public final class UtilityManagerCommon {
         return resultList;
     }
 
+    public static String createStandardOrganisationInsert(Integer organisationGroup, String tableName) throws Exception {
+
+        String query = String.format("insert into %s " +
+                " select distinct coalesce(child.id, o.id) \n" +
+                "from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
+                "join enterprise_data_pseudonymised.organization o on o.ods_code = l.ods_code\n" +
+                "left outer join enterprise_data_pseudonymised.organization child on child.parent_organization_id = o.id and child.type_code = 'PR'\n" +
+                "where l.group_id = %d;", tableName, organisationGroup);
+
+
+        return query;
+    }
+
     public static List getDistinctValuesForGraphing(String columnName, String rawDataTableName) throws Exception {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
         List resultList;

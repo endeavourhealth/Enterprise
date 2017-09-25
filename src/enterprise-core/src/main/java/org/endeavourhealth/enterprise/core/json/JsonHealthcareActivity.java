@@ -18,6 +18,9 @@ public class JsonHealthcareActivity {
     private String timePeriodNo = null;
     private String timePeriod = null;
     private Integer ServiceGroupId = null;
+    private String dateType = null;
+    private String population = null;
+    private String orgType = null;
 
     public Integer getOrganisationGroup() {
         return organisationGroup;
@@ -113,5 +116,29 @@ public class JsonHealthcareActivity {
 
     public void setServiceGroupId(Integer serviceGroupId) {
         ServiceGroupId = serviceGroupId;
+    }
+
+    public String getDateType() {
+        return dateType;
+    }
+
+    public void setDateType(String dateType) {
+        this.dateType = dateType;
+    }
+
+    public String getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(String population) {
+        this.population = population;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
     }
 }

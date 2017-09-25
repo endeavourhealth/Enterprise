@@ -1,8 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Http, URLSearchParams} from "@angular/http";
 import {BaseHttp2Service} from "eds-common-js";
-import {PrevInc} from "../models/PrevInc";
 import {Observable} from "rxjs/Rx";
+import {HealthCareActivity} from "../models/HealthCareActivity";
 
 @Injectable()
 export class HealthCareActivityService extends BaseHttp2Service {
@@ -10,9 +10,10 @@ export class HealthCareActivityService extends BaseHttp2Service {
 		super(http);
 	}
 
-	runHealthCareActivityReport(options: PrevInc): Observable<any> {
+	runHealthCareActivityReport(options: HealthCareActivity): Observable<any> {
 		console.log('sending options');
-		return this.httpPost('api/healthCareActivityUtility/healthCareActivityRun', options);
+		console.log(options);
+		return this.httpPost('api/healthCareActivityUtility/runActivityReport', options);
 	}
 
 	getActivityResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], orgs: string[],  agex10: string[], ccgs: string[]): Observable<any> {

@@ -10,6 +10,7 @@ import {HealthCareActivity} from "./models/HealthCareActivity";
 import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
 import {PrevIncService} from "./prevInc/prevInc.service";
 import {HealthCareActivityChart} from "./healthCareActivity/healthCareActivityChart.dialog";
+import {HealthCareActivityService} from "./healthCareActivity/healthCareActivity.service";
 
 @Component({
 	template : require('./utilities.html')
@@ -19,6 +20,7 @@ export class UtilitiesComponent {
 	incPrevRunning: boolean = false;
 
 	constructor(private prevIncService: PrevIncService,
+							private healthcareActivityService: HealthCareActivityService,
 							private transition: Transition,
 							private logger: LoggerService,
 							private $modal: NgbModal,
@@ -83,6 +85,19 @@ export class UtilitiesComponent {
 			);
 	}
 
+    runHCAReport(options: PrevInc) {
+        let vm = this;
+        vm.incPrevRunning = true;
+        vm.healthcareActivityService.runHealthCareActivityReport(options)
+            .subscribe(
+                (result) => {
+                    vm.incPrevRunning = false;
+                    console.log('report complete')
+                },
+                (data) => vm.logger.error('Error loading', data, 'Error')
+            );
+    }
+
 	showResultsPI() {
 		PrevIncChartDialog.open(this.$modal, 'Results');
 	}
@@ -91,7 +106,6 @@ export class UtilitiesComponent {
 		let vm = this;
 		let healthCareActivity: HealthCareActivity = {
 			organisationGroup: 0,
-			population: "0",
 			timePeriodNo: "10",
 			timePeriod: "YEARS",
 			title: 'Health Care Activity',
@@ -100,7 +114,6 @@ export class UtilitiesComponent {
 			msoaCode: [],
 			sex: "-1",
 			ethnicity: [],
-			orgType: "",
 			ageFrom: "",
 			ageTo: "",
 			dateType: "absolute"
@@ -109,7 +122,7 @@ export class UtilitiesComponent {
 			(result) => {
 				console.log(result);
 				if (result)
-					vm.runReport(result);
+					vm.runHCAReport(result);
 				else
 					console.log('Cancelled');
 			},

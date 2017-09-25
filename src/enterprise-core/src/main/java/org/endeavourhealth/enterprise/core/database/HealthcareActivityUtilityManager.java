@@ -20,7 +20,7 @@ public class HealthcareActivityUtilityManager {
         cleanUpDatabase();
         createTemporaryTables();
         generateWhereClausesFromOptions(options);
-        populateOrganisationList(options);
+        populateOrganisationTable(options);
         populatePatientList();
         populateRawData(options);
         return true;
@@ -93,33 +93,32 @@ public class HealthcareActivityUtilityManager {
         }
     }
 
-    private void populateOrganisationList(JsonHealthcareActivity options) throws Exception {
+    private void populateOrganisationTable(JsonHealthcareActivity options) throws Exception {
 
-        List<String> organisationScripts = new ArrayList<>();
+        List<String> orgScripts = new ArrayList<>();
 
-        organisationScripts.add(String.format("insert into enterprise_admin.healthcare_activity_organisation_list  \n" +
-                "select coalesce(child.id, o.id) \n" +
-                "from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
-                "join enterprise_data_pseudonymised.organization o on o.ods_code = l.ods_code\n" +
-                "left outer join enterprise_data_pseudonymised.organization child \n" +
-                "\ton child.parent_organization_id = o.id and child.type_code = 'PR' \n" +
-                "where l.group_id = %d;", options.getOrganisationGroup()));
+        if (options.getOrganisationGroup() != null && !options.getOrganisationGroup().equals(0)) {
+            includeOrganisationQuery = true;
+            orgScripts.add(UtilityManagerCommon.createStandardOrganisationInsert(options.getOrganisationGroup(),
+                    "enterprise_admin.healthcare_activity_organisation_list"));
+        }
 
-
-        for (String script : organisationScripts) {
+        for (String script : orgScripts) {
             UtilityManagerCommon.runScript(script);
         }
+
     }
 
     private void populatePatientList() throws Exception {
 
         List<String> patientScripts = new ArrayList<>();
 
-        patientScripts.add("insert into enterprise_admin.healthcare_activity_patient_list (patient_id)\n" +
+        patientScripts.add(String.format("insert into enterprise_admin.healthcare_activity_patient_list (patient_id)\n" +
                 "select \n" +
                 "\tid \n" +
                 "from enterprise_data_pseudonymised.patient p \n" +
-                "join enterprise_admin.healthcare_activity_organisation_list o  on o.organisation_id = p.organization_id;");
+                "%s \n" +
+                "%s;", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
 
         for (String script : patientScripts) {

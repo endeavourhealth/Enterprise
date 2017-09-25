@@ -4,6 +4,7 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavourhealth.enterprise.core.database.HealthcareActivityUtilityManager;
 import org.endeavourhealth.enterprise.core.database.UtilityManagerCommon;
 import org.endeavourhealth.enterprise.core.json.JsonHealthcareActivity;
+import org.endeavourhealth.enterprise.core.json.JsonHealthcareActivityGraph;
 import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
 
 import javax.ws.rs.*;
@@ -42,6 +43,25 @@ public class HealthcareActivityUtilityEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
         List results = new UtilityManagerCommon().getDistinctValuesForGraphing(columnName, "enterprise_admin.healthcare_activity_raw_data");
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/incidence")
+    public Response getIncidenceResults(@Context SecurityContext sc, JsonHealthcareActivityGraph params) throws Exception {
+        System.out.println("Retrieving Incidence results");
+        super.setLogbackMarkers(sc);
+
+
+        List results = new HealthcareActivityUtilityManager().getIncidenceResults(params);
 
         clearLogbackMarkers();
 

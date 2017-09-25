@@ -1,10 +1,10 @@
 package org.endeavourhealth.enterprise.core.database;
 
-import org.endeavourhealth.enterprise.core.json.JsonHealthcareActivity;
-import org.endeavourhealth.enterprise.core.json.JsonLsoa;
-import org.endeavourhealth.enterprise.core.json.JsonMsoa;
-import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
+import org.apache.commons.lang3.StringUtils;
+import org.endeavourhealth.enterprise.core.json.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -229,5 +229,86 @@ public class HealthcareActivityUtilityManager {
         }
 
         whereClauses = allWhereClauses;
+    }
+
+    public List getIncidenceResults(JsonHealthcareActivityGraph params) {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        String select = "r.min_date, count(distinct d.person_id)";
+        String from = " enterprise_admin.incidence_prevalence_date_range r" +
+                " left outer join enterprise_admin.healthcare_activity_raw_data d  " +
+                "   on d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date";
+        List<String> andJoin = getAndJoinClauseForIncidence(params);
+
+        String group = "r.min_date";
+        String order = "r.min_date";
+
+        // GROUPING
+        if (params.breakdown != null && !params.breakdown.isEmpty()) {
+            select += ", IFNULL(" + params.breakdown+", 'Unknown')";
+            group += ", IFNULL(" + params.breakdown+", 'Unknown')";
+            order = params.breakdown + ", " + order;
+        }
+
+        String sql = " SELECT " + select +
+                " FROM " + from ;
+        if (andJoin.size() > 0)
+            sql += " AND " + StringUtils.join(andJoin, "\nAND ");
+        sql += " GROUP BY " + group +
+                " ORDER BY " + order;
+
+        System.out.println(sql);
+
+        Query q = entityManager.createNativeQuery(sql);
+
+        List resultList = q.getResultList();
+
+        System.out.println(resultList.size() + " rows affected");
+
+        entityManager.close();
+
+        return resultList;
+    }
+
+    public List<String> getAndJoinClauseForIncidence(JsonHealthcareActivityGraph params) {
+
+        List<String> where = new ArrayList<>();
+
+        // FILTERING
+        if (params.gender != null && params.gender.size() > 0)
+            where.add("patient_gender_id in (" + StringUtils.join(params.gender, ',') + ")\n");
+
+        if (params.ethnicity != null && params.ethnicity.size() > 0)
+            where.add("ethnic_code in ('" + StringUtils.join(params.ethnicity, "','") + "')\n");
+
+        if (params.postcode != null && params.postcode.size() > 0)
+            where.add("postcode_prefix in ('" + StringUtils.join(params.postcode, "','") + "')\n");
+
+        if (params.lsoa != null && params.lsoa.size() > 0)
+            where.add("lsoa_code in ('" + StringUtils.join(params.lsoa, "','") + "')\n");
+
+        if (params.msoa != null && params.msoa.size() > 0)
+            where.add("msoa_code in ('" + StringUtils.join(params.msoa, "','") + "')\n");
+
+        if (params.orgs != null && params.orgs.size() > 0)
+            where.add("organisation_id in (" + StringUtils.join(params.orgs, ",") + ")\n");
+
+        if (params.agex10 != null && params.agex10.size() > 0) {
+            List<String> ageWhere = new ArrayList<>();
+
+            for(int i = 0; i < params.agex10.size(); i++) {
+                int agex10 = Integer.parseInt(params.agex10.get(i)) * 10;
+                if(agex10 == 0)
+                    ageWhere.add("age_years < 10");
+                else if (agex10 == 90)
+                    ageWhere.add("age_years > 90");
+                else
+                    ageWhere.add("(age_years >= "+String.valueOf(agex10) + " AND age_years < "+String.valueOf(agex10 + 9) + ")");
+            }
+
+            where.add("(" + StringUtils.join(ageWhere, "\nOR ") + ")");
+        }
+
+        return where;
     }
 }

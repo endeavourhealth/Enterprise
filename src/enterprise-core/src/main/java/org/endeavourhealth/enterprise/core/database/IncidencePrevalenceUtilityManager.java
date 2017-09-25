@@ -93,7 +93,7 @@ public class IncidencePrevalenceUtilityManager {
         }
 
         for (String script : initialiseScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
 
     }
@@ -109,7 +109,7 @@ public class IncidencePrevalenceUtilityManager {
                 "values ('" + objMap.writerWithDefaultPrettyPrinter().writeValueAsString(options) + "');");
 
         for (String script : optionsScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
 
     }
@@ -148,7 +148,7 @@ public class IncidencePrevalenceUtilityManager {
         deleteScripts.add("drop table if exists enterprise_admin.incidence_prevalence_options");
 
         for (String script : deleteScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
     }
 
@@ -236,7 +236,7 @@ public class IncidencePrevalenceUtilityManager {
                 " options varchar(5000)\n);");
 
         for (String script : tempTableScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
     }
 
@@ -263,7 +263,7 @@ public class IncidencePrevalenceUtilityManager {
         }
 
         for (String script : orgScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
 
     }
@@ -336,10 +336,10 @@ public class IncidencePrevalenceUtilityManager {
                 "\tid \n" +
                 "from enterprise_data_pseudonymised.patient p" +
                 "%s" +
-                "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
+                "%s;", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
         for (String script : populateScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
 
     }
@@ -387,7 +387,7 @@ public class IncidencePrevalenceUtilityManager {
         }
 
         for (String script : clinicalScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
     }
 
@@ -414,7 +414,7 @@ public class IncidencePrevalenceUtilityManager {
                 "    r.ccg = parentOrg.ods_code;");
 
         for (String script : personScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
 
     }
@@ -453,30 +453,8 @@ public class IncidencePrevalenceUtilityManager {
                 "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
         for (String script : populationScripts) {
-            runScript(script);
+            UtilityManagerCommon.runScript(script);
         }
-    }
-
-    private void runScript(String script) throws Exception {
-        System.out.println(script);
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-
-        entityManager.getTransaction().begin();
-        try {
-            Query q = entityManager.createNativeQuery(script);
-
-            int resultCount = q.executeUpdate();
-
-            System.out.println(resultCount + " rows affected");
-        } finally {
-            entityManager.getTransaction().commit();
-
-            entityManager.close();
-        }
-
-
-
-
     }
 
     public List getIncidenceResults(JsonPrevIncGraph params) {
@@ -641,109 +619,6 @@ public class IncidencePrevalenceUtilityManager {
         entityManager.close();
 
         return resultList;
-    }
-
-    public List getDistinctValuesForGraphingNoLookup(String columnName) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-
-        Query q = entityManager.createNativeQuery("SELECT DISTINCT " + columnName + " as id, " +
-                " ifnull(" + columnName + ", 'Unknown') " +
-                " FROM enterprise_admin.incidence_prevalence_population_list d " +
-                " ORDER BY " + columnName +
-                " ASC");
-
-        List resultList = q.getResultList();
-
-        entityManager.close();
-
-        return resultList;
-    }
-
-    public List getDistinctValuesForGraphing(String columnName) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-        List resultList;
-        try {
-            if (columnName.equals("postcode_prefix")) {
-                return getDistinctValuesForGraphingNoLookup(columnName);
-            }
-
-            String joinTable = getJoinTableForDistinctValues(columnName);
-            String joinColumn = getJoinColumnForDistinctValues(columnName);
-            String lookupColumn = getLookupColumnForDistinctValues(columnName);
-
-            String query = "SELECT DISTINCT d." + columnName + ", " +
-                    " ifnull(j." + lookupColumn + ", 'Unknown') " +
-                    " FROM enterprise_admin.incidence_prevalence_population_list d " +
-                    " join " + joinTable + " j on d." + columnName + " =  j." + joinColumn + " ORDER BY " +
-                    " j." + lookupColumn +
-                    " ASC";
-            Query q = entityManager.createNativeQuery(query);
-            System.out.println(query);
-            entityManager.getTransaction().begin();
-            resultList = q.getResultList();
-            entityManager.getTransaction().commit();
-        } finally {
-            entityManager.close();
-        }
-
-        return resultList;
-    }
-
-    private String getJoinTableForDistinctValues(String column) {
-        switch (column) {
-            case "patient_gender_id":
-                return "enterprise_data_pseudonymised.patient_gender";
-            case "lsoa_code":
-                return "enterprise_data_pseudonymised.lsoa_lookup";
-            case "msoa_code":
-                return "enterprise_data_pseudonymised.msoa_lookup";
-            case "ethnic_code":
-                return "enterprise_data_pseudonymised.ethnicity_lookup";
-            case "organisation_id":
-                return "enterprise_data_pseudonymised.organization";
-            case "ccg":
-                return "enterprise_data_pseudonymised.organization";
-        }
-
-        return "";
-    }
-
-    private String getJoinColumnForDistinctValues(String column) {
-        switch (column) {
-            case "patient_gender_id":
-                return "id";
-            case "lsoa_code":
-                return "lsoa_code";
-            case "msoa_code":
-                return "msoa_code";
-            case "ethnic_code":
-                return "ethnic_code";
-            case "organisation_id":
-                return "id";
-            case "ccg":
-                return "ods_code";
-        }
-
-        return "";
-    }
-
-    private String getLookupColumnForDistinctValues(String column) {
-        switch (column) {
-            case "patient_gender_id":
-                return "value";
-            case "lsoa_code":
-                return "lsoa_name";
-            case "msoa_code":
-                return "msoa_name";
-            case "ethnic_code":
-                return "ethnic_name";
-            case "organisation_id":
-                return "name";
-            case "ccg":
-                return "name";
-        }
-
-        return "";
     }
 
     public List getOrganisationGroups() throws Exception {

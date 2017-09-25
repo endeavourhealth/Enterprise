@@ -1,5 +1,6 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavourhealth.enterprise.core.database.UtilityManagerCommon;
 import org.endeavourhealth.enterprise.core.json.JsonOrganisationGroup;
 import org.endeavourhealth.enterprise.core.json.JsonPrevIncGraph;
 import org.endeavourhealth.enterprise.core.database.IncidencePrevalenceUtilityManager;
@@ -98,7 +99,7 @@ public final class IncidencePrevalenceUtilityEndpoint extends AbstractItemEndpoi
         System.out.println("Retrieving distinct values for " + columnName);
         super.setLogbackMarkers(sc);
 
-        List results = new IncidencePrevalenceUtilityManager().getDistinctValuesForGraphing(columnName);
+        List results = new UtilityManagerCommon().getDistinctValuesForGraphing(columnName, "enterprise_admin.incidence_prevalence_population_list");
 
         clearLogbackMarkers();
 

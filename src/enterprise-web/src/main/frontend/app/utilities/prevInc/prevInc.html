@@ -22,6 +22,7 @@
 										</div>
 										<div class="form-group">
 											<label>Choose an organisation group: </label>
+											<br/>(for which the patient has had an episode of care)
 											<button class="btn btn-success btn-sm pull-right" (click)="orgManager()"><i class="fa fa-hospital-o"></i> Manage Organisation Groups</button>
 											<br><br>
 											<select class="form-control" [(ngModel)]="selectedGroupId" name="selectedGroupId" [ngModelOptions]="{standalone: true}">
@@ -91,7 +92,7 @@
 									<div style="padding: 10px">
 										<label>Trend Time Period: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTM }}"></span>
 										<div class="input-group">
-											<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." [(ngModel)]="timePeriodNo" [ngModelOptions]="{standalone: true}">
+											<input type="text" class="form-control" style="width:45px;margin-right:10px" placeholder="no." [(ngModel)]="timePeriodNo" [ngModelOptions]="{standalone: true}">
 											<select class="form-control" style="width:100px"  [(ngModel)]="timePeriod" [ngModelOptions]="{standalone: true}">
 												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
 											</select>

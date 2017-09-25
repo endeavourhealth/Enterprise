@@ -7,23 +7,39 @@
 			<form>
 				<div class="form-group">
 					<div class="row">
-						<div class="col-md-8">
-							<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-bar-chart"></i> Run Prevalence and Incidence Report</button>
-							<span class="pull-left" style="width:10px;">&nbsp;</span>
-							<loadingIndicator [done]="!incPrevRunning" [text]="'Processing...'">
-								<button class="btn btn-success btn-sm pull-left" (click)="showResultsPI()"><i class="fa fa-bar-chart"></i> Last Run Results</button>
-							</loadingIndicator>
+
+						<div class="col-md-3">
+							<div class="panel panel-default">
+								<div class="panel-heading">Prevalence &amp; Incidence</div>
+								<div class="panel-body">
+									The prevalence &amp; incidence report.. blah.. blah..
+									<div>
+										<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-bar-chart"></i> Run Report</button>
+										<span class="pull-left" style="width:10px;">&nbsp;</span>
+										<loadingIndicator [done]="!incPrevRunning" [text]="'Processing...'">
+											<button class="btn btn-success btn-sm pull-left" (click)="showResultsPI()"><i class="fa fa-bar-chart"></i> Last Run Results</button>
+										</loadingIndicator>
+									</div>
+								</div>
+							</div>
 						</div>
-					</div>
-					<div><hr/></div>
-					<div class="row">
-						<div class="col-md-8">
-							<button class="btn btn-success btn-sm pull-left" (click)="hca()"><i class="fa fa-bar-chart"></i> Run Health Care Activity Report</button>
-							<span class="pull-left" style="width:10px;">&nbsp;</span>
-							<loadingIndicator [done]="!incPrevRunning" [text]="'Processing...'">
-								<button class="btn btn-success btn-sm pull-left" (click)="showResultsHCA()"><i class="fa fa-bar-chart"></i> Last Run Results</button>
-							</loadingIndicator>
+
+						<div class="col-md-3">
+							<div class="panel panel-default">
+								<div class="panel-heading">Health Care Activity</div>
+								<div class="panel-body">
+									The health care activity report.. blah.. blah.. blah..
+									<div>
+										<button class="btn btn-success btn-sm pull-left" (click)="hca()"><i class="fa fa-bar-chart"></i> Run Report</button>
+										<span class="pull-left" style="width:10px;">&nbsp;</span>
+										<loadingIndicator [done]="!incPrevRunning" [text]="'Processing...'">
+											<button class="btn btn-success btn-sm pull-left" (click)="showResultsHCA()"><i class="fa fa-bar-chart"></i> Last Run Results</button>
+										</loadingIndicator>
+									</div>
+								</div>
+							</div>
 						</div>
+
 					</div>
 				</div>
 			</form>

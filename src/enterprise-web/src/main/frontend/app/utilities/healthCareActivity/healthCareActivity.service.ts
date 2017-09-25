@@ -28,7 +28,7 @@ export class HealthCareActivityService extends BaseHttp2Service {
 			agex10: agex10,
 			ccgs: ccgs
 		};
-		return this.httpPost('api/healthCareActivityUtility/healthCareActivity', body);
+		return this.httpPost('api/healthCareActivityUtility/incidence', body);
 	}
 
 	getDistinctValues(columnName: string): Observable<any> {

@@ -18,6 +18,7 @@ import {HealthCareActivityService} from "./healthCareActivity/healthCareActivity
 export class UtilitiesComponent {
 
 	incPrevRunning: boolean = false;
+	hcaRunning: boolean = false;
 
 	constructor(private prevIncService: PrevIncService,
 							private healthcareActivityService: HealthCareActivityService,
@@ -87,11 +88,11 @@ export class UtilitiesComponent {
 
     runHCAReport(options: PrevInc) {
         let vm = this;
-        vm.incPrevRunning = true;
+        vm.hcaRunning = true;
         vm.healthcareActivityService.runHealthCareActivityReport(options)
             .subscribe(
                 (result) => {
-                    vm.incPrevRunning = false;
+                    vm.hcaRunning = false;
                     console.log('report complete')
                 },
                 (data) => vm.logger.error('Error loading', data, 'Error')

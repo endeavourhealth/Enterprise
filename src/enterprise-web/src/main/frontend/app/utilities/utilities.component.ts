@@ -86,7 +86,7 @@ export class UtilitiesComponent {
 			);
 	}
 
-    runHCAReport(options: PrevInc) {
+    runHCAReport(options: HealthCareActivity) {
         let vm = this;
         vm.hcaRunning = true;
         vm.healthcareActivityService.runHealthCareActivityReport(options)

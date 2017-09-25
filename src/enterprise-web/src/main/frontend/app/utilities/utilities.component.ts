@@ -106,6 +106,8 @@ export class UtilitiesComponent {
 		let vm = this;
 		let healthCareActivity: HealthCareActivity = {
 			organisationGroup: 0,
+            population: "",
+            orgType: "",
 			timePeriodNo: "10",
 			timePeriod: "YEARS",
 			title: 'Health Care Activity',

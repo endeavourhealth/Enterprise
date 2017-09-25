@@ -7,9 +7,10 @@ import {LoggerService} from "eds-common-js";
 import {CohortService} from "../../cohort/cohort.service";
 import {UtilitiesService} from "../utilities.service";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
-import {OrganisationGroup} from "../models/OrganisationGroup";
-import {OrgGroupPickerComponent} from "../orgGroupPicker.component";
+import {OrganisationGroup} from "../../organisationGroup/models/OrganisationGroup";
+import {OrgGroupPickerComponent} from "../../organisationGroup/orgGroupPicker.component";
 import {PrevIncService} from "./prevInc.service";
+import {OrganisationGroupService} from "../../organisationGroup/organisationGroup.service";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -106,6 +107,7 @@ export class PrevIncDialog implements OnInit {
 	constructor(private utiliesService : UtilitiesService,
 							protected cohortService: CohortService,
 							private prevIncService: PrevIncService,
+							private orgGroupService: OrganisationGroupService,
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
@@ -135,7 +137,7 @@ export class PrevIncDialog implements OnInit {
     getOrganisationGroups() {
         var vm = this;
         vm.orgGroups = [];
-        vm.utiliesService.getOrganisationGroups()
+        vm.orgGroupService.getOrganisationGroups()
             .subscribe(
                 (result) => {
                     for (let value of result) {

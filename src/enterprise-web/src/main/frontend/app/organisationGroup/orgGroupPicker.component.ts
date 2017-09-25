@@ -1,10 +1,11 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {LoggerService, MessageBoxDialog} from "eds-common-js";
-import {UtilitiesService} from "./utilities.service";
+import {UtilitiesService} from "../utilities/utilities.service";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {OrganisationGroup} from "./models/OrganisationGroup";
 import {Organisation} from "../report/models/Organisation";
+import {OrganisationGroupService} from "./organisationGroup.service";
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -27,7 +28,7 @@ export class OrgGroupPickerComponent implements OnInit {
     selectedGroup: OrganisationGroup = {id: 0, name: ""};
 
 
-    constructor(private utilitiesService:UtilitiesService,
+    constructor(private organisationGroupService:OrganisationGroupService,
                 private $modal: NgbModal,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
@@ -42,7 +43,7 @@ export class OrgGroupPickerComponent implements OnInit {
     getOrganisationGroups() {
         var vm = this;
         vm.orgGroups = [];
-        vm.utilitiesService.getOrganisationGroups()
+        vm.organisationGroupService.getOrganisationGroups()
             .subscribe(
                 (result) => {
                     for (let value of result) {
@@ -61,7 +62,7 @@ export class OrgGroupPickerComponent implements OnInit {
     getOrganisationsInGroup() {
         var vm = this;
         vm.selectedGroup.organisations = [];
-        vm.utilitiesService.getOrganisationsInGroup(vm.selectedGroup.id)
+        vm.organisationGroupService.getOrganisationsInGroup(vm.selectedGroup.id)
             .subscribe(
                 (result) => {
                     for (let value of result)
@@ -72,7 +73,7 @@ export class OrgGroupPickerComponent implements OnInit {
 
     getAvailableOrganisations() {
         var vm = this;
-        vm.utilitiesService.getAvailableOrganisation()
+        vm.organisationGroupService.getAvailableOrganisation()
             .subscribe(
                 (result) => {
                     for (let value of result)
@@ -111,7 +112,7 @@ export class OrgGroupPickerComponent implements OnInit {
 
     save(close: boolean = false) {
         var vm = this;
-        vm.utilitiesService.updateOrganisationGroup(vm.selectedGroup)
+        vm.organisationGroupService.updateOrganisationGroup(vm.selectedGroup)
             .subscribe(
                 (result) => {
                     console.log('saved');

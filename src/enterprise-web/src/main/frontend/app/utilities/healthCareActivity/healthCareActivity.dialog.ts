@@ -7,8 +7,9 @@ import {LoggerService} from "eds-common-js";
 import {CohortService} from "../../cohort/cohort.service";
 import {UtilitiesService} from "../utilities.service";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
-import {OrganisationGroup} from "../models/OrganisationGroup";
-import {OrgGroupPickerComponent} from "../orgGroupPicker.component";
+import {OrganisationGroup} from "../../organisationGroup/models/OrganisationGroup";
+import {OrgGroupPickerComponent} from "../../organisationGroup/orgGroupPicker.component";
+import {OrganisationGroupService} from "../../organisationGroup/organisationGroup.service";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -95,6 +96,7 @@ export class HealthCareActivityDialog implements OnInit {
 
 	constructor(protected cohortService: CohortService,
 							private utilitiesService:UtilitiesService,
+							private organisationGroupService: OrganisationGroupService,
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
@@ -122,7 +124,7 @@ export class HealthCareActivityDialog implements OnInit {
     getOrganisationGroups() {
         var vm = this;
         vm.orgGroups = [];
-        vm.utilitiesService.getOrganisationGroups()
+        vm.organisationGroupService.getOrganisationGroups()
             .subscribe(
                 (result) => {
                     for (let value of result) {

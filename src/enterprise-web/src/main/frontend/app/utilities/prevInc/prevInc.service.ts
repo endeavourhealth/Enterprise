@@ -3,7 +3,7 @@ import {Http, URLSearchParams} from "@angular/http";
 import {BaseHttp2Service} from "eds-common-js";
 import {PrevInc} from "../models/PrevInc";
 import {Observable} from "rxjs/Rx";
-import {OrganisationGroup} from "../models/OrganisationGroup";
+import {OrganisationGroup} from "../../organisationGroup/models/OrganisationGroup";
 
 @Injectable()
 export class PrevIncService extends BaseHttp2Service {

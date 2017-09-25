@@ -1,21 +1,22 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {Chart} from "../../charting/models/Chart";
+import {UtilitiesService} from "../utilities.service";
 import {Breakdown} from "../models/Breakdown";
 import {Series} from "../../charting/models/Series";
 import {Filter} from "../models/Filter";
 import {linq} from "eds-common-js";
 import {PrevInc} from "../models/PrevInc";
-import {PrevIncService} from "./prevInc.service";
+import {HealthCareActivityService} from "./healthCareActivity.service";
 
 @Component({
 	selector: 'ngbd-modal-content',
-	template: require('./prevIncChart-dialog.html')
+	template: require('./healthCareActivityChart.html')
 })
-export class PrevIncChartDialog implements OnInit {
+export class HealthCareActivityChart implements OnInit {
 
 	public static open(modalService: NgbModal, title : string) {
-		const modalRef = modalService.open(PrevIncChartDialog, { backdrop : "static", size : "lg"});
+		const modalRef = modalService.open(HealthCareActivityChart, { backdrop : "static", size : "lg"});
 		modalRef.componentInstance.title = title;
 
 		return modalRef;
@@ -52,20 +53,19 @@ export class PrevIncChartDialog implements OnInit {
 	private ccgs : string[];
 
 	// Result data
-	private populationCounts : any[];
-	private incidenceResults : any[];
-	private prevalenceResults : any[];
+	private activityResults : any;
 
 	// Chart data
-	private incChart: Chart;
-	private prevChart: Chart;
-	private popChart: Chart;
+	private activityData: Chart;
 
 	// Chrt config
-	private height = 200;
+	private height = 500;
 	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 100};
 
-	constructor(protected $uibModalInstance : NgbActiveModal, protected prevIncService : PrevIncService) {
+	constructor(
+		protected $uibModalInstance : NgbActiveModal,
+		protected utilService : UtilitiesService,
+		protected healthCareActivityService : HealthCareActivityService) {
 	}
 
 	ngOnInit(): void {
@@ -78,7 +78,7 @@ export class PrevIncChartDialog implements OnInit {
 
     getReportOptions() {
         let vm = this;
-        vm.prevIncService.getIncPrevOptions()
+        vm.healthCareActivityService.getHealthCareActivityOptions()
             .subscribe(
                 (result) => {
                     vm.prevIncOptions = result;
@@ -89,11 +89,7 @@ export class PrevIncChartDialog implements OnInit {
 
 	setGraph(graphAs : string) {
 		this.graphAs = graphAs;
-		this.incChart = this.getChartData('Incidence', this.incidenceResults, graphAs);
-		console.log(this.prevIncOptions.diseaseCategory);
-		if (this.prevIncOptions.diseaseCategory === "0") {
-            this.prevChart = this.getChartData('Prevalence', this.prevalenceResults, graphAs);
-        }
+		this.activityData = this.getChartData('Incidence', this.activityResults, graphAs);
 	}
 
 	clear() {
@@ -110,62 +106,14 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 	refresh() {
-		this.incChart = null;
-		this.prevChart = null;
-		this.popChart = null;
-		this.graphsLoaded = 0;
-
-		// Get the populations first (per1k and percent charts need this data)
-		this.loadPopulationResults();
-	}
-
-	private loadPopulationResults() {
 		let vm = this;
-		vm.prevIncService.getPopulationResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
+		vm.activityData = null;
+		vm.healthCareActivityService.getActivityResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
 			.subscribe(
 				(results) => {
 					// Only load Inc/Prev AFTER we have population (to allow per1k and percentage calculations)
-					vm.populationCounts = results;
-					vm.popChart = vm.getChartData('Population', results, 'count');
-					vm.loadIncidenceResults();
-                    if (this.prevIncOptions.diseaseCategory === "0") {
-                        vm.loadPrevalenceResults();
-                    }
-				},
-				(error) => console.log(error)
-			);
-	}
-
-	private loadIncidenceResults() {
-		let vm = this;
-		vm.prevIncService.getIncidenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
-			.subscribe(
-				(results) => {
-					vm.incidenceResults = results;
-					vm.incChart = this.getChartData('Incidence', results, vm.graphAs);
-
-					console.log(this.prevIncOptions.diseaseCategory);
-                    if (this.prevIncOptions.diseaseCategory != "0") {
-                    	vm.graphsLoaded += 2;
-                    } else {
-                    	vm.graphsLoaded += 1;
-					}
-                    console.log(vm.graphsLoaded);
-
-				},
-				(error) => console.log(error)
-			);
-	}
-
-	private loadPrevalenceResults() {
-		let vm = this;
-		vm.prevIncService.getPrevalenceResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
-			.subscribe(
-				(results) => {
-					vm.prevalenceResults = results;
-					vm.prevChart = this.getChartData('Prevalence', results, vm.graphAs);
-                    vm.graphsLoaded += 1;
-                    console.log(vm.graphsLoaded);
+					vm.activityResults = results;
+					vm.activityData = vm.getChartData('Population', results, 'count');
 				},
 				(error) => console.log(error)
 			);
@@ -191,7 +139,7 @@ export class PrevIncChartDialog implements OnInit {
 		let breakdown = {id: id, name: title, field: fieldName, filters: []};
 		this.breakdownOptions.push(breakdown);
 
-		vm.prevIncService.getDistinctValues(fieldName)
+		vm.healthCareActivityService.getDistinctValues(fieldName)
 			.subscribe(
 				(result) => {
 					for (let value of result)
@@ -307,29 +255,11 @@ export class PrevIncChartDialog implements OnInit {
 			if (!result || result[1] == null)
 				data.push(0);
 			else {
-				data.push(this.getSeriesDataGraphAsValue(graphAs, result, category, series));
+				data.push(result[1]);
 			}
 		}
 
 		return data;
-	}
-
-	private getSeriesDataGraphAsValue(graphAs: string, result: any, category, series: string) {
-		if (graphAs == 'count')
-			return result[1];
-
-		let population = this.getPopulationForCategoryAndSeries(category, series);
-
-		if (graphAs == 'per1k')
-			return (this.round(result[1] * 1000 / population[1], 2));
-		else if (graphAs == 'percent')
-			return (this.round(result[1] * 100 / population[1], 2));
-	}
-
-	private getPopulationForCategoryAndSeries(category, series : string) {
-		return linq(this.populationCounts)
-			.Where(r => category == r[0] && (!series || (series == r[2] || r[2] == null)))
-			.SingleOrDefault();
 	}
 
 	private round(n : number, dp : number) {
@@ -346,8 +276,8 @@ export class PrevIncChartDialog implements OnInit {
 
 		let rowData = [];
 
-		rowData.push(this.incChart.title);
-		rowData = rowData.concat(this.incChart.getRowData())
+		rowData.push(this.activityData.title);
+		rowData = rowData.concat(this.activityData.getRowData())
 
 		let blob = new Blob([rowData.join('\n')], { type: 'text/plain' });
 		window['saveAs'](blob, this.title + '.csv');

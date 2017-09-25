@@ -9,6 +9,7 @@ import {UtilitiesService} from "../utilities.service";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {OrganisationGroup} from "../models/OrganisationGroup";
 import {OrgGroupPickerComponent} from "../orgGroupPicker.component";
+import {PrevIncService} from "./prevInc.service";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -102,8 +103,9 @@ export class PrevIncDialog implements OnInit {
 		{code: "Z", name: 'Not stated'},
 	];
 
-	constructor(protected cohortService: CohortService,
-							private utilitiesService:UtilitiesService,
+	constructor(private utiliesService : UtilitiesService,
+							protected cohortService: CohortService,
+							private prevIncService: PrevIncService,
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
@@ -133,7 +135,7 @@ export class PrevIncDialog implements OnInit {
     getOrganisationGroups() {
         var vm = this;
         vm.orgGroups = [];
-        vm.utilitiesService.getOrganisationGroups()
+        vm.utiliesService.getOrganisationGroups()
             .subscribe(
                 (result) => {
                     for (let value of result) {
@@ -148,7 +150,7 @@ export class PrevIncDialog implements OnInit {
 		var vm = this;
 
 		vm.codeSets = null;
-		vm.utilitiesService.getCodeSets()
+		vm.utiliesService.getCodeSets()
 			.subscribe(
 				(data:FolderItem[]) => vm.codeSets = data
 			);

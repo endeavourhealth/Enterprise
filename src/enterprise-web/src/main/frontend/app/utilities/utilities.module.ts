@@ -11,6 +11,9 @@ import {ControlsModule} from "eds-common-js";
 import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
 import {OrgGroupPickerComponent} from "./orgGroupPicker.component";
 import {MultiselectModule} from "../multiselect/multiselect.module";
+import {PrevIncService} from "./prevInc/prevInc.service";
+import {HealthCareActivityService} from "./healthCareActivity/healthCareActivity.service";
+import {HealthCareActivityChart} from "./healthCareActivity/healthCareActivityChart.dialog";
 
 @NgModule({
 	imports : [
@@ -24,18 +27,22 @@ import {MultiselectModule} from "../multiselect/multiselect.module";
 	declarations : [
 		UtilitiesComponent,
 		PrevIncDialog,
-		HealthCareActivityDialog,
 		PrevIncChartDialog,
+		HealthCareActivityDialog,
+		HealthCareActivityChart,
 		OrgGroupPickerComponent
 	],
 	entryComponents : [
 		PrevIncDialog,
-		HealthCareActivityDialog,
 		PrevIncChartDialog,
+		HealthCareActivityDialog,
+		HealthCareActivityChart,
 		OrgGroupPickerComponent
 	],
 	providers : [
-		UtilitiesService
+		UtilitiesService,
+		PrevIncService,
+		HealthCareActivityService
 	]
 })
 export class UtilitiesModule {}

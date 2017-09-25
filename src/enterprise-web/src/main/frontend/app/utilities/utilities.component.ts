@@ -2,13 +2,14 @@ import {Component} from "@angular/core";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {Transition} from "ui-router-ng2";
 import {StateService} from "ui-router-ng2";
-import {UtilitiesService} from "./utilities.service";
 import {LoggerService} from "eds-common-js";
 import {PrevIncDialog} from "./prevInc/prevInc.dialog";
 import {HealthCareActivityDialog} from "./healthCareActivity/healthCareActivity.dialog";
 import {PrevInc} from "./models/PrevInc";
 import {HealthCareActivity} from "./models/HealthCareActivity";
 import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
+import {PrevIncService} from "./prevInc/prevInc.service";
+import {HealthCareActivityChart} from "./healthCareActivity/healthCareActivityChart.dialog";
 
 @Component({
 	template : require('./utilities.html')
@@ -17,7 +18,7 @@ export class UtilitiesComponent {
 
 	incPrevRunning: boolean = false;
 
-	constructor(private utilitiesService: UtilitiesService,
+	constructor(private prevIncService: PrevIncService,
 							private transition: Transition,
 							private logger: LoggerService,
 							private $modal: NgbModal,
@@ -72,7 +73,7 @@ export class UtilitiesComponent {
 	runReport(options: PrevInc) {
 		let vm = this;
 		vm.incPrevRunning = true;
-		vm.utilitiesService.runPrevIncReport(options)
+		vm.prevIncService.runPrevIncReport(options)
 			.subscribe(
 				(result) => {
 					vm.incPrevRunning = false;
@@ -114,6 +115,10 @@ export class UtilitiesComponent {
 			},
 			(error) => vm.logger.error("Error running utility", error)
 		);
+	}
+
+	showResultsHCA() {
+		HealthCareActivityChart.open(this.$modal, 'Results');
 	}
 }
 

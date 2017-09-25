@@ -5,7 +5,9 @@ import {StateService} from "ui-router-ng2";
 import {UtilitiesService} from "./utilities.service";
 import {LoggerService} from "eds-common-js";
 import {PrevIncDialog} from "./prevInc/prevInc.dialog";
+import {HealthCareActivityDialog} from "./healthCareActivity/healthCareActivity.dialog";
 import {PrevInc} from "./models/PrevInc";
+import {HealthCareActivity} from "./models/HealthCareActivity";
 import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
 
 @Component({
@@ -80,8 +82,38 @@ export class UtilitiesComponent {
 			);
 	}
 
-	showResults() {
+	showResultsPI() {
 		PrevIncChartDialog.open(this.$modal, 'Results');
+	}
+
+	hca() {
+		let vm = this;
+		let healthCareActivity: HealthCareActivity = {
+			organisationGroup: 0,
+			population: "0",
+			timePeriodNo: "10",
+			timePeriod: "YEARS",
+			title: 'Health Care Activity',
+			postCodePrefix: "",
+			lsoaCode: [],
+			msoaCode: [],
+			sex: "-1",
+			ethnicity: [],
+			orgType: "",
+			ageFrom: "",
+			ageTo: "",
+			dateType: "absolute"
+		};
+		HealthCareActivityDialog.open(vm.$modal, healthCareActivity).result.then(
+			(result) => {
+				console.log(result);
+				if (result)
+					vm.runReport(result);
+				else
+					console.log('Cancelled');
+			},
+			(error) => vm.logger.error("Error running utility", error)
+		);
 	}
 }
 

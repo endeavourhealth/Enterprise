@@ -5,6 +5,7 @@ import {UtilitiesService} from "./utilities.service";
 import {UtilitiesComponent} from "./utilities.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {PrevIncDialog} from "./prevInc/prevInc.dialog";
+import {HealthCareActivityDialog} from "./healthCareActivity/healthCareActivity.dialog";
 import {ChartModule} from "../charting/chart.module";
 import {ControlsModule} from "eds-common-js";
 import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
@@ -23,11 +24,13 @@ import {MultiselectModule} from "../multiselect/multiselect.module";
 	declarations : [
 		UtilitiesComponent,
 		PrevIncDialog,
+		HealthCareActivityDialog,
 		PrevIncChartDialog,
 		OrgGroupPickerComponent
 	],
 	entryComponents : [
 		PrevIncDialog,
+		HealthCareActivityDialog,
 		PrevIncChartDialog,
 		OrgGroupPickerComponent
 	],

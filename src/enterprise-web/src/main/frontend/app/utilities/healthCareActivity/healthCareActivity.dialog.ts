@@ -131,24 +131,44 @@ export class HealthCareActivityDialog implements OnInit {
 
 		vm.getOrganisationGroups();
 
-		// temp data until table mapped
+		// temp data in JSON until IM Concept table created in MySQL - awaiting full mapping from source
 		vm.encounterTreeData = [
 			{
-				id: '1',
+				id: '0',
 				name: 'All',
 				checked: false,
 				children: [
-					{ id: '2', name: 'Hospital Inpatient encounters', checked: false },
-					{ id: '3', name: 'A&E attendances', checked: false },
-					{ id: '4', name: 'Outpatient attendances', checked: false },
-					{ id: '5', name: 'GP Encounters', checked: false, children: [
-						{ id: '6', name: 'GP Clinical encounters', checked: false,  children: [
-							{ id: '7', name: 'GP face to face consultations', checked: false },
-							{ id: '8', name: 'GP Telephone', checked: false }
+					{ id: '8000', name: 'Encounters by setting', checked: false,
+						children: [
+							{ id: '113', name: 'Provided in service setting', checked: false,
+								children: [
+									{ id: '8003', name: 'General Practice consultation', checked: false },
+									{ id: '8005', name: 'Acute care setting', checked: false,
+										children: [
+											{ id: '8016', name: 'Accident and emergency attendance', checked: false }
+										]
+									},
+									{ id: '8006', name: 'Community health setting', checked: false },
+									{ id: '8007', name: 'Social care settings', checked: false }
+								]
+							}
 						]
-						},
-						{ id: '9', name: 'GP Administration encounters', checked: false }
-					] }
+					},
+					{ id: '8001', name: 'Encounters by interaction mode', checked: false,
+						children: [
+							{ id: '8008', name: 'Face to face encounter', checked: false },
+							{ id: '8009', name: 'E-mail encounter', checked: false },
+							{ id: '8010', name: 'Video encounter', checked: false }
+						]
+					},
+					{ id: '8002', name: 'Encounters by care process', checked: false,
+						children: [
+							{ id: '8014', name: 'Hospital admission', checked: false },
+							{ id: '8015', name: 'Hospital Discharge', checked: false }
+						]
+					},
+					{ id: '8011', name: 'Encounter by place type', checked: false },
+					{ id: '8013', name: 'Administration entry', checked: false }
 				]
 			}
 		];

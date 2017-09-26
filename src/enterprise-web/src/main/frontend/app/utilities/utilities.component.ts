@@ -120,7 +120,7 @@ export class UtilitiesComponent {
 			ageFrom: "",
 			ageTo: "",
 			dateType: "absolute",
-			serviceGroup: 0,
+			serviceGroupId: 0,
 			encounterType: []
 		};
 		HealthCareActivityDialog.open(vm.$modal, healthCareActivity).result.then(

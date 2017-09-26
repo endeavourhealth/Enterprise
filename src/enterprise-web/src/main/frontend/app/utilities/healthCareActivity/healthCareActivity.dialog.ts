@@ -288,7 +288,7 @@ export class HealthCareActivityDialog implements OnInit {
 		vm.resultData.orgType = vm.orgType;
 		vm.resultData.dateType = vm.dateType;
 		vm.resultData.organisationGroup = vm.selectedGroupId;
-		vm.resultData.serviceGroup = vm.selectedServiceGroupId;
+		vm.resultData.serviceGroupId = vm.selectedServiceGroupId;
 
 		this.ok();
 	}

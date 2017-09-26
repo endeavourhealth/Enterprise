@@ -16,7 +16,7 @@ export class HealthCareActivity {
 	ageFrom: string;
 	ageTo: string;
     dateType: string;
-	serviceGroup: number;
+	serviceGroupId: number;
 	encounterType: string[];
 
 }

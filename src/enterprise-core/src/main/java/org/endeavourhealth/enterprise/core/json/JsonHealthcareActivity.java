@@ -21,6 +21,7 @@ public class JsonHealthcareActivity {
     private String dateType = null;
     private String population = null;
     private String orgType = null;
+    private List<String> encounterType = null;
 
     public Integer getOrganisationGroup() {
         return organisationGroup;
@@ -140,5 +141,13 @@ public class JsonHealthcareActivity {
 
     public void setOrgType(String orgType) {
         this.orgType = orgType;
+    }
+
+    public List<String> getEncounterType() {
+        return encounterType;
+    }
+
+    public void setEncounterType(List<String> encounterType) {
+        this.encounterType = encounterType;
     }
 }

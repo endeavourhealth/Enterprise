@@ -10,6 +10,7 @@ import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {OrganisationGroup} from "../../organisationGroup/models/OrganisationGroup";
 import {OrgGroupPickerComponent} from "../../organisationGroup/orgGroupPicker.component";
 import {OrganisationGroupService} from "../../organisationGroup/organisationGroup.service";
+import {ITreeOptions} from "angular2-tree-component";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -28,6 +29,9 @@ export class HealthCareActivityDialog implements OnInit {
 	}
 
 	@Input() resultData;
+
+	options : ITreeOptions;
+	encounterTreeData : any[];
 
 	population: string = "0";
 	codeSet: string = "";
@@ -103,6 +107,11 @@ export class HealthCareActivityDialog implements OnInit {
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
+
+		this.options = {
+			childrenField : 'children',
+			idField : 'id'
+		};
 	}
 
 	ngOnInit(): void {
@@ -122,6 +131,70 @@ export class HealthCareActivityDialog implements OnInit {
 
 		vm.getOrganisationGroups();
 
+		// temp data until table mapped
+		vm.encounterTreeData = [
+			{
+				id: '1',
+				name: 'All',
+				checked: false,
+				children: [
+					{ id: '2', name: 'Hospital Inpatient encounters', checked: false },
+					{ id: '3', name: 'A&E attendances', checked: false },
+					{ id: '4', name: 'Outpatient attendances', checked: false },
+					{ id: '5', name: 'GP Encounters', checked: false, children: [
+						{ id: '6', name: 'GP Clinical encounters', checked: false,  children: [
+							{ id: '7', name: 'GP face to face consultations', checked: false },
+							{ id: '8', name: 'GP Telephone', checked: false }
+						]
+						},
+						{ id: '9', name: 'GP Administration encounters', checked: false }
+					] }
+				]
+			}
+		];
+
+	}
+
+	check(node, checked) {
+		this.updateChildNodeCheckbox(node, checked);
+		this.updateParentNodeCheckbox(node.realParent);
+	}
+
+	updateChildNodeCheckbox(node, checked) {
+		node.data.checked = checked;
+		if (node.children) {
+			node.children.forEach((child) => this.updateChildNodeCheckbox(child, checked));
+		}
+	}
+
+	updateParentNodeCheckbox(node) {
+		if (!node) {
+			return;
+		}
+
+		let allChildrenChecked = true;
+		let noChildChecked = true;
+
+		for (const child of node.children) {
+			if (!child.data.checked || child.data.indeterminate) {
+				allChildrenChecked = false;
+			}
+			if (child.data.checked) {
+				noChildChecked = false;
+			}
+		}
+
+		if (allChildrenChecked) {
+			node.data.checked = true;
+			node.data.indeterminate = false;
+		} else if (noChildChecked) {
+			node.data.checked = false;
+			node.data.indeterminate = false;
+		} else {
+			node.data.checked = false;
+			node.data.indeterminate = true;
+		}
+		this.updateParentNodeCheckbox(node.parent);
 	}
 
     getOrganisationGroups() {
@@ -172,16 +245,38 @@ export class HealthCareActivityDialog implements OnInit {
 		}
 	}
 
-	setSelectedEncounterTypes(selectElement) {
+	checkEncounterSelection() {
 		var vm = this;
-		vm.resultData.encounterType = <any>[];
-		for (let optionElement of selectElement.selectedOptions) {
-			vm.resultData.encounterType.push(optionElement.value);
+
+		for (let node of vm.encounterTreeData) {
+			if (node.checked) {
+				vm.resultData.encounterType.push('0');
+				break;
+			}
+			if (node.children)
+				vm.checkEncounterChildSelection(node.children);
 		}
+
+	}
+
+	checkEncounterChildSelection(children) {
+		var vm = this;
+
+		for (let node of children) {
+			if (node.checked) {
+				vm.resultData.encounterType.push(node.id);
+			}
+			if (node.children)
+				vm.checkEncounterChildSelection(node.children);
+		}
+
 	}
 
 	run() {
 		var vm = this;
+
+		vm.checkEncounterSelection();
+
 		vm.resultData.population = vm.population;
 		vm.resultData.timePeriodNo = vm.timePeriodNo;
 		vm.resultData.timePeriod = vm.timePeriod;

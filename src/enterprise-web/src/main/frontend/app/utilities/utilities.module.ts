@@ -14,11 +14,13 @@ import {PrevIncService} from "./prevInc/prevInc.service";
 import {HealthCareActivityService} from "./healthCareActivity/healthCareActivity.service";
 import {HealthCareActivityChart} from "./healthCareActivity/healthCareActivityChart.dialog";
 import {OrganisationGroupModule} from "../organisationGroup/organisationGroup.module";
+import {TreeModule} from "angular2-tree-component";
 
 @NgModule({
 	imports : [
 		BrowserModule,
 		FormsModule,
+		TreeModule,
 		NgbModule,
 		ChartModule,
 		ControlsModule,

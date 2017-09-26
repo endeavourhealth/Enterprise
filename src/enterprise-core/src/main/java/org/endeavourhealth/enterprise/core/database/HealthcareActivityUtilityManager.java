@@ -13,6 +13,9 @@ public class HealthcareActivityUtilityManager {
     private boolean includeOrganisationQuery = false;
     private String orgJoin = " join enterprise_admin.healthcare_activity_organisation_list o " +
             " on o.organisation_id = p.organization_id ";
+    private boolean includeServiceQuery = false;
+    private String serviceJoin = " join enterprise_admin.healthcare_activity_service_list s " +
+            " on s.organisation_id = e.service_provider_organization_id ";
     private String whereClauses = "";
 
     public boolean getDenominatorPopulation(JsonHealthcareActivity options) throws Exception {
@@ -21,6 +24,7 @@ public class HealthcareActivityUtilityManager {
         createTemporaryTables();
         generateWhereClausesFromOptions(options);
         populateOrganisationTable(options);
+        populateServiceTable(options);
         populatePatientList();
         populateRawData(options);
         return true;
@@ -29,6 +33,7 @@ public class HealthcareActivityUtilityManager {
     private void cleanUpDatabase() throws Exception {
 
         includeOrganisationQuery = false;
+        includeServiceQuery = false;
         whereClauses = "";
 
         List<String> deleteScripts = new ArrayList<>();
@@ -38,6 +43,7 @@ public class HealthcareActivityUtilityManager {
         deleteScripts.add("drop table if exists enterprise_admin.healthcare_activity_raw_data;");
         deleteScripts.add("drop table if exists enterprise_admin.healthcare_activity_date_range");
         deleteScripts.add("drop table if exists enterprise_admin.healthcare_activity_options");
+        deleteScripts.add("drop table if exists enterprise_admin.healthcare_activity_service_list");
 
         for (String script : deleteScripts) {
             UtilityManagerCommon.runScript(script);
@@ -53,6 +59,10 @@ public class HealthcareActivityUtilityManager {
                 ");");
 
         tempTableScripts.add("create table enterprise_admin.healthcare_activity_organisation_list (\n" +
+                "\torganisation_id bigint(20) not null primary key\n" +
+                ");");
+
+        tempTableScripts.add("create table enterprise_admin.healthcare_activity_service_list (\n" +
                 "\torganisation_id bigint(20) not null primary key\n" +
                 ");");
 
@@ -109,6 +119,22 @@ public class HealthcareActivityUtilityManager {
 
     }
 
+    private void populateServiceTable(JsonHealthcareActivity options) throws Exception {
+
+        List<String> orgScripts = new ArrayList<>();
+
+        if (options.getServiceGroupId() != null && !options.getServiceGroupId().equals(0)) {
+            includeServiceQuery = true;
+            orgScripts.add(UtilityManagerCommon.createStandardOrganisationInsert(options.getOrganisationGroup(),
+                    "enterprise_admin.healthcare_activity_service_list"));
+        }
+
+        for (String script : orgScripts) {
+            UtilityManagerCommon.runScript(script);
+        }
+
+    }
+
     private void populatePatientList() throws Exception {
 
         List<String> patientScripts = new ArrayList<>();
@@ -157,9 +183,9 @@ public class HealthcareActivityUtilityManager {
                 "inner join enterprise_data_pseudonymised.encounter e on e.patient_id = p.id\n" +
                 "inner JOIN enterprise_data_pseudonymised.organization org on org.id = p.organization_id \n" +
                 "inner JOIN enterprise_data_pseudonymised.organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
-                " join enterprise_admin.healthcare_activity_organisation_list o  on o.organisation_id = p.organization_id\n" +
+                " %s \n" +
                 " where e.clinical_effective_date > date_add(current_date, INTERVAL -%s %s);",
-                options.getTimePeriodNo(), options.getTimePeriod().replaceFirst("S", "")));
+                includeServiceQuery ? serviceJoin : "", options.getTimePeriodNo(), options.getTimePeriod().replaceFirst("S", "")));
 
 
         for (String script : organisationScripts) {
@@ -214,10 +240,6 @@ public class HealthcareActivityUtilityManager {
 
         if (options.getSex() != null && !options.getSex().equals("-1")) {
             whereClauseList.add(" p.patient_gender_id = " + options.getSex());
-        }
-
-        if (options.getServiceGroupId() != null && !options.getServiceGroupId().equals("")) {
-            //Add service group in there
         }
 
         String allWhereClauses = "";

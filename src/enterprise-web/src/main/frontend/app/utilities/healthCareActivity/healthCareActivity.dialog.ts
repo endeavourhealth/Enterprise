@@ -48,8 +48,8 @@ export class HealthCareActivityDialog implements OnInit {
 	ageFrom: string = "";
 	ageTo: string = "";
     dateType: string = "absolute";
-    selectedGroupId: number = 1;
-	selectedServiceGroupId: number = 1;
+    selectedGroupId: number = 0;
+	selectedServiceGroupId: number = 0;
     orgGroups: OrganisationGroup[] = [];
 	serviceGroups: OrganisationGroup[] = [];
 

@@ -83,12 +83,14 @@ public class HealthcareActivityUtilityManager {
                 "    encounter_snomed_concept_id bigint(20) null,\n" +
                 "    clinical_effective_date date null,\n " +
                 "    service_id bigint(20) null,\n " +
+                "    encounter_type varchar(250) null, \n " +
                 "     \n" +
                 "    index ix_healthcare_activity_raw_data_patient_gender_id (patient_gender_id),    \n" +
                 "    index ix_healthcare_activity_raw_data_postcode_prefix (postcode_prefix),\n" +
                 "    index ix_healthcare_activity_raw_data_age_years (age_years),      \n" +
                 "    index ix_healthcare_activity_raw_data_person_id (patient_id) ,      \n" +
                 "    index ix_healthcare_activity_raw_data_service_id (service_id) ,      \n" +
+                "    index ix_healthcare_activity_raw_data_encounter_type (encounter_type) ,      \n" +
                 "    index ix_healthcare_activity_raw_data_clinical_effective_date (clinical_effective_date) ,      \n" +
                 "    index ix_healthcare_activity_raw_data_encounter_concept_id (encounter_snomed_concept_id)      \n" +
                 "    \n" +
@@ -220,9 +222,25 @@ public class HealthcareActivityUtilityManager {
         }
     }
 
+    private String generateEncounterTypeWhere(List<String> encounterTypes) throws Exception {
+        String where = "";
+        if (encounterTypes != null && encounterTypes.size() > 0) {
+            where += " AND c.id in (";
+            where += StringUtils.join(encounterTypes, ", ");
+            where += " )";
+            System.out.println(where);
+        }
+
+        return where;
+    }
+
     private void populateRawData(JsonHealthcareActivity options) throws Exception {
 
         List<String> organisationScripts = new ArrayList<>();
+
+        String encounterTypeWhereClause = "";
+
+        encounterTypeWhereClause = generateEncounterTypeWhere(options.getEncounterType());
 
         organisationScripts.add(String.format("insert into enterprise_admin.healthcare_activity_raw_data \n" +
                 "(\tpatient_id,\n" +
@@ -236,7 +254,8 @@ public class HealthcareActivityUtilityManager {
                 "    ccg,\n" +
                 "    encounter_snomed_concept_id,\n" +
                 "    clinical_effective_date,\n " +
-                "    service_id )\n " +
+                "    service_id, \n " +
+                "    encounter_type)\n " +
                 "select \n" +
                 "\tpl.patient_id,\n" +
                 "    p.patient_gender_id,\n" +
@@ -249,15 +268,21 @@ public class HealthcareActivityUtilityManager {
                 "\tparentOrg.ods_code,\n" +
                 "    e.snomed_concept_id,    \n" +
                 "    e.clinical_effective_date, \n " +
-                "    e.service_provider_organization_id \n " +
+                "    e.service_provider_organization_id, \n " +
+                "    c.name \n " +
                 "from enterprise_admin.healthcare_activity_patient_list pl \n" +
                 "inner join enterprise_data_pseudonymised.patient p on p.id = pl.patient_id\n" +
                 "inner join enterprise_data_pseudonymised.encounter e on e.patient_id = p.id\n" +
                 "inner JOIN enterprise_data_pseudonymised.organization org on org.id = p.organization_id \n" +
                 "inner JOIN enterprise_data_pseudonymised.organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
+                "join enterprise_admin.expression_concept ec on ec.expression = e.snomed_concept_id\n" +
+                "join enterprise_admin.concepts c on c.id = ec.value_concept \n " +
                 " %s \n" +
-                " where e.clinical_effective_date > date_add(current_date, INTERVAL -%s %s);",
-                includeServiceQuery ? serviceJoin : "", options.getTimePeriodNo(), options.getTimePeriod().replaceFirst("S", "")));
+                " where e.clinical_effective_date > date_add(current_date, INTERVAL -%s %s)" +
+                        "%s;",
+                includeServiceQuery ? serviceJoin : "", options.getTimePeriodNo(),
+                options.getTimePeriod().replaceFirst("S", ""),
+                encounterTypeWhereClause));
 
 
         for (String script : organisationScripts) {

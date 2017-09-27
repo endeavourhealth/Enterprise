@@ -36,8 +36,4 @@ export class HealthCareActivityService extends BaseHttp2Service {
 		params.append('columnName', columnName);
 		return this.httpGet('api/healthCareActivityUtility/distinctValues', {search: params});
 	}
-
-	getHealthCareActivityOptions(): Observable<any> {
-        return this.httpGet('api/healthCareActivityUtility/getOptions');
-    }
 }

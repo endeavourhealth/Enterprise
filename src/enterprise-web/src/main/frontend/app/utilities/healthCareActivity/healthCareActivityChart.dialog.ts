@@ -24,17 +24,13 @@ export class HealthCareActivityChart implements OnInit {
 
 	@Input() title;
 
-	private prevIncOptions: PrevInc;
-
-	// Graph style - count/per1k/percent
-	private graphAs : string = "count";
-	private graphsLoaded: number = 0;
-
 	// Breakdown options and current selection
 	private breakdownOptions : Breakdown[] = [];
 	private breakdown : Breakdown;
 
 	// Filter options and current selection
+	private filterEncounterType : Filter[] = [];
+	private encounterType : string[];
 	private filterGender : Filter[] = [];
 	private genders : string[];
 	private filterEthnicity : Filter[] = [];
@@ -47,6 +43,8 @@ export class HealthCareActivityChart implements OnInit {
 	private msoa : string[];
 	private filterAgex10 : Filter[] = [];
 	private agex10 : string[];
+	private filterServices : Filter[] = [];
+	private services : string[];
 	private filterOrgs : Filter[] = [];
 	private orgs : string[];
 	private filterCcg: Filter[] = [];
@@ -69,36 +67,21 @@ export class HealthCareActivityChart implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.getReportOptions();
 		this.getOptions();
 		this.refresh();
 	}
 
 	//---------------------------
 
-    getReportOptions() {
-        let vm = this;
-        vm.healthCareActivityService.getHealthCareActivityOptions()
-            .subscribe(
-                (result) => {
-                    vm.prevIncOptions = result;
-                    vm.title = vm.prevIncOptions.title;
-                }
-            );
-    }
-
-	setGraph(graphAs : string) {
-		this.graphAs = graphAs;
-		this.activityData = this.getChartData('Incidence', this.activityResults, graphAs);
-	}
-
 	clear() {
 		this.breakdown = this.breakdownOptions[0];
+		this.encounterType = [];
 		this.genders = [];
 		this.ethnicity = [];
 		this.postcode = [];
 		this.lsoa = [];
 		this.msoa = [];
+		this.services = [];
 		this.orgs = [];
 		this.agex10 = [];
 		this.ccgs = [];
@@ -113,7 +96,7 @@ export class HealthCareActivityChart implements OnInit {
 				(results) => {
 					// Only load Inc/Prev AFTER we have population (to allow per1k and percentage calculations)
 					vm.activityResults = results;
-					vm.activityData = vm.getChartData('Population', results, 'count');
+					vm.activityData = vm.getChartData('Population', results);
 				},
 				(error) => console.log(error)
 			);
@@ -123,14 +106,16 @@ export class HealthCareActivityChart implements OnInit {
 
 	private getOptions() {
 		this.breakdownOptions = [{ id : 0, name : 'None', field : null, filters : [] }];
+		this.getOptionList(10, 'Encounter Type', 'encounter_snomed_concept_id', this.filterEncounterType);
 		this.getOptionList(1, 'Gender', 'patient_gender_id', this.filterGender);
 		this.getOptionList(2, 'Ethnicity', 'ethnic_code', this.filterEthnicity);
 		this.getOptionList(3, 'Postcode', 'postcode_prefix', this.filterPostcode);
 		this.getOptionList(4, 'LSOA', 'lsoa_code', this.filterLsoa);
 		this.getOptionList(5, 'MSOA', 'msoa_code', this.filterMsoa);
+		this.getOptionList(9, 'Service', 'service_id', this.filterServices);
 		this.getOptionList(6, 'Organisation', 'organisation_id', this.filterOrgs);
 		this.getAgeBands(7,'Age band (10 yrs)', 'FLOOR(age_years/10)', 0, 90, 10, this.filterAgex10);
-        this.getOptionList(8, 'CCG', 'ccg', this.filterCcg);
+		this.getOptionList(8, 'CCG', 'ccg', this.filterCcg);
 		this.breakdown = this.breakdownOptions[0];
 	}
 
@@ -173,41 +158,32 @@ export class HealthCareActivityChart implements OnInit {
 
 	//---------------------------
 
-	private getChartData(title : string, results: any, graphAs : string) {
+	private getChartData(title : string, results: any) {
 		if (results[0].length == 3)
-			return this.getGroupedChartData(title, results, graphAs);
+			return this.getGroupedChartData(title, results);
 
-		return this.getTotalChartData(title, results, graphAs);
+		return this.getTotalChartData(title, results);
 	}
 
-	private getTotalChartData(title : string, results : any, graphAs : string) {
+	private getTotalChartData(title : string, results : any) {
 		let categories : string[] = linq(results).Select(row => row[0]).ToArray();
-		let data : number[] = this.getSeriesData(categories, results, graphAs);
+		let data : number[] = this.getSeriesData(categories, results);
 
 		return new Chart()
 			.setCategories(categories)
 			.setHeight(this.height)
 			.setLegend(this.legend)
 			//.setTitle(title)
-			.addYAxis(title + this.getGraphAsSuffix(graphAs), false)
+			.addYAxis(title, false)
 			.setSeries([
 				new Series()
-					.setName('Total '+this.getGraphAsSuffix(graphAs))
+					.setName('Total')
 					.setType('spline')
 					.setData(data)
 			]);
 	}
 
-	private getGraphAsSuffix(graphAs : string) {
-		if (graphAs == 'percent')
-			return ' (%)';
-		else if (graphAs == 'per1k')
-			return ' (/1k)';
-		else
-			return '';
-	}
-
-	private getGroupedChartData(title : string, results : any, graphAs : string) {
+	private getGroupedChartData(title : string, results : any) {
 		let categories : string[] = linq(results)
 			.Select(row => row[0])
 			.Distinct()
@@ -219,7 +195,7 @@ export class HealthCareActivityChart implements OnInit {
 			.GroupBy(r => r[2], r => r);
 
 		let chartSeries : Series[] = linq(Object.keys(groupedResults))
-			.Select(key => this.createSeriesChart(key, categories, groupedResults[key], graphAs))
+			.Select(key => this.createSeriesChart(key, categories, groupedResults[key]))
 			.ToArray();
 
 		return new Chart()
@@ -227,11 +203,11 @@ export class HealthCareActivityChart implements OnInit {
 			.setHeight(this.height)
 			.setLegend(this.legend)
 			//.setTitle(title)
-			.addYAxis(title + this.getGraphAsSuffix(graphAs), false)
+			.addYAxis(title, false)
 			.setSeries(chartSeries);
 	}
 
-	private createSeriesChart(series : string, categories : string[], results : any, graphAs : string) : Series {
+	private createSeriesChart(series : string, categories : string[], results : any) : Series {
 		let filter = this.breakdown.filters.find(f => f.id == series);
 
 		let title = (filter == null) ? 'Unknown' : filter.name;
@@ -240,14 +216,14 @@ export class HealthCareActivityChart implements OnInit {
 			.setName(title)
 			.setType('spline');
 
-		let data : number[] = this.getSeriesData(categories, results, graphAs, series);
+		let data : number[] = this.getSeriesData(categories, results);
 
 		chartSeries.setData(data);
 
 		return chartSeries;
 	}
 
-	private getSeriesData(categories : string[], results : any, graphAs : string, series? : string) {
+	private getSeriesData(categories : string[], results : any) {
 		let data : number[] = [];
 
 		for (let category of categories) {
@@ -262,14 +238,6 @@ export class HealthCareActivityChart implements OnInit {
 		return data;
 	}
 
-	private round(n : number, dp : number) {
-		if (dp == 0)
-			return n;
-
-		let factor = Math.pow(10,dp);
-		return Math.round(n * factor) / factor;
-	}
-
 	//----------------------------
 
 	export() {
@@ -277,7 +245,7 @@ export class HealthCareActivityChart implements OnInit {
 		let rowData = [];
 
 		rowData.push(this.activityData.title);
-		rowData = rowData.concat(this.activityData.getRowData())
+		rowData = rowData.concat(this.activityData.getRowData());
 
 		let blob = new Blob([rowData.join('\n')], { type: 'text/plain' });
 		window['saveAs'](blob, this.title + '.csv');

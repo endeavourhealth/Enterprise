@@ -87,6 +87,8 @@ public final class UtilityManagerCommon {
 
     private static String getJoinTableForDistinctValues(String column) {
         switch (column) {
+            case "encounter_snomed_concept_id":
+                return "enterprise_data_pseudonymised.concept";
             case "patient_gender_id":
                 return "enterprise_data_pseudonymised.patient_gender";
             case "lsoa_code":
@@ -95,6 +97,8 @@ public final class UtilityManagerCommon {
                 return "enterprise_data_pseudonymised.msoa_lookup";
             case "ethnic_code":
                 return "enterprise_data_pseudonymised.ethnicity_lookup";
+            case "service_id":
+                return "enterprise_data_pseudonymised.organization";
             case "organisation_id":
                 return "enterprise_data_pseudonymised.organization";
             case "ccg":
@@ -106,6 +110,8 @@ public final class UtilityManagerCommon {
 
     private static String getJoinColumnForDistinctValues(String column) {
         switch (column) {
+            case "encounter_snomed_concept_id":
+                return "ConceptId";
             case "patient_gender_id":
                 return "id";
             case "lsoa_code":
@@ -114,6 +120,8 @@ public final class UtilityManagerCommon {
                 return "msoa_code";
             case "ethnic_code":
                 return "ethnic_code";
+            case "service_id":
+                return "id";
             case "organisation_id":
                 return "id";
             case "ccg":
@@ -125,6 +133,8 @@ public final class UtilityManagerCommon {
 
     private static String getLookupColumnForDistinctValues(String column) {
         switch (column) {
+            case "encounter_snomed_concept_id":
+                return "Definition";
             case "patient_gender_id":
                 return "value";
             case "lsoa_code":
@@ -133,6 +143,8 @@ public final class UtilityManagerCommon {
                 return "msoa_name";
             case "ethnic_code":
                 return "ethnic_name";
+            case "service_id":
+                return "name";
             case "organisation_id":
                 return "name";
             case "ccg":

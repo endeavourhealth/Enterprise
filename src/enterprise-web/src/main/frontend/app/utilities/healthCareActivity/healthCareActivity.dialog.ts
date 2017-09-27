@@ -268,15 +268,12 @@ export class HealthCareActivityDialog implements OnInit {
 	checkEncounterSelection() {
 		var vm = this;
 
-		for (let node of vm.encounterTreeData) {
-			if (node.checked) {
-				vm.resultData.encounterType.push('0');
-				break;
-			}
-			if (node.children)
-				vm.checkEncounterChildSelection(node.children);
-		}
+		let root = vm.encounterTreeData[0];
 
+		if (root.checked)
+			return;
+
+		vm.checkEncounterChildSelection(root.children);
 	}
 
 	checkEncounterChildSelection(children) {

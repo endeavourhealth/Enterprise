@@ -56,9 +56,8 @@ export class HealthCareActivityChart implements OnInit {
 	// Chart data
 	private activityData: Chart;
 
-	// Chrt config
+	// Chart config
 	private height = 500;
-	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 200};
 
 	constructor(
 		protected $uibModalInstance : NgbActiveModal,
@@ -172,8 +171,6 @@ export class HealthCareActivityChart implements OnInit {
 		return new Chart()
 			.setCategories(categories)
 			.setHeight(this.height)
-			.setLegend(this.legend)
-			//.setTitle(title)
 			.addYAxis(title, false)
 			.setSeries([
 				new Series()
@@ -201,8 +198,6 @@ export class HealthCareActivityChart implements OnInit {
 		return new Chart()
 			.setCategories(categories)
 			.setHeight(this.height)
-			.setLegend(this.legend)
-			//.setTitle(title)
 			.addYAxis(title, false)
 			.setSeries(chartSeries);
 	}

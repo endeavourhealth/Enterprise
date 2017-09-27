@@ -58,7 +58,7 @@ export class HealthCareActivityChart implements OnInit {
 
 	// Chrt config
 	private height = 500;
-	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 100};
+	private legend = {align: 'right', layout: 'vertical', verticalAlign: 'middle', width: 200};
 
 	constructor(
 		protected $uibModalInstance : NgbActiveModal,
@@ -106,7 +106,7 @@ export class HealthCareActivityChart implements OnInit {
 
 	private getOptions() {
 		this.breakdownOptions = [{ id : 0, name : 'None', field : null, filters : [] }];
-		this.getOptionList(10, 'Encounter Type', 'encounter_snomed_concept_id', this.filterEncounterType);
+		this.getOptionList(10, 'Encounter Type', 'encounter_type', this.filterEncounterType);
 		this.getOptionList(1, 'Gender', 'patient_gender_id', this.filterGender);
 		this.getOptionList(2, 'Ethnicity', 'ethnic_code', this.filterEthnicity);
 		this.getOptionList(3, 'Postcode', 'postcode_prefix', this.filterPostcode);

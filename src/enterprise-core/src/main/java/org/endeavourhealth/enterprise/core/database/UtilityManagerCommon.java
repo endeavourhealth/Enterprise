@@ -59,7 +59,7 @@ public final class UtilityManagerCommon {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
         List resultList;
         try {
-            if (columnName.equals("postcode_prefix")) {
+            if (columnName.equals("postcode_prefix") || columnName.equals("encounter_type")) {
                 return getDistinctValuesForGraphingNoLookup(columnName, rawDataTableName);
             }
 
@@ -87,8 +87,6 @@ public final class UtilityManagerCommon {
 
     private static String getJoinTableForDistinctValues(String column) {
         switch (column) {
-            case "encounter_snomed_concept_id":
-                return "enterprise_data_pseudonymised.concept";
             case "patient_gender_id":
                 return "enterprise_data_pseudonymised.patient_gender";
             case "lsoa_code":
@@ -110,8 +108,6 @@ public final class UtilityManagerCommon {
 
     private static String getJoinColumnForDistinctValues(String column) {
         switch (column) {
-            case "encounter_snomed_concept_id":
-                return "ConceptId";
             case "patient_gender_id":
                 return "id";
             case "lsoa_code":
@@ -133,8 +129,6 @@ public final class UtilityManagerCommon {
 
     private static String getLookupColumnForDistinctValues(String column) {
         switch (column) {
-            case "encounter_snomed_concept_id":
-                return "Definition";
             case "patient_gender_id":
                 return "value";
             case "lsoa_code":

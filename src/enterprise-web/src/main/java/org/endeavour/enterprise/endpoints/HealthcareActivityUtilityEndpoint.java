@@ -5,7 +5,6 @@ import org.endeavourhealth.enterprise.core.database.HealthcareActivityUtilityMan
 import org.endeavourhealth.enterprise.core.database.UtilityManagerCommon;
 import org.endeavourhealth.enterprise.core.json.JsonHealthcareActivity;
 import org.endeavourhealth.enterprise.core.json.JsonHealthcareActivityGraph;
-import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;

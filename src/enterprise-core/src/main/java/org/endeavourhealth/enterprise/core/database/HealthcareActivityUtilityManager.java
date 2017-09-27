@@ -5,7 +5,10 @@ import org.endeavourhealth.enterprise.core.json.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class HealthcareActivityUtilityManager {
@@ -23,6 +26,7 @@ public class HealthcareActivityUtilityManager {
         cleanUpDatabase();
         createTemporaryTables();
         generateWhereClausesFromOptions(options);
+        initialiseReportResultTable(options);
         populateOrganisationTable(options);
         populateServiceTable(options);
         populatePatientList();
@@ -77,11 +81,15 @@ public class HealthcareActivityUtilityManager {
                 "    organisation_id bigint(20) null,\n" +
                 "    ccg varchar(10) null,\n" +
                 "    encounter_snomed_concept_id bigint(20) null,\n" +
+                "    clinical_effective_date date null,\n " +
+                "    service_id bigint(20) null,\n " +
                 "     \n" +
                 "    index ix_healthcare_activity_raw_data_patient_gender_id (patient_gender_id),    \n" +
                 "    index ix_healthcare_activity_raw_data_postcode_prefix (postcode_prefix),\n" +
                 "    index ix_healthcare_activity_raw_data_age_years (age_years),      \n" +
                 "    index ix_healthcare_activity_raw_data_person_id (patient_id) ,      \n" +
+                "    index ix_healthcare_activity_raw_data_service_id (service_id) ,      \n" +
+                "    index ix_healthcare_activity_raw_data_clinical_effective_date (clinical_effective_date) ,      \n" +
                 "    index ix_healthcare_activity_raw_data_encounter_concept_id (encounter_snomed_concept_id)      \n" +
                 "    \n" +
                 ");");
@@ -101,6 +109,66 @@ public class HealthcareActivityUtilityManager {
         for (String script : tempTableScripts) {
             UtilityManagerCommon.runScript(script);
         }
+    }
+
+    private void initialiseReportResultTable(JsonHealthcareActivity options) throws Exception {
+        List<String> initialiseScripts = new ArrayList<>();
+
+        initialiseScripts.add("delete from enterprise_admin.healthcare_activity_date_range;");
+
+        Date currentDate = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(currentDate);
+
+        Date beginning;
+        Date end;
+
+        Integer number = Integer.parseInt(options.getTimePeriodNo());
+
+        String insert = "insert into enterprise_admin.healthcare_activity_date_range (min_date, max_date)\n" +
+                "values ('%s', '%s')";
+
+        int precision = Calendar.DAY_OF_YEAR;
+        int substractionPrecision = Calendar.YEAR;
+
+        if (options.getTimePeriod().equals("MONTHS")) {
+            precision = Calendar.DAY_OF_MONTH;
+            substractionPrecision = Calendar.MONTH;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Integer i = 0; i < number; i++) {
+
+            // get the last day of the month/year
+            if (options.getDateType().equals("absolute"))
+                c.set(precision, c.getActualMaximum(precision));
+            end = c.getTime();
+
+
+            // get the first day of the month/year
+            if (options.getDateType().equals("absolute")) {
+                c.set(precision, c.getActualMinimum(precision));
+                beginning = c.getTime();
+            } else {
+                Calendar b = Calendar.getInstance();
+                b.setTime(c.getTime());
+                b.add(substractionPrecision, -1);
+                //Make sure same date isnt counted twice
+                b.add(Calendar.DAY_OF_MONTH, 1);
+                beginning = b.getTime();
+            }
+
+            c.add(substractionPrecision, -1);
+            initialiseScripts.add(String.format(insert, dateFormat.format(beginning).toString(),dateFormat.format(end).toString()));
+
+
+        }
+
+        for (String script : initialiseScripts) {
+            UtilityManagerCommon.runScript(script);
+        }
+
     }
 
     private void populateOrganisationTable(JsonHealthcareActivity options) throws Exception {
@@ -166,7 +234,9 @@ public class HealthcareActivityUtilityManager {
                 "    ethnic_code,\n" +
                 "    organisation_id,\n" +
                 "    ccg,\n" +
-                "    encounter_snomed_concept_id)\n" +
+                "    encounter_snomed_concept_id,\n" +
+                "    clinical_effective_date,\n " +
+                "    service_id )\n " +
                 "select \n" +
                 "\tpl.patient_id,\n" +
                 "    p.patient_gender_id,\n" +
@@ -177,7 +247,9 @@ public class HealthcareActivityUtilityManager {
                 "\tp.ethnic_code, \n" +
                 "    p.organization_id, \n" +
                 "\tparentOrg.ods_code,\n" +
-                "    e.snomed_concept_id    \n" +
+                "    e.snomed_concept_id,    \n" +
+                "    e.clinical_effective_date, \n " +
+                "    e.service_provider_organization_id \n " +
                 "from enterprise_admin.healthcare_activity_patient_list pl \n" +
                 "inner join enterprise_data_pseudonymised.patient p on p.id = pl.patient_id\n" +
                 "inner join enterprise_data_pseudonymised.encounter e on e.patient_id = p.id\n" +
@@ -255,8 +327,8 @@ public class HealthcareActivityUtilityManager {
     public List getIncidenceResults(JsonHealthcareActivityGraph params) {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        String select = "r.min_date, count(distinct d.person_id)";
-        String from = " enterprise_admin.incidence_prevalence_date_range r" +
+        String select = "r.min_date, count(d.patient_id)";
+        String from = " enterprise_admin.healthcare_activity_date_range r" +
                 " left outer join enterprise_admin.healthcare_activity_raw_data d  " +
                 "   on d.clinical_effective_date >= r.min_date and d.clinical_effective_date <= r.max_date";
         List<String> andJoin = getAndJoinClauseForIncidence(params);

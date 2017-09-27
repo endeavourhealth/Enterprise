@@ -136,6 +136,9 @@ public class HealthcareActivityUtilityManager {
         if (options.getTimePeriod().equals("MONTHS")) {
             precision = Calendar.DAY_OF_MONTH;
             substractionPrecision = Calendar.MONTH;
+        } else if (options.getTimePeriod().equals("WEEKS")) {
+            precision = Calendar.DAY_OF_WEEK;
+            substractionPrecision = Calendar.WEEK_OF_YEAR;
         }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

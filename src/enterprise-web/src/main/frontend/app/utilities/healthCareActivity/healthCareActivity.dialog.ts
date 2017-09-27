@@ -65,7 +65,7 @@ export class HealthCareActivityDialog implements OnInit {
 	organisations = <any>[];
 	msoas = <any>[];
 	lsoas = <any>[]
-	periods = ['','MONTHS','YEARS'];
+	periods = ['','MONTHS','YEARS', 'WEEKS'];
 
 	genders = [
 		{id: -1, name: 'All'},

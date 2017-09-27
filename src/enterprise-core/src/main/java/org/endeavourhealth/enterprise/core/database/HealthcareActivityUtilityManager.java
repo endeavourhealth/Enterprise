@@ -408,8 +408,14 @@ public class HealthcareActivityUtilityManager {
         if (params.msoa != null && params.msoa.size() > 0)
             where.add("msoa_code in ('" + StringUtils.join(params.msoa, "','") + "')\n");
 
+        if (params.services != null && params.services.size() > 0)
+            where.add("service_id in (" + StringUtils.join(params.services, ",") + ")\n");
+
         if (params.orgs != null && params.orgs.size() > 0)
             where.add("organisation_id in (" + StringUtils.join(params.orgs, ",") + ")\n");
+
+        if (params.encounterType != null && params.encounterType.size() > 0)
+            where.add("encounter_type in ('" + StringUtils.join(params.encounterType, "','") + "')\n");
 
         if (params.agex10 != null && params.agex10.size() > 0) {
             List<String> ageWhere = new ArrayList<>();

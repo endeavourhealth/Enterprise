@@ -16,7 +16,7 @@ export class HealthCareActivityService extends BaseHttp2Service {
 		return this.httpPost('api/healthCareActivityUtility/runActivityReport', options);
 	}
 
-	getActivityResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], orgs: string[],  agex10: string[], ccgs: string[]): Observable<any> {
+	getActivityResults(breakdown: string, gender: string[], ethnicity: string[], postcode: string[], lsoa: string[], msoa: string[], services : string[], orgs: string[],  agex10: string[], ccgs: string[], encounterType : string[]): Observable<any> {
 		let body = {
 			breakdown: breakdown,
 			gender: gender,
@@ -24,9 +24,11 @@ export class HealthCareActivityService extends BaseHttp2Service {
 			postcode: postcode,
 			lsoa: lsoa,
 			msoa: msoa,
+			services: services,
 			orgs: orgs,
 			agex10: agex10,
-			ccgs: ccgs
+			ccgs: ccgs,
+			encounterType: encounterType
 		};
 		return this.httpPost('api/healthCareActivityUtility/incidence', body);
 	}

@@ -12,9 +12,12 @@ public class JsonHealthcareActivityGraph {
     public List<String> postcode;
     public List<String> lsoa;
     public List<String> msoa;
+    public List<String> services;
     public List<String> orgs;
     public List<String> agex10;
     public List<String> ccgs;
+    public List<String> encounterType;
+
     private String timePeriodNo = null;
     private String timePeriod = null;
 
@@ -66,6 +69,14 @@ public class JsonHealthcareActivityGraph {
         this.msoa = msoa;
     }
 
+    public List<String> getServices() {
+        return services;
+    }
+
+    public void setServices(List<String> services) {
+        this.services= services;
+    }
+
     public List<String> getOrgs() {
         return orgs;
     }
@@ -88,6 +99,14 @@ public class JsonHealthcareActivityGraph {
 
     public void setCcgs(List<String> ccgs) {
         this.ccgs = ccgs;
+    }
+
+    public List<String> getEncounterType() {
+        return encounterType;
+    }
+
+    public void setEncounterType(List<String> encounterType) {
+        this.encounterType = encounterType;
     }
 
     public String getTimePeriodNo() {

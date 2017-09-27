@@ -91,7 +91,7 @@ export class HealthCareActivityChart implements OnInit {
 	refresh() {
 		let vm = this;
 		vm.activityData = null;
-		vm.healthCareActivityService.getActivityResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.orgs, vm.agex10, vm.ccgs)
+		vm.healthCareActivityService.getActivityResults(vm.breakdown.field, vm.genders, vm.ethnicity, vm.postcode, vm.lsoa, vm.msoa, vm.services, vm.orgs, vm.agex10, vm.ccgs, vm.encounterType)
 			.subscribe(
 				(results) => {
 					// Only load Inc/Prev AFTER we have population (to allow per1k and percentage calculations)

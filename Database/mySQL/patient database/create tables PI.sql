@@ -357,7 +357,7 @@ CREATE UNIQUE INDEX patient_id
   ON patient
   (id);
   
-CREATE UNIQUE INDEX patient_person_id
+CREATE INDEX patient_person_id
   ON patient
   (person_id);
 
@@ -508,9 +508,9 @@ CREATE INDEX fki_encounter_patient_id_organization_id
   ON encounter
   (patient_id, organization_id);
   
-CREATE INDEX encounter_snomed_concept_id
+CREATE INDEX encounter_snomed_concept_id_clinical_effective_date
   ON encounter
-  (snomed_concept_id);
+  (snomed_concept_id, clinical_effective_date);
 
 -- Table: allergy_intolerance
 

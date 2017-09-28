@@ -1,14 +1,12 @@
 import {Msoa} from "../../cohort/models/Msoa";
 import {Lsoa} from "../../cohort/models/Lsoa";
 
-export class PrevInc {
+export class HealthCareActivity {
 	organisationGroup: number;
 	population: string;
-	codeSet: string;
 	timePeriodNo: string;
 	timePeriod: string;
 	title: string;
-	diseaseCategory: string;
 	postCodePrefix: string;
 	lsoaCode: Lsoa[];
 	msoaCode: Msoa[];
@@ -18,4 +16,7 @@ export class PrevInc {
 	ageFrom: string;
 	ageTo: string;
     dateType: string;
+	serviceGroupId: number;
+	encounterType: string[];
+
 }

@@ -1,13 +1,16 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {PrevInc} from "./models/PrevInc";
-import {Organisation} from "../report/models/Organisation";
-import {Msoa} from "../cohort/models/Msoa";
-import {Lsoa} from "../cohort/models/Lsoa";
-import {LoggerService, MessageBoxDialog} from "eds-common-js";
-import {CohortService} from "../cohort/cohort.service";
-import {UtilitiesService} from "./utilities.service";
+import {NgbModal, NgbActiveModal, NgbTabChangeEvent} from "@ng-bootstrap/ng-bootstrap";
+import {PrevInc} from "../models/PrevInc";
+import {Msoa} from "../../cohort/models/Msoa";
+import {Lsoa} from "../../cohort/models/Lsoa";
+import {LoggerService} from "eds-common-js";
+import {CohortService} from "../../cohort/cohort.service";
+import {UtilitiesService} from "../utilities.service";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
+import {OrganisationGroup} from "../../organisationGroup/models/OrganisationGroup";
+import {OrgGroupPickerComponent} from "../../organisationGroup/orgGroupPicker.component";
+import {PrevIncService} from "./prevInc.service";
+import {OrganisationGroupService} from "../../organisationGroup/organisationGroup.service";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -16,6 +19,7 @@ import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 export class PrevIncDialog implements OnInit {
 
 	codeSets:FolderItem[];
+	activeTab : string = 'tab-denominator';
 
 	public static open(modalService: NgbModal, prevInc: PrevInc) {
 		const modalRef = modalService.open(PrevIncDialog, { backdrop : "static", size : "lg"});
@@ -26,7 +30,6 @@ export class PrevIncDialog implements OnInit {
 
 	@Input() resultData;
 
-	organisation: Organisation = <any>[];
 	population: string = "0";
 	codeSet: string = "";
 	timePeriodNo: string = "10";
@@ -42,6 +45,8 @@ export class PrevIncDialog implements OnInit {
 	ageFrom: string = "";
 	ageTo: string = "";
     dateType: string = "absolute";
+    selectedGroupId: number = 1;
+    orgGroups: OrganisationGroup[] = [];
 
 	orgTT: string = "To select multiples please use Shift and Click.";
 	ppTT: string = "Please select a patient population as the denominator";
@@ -99,8 +104,10 @@ export class PrevIncDialog implements OnInit {
 		{code: "Z", name: 'Not stated'},
 	];
 
-	constructor(protected cohortService: CohortService,
-							private utilitiesService:UtilitiesService,
+	constructor(private utiliesService : UtilitiesService,
+							protected cohortService: CohortService,
+							private prevIncService: PrevIncService,
+							private orgGroupService: OrganisationGroupService,
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
@@ -123,53 +130,32 @@ export class PrevIncDialog implements OnInit {
 
 		vm.getCodeSets();
 
-		vm.cohortService.getRegions()
-			.subscribe(
-				(data) => {
-					vm.orgTypes = data;
-					let t = {uuid: '1', name: 'Choose Organisations'};
-					vm.orgTypes.unshift(t);
-					t = {uuid: '0', name: 'Organisation Types'};
-					vm.orgTypes.unshift(t);
-				});
+		vm.getOrganisationGroups();
+
 	}
+
+    getOrganisationGroups() {
+        var vm = this;
+        vm.orgGroups = [];
+        vm.orgGroupService.getOrganisationGroups()
+            .subscribe(
+                (result) => {
+                    for (let value of result) {
+                        if (value != null) {
+                            vm.orgGroups.push({id: value[0], name: value[1]});
+                        }
+                    }
+                });
+    }
 
 	getCodeSets() {
 		var vm = this;
 
 		vm.codeSets = null;
-		vm.utilitiesService.getCodeSets()
+		vm.utiliesService.getCodeSets()
 			.subscribe(
 				(data:FolderItem[]) => vm.codeSets = data
 			);
-	}
-
-	setSelectedOrganisations(selectElement) {
-		var vm = this;
-		vm.resultData.organisation = <any>[];
-		for (let optionElement of selectElement.selectedOptions) {
-			let odscode = optionElement.value.split('~')[1];
-			let org = {
-				id: optionElement.value.split('~')[0],
-				name: optionElement.text,
-				odsCode: odscode
-			};
-			vm.cohortService.getOrgsForParentOdsCode(odscode)
-				.subscribe(
-					(data) => {
-						let orgs = <any>[];
-						orgs = data;
-						for (let org of orgs) {
-							let o = {
-								id: org.id,
-								name: org.name,
-								odsCode: org.odsCode
-							};
-							vm.resultData.organisation.push(o);
-						}
-					});
-			vm.resultData.organisation.push(org);
-		}
 	}
 
 	setSelectedLsoas(selectElement) {
@@ -204,25 +190,6 @@ export class PrevIncDialog implements OnInit {
 		}
 	}
 
-	setSelectedOrgType(selectElement) {
-		var vm = this;
-		if (vm.orgType === "0") {
-			vm.organisations = vm.organisationTypes;
-		} else if (vm.orgType === "1") {
-			vm.cohortService.getOrganisations()
-				.subscribe(
-					(data) => {
-						vm.organisations = data;
-					});
-		} else {
-			vm.cohortService.getOrgsForRegion(vm.orgType)
-				.subscribe(
-					(data) => {
-						vm.organisations = data;
-					});
-		}
-	}
-
 	run() {
 		var vm = this;
 		vm.resultData.population = vm.population;
@@ -237,6 +204,7 @@ export class PrevIncDialog implements OnInit {
 		vm.resultData.ageTo = vm.ageTo;
 		vm.resultData.orgType = vm.orgType;
 		vm.resultData.dateType = vm.dateType;
+		vm.resultData.organisationGroup = vm.selectedGroupId;
 
 		this.ok();
 	}
@@ -248,4 +216,25 @@ export class PrevIncDialog implements OnInit {
 	cancel() {
 		this.$uibModalInstance.close(null);
 	}
+
+    orgManager() {
+		var vm = this;
+        OrgGroupPickerComponent.open(this.$modal, vm.selectedGroupId ).result.then(
+            (result) => {
+                if (result) {
+                    vm.selectedGroupId = result;
+                    vm.getOrganisationGroups();
+                    console.log(vm.selectedGroupId);
+                }
+                else
+                    console.log('Cancelled');
+            },
+            (error) => vm.logger.error("Error running utility", error)
+        );
+    }
+
+    tabChange($event : NgbTabChangeEvent) {
+			this.activeTab = $event.nextId;
+			console.log(this.activeTab);
+		}
 }

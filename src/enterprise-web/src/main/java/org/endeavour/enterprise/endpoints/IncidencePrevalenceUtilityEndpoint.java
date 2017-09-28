@@ -1,7 +1,9 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.endeavourhealth.enterprise.core.database.UtilityManagerCommon;
+import org.endeavourhealth.enterprise.core.json.JsonOrganisationGroup;
 import org.endeavourhealth.enterprise.core.json.JsonPrevIncGraph;
-import org.endeavourhealth.enterprise.core.database.UtilityManager;
+import org.endeavourhealth.enterprise.core.database.IncidencePrevalenceUtilityManager;
 import org.endeavourhealth.enterprise.core.json.JsonPrevInc;
 
 import javax.ws.rs.*;
@@ -11,8 +13,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 
-@Path("/utility")
-public final class UtilityEndpoint extends AbstractItemEndpoint {
+@Path("/incidencePrevalenceUtility")
+public final class IncidencePrevalenceUtilityEndpoint extends AbstractItemEndpoint {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -21,7 +23,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
     public Response reportResult(@Context SecurityContext sc, JsonPrevInc options) throws Exception {
         super.setLogbackMarkers(sc);
 
-        boolean success = new UtilityManager().runPrevIncReport(options);
+        boolean success = new IncidencePrevalenceUtilityManager().runPrevIncReport(options);
 
         clearLogbackMarkers();
 
@@ -40,7 +42,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
 
-        List results = new UtilityManager().getIncidenceResults(params);
+        List results = new IncidencePrevalenceUtilityManager().getIncidenceResults(params);
 
         clearLogbackMarkers();
 
@@ -59,7 +61,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
 
-        List results = new UtilityManager().getPrevalenceResults(params);
+        List results = new IncidencePrevalenceUtilityManager().getPrevalenceResults(params);
 
         clearLogbackMarkers();
 
@@ -78,7 +80,7 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         super.setLogbackMarkers(sc);
 
 
-        List results = new UtilityManager().getPopulationResults(params);
+        List results = new IncidencePrevalenceUtilityManager().getPopulationResults(params);
 
         clearLogbackMarkers();
 
@@ -97,13 +99,31 @@ public final class UtilityEndpoint extends AbstractItemEndpoint {
         System.out.println("Retrieving distinct values for " + columnName);
         super.setLogbackMarkers(sc);
 
-        List results = new UtilityManager().getDistinctValuesForGraphing(columnName);
+        List results = new UtilityManagerCommon().getDistinctValuesForGraphing(columnName, "enterprise_admin.incidence_prevalence_population_list");
 
         clearLogbackMarkers();
 
         return Response
                 .ok()
                 .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getOptions")
+    public Response getOptions(@Context SecurityContext sc) throws Exception {
+        System.out.println("Retrieving JSON Options ");
+        super.setLogbackMarkers(sc);
+
+        JsonPrevInc options = new IncidencePrevalenceUtilityManager().getReportOptions();
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(options)
                 .build();
     }
 }

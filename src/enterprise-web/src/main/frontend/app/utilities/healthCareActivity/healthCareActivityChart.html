@@ -45,12 +45,8 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Graph as: </label>
-							<select class="form-control" [ngModel]="graphAs" (ngModelChange)="setGraph($event)" name="breakdown">
-								<option value="count">Count</option>
-								<option value="per1k">Per 1000</option>
-								<option value="percent">Percentage</option>
-							</select>
+							<label>Encounter Type: </label>
+							<multiSelectDropdown [data]="filterEncounterType" [(ngModel)]="encounterType" name="encounterTypeFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
 							<label>LSOA: </label>
@@ -61,8 +57,16 @@
 							<multiSelectDropdown [data]="filterMsoa" [(ngModel)]="msoa" name="msoaFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
+							<label>Service: </label>
+							<multiSelectDropdown [data]="filterServices" [(ngModel)]="services" name="serviceFilter" ></multiSelectDropdown>
+						</div>
+						<div class="form-group col-md-2 col-sm-3">
 							<label>Organisation: </label>
 							<multiSelectDropdown [data]="filterOrgs" [(ngModel)]="orgs" name="orgFilter" ></multiSelectDropdown>
+						</div>
+						<div class="form-group col-md-2 col-sm-3">
+							<label>CCG: </label>
+							<multiSelectDropdown [data]="filterCcg" [(ngModel)]="ccgs" name="ccgFilter" ></multiSelectDropdown>
 						</div>
 					</div>
 				</div>
@@ -70,15 +74,13 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<loadingIndicator [done]="incChart && prevChart">
+				<loadingIndicator [done]="activityData">
 					<ngb-tabset>
 						<ngb-tab title="Graph">
 							<template ngbTabContent>
 								<div class="row">
 									<div class="col-md-12">
-										<chart [data]="incChart"></chart>
-										<chart [data]="prevChart"></chart>
-										<chart [data]="popChart"></chart>
+										<chart [data]="activityData"></chart>
 									</div>
 								</div>
 							</template>
@@ -87,9 +89,7 @@
 							<template ngbTabContent>
 								<div class="row">
 									<div class="col-md-12">
-										<chart-table [data]="incChart"></chart-table>
-										<chart-table [data]="prevChart"></chart-table>
-										<chart-table [data]="popChart"></chart-table>
+										<chart-table [data]="activityData"></chart-table>
 									</div>
 								</div>
 							</template>

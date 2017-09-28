@@ -15,9 +15,9 @@
 				<div class="form-group">
 					<table style="margin-top:10px;margin-left:15px;width:830px">
 						<tr>
-							<th>Entries you can test</th>
-							<th>Test the Entry is</th>
-							<th>Test the Entry is</th>
+							<th><u>Entries you can test</u></th>
+							<th><u>Test the Entry is</u></th>
+							<th></th>
 						</tr>
 						<tr style="height:100px" *ngFor="let restriction of restrictions; let isLast=last">
 							<td style="font-size: 12px; width:220px">
@@ -27,8 +27,18 @@
 								<div class="form-group">
 									<div class="input-group">
 										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') >= 0"><=&nbsp;&nbsp;</div>
-										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') < 0">>=&nbsp;&nbsp;</div>
-										<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueFrom.constant" [ngModelOptions]="{standalone: true}">
+										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('VALUE') >= 0">>=&nbsp;&nbsp;</div>
+										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('CODE') >= 0">=&nbsp;&nbsp;</div>
+										<div *ngIf="restriction.field.indexOf('CODE') >= 0 && restriction.filter.codeSet!=null">
+											<div style='float:left' *ngFor="let codeSetValue of restriction.filter.codeSet.codeSetValue">
+												{{codeSetValue.term}},
+											</div>
+										</div>
+										<label *ngIf="restriction.field.indexOf('CODE') >= 0">
+											<a class="queryLink" (click)="pickCompareCode(restriction.field)"><i class="fa fa-search"></i> Select Concept(s)</a>
+											<a style='margin-left: 20px' class="queryLink" (click)="pickCompareCodeSet(restriction.field)"><i class="fa fa-tags"></i> Select Code Set</a>
+										</label>
+										<input *ngIf="restriction.field.indexOf('CODE') < 0" type="text" class="form-control" style="width:150px;margin-right:10px" [(ngModel)]="restriction.filter.valueFrom.constant" [ngModelOptions]="{standalone: true}">
 										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
 											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueFrom.relativeUnit" [ngModelOptions]="{standalone: true}">
 												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
@@ -42,12 +52,12 @@
 									</div>
 								</div>
 							</td>
-							<td style="font-size: 12px">
+							<td style="font-size: 12px" *ngIf="restriction.field.indexOf('CODE') < 0">
 								<div class="form-group">
 									<div class="input-group">
 										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') >= 0">>=&nbsp;&nbsp;</div>
-										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') < 0"><=&nbsp;&nbsp;</div>
-										<input type="text" class="form-control" style="width:60px;margin-right:10px" placeholder="no." [(ngModel)]="restriction.filter.valueTo.constant" [ngModelOptions]="{standalone: true}">
+										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('VALUE') >= 0"><=&nbsp;&nbsp;</div>
+										<input type="text" class="form-control" style="width:150px;margin-right:10px"  [(ngModel)]="restriction.filter.valueTo.constant" [ngModelOptions]="{standalone: true}">
 										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
 											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueTo.relativeUnit" [ngModelOptions]="{standalone: true}">
 												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
@@ -235,7 +245,7 @@
 			<div class="col-xs-2">
 				<div class="form-group">
 					<label>How Many?</label>
-					<input type="text" class="form-control" [(ngModel)]="restrictionCount" placeholder="1" (blur)="restrictionChange(restrictionCount)" name="restrictionCount">
+					<input type="text" class="form-control" [(ngModel)]="restrictionCount" placeholder="1" (blur)="restrictionChange(restrictionCount)" name="restrictionCount" DISABLED>
 				</div>
 			</div>
 			<div class="col-xs-3">

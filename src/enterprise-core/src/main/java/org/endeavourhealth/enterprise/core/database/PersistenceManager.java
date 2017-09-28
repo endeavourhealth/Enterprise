@@ -21,16 +21,22 @@ public enum PersistenceManager {
 	private EntityManagerFactory emDataSharingManagerData;
 
     PersistenceManager() {
-
+        System.out.println("Fetching hibernate overrides (admin)...");
 		Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");
-
+        System.out.println("Connecting to database (admin)...");
 		emEnterpriseAdmin = Persistence.createEntityManagerFactory("enterprise_admin", override);
 
+        System.out.println("Fetching hibernate overrides (patient)...");
 		override = getHibernateOverridesFromConfig("patient_database");
+        System.out.println("Connecting to database (patient)...");
 		emEnterpriseData = Persistence.createEntityManagerFactory("enterprise_data", override);
 
+        System.out.println("Fetching hibernate overrides (DSM)...");
 		override = getHibernateOverridesFromConfig("data_sharing_manager");
+        System.out.println("Connecting to database (DSM)...");
 		emDataSharingManagerData = Persistence.createEntityManagerFactory("data_sharing_manager", override);
+
+		System.out.println("Persistence manager initialized");
 	}
 
 	public EntityManager getEmEnterpriseAdmin() {
@@ -71,6 +77,9 @@ public enum PersistenceManager {
 				override.put("hibernate.connection.password", config.get("enterprise_password").asText());
 
 		} catch (Exception e) {
+		    System.out.println("Error loading config ["+configId+"]");
+		    System.out.println(e.getMessage());
+		    e.printStackTrace();
 			LOG.warn("Error loading config ["+configId+"]", e);
 		}
 		return override;

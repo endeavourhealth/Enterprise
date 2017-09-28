@@ -13,6 +13,8 @@ DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResult;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultQuery;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultOrganisation;
 DROP TABLE IF EXISTS enterprise_admin.incidence_prevalence_result;
+DROP TABLE IF EXISTS enterprise_admin.incidence_prevalence_organisation_group_lookup;
+DROP TABLE IF EXISTS enterprise_admin.incidence_prevalence_organisation_group;
 
 CREATE TABLE enterprise_admin.ActiveItem (
 	ActiveItemUuid char(36) NOT NULL,
@@ -146,4 +148,18 @@ CREATE TABLE enterprise_admin.incidence_prevalence_result (
 	prevalence_male int null default 0, 
 	prevalence_female int null default 0, 
 	prevalence_other int null default 0
+);
+
+create table enterprise_admin.incidence_prevalence_organisation_group (
+	group_id int not null auto_increment primary key,
+	group_name varchar(100) not null,
+
+	index ix_incidence_prevalence_organisation_group_lookup_group_name (group_name)
+);
+
+create table enterprise_admin.incidence_prevalence_organisation_group_lookup (
+	group_id int not null,
+	ods_code varchar(50) not null,
+
+	primary key pk_organisation_group_lookup_group_id_organisation_id (group_id, ods_code)
 );

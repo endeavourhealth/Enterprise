@@ -7,13 +7,39 @@
 			<form>
 				<div class="form-group">
 					<div class="row">
-						<div class="col-md-8">
-							<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-bar-chart"></i> Run Prevalence and Incidence</button>
-							<span class="pull-left" style="width:10px;">&nbsp;</span>
-							<loadingIndicator [done]="!incPrevRunning" [text]="'Processing...'">
-								<button class="btn btn-success btn-sm pull-left" (click)="showResults()"><i class="fa fa-bar-chart"></i> Last Run Results</button>
-							</loadingIndicator>
+						<div class="col-md-4">
+							<h4>Incidence and Prevalence</h4>
+							<div style="color:grey">
+								The utility consists of a simple representation of the incidence and prevalence of a selected chronic or acute disease group as a graphical trend over time, involving a regionally defined denominator population.
+							</div>
 						</div>
+						<loadingIndicator [done]="!incPrevRunning" [text]="'Running report, please wait...'">
+							<div class="col-md-3">
+								<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-play-circle-o"></i> Run Prevalence and Incidence Report</button>
+							</div>
+							<div class="col-md-5">
+								<span class="pull-left" style="width:10px;">&nbsp;</span>
+									<button class="btn btn-success btn-sm pull-left" (click)="showResultsPI()"><i class="fa fa-line-chart"></i> Last Run Results</button>
+							</div>
+						</loadingIndicator>
+					</div>
+					<div><hr/></div>
+					<div class="row">
+						<div class="col-md-4">
+							<h4>Health Care Activity</h4>
+							<div style="color:grey">
+								The utility consists of a simple representation of  encounters that have occurred for a given population of patients over a selected period of time.
+							</div>
+						</div>
+						<loadingIndicator [done]="!hcaRunning" [text]="'Running report, please wait...'">
+							<div class="col-md-3">
+								<button class="btn btn-success btn-sm pull-left" (click)="hca()"><i class="fa fa-play-circle-o"></i> Run Health Care Activity Report</button>
+							</div>
+							<div class="col-md-5">
+								<span class="pull-left" style="width:10px;">&nbsp;</span>
+									<button class="btn btn-success btn-sm pull-left" (click)="showResultsHCA()"><i class="fa fa-line-chart"></i> Last Run Results</button>
+							</div>
+						</loadingIndicator>
 					</div>
 				</div>
 			</form>

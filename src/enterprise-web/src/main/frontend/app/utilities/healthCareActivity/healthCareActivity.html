@@ -1,0 +1,163 @@
+<style>
+	.form-group {
+		margin-bottom: 10px;
+	}
+</style>
+<div class="modal-header">
+	<button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+	<h4 class="modal-title">Health Care Activity Utility</h4>
+</div>
+<div class="modal-body">
+	<form role="form">
+		<div class="row">
+			<div class="col-md-12">
+				<ngb-tabset #t="ngbTabset" (tabChange)="tabChange($event)">
+					<ngb-tab title="Denominator Population" id="tab-denominator">
+						<template ngbTabContent>
+							<div class="row">
+								<div class="col-md-6">
+									<div style="padding: 10px">
+										<div class="form-group">
+											<label>Choose an organisation group: </label>
+											<br/>(for which the patient has had an episode of care)
+											<button class="btn btn-success btn-sm pull-right" (click)="orgManager()"><i class="fa fa-hospital-o"></i> Manage Organisation Groups</button>
+											<br><br>
+											<select class="form-control" [(ngModel)]="selectedGroupId" name="selectedGroupId" [ngModelOptions]="{standalone: true}">
+												<option *ngFor="let group of orgGroups" [ngValue]="group.id">{{group.name}}</option>
+											</select>
+
+										</div>
+										<div class="form-group">
+											<label>Age (from/to): </label>
+											<label style="margin-left:85px;">Sex: </label>
+											<div class="input-group">
+												<input type="text" class="form-control" style="width:80px"  [(ngModel)]="ageFrom" [ngModelOptions]="{standalone: true}">
+												<input type="text" class="form-control" style="margin-left:10px; width:80px"  [(ngModel)]="ageTo" [ngModelOptions]="{standalone: true}">
+												<select class="form-control" style="margin-left:10px;width:100px" [(ngModel)]="sex" [ngModelOptions]="{standalone: true}">
+													<option *ngFor="let gender of genders" value="{{gender.id}}">{{gender.name}}</option>
+												</select>
+											</div>
+										</div>
+										<div class="form-group">
+											<label>Ethnic Groups: </label>
+											<span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgEG }}"></span>
+											<select multiple class="form-control" style="width:300px" (change)="setSelectedEthnicGroups($event.target)">
+												<option *ngFor="let group of ethnicGroups" value="{{group.code}}">{{group.name}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div style="padding: 10px">
+										<div class="form-group">
+											<br/>
+											<label><b>Patients living in the following geographic areas:</b></label> <span style="cursor: pointer" ></span>
+										</div>
+										<div class="form-group">
+											<label>Post Code Prefix: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppPC }}"></span>
+											<input type="text" class="form-control" style="width:120px"  [(ngModel)]="postCodePrefix" [ngModelOptions]="{standalone: true}">
+										</div>
+										<div class="form-group">
+											<label>LSOA Code: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppLSOA }}"></span>
+											<select multiple class="form-control" style="width:400px" (change)="setSelectedLsoas($event.target)" >
+												<option *ngFor="let lsoa of lsoas" value="{{lsoa.lsoaCode}}">{{lsoa.lsoaName}}</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<label>MSOA Code: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppMSOA }}"></span>
+											<select multiple class="form-control" style="width:400px" (change)="setSelectedMsoas($event.target)" >
+												<option *ngFor="let msoa of msoas" value="{{msoa.msoaCode}}">{{msoa.msoaName}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</template>
+					</ngb-tab>
+					<ngb-tab title="Enumerator Criteria" id="tab-enumerator">
+						<template ngbTabContent>
+							<div class="row">
+								<div class="col-md-6">
+									<div style="padding: 10px">
+										<div class="form-group">
+											<label>Report Title: </label> <span style="cursor: pointer" ></span>
+											<input type="text" class="form-control"  placeholder="title" [(ngModel)]="title" [ngModelOptions]="{standalone: true}">
+										</div>
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div style="padding: 10px">
+										<label>Trend Time Period: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTM }}"></span>
+										<div class="input-group">
+											<input type="text" class="form-control" style="width:45px;margin-right:10px" placeholder="no." [(ngModel)]="timePeriodNo" [ngModelOptions]="{standalone: true}">
+											<select class="form-control" style="width:100px"  [(ngModel)]="timePeriod" [ngModelOptions]="{standalone: true}">
+												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div style="padding: 10px">
+										<label></label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ absoluteTT }}"></span>
+										<div class="form-group">
+											<div class="input-group">
+												<span for="relative">Use relative dates</span>&nbsp;&nbsp;
+												<input id="relative" type="radio" name="dateType" [(ngModel)]="dateType" value="relative" name="dateRelative">
+												&nbsp;
+												<span for="absolute">or absolute dates</span>&nbsp;&nbsp;
+												<input id="absolute" type="radio" name="dateType" [(ngModel)]="dateType" value="absolute" name="dateAbsolute">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div style="padding: 10px">
+										<div class="form-group">
+											<label>Choose a service group: </label>
+											<br/>(services in which the health care activities took place)
+											<button class="btn btn-success btn-sm pull-right" (click)="serviceManager()"><i class="fa fa-hospital-o"></i> Manage Service Groups</button>
+											<br><br>
+											<select class="form-control" [(ngModel)]="selectedServiceGroupId" name="selectedServiceGroupId" [ngModelOptions]="{standalone: true}">
+												<option *ngFor="let group of serviceGroups" [ngValue]="group.id">{{group.name}}</option>
+											</select>
+
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div style="padding: 10px">
+										<div class="form-group">
+											<label>Encounter Types: </label> <span style="cursor: pointer" ></span>
+											<div class="scroll-box-300 form-control" style="color:black;font-size:12px">
+												<Tree [nodes]="encounterTreeData" [options]="options">
+													<template #treeNodeTemplate let-node="node">
+														<input
+															(change)="check(node, !node.data.checked)"
+															type="checkbox"
+															[indeterminate]="node.data.indeterminate"
+															[checked]="node.data.checked">
+														{{ node.data.name }}
+													</template>
+												</Tree>
+
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</template>
+					</ngb-tab>
+				</ngb-tabset>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
+	<button type="button" class="btn btn-primary" *ngIf="activeTab=='tab-denominator'" (click)="t.select('tab-enumerator')">Next ></button>
+	<button type="button" class="btn btn-primary" *ngIf="activeTab=='tab-enumerator'" (click)="run();">Run</button>
+</div>

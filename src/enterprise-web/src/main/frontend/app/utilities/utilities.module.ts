@@ -4,32 +4,46 @@ import {FormsModule} from "@angular/forms";
 import {UtilitiesService} from "./utilities.service";
 import {UtilitiesComponent} from "./utilities.component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
-import {PrevIncDialog} from "./prevInc.dialog";
+import {PrevIncDialog} from "./prevInc/prevInc.dialog";
+import {HealthCareActivityDialog} from "./healthCareActivity/healthCareActivity.dialog";
 import {ChartModule} from "../charting/chart.module";
 import {ControlsModule} from "eds-common-js";
-import {PrevIncChartDialog} from "./prevIncChart.dialog";
-import {MultiSelectDropdownComponent} from "./multiSelectDropdown.component";
+import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
+import {MultiselectModule} from "../multiselect/multiselect.module";
+import {PrevIncService} from "./prevInc/prevInc.service";
+import {HealthCareActivityService} from "./healthCareActivity/healthCareActivity.service";
+import {HealthCareActivityChart} from "./healthCareActivity/healthCareActivityChart.dialog";
+import {OrganisationGroupModule} from "../organisationGroup/organisationGroup.module";
+import {TreeModule} from "angular2-tree-component";
 
 @NgModule({
 	imports : [
 		BrowserModule,
 		FormsModule,
+		TreeModule,
 		NgbModule,
 		ChartModule,
-		ControlsModule
+		ControlsModule,
+		MultiselectModule,
+		OrganisationGroupModule
 	],
 	declarations : [
 		UtilitiesComponent,
 		PrevIncDialog,
 		PrevIncChartDialog,
-		MultiSelectDropdownComponent
+		HealthCareActivityDialog,
+		HealthCareActivityChart
 	],
 	entryComponents : [
 		PrevIncDialog,
-		PrevIncChartDialog
+		PrevIncChartDialog,
+		HealthCareActivityDialog,
+		HealthCareActivityChart
 	],
 	providers : [
-		UtilitiesService
+		UtilitiesService,
+		PrevIncService,
+		HealthCareActivityService
 	]
 })
 export class UtilitiesModule {}

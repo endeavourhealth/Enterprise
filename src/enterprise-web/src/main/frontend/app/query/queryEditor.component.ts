@@ -483,8 +483,10 @@ export class QueryEditComponent {
 					&& vm.chartViewModel.data.query.rule[i].type!='2'
 					&& !vm.chartViewModel.data.query.rule[i].expression
 					&& vm.chartViewModel.data.query.rule[i].id!=vm.ruleId
+					&& vm.chartViewModel.data.query.rule[i].test!=null
 					&& vm.chartViewModel.data.query.rule[i].test.restriction!=null) {
 					for (let f = 0; f < vm.chartViewModel.data.query.rule[i].test.restriction.field.length; ++f) {
+
 						var valueFrom : ValueFrom = {
 							constant: null,
 							absoluteUnit: null,

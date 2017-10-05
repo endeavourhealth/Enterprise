@@ -191,25 +191,32 @@ export class HealthCareActivityChart implements OnInit {
 			.Where(r => r[2] != 'Unknown')
 			.GroupBy(r => r[2], r => r);
 
+		let yAxis = 0;
 		let chartSeries : Series[] = linq(Object.keys(groupedResults))
-			.Select(key => this.createSeriesChart(key, categories, groupedResults[key]))
+			.Select(key => this.createSeriesChart(key, categories, yAxis++, groupedResults[key]))
 			.ToArray();
 
-		return new Chart()
+		let chart = new Chart()
 			.setCategories(categories)
 			.setHeight(this.height)
-			.addYAxis(title, false)
 			.setSeries(chartSeries);
+
+		let showRight = false;
+		linq(chartSeries)
+			.ForEach((series) => chart.addYAxis(series.name, showRight = !showRight));
+
+		return chart;
 	}
 
-	private createSeriesChart(series : string, categories : string[], results : any) : Series {
+	private createSeriesChart(series : string, categories : string[], yAxis : number, results : any) : Series {
 		let filter = this.breakdown.filters.find(f => f.id == series);
 
 		let title = (filter == null) ? 'Unknown' : filter.name;
 
 		let chartSeries : Series = new Series()
 			.setName(title)
-			.setType('spline');
+			.setType('spline')
+			.setyAxis(yAxis);
 
 		let data : number[] = this.getSeriesData(categories, results);
 

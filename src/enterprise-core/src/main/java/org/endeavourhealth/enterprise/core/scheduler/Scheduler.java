@@ -1,12 +1,22 @@
 package org.endeavourhealth.enterprise.core.scheduler;
 
+import org.endeavourhealth.coreui.framework.ContextShutdownHook;
+import org.endeavourhealth.coreui.framework.StartupConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public enum Scheduler {
-	INSTANCE;
+public class Scheduler implements ContextShutdownHook {
+    private static final Logger LOG = LoggerFactory.getLogger(Scheduler.class);
+    public static final Scheduler INSTANCE = new Scheduler();
 
 	Map<String, ScheduledTask> tasks = new HashMap<>();
+
+	private Scheduler() {
+        StartupConfig.registerShutdownHook("Scheduler", this);
+    }
 
 	public void add(ScheduledTask task) {
 		if (this.tasks.containsKey(task.getName()))
@@ -28,4 +38,17 @@ public enum Scheduler {
 		task.stop();
 	}
 
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println("In finalize block");
+        super.finalize();
+    }
+
+    @Override
+    public void contextShutdown() {
+        for (Map.Entry<String, ScheduledTask> entry : tasks.entrySet()) {
+            LOG.trace("\tStopping task [" + entry.getKey() + "]");
+            entry.getValue().stop();
+        }
+    }
 }

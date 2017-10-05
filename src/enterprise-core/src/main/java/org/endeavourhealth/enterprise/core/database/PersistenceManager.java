@@ -3,6 +3,8 @@ package org.endeavourhealth.enterprise.core.database;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.endeavourhealth.common.config.ConfigManager;
 
+import org.endeavourhealth.coreui.framework.ContextShutdownHook;
+import org.endeavourhealth.coreui.framework.StartupConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,15 +14,17 @@ import javax.persistence.Persistence;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum PersistenceManager {
-    INSTANCE;
+public class PersistenceManager implements ContextShutdownHook {
+    public static final PersistenceManager INSTANCE = new PersistenceManager();
 	private static final Logger LOG = LoggerFactory.getLogger(PersistenceManager.class);
 
     private EntityManagerFactory emEnterpriseAdmin;
     private EntityManagerFactory emEnterpriseData;
 	private EntityManagerFactory emDataSharingManagerData;
 
-    PersistenceManager() {
+    private PersistenceManager() {
+        StartupConfig.registerShutdownHook("Enterprise Persistence Manager", this);
+
         System.out.println("Fetching hibernate overrides (admin)...");
 		Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");
         System.out.println("Connecting to database (admin)...");
@@ -84,4 +88,9 @@ public enum PersistenceManager {
 		}
 		return override;
 	}
+
+    @Override
+    public void contextShutdown() {
+        this.close();
+    }
 }

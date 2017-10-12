@@ -61,6 +61,7 @@ public class MsoaLookupEntity {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
+                .setMaxResults(100)
                 .getResultList();
 
         entityManager.close();

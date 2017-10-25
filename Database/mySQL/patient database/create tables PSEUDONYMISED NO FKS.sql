@@ -228,6 +228,7 @@ INSERT INTO registration_type (id, code, description) VALUES (3, 'T', 'Temporary
 INSERT INTO registration_type (id, code, description) VALUES (4, 'P', 'Private');
 INSERT INTO registration_type (id, code, description) VALUES (5, 'O', 'Other');
 INSERT INTO registration_type (id, code, description) VALUES (6, 'D', 'Dummy/Synthetic');
+INSERT INTO registration_type (id, code, description) VALUES (7, 'C', 'Community');
 
 -- Table: organization
 

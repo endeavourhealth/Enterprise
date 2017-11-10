@@ -109,7 +109,7 @@ CREATE TABLE enterprise_data_pseudonymised.ReportResult (
   ReportItemUuid char(36) NOT NULL,
   RunDate timestamp NULL DEFAULT NULL,
   ReportRunParams text NOT NULL,
-  ReportOutput TEXT NULL,
+  ReportOutput LONGTEXT NULL,
   PRIMARY KEY (`ReportResultId`),
   KEY `RunDate` (`RunDate`),
   KEY `ReportItemUuid` (`ReportItemUuid`)

@@ -1,6 +1,6 @@
 -- create database enterprise_pseudo;
 
--- use enterprise_pseudo;
+use enterprise_pseudo;
 
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;

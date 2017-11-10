@@ -11,6 +11,7 @@ public final class JsonReportRun {
 
 	private List<JsonOrganisation> organisation = new ArrayList<>();
 	private String population = null;
+	private String cohortName = null;
 	private String baselineCohortId = null;
 	private String baselineDate = null;
 	private String reportItemUuid = null;
@@ -45,6 +46,14 @@ public final class JsonReportRun {
 
 	public void setBaselineDate(String baselineDate) {
 		this.baselineDate = baselineDate;
+	}
+
+	public String getCohortName() {
+		return cohortName;
+	}
+
+	public void setCohortName(String cohortName) {
+		this.cohortName = cohortName;
 	}
 
 	public String getReportItemUuid() {

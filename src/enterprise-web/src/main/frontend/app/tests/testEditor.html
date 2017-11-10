@@ -230,9 +230,7 @@
 				</div>
 			</div>
 		</div>
-		<div style="margin-top: 10px;">
-			<a class="queryLink" (click)="toggleRestriction()"><i class="fa fa-sort-amount-asc"></i> Keep Entries</a>
-		</div>
+
 		<div class='row' style="margin-left:2px;"><br/>
 			<div class="col-xs-3">
 				<div class="form-group">
@@ -256,7 +254,7 @@
 			</div>
 			<div class="col-xs-4">
 				<div class="form-group">
-					<label>Keep the Fields:</label>
+					<label>Keep the Fields<br/>(for further tests or for display columns in reports):</label>
 					<div *ngFor="let field of keepFields">
 						<input type="checkbox"
 							   value="{field}}"

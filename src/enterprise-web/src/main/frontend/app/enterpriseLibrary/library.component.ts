@@ -4,7 +4,9 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {EnterpriseLibraryItem} from "./models/EnterpriseLibraryItem";
 import {CohortEditDialog} from "../cohort/cohortEditor.dialog";
 import {CohortViewDialog} from "../cohort/cohortViewer.dialog";
+import {ReportViewDialog} from "../report/reportViewer.dialog";
 import {CohortRun} from "../cohort/models/CohortRun";
+import {ReportRun} from "../report/models/ReportRun";
 import {CohortService} from "../cohort/cohort.service";
 import {LibraryService, LoggerService, MessageBoxDialog, ModuleStateService} from "eds-common-js";
 import {ItemSummaryList} from "eds-common-js/dist/library/models/ItemSummaryList";
@@ -15,7 +17,6 @@ import {ActionItem} from "eds-common-js/dist/folder/models/ActionItem";
 import {ActionMenuItem} from "eds-common-js/dist/folder/models/ActionMenuItem";
 import {ReportRunnerDialog} from "../report/reportRunner.dialog";
 import {ReportService} from "../report/report.service";
-import {ReportRun} from "../report/models/ReportRun";
 
 @Component({
 	template : require('./library.html')
@@ -35,6 +36,7 @@ export class LibraryComponent {
 							protected $state: StateService) {
 		this.actionMenuItems = [
 			{type: ItemType.Query, text: 'Add cohort'},
+			{type: ItemType.Query, text: 'Add report feature'},
 			{type: ItemType.CodeSet, text: 'Add code set '},
 			{type: ItemType.Report, text: 'Add report'}
 		];
@@ -135,6 +137,9 @@ export class LibraryComponent {
 			case ItemType.Query:
 				this.viewCohort(item);
 				break;
+			case ItemType.Report:
+				this.viewReport(item);
+				break;
 		}
 	}
 
@@ -157,6 +162,29 @@ export class LibraryComponent {
 		});
 	}
 
+	viewReport(item: FolderItem) {
+		var vm = this;
+		console.log(item);
+
+		let reportRun: ReportRun = {
+			organisation: [],
+			population: "",
+			baselineCohortId: "",
+			cohortName: "",
+			baselineDate: "",
+			reportItemUuid: "",
+			scheduled: false,
+			scheduleDateTime: null
+		};
+
+		ReportViewDialog.open(vm.$modal, reportRun, item)
+			.result.then(function (resultData: CohortRun) {
+
+			console.log(resultData);
+
+		});
+	}
+
 	runReport(item: FolderItem) {
 		let reportRun: ReportRun = {
 			organisation: [],
@@ -165,7 +193,8 @@ export class LibraryComponent {
 			reportItemUuid: item.uuid,
 			scheduled: false,
 			scheduleDateTime: null,
-			baselineCohortId : null
+			baselineCohortId : null,
+			cohortName: ""
 		};
 
 		let vm = this;

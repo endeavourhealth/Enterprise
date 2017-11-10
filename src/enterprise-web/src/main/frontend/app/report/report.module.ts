@@ -3,6 +3,7 @@ import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule} from "@angular/forms";
 import {ReportEditComponent} from "./reportEditor.component";
 import {ReportRunnerDialog} from "./reportRunner.dialog";
+import {ReportViewDialog} from "./reportViewer.dialog";
 import {ReportService} from "./report.service";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
@@ -14,10 +15,12 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 	],
 	declarations: [
 		ReportEditComponent,
-		ReportRunnerDialog
+		ReportRunnerDialog,
+		ReportViewDialog
 	],
 	entryComponents: [
-		ReportRunnerDialog
+		ReportRunnerDialog,
+		ReportViewDialog
 	],
 	providers : [
 		ReportService

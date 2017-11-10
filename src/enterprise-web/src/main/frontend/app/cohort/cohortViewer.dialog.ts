@@ -56,12 +56,15 @@ export class CohortViewDialog implements OnInit {
                     vm.organisations = data;
                 });
 
+        console.log(vm.item.lastRun);
+
         vm.getCohortResults(vm.item.uuid, vm.item.lastRun);
 
         vm.cohortService.getAllCohortResults(vm.item.uuid)
             .subscribe(
                 (data) => {
                     vm.allCohortResults = data;
+                    console.log(vm.allCohortResults);
                 });
     }
 

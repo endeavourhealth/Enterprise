@@ -60,28 +60,48 @@ public class CohortManager {
 	}
 
 	public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate) throws Exception {
-		runCohort(libraryItem, cohortRun, userUuid, runDate, null);
+		runCohort(libraryItem, cohortRun, userUuid, runDate, null, false);
 	}
 
-	public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, String baselineCohortId) throws Exception {
+	public static List<Long> runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {
+
+		List<QueryResult> queryResults = new ArrayList<>();
+		List<Long> allPatients = new ArrayList<>();
+
+		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId, report);
+
+		if (!report)
+			allPatients = calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baselineCohortId);
+
+		return allPatients;
+	}
+
+	public static List<QueryResult> runCohortFeature(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {
 
 		List<QueryResult> queryResults = new ArrayList<>();
 
-		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId);
+		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId, report);
 
-		calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baselineCohortId);
+		if (!report)
+			calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baselineCohortId);
+
+		return queryResults;
 	}
 
-	private static void calculateAndStoreResults(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, String baselineCohortId) throws Exception {
+	private static List<Long> calculateAndStoreResults(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, String baselineCohortId) throws Exception {
 		// Calculate and store the results for each organisation in the cohort
 		List<JsonOrganisation> organisations = cohortRun.getOrganisation();
 
+		List<Long> allPatients = new ArrayList<>();
+
 		for (JsonOrganisation organisationInCohort : organisations) {
-			getResultsForOrganisation(libraryItem, cohortRun, userUuid, runDate, queryResults, organisationInCohort, baselineCohortId);
+			allPatients.addAll(getResultsForOrganisation(libraryItem, cohortRun, userUuid, runDate, queryResults, organisationInCohort, baselineCohortId));
 		} // next organisation in cohort
+
+		return allPatients;
 	}
 
-	private static void getResultsForOrganisation(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, JsonOrganisation organisationInCohort, String baselineCohortId) throws Exception {
+	private static List<Long> getResultsForOrganisation(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, JsonOrganisation organisationInCohort, String baselineCohortId) throws Exception {
 		// calculate cohort denominator count
 		String denominatorSQL = getDenominatorSQL(cohortRun.getPopulation(), baselineCohortId);
 
@@ -117,6 +137,8 @@ public class CohortManager {
 
 		saveIdentifiedPatientsIntoCohortPatientTable(cohortRun, runDate, organisationInCohort, finalPatients);
 		saveQueryCountsToCohortSummaryTable(cohortRun, userUuid, runDate, organisationInCohort, baselineDate, denominatorPatients, finalPatients);
+
+		return finalPatients;
 	}
 
 	private static String getDenominatorSQL(String cohortPopulation, String baselineCohortId) {
@@ -240,7 +262,7 @@ public class CohortManager {
 		return finalPatients;
 	}
 
-	private static void executeRules(String userUuid, LibraryItem libraryItem, JsonCohortRun cohortRun, List<QueryResult> queryResults, Timestamp runDate, String baselineCohortId) throws Exception {
+	private static void executeRules(String userUuid, LibraryItem libraryItem, JsonCohortRun cohortRun, List<QueryResult> queryResults, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {
 
 		for (Rule rule : libraryItem.getQuery().getRule()) { // execute each rule
 			List<Filter> filters = rule.getTest().getFilter();
@@ -251,11 +273,12 @@ public class CohortManager {
 
 			// Run the rule SQL for each organisation in the report
 
-			runRuleForOrganisations(libraryItem, cohortRun, queryResults, rule, q, baselineCohortId, runDate, filters);
+			runRuleForOrganisations(libraryItem, cohortRun, queryResults, rule, q, baselineCohortId, runDate, filters, report);
 		} // next Rule in Query
+
 	}
 
-	private static void runRuleForOrganisations(LibraryItem libraryItem, JsonCohortRun cohortRun, List<QueryResult> queryResults, Rule rule, QueryMeta q, String baselineCohortId, Timestamp runDate, List<Filter> filters) throws Exception {
+	private static void runRuleForOrganisations(LibraryItem libraryItem, JsonCohortRun cohortRun, List<QueryResult> queryResults, Rule rule, QueryMeta q, String baselineCohortId, Timestamp runDate, List<Filter> filters, Boolean report) throws Exception {
 		List<JsonOrganisation> organisations = cohortRun.getOrganisation();
 
 		String cohortPopulation = cohortRun.getPopulation();
@@ -415,6 +438,7 @@ public class CohortManager {
 					i++;
 				}
 				patientObservations = new ArrayList<ObservationEntity>(patientObservations2);
+				patientObservations2 = new ArrayList<>();
 
 			} else if (rule.getType()==1) { // Feature rule
 				if (ruleSQL.contains("JOIN ObservationEntity")) {
@@ -506,7 +530,8 @@ public class CohortManager {
 			queryResult.setOnPass(rule.getOnPass());
 			queryResult.setOnFail(rule.getOnFail());
 			List<Long> queryPatients = new ArrayList<>();
-			if (ruleSQL.contains("JOIN PatientEntity")) {
+
+			if (ruleSQL.contains("JOIN PatientEntity") && !ruleSQL.contains("CohortPatientsEntity")) {
 				for (PatientEntity patientEntity : patients) {
 					if (queryPatients.indexOf(patientEntity.getId())<0) // only add distinct patients
 						queryPatients.add(patientEntity.getId());
@@ -516,8 +541,9 @@ public class CohortManager {
 				Long lastPatientId = 0L;
 				for (ObservationEntity observationEntity : patientObservations) {
 					patientId = observationEntity.getPatientId();
-					if (queryPatients.indexOf(patientId)<0) // only add distinct patients
+					if (queryPatients.indexOf(patientId)<0) { // only add distinct patients
 						queryPatients.add(observationEntity.getPatientId());
+					}
 					if (!patientId.equals(lastPatientId)) {
 						patientObservations2.add(observationEntity);
 					}
@@ -578,6 +604,7 @@ public class CohortManager {
 
 		} // next organisation in cohort
 		entityManager.close();
+
 	}
 
 	private static void buildFilters(JsonCohortRun cohortRun, List<Filter> filters, QueryMeta q) throws Exception {

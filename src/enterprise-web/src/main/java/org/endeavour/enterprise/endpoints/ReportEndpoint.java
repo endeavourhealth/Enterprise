@@ -3,6 +3,8 @@ package org.endeavour.enterprise.endpoints;
 import org.endeavourhealth.common.security.SecurityUtils;
 import org.endeavourhealth.enterprise.core.database.ReportManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.CohortPatientsEntity;
+import org.endeavourhealth.enterprise.core.database.models.data.CohortResultEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.ReportResultEntity;
 import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
@@ -38,12 +40,16 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 		String xml = item.getXmlContent();
 		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
 
+		item = ItemEntity.retrieveLatestForUUid(report.getBaselineCohortId());
+		xml = item.getXmlContent();
+		LibraryItem cohortItem = QueryDocumentSerializer.readLibraryItemFromXml(xml);
+
 		Timestamp runDate = null;
 		if (report.getScheduled())
-			runDate = new ReportManager().runLater(userUuid, report, libraryItem);
+			runDate = new ReportManager().runLater(userUuid, report, libraryItem, cohortItem.getName());
 		else {
 			runDate = new Timestamp(System.currentTimeMillis());
-			new ReportManager().runNow(userUuid, report, libraryItem, runDate);
+			new ReportManager().runNow(userUuid, report, libraryItem, runDate, cohortItem.getName());
 		}
 
 		clearLogbackMarkers();
@@ -74,5 +80,41 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 				.entity(null)
 				.build();
 	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getResults")
+	public Response getResults(@Context SecurityContext sc, @QueryParam("reportItemUuid") String reportItemUuid, @QueryParam("runDate") String runDate) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List<ReportResultEntity[]> results = ReportResultEntity.getReportResults(reportItemUuid, runDate);
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(results)
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getAllResults")
+	public Response getAllResults(@Context SecurityContext sc, @QueryParam("reportItemUuid") String reportItemUuid, @QueryParam("runDate") String runDate) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List<ReportResultEntity[]> results = ReportResultEntity.getAllReportResults(reportItemUuid);
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(results)
+				.build();
+	}
+
+
 
 }

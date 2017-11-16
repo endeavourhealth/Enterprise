@@ -1,0 +1,59 @@
+<style>
+	.form-group { margin-bottom: 10px; }
+	dropdown { display: inline-block; }
+</style>
+<div class="modal-header">
+	<button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
+	<h4 class="modal-title">{{title}}</h4>
+</div>
+<div class="modal-body">
+	<form role="form">
+		<div class="row">
+			<div class="form-group col-md-4">
+				<label>Quality Indicator: </label>
+				<multiSelectDropdown [data]="filterIndicators" [(ngModel)]="indicators" name="indicatorFilter" ></multiSelectDropdown>
+			</div>
+			<div class="form-group col-md-4">
+				<label>Organisation: </label>
+				<multiSelectDropdown [data]="filterOrgs" [(ngModel)]="orgs" name="orgFilter" ></multiSelectDropdown>
+			</div>
+			<div class="form-group col-md-2">
+				<label>CCG: </label>
+				<multiSelectDropdown [data]="filterCcg" [(ngModel)]="ccgs" name="ccgFilter" ></multiSelectDropdown>
+			</div>
+			<div class="form-group col-md-2">
+				<button style="margin-top: 25px" class="btn btn-success btn-sm" (click)="indDash()"><i class="fa fa-line-chart"></i> Load Indicator</button>
+			</div>
+		</div>
+		<div class="row" *ngIf="indicator=='1'">
+			<div class="col-md-12">
+				<img style="width: 1000px; height: 600px" class="indicator1-png">
+			</div>
+		</div>
+		<div class="row" *ngIf="indicator=='2'">
+			<div class="col-md-12">
+				<img style="width: 1000px; height: 600px" class="indicator2-png">
+			</div>
+		</div>
+		<div class="row" *ngIf="indicator=='3'">
+			<div class="col-md-12">
+				<img style="width: 1000px; height: 600px" class="indicator3-png">
+			</div>
+		</div>
+		<div class="row" *ngIf="indicator=='4'">
+			<div class="col-md-12">
+				<img style="width: 1000px; height: 600px" class="indicator4-png">
+			</div>
+		</div>
+		<div class="row" *ngIf="indicator=='5'">
+			<div class="col-md-12">
+				<img style="width: 1000px; height: 600px" class="indicator5-png">
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-primary" (click)="export()">Export</button>
+	<button type="button" class="btn btn-default" (click)="cancel()">Close</button>
+</div>

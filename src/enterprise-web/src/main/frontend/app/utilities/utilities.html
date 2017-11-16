@@ -41,6 +41,20 @@
 							</div>
 						</loadingIndicator>
 					</div>
+					<div><hr/></div>
+					<div class="row">
+						<div class="col-md-4">
+							<h4>Quality Indicator Dashboard</h4>
+							<div style="color:grey">
+								This utility compares quality indicators between organisations trended over a period of time.
+							</div>
+						</div>
+						<loadingIndicator [done]="!indRunning" [text]="'Loading dashboard, please wait...'">
+							<div class="col-md-3">
+								<button class="btn btn-success btn-sm pull-left" (click)="indDash()"><i class="fa fa-play-circle-o"></i> Load Indicator Dashboard</button>
+							</div>
+						</loadingIndicator>
+					</div>
 				</div>
 			</form>
 		</div>

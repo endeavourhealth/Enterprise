@@ -1,4 +1,25 @@
 /* Endeavour specific CSS */
+
+.indicator1-png {
+    content: url('../img/indicator1.png');
+}
+
+.indicator2-png {
+    content: url('../img/indicator2.png');
+}
+
+.indicator3-png {
+    content: url('../img/indicator3.png');
+}
+
+.indicator4-png {
+    content: url('../img/indicator4.png');
+}
+
+.indicator5-png {
+    content: url('../img/indicator5.png');
+}
+
 .center-float {
     left:50%;
     top:50%;

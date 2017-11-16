@@ -8,6 +8,7 @@ import {HealthCareActivityDialog} from "./healthCareActivity/healthCareActivity.
 import {PrevInc} from "./models/PrevInc";
 import {HealthCareActivity} from "./models/HealthCareActivity";
 import {PrevIncChartDialog} from "./prevInc/prevIncChart.dialog";
+import {IndDashChartDialog} from "./indDash/indDashChart.dialog";
 import {PrevIncService} from "./prevInc/prevInc.service";
 import {HealthCareActivityChart} from "./healthCareActivity/healthCareActivityChart.dialog";
 import {HealthCareActivityService} from "./healthCareActivity/healthCareActivity.service";
@@ -101,6 +102,10 @@ export class UtilitiesComponent {
 
 	showResultsPI() {
 		PrevIncChartDialog.open(this.$modal, 'Results');
+	}
+
+	indDash() {
+		IndDashChartDialog.open(this.$modal, 'Quality Indicator Dashboard');
 	}
 
 	hca() {

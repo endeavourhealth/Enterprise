@@ -1,4 +1,4 @@
-
+-- Enterprise database WITH foreign keys
 
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;
@@ -13,6 +13,8 @@ DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS procedure;
 DROP TABLE IF EXISTS procedure_request;
 DROP TABLE IF EXISTS referral_request;
+DROP TABLE IF EXISTS encounter_raw;
+DROP TABLE IF EXISTS encounter_detail;
 DROP TABLE IF EXISTS encounter;
 DROP TABLE IF EXISTS appointment;
 DROP TABLE IF EXISTS episode_of_care;
@@ -20,6 +22,7 @@ DROP TABLE IF EXISTS patient;
 DROP TABLE IF EXISTS schedule;
 DROP TABLE IF EXISTS person;
 DROP TABLE IF EXISTS practitioner;
+DROP TABLE IF EXISTS location;
 DROP TABLE IF EXISTS organization;
 DROP TABLE IF EXISTS date_precision;
 DROP TABLE IF EXISTS appointment_status;
@@ -217,6 +220,8 @@ ALTER TABLE public.patient_gender
 
 INSERT INTO patient_gender (id, value) VALUES (0, 'Male');
 INSERT INTO patient_gender (id, value) VALUES (1, 'Female');
+INSERT INTO patient_gender (id, value) VALUES (2, 'Other');
+INSERT INTO patient_gender (id, value) VALUES (3, 'Unknown');
 
 -- Table: registration_type
 
@@ -278,6 +283,34 @@ CREATE UNIQUE INDEX organization_id
   ON organization
   USING btree
   (id);
+
+-- Table: location
+
+CREATE TABLE location (
+  id bigint NOT NULL,
+  name character varying(255),
+  type_code character varying(50),
+  type_desc character varying(255),
+  postcode character varying(10),
+  managing_organization_id bigint,
+  CONSTRAINT pk_location_id PRIMARY KEY (id),
+  CONSTRAINT fk_location_organisation_id FOREIGN KEY (managing_organization_id)
+      REFERENCES organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION  
+)WITH (
+  OIDS=FALSE
+);
+ALTER TABLE location
+  OWNER TO postgres;
+
+CREATE UNIQUE INDEX location_id
+  ON location
+  (id);
+  
+CREATE INDEX fk_location_managing_organisation_id
+  ON location
+  (managing_organization_id);
+
 
 -- Table: public.practitioner
 
@@ -556,7 +589,7 @@ CREATE TABLE encounter
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_encounter_service_provider_organization_id FOREIGN KEY (service_provider_organization_id)
       REFERENCES public.organization (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION		  
+      ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
@@ -600,6 +633,147 @@ CREATE INDEX fki_encounter_patient_id_organization_id
   ON encounter
   USING btree
   (patient_id, organization_id);
+
+
+
+
+-- Table: encounter_detail
+
+CREATE TABLE encounter_detail (
+  id bigint NOT NULL,
+  organization_id bigint NOT NULL,
+  patient_id bigint NOT NULL,
+  person_id bigint NOT NULL,
+  practitioner_id bigint,
+  episode_of_care_id bigint,
+  clinical_effective_date date,
+  date_precision_id smallint,
+  recording_practitioner_id bigint,
+  recording_date date,
+  appointment_id bigint,
+  service_provider_organization_id bigint, 
+  location_id bigint,
+  end_date date,
+  duration_minutes int,
+  completion_status_concept_id bigint,
+  healthcare_service_type_concept_id bigint,
+  interaction_mode_concept_id bigint,
+  administrative_action_concept_id bigint,
+  purpose_concept_id bigint,
+  disposition_concept_id bigint,
+  site_of_care_type_concept_id bigint,
+  patient_status_concept_id bigint,
+  CONSTRAINT pk_encounter_detail_id PRIMARY KEY (organization_id, person_id, id),
+  CONSTRAINT fk_encounter_detail_appointment_id FOREIGN KEY (appointment_id)
+      REFERENCES appointment (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_detail_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
+      REFERENCES patient (id, organization_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_detail_practitioner_id FOREIGN KEY (practitioner_id)
+      REFERENCES practitioner (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_detail_date_precision FOREIGN KEY (date_precision_id)
+      REFERENCES date_precision (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_detail_episode_of_care_id FOREIGN KEY (episode_of_care_id)
+      REFERENCES episode_of_care (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_detail_service_provider_organization_id FOREIGN KEY (service_provider_organization_id)
+      REFERENCES organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION	
+)WITH (
+  OIDS=FALSE
+);
+ALTER TABLE encounter_detail
+  OWNER TO postgres;
+
+CREATE UNIQUE INDEX ix_encounter_detail_id
+  ON encounter_detail
+  (id);
+
+CREATE INDEX ix_encounter_detail_patient_id
+  ON encounter_detail
+  (patient_id);
+
+CREATE INDEX ix_encounter_detail_appointment_id
+  ON encounter_detail
+  (appointment_id);
+  
+CREATE INDEX ix_encounter_detail_patient_id_organization_id
+  ON encounter_detail
+  (patient_id, organization_id);
+  
+
+-- need location table too
+
+-- Table: encounter_raw
+
+CREATE TABLE encounter_raw (
+  id bigint NOT NULL,
+  organization_id bigint NOT NULL,
+  patient_id bigint NOT NULL,
+  person_id bigint NOT NULL,
+  practitioner_id bigint,
+  episode_of_care_id bigint,
+  clinical_effective_date date,
+  date_precision_id smallint,
+  recording_practitioner_id bigint,
+  recording_date date,
+  appointment_id bigint,
+  service_provider_organization_id bigint, 
+  location_id bigint,
+  end_date date,
+  duration_minutes int,
+  fhir_adt_message_code varchar(50),
+  fhir_class varchar(50),
+  fhir_type varchar(50),
+  fhir_status varchar(50),
+  fhir_snomed_concept_id bigint,
+  fhir_original_code character varying(20),
+  fhir_original_term character varying(1000),
+  CONSTRAINT pk_encounter_raw_id PRIMARY KEY (organization_id, person_id, id),
+  CONSTRAINT fk_encounter_raw_appointment_id FOREIGN KEY (appointment_id)
+      REFERENCES appointment (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_raw_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
+      REFERENCES patient (id, organization_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_raw_practitioner_id FOREIGN KEY (practitioner_id)
+      REFERENCES practitioner (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_raw_date_precision FOREIGN KEY (date_precision_id)
+      REFERENCES date_precision (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_raw_episode_of_care_id FOREIGN KEY (episode_of_care_id)
+      REFERENCES episode_of_care (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_encounter_raw_service_provider_organization_id FOREIGN KEY (service_provider_organization_id)
+      REFERENCES organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION	
+)WITH (
+  OIDS=FALSE
+);
+ALTER TABLE encounter_detail
+  OWNER TO postgres;
+
+CREATE UNIQUE INDEX ix_raw_detail_id
+  ON encounter_raw
+  (id);
+
+CREATE INDEX ix_encounter_raw_patient_id
+  ON encounter_raw
+  (patient_id);
+
+CREATE INDEX ix_encounter_raw_appointment_id
+  ON encounter_raw
+  (appointment_id);
+  
+CREATE INDEX ix_encounter_raw_patient_id_organization_id
+  ON encounter_raw
+  (patient_id, organization_id);
+  
+
 
 -- Table: allergy_intolerance
 

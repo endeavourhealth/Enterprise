@@ -268,7 +268,10 @@ CREATE TABLE location (
   type_desc character varying(255),
   postcode character varying(10),
   managing_organization_id bigint,
-  CONSTRAINT pk_location_id PRIMARY KEY (id)
+  CONSTRAINT pk_location_id PRIMARY KEY (id),
+  CONSTRAINT fk_location_organisation_id FOREIGN KEY (managing_organization_id)
+      REFERENCES organization (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION  
 );
 
 CREATE UNIQUE INDEX location_id

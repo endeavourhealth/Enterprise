@@ -1,3 +1,4 @@
+-- Data Checking (PI) database WITHOUT foreign keys
 
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;
@@ -12,6 +13,8 @@ DROP TABLE IF EXISTS observation;
 DROP TABLE IF EXISTS procedure;
 DROP TABLE IF EXISTS procedure_request;
 DROP TABLE IF EXISTS referral_request;
+DROP TABLE IF EXISTS encounter_raw;
+DROP TABLE IF EXISTS encounter_detail;
 DROP TABLE IF EXISTS encounter;
 DROP TABLE IF EXISTS appointment;
 DROP TABLE IF EXISTS episode_of_care;
@@ -19,6 +22,7 @@ DROP TABLE IF EXISTS patient;
 DROP TABLE IF EXISTS schedule;
 DROP TABLE IF EXISTS person;
 DROP TABLE IF EXISTS practitioner;
+DROP TABLE IF EXISTS location;
 DROP TABLE IF EXISTS organization;
 DROP TABLE IF EXISTS date_precision;
 DROP TABLE IF EXISTS appointment_status;
@@ -280,6 +284,31 @@ CREATE UNIQUE INDEX organization_id
   USING btree
   (id);
 
+-- Table: location
+
+CREATE TABLE location (
+  id bigint NOT NULL,
+  name character varying(255),
+  type_code character varying(50),
+  type_desc character varying(255),
+  postcode character varying(10),
+  managing_organization_id bigint,
+  CONSTRAINT pk_location_id PRIMARY KEY (id) 
+)WITH (
+  OIDS=FALSE
+);
+ALTER TABLE location
+  OWNER TO postgres;
+
+CREATE UNIQUE INDEX location_id
+  ON location
+  (id);
+  
+CREATE INDEX fk_location_managing_organisation_id
+  ON location
+  (managing_organization_id);
+
+
 -- Table: public.practitioner
 
 -- DROP TABLE public.practitioner;
@@ -345,7 +374,7 @@ CREATE TABLE person
   id bigint NOT NULL,
   patient_gender_id smallint NOT NULL,
   nhs_number character varying(255),
-  date_of_birth date NOT NULL,
+  date_of_birth date,
   date_of_death date,
   postcode character varying(20),
   household_id bigint,
@@ -384,7 +413,7 @@ CREATE TABLE patient
   patient_gender_id smallint NOT NULL,
   --pseudo_id character varying(255),
   nhs_number character varying(255),
-  date_of_birth date NOT NULL,
+  date_of_birth date,
   date_of_death date,
   postcode character varying(20),
   household_id bigint,
@@ -548,6 +577,109 @@ CREATE INDEX fki_encounter_patient_id_organization_id
   USING btree
   (patient_id, organization_id);
 
+
+-- Table: encounter_detail
+
+CREATE TABLE encounter_detail (
+  id bigint NOT NULL,
+  organization_id bigint NOT NULL,
+  patient_id bigint NOT NULL,
+  person_id bigint NOT NULL,
+  practitioner_id bigint,
+  episode_of_care_id bigint,
+  clinical_effective_date date,
+  date_precision_id smallint,
+  recording_practitioner_id bigint,
+  recording_date date,
+  appointment_id bigint,
+  service_provider_organization_id bigint, 
+  location_id bigint,
+  end_date date,
+  duration_minutes int,
+  completion_status_concept_id bigint,
+  healthcare_service_type_concept_id bigint,
+  interaction_mode_concept_id bigint,
+  administrative_action_concept_id bigint,
+  purpose_concept_id bigint,
+  disposition_concept_id bigint,
+  site_of_care_type_concept_id bigint,
+  patient_status_concept_id bigint,
+  CONSTRAINT pk_encounter_detail_id PRIMARY KEY (organization_id, person_id, id)
+)WITH (
+  OIDS=FALSE
+);
+ALTER TABLE encounter_detail
+  OWNER TO postgres;
+
+CREATE UNIQUE INDEX ix_encounter_detail_id
+  ON encounter_detail
+  (id);
+
+CREATE INDEX ix_encounter_detail_patient_id
+  ON encounter_detail
+  (patient_id);
+
+CREATE INDEX ix_encounter_detail_appointment_id
+  ON encounter_detail
+  (appointment_id);
+  
+CREATE INDEX ix_encounter_detail_patient_id_organization_id
+  ON encounter_detail
+  (patient_id, organization_id);
+  
+
+-- need location table too
+
+-- Table: encounter_raw
+
+CREATE TABLE encounter_raw (
+  id bigint NOT NULL,
+  organization_id bigint NOT NULL,
+  patient_id bigint NOT NULL,
+  person_id bigint NOT NULL,
+  practitioner_id bigint,
+  episode_of_care_id bigint,
+  clinical_effective_date date,
+  date_precision_id smallint,
+  recording_practitioner_id bigint,
+  recording_date date,
+  appointment_id bigint,
+  service_provider_organization_id bigint, 
+  location_id bigint,
+  end_date date,
+  duration_minutes int,
+  fhir_adt_message_code varchar(50),
+  fhir_class varchar(50),
+  fhir_type varchar(50),
+  fhir_status varchar(50),
+  fhir_snomed_concept_id bigint,
+  fhir_original_code character varying(20),
+  fhir_original_term character varying(1000),
+  CONSTRAINT pk_encounter_raw_id PRIMARY KEY (organization_id, person_id, id)
+)WITH (
+  OIDS=FALSE
+);
+ALTER TABLE encounter_detail
+  OWNER TO postgres;
+
+CREATE UNIQUE INDEX ix_raw_detail_id
+  ON encounter_raw
+  (id);
+
+CREATE INDEX ix_encounter_raw_patient_id
+  ON encounter_raw
+  (patient_id);
+
+CREATE INDEX ix_encounter_raw_appointment_id
+  ON encounter_raw
+  (appointment_id);
+  
+CREATE INDEX ix_encounter_raw_patient_id_organization_id
+  ON encounter_raw
+  (patient_id, organization_id);
+  
+
+
 -- Table: allergy_intolerance
 
 CREATE TABLE allergy_intolerance
@@ -606,20 +738,7 @@ CREATE TABLE condition
   snomed_concept_id bigint,
   is_review boolean NOT NULL,
   original_code character varying(20),
-  CONSTRAINT pk_condition_id PRIMARY KEY (id),
-  CONSTRAINT fk_condition_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_condition_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_condition_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_condition_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION            
-      
+  CONSTRAINT pk_condition_id PRIMARY KEY (id)            
 )
 WITH (
   OIDS=FALSE
@@ -660,20 +779,7 @@ CREATE TABLE specimen
   date_precision_id smallint,
   snomed_concept_id bigint,
   original_code character varying(20),
-  CONSTRAINT pk_specimen_id PRIMARY KEY (id),
-  CONSTRAINT fk_specimen_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_specimen_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_specimen_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_specimen_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION            
-      
+  CONSTRAINT pk_specimen_id PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
@@ -714,20 +820,7 @@ CREATE TABLE diagnostic_order
   date_precision_id smallint,
   snomed_concept_id bigint,
   original_code character varying(20),
-  CONSTRAINT pk_diagnostic_order_id PRIMARY KEY (id),
-  CONSTRAINT fk_diagnostic_order_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_diagnostic_order_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_diagnostic_order_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_diagnostic_order_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION            
-     
+  CONSTRAINT pk_diagnostic_order_id PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
@@ -768,20 +861,7 @@ CREATE TABLE diagnostic_report
   date_precision_id smallint,
   snomed_concept_id bigint,
   original_code character varying(20),
-  CONSTRAINT pk_diagnostic_report_id PRIMARY KEY (id),
-  CONSTRAINT fk_diagnostic_report_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_diagnostic_report_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_diagnostic_report_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_diagnostic_report_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION            
-           
+  CONSTRAINT pk_diagnostic_report_id PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
@@ -823,20 +903,7 @@ CREATE TABLE family_member_history
   date_precision_id smallint,
   snomed_concept_id bigint,
   original_code character varying(20),
-  CONSTRAINT pk_family_member_history_id PRIMARY KEY (id),
-  CONSTRAINT fk_family_member_history_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_family_member_history_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_family_member_history_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_family_member_history_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION            
-      
+  CONSTRAINT pk_family_member_history_id PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
@@ -878,19 +945,7 @@ CREATE TABLE immunization
   date_precision_id smallint,
   snomed_concept_id bigint,
   original_code character varying(20),
-  CONSTRAINT pk_immunization_id PRIMARY KEY (id),
-  CONSTRAINT fk_immunization_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_immunization_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_immunization_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_immunization_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION                  
+  CONSTRAINT pk_immunization_id PRIMARY KEY (id)               
 )
 WITH (
   OIDS=FALSE
@@ -1074,19 +1129,7 @@ CREATE TABLE procedure
   date_precision_id smallint,
   snomed_concept_id bigint,
   original_code character varying(20),
-  CONSTRAINT pk_procedure_id PRIMARY KEY (id),
-  CONSTRAINT fk_procedure_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES encounter (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_procedure_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES patient (id, organization_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_procedure_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES practitioner (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_procedure_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION                  
+  CONSTRAINT pk_procedure_id PRIMARY KEY (id)                  
 )
 WITH (
   OIDS=FALSE

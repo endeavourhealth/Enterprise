@@ -102,7 +102,7 @@ CREATE TABLE appointment_status
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.appointment_status
+ALTER TABLE appointment_status
   OWNER TO postgres;
 
 INSERT INTO appointment_status (id, value) VALUES (0, 'Proposed');
@@ -124,7 +124,7 @@ CREATE TABLE procedure_request_status
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.procedure_request_status
+ALTER TABLE procedure_request_status
   OWNER TO postgres;
 
 INSERT INTO procedure_request_status (id, value) VALUES (0, 'Proposed');
@@ -149,7 +149,7 @@ CREATE TABLE referral_request_priority
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.referral_request_priority
+ALTER TABLE referral_request_priority
   OWNER TO postgres;
 
 INSERT INTO referral_request_priority (id, value) VALUES (0, 'Routine');
@@ -168,7 +168,7 @@ CREATE TABLE referral_request_type
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.referral_request_type
+ALTER TABLE referral_request_type
   OWNER TO postgres;
 
 INSERT INTO referral_request_type (id, value) VALUES (0, 'Unknown');
@@ -185,7 +185,7 @@ INSERT INTO referral_request_type (id, value) VALUES (10, 'Admission');
 INSERT INTO referral_request_type (id, value) VALUES (11, 'Day Care');
 INSERT INTO referral_request_type (id, value) VALUES (12, 'Assessment & Education');
 
--- Table: public.medication_statement_authorisation_type
+-- Table: medication_statement_authorisation_type
 
 CREATE TABLE medication_statement_authorisation_type
 (
@@ -196,7 +196,7 @@ CREATE TABLE medication_statement_authorisation_type
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.medication_statement_authorisation_type
+ALTER TABLE medication_statement_authorisation_type
   OWNER TO postgres;
 
 INSERT INTO medication_statement_authorisation_type (id, value) VALUES (0, 'Acute');
@@ -215,7 +215,7 @@ CREATE TABLE patient_gender
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.patient_gender
+ALTER TABLE patient_gender
   OWNER TO postgres;
 
 INSERT INTO patient_gender (id, value) VALUES (0, 'Male');
@@ -235,7 +235,7 @@ CREATE TABLE registration_type
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.registration_type
+ALTER TABLE registration_type
   OWNER TO postgres;
 
 INSERT INTO registration_type (id, code, description) VALUES (0, 'E', 'Emergency');
@@ -263,7 +263,7 @@ CREATE TABLE organization
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.organization
+ALTER TABLE organization
   OWNER TO postgres;
 
 -- Index: fki_organization_parent_organization_id
@@ -312,34 +312,34 @@ CREATE INDEX fk_location_managing_organisation_id
   (managing_organization_id);
 
 
--- Table: public.practitioner
+-- Table: practitioner
 
--- DROP TABLE public.practitioner;
+-- DROP TABLE practitioner;
 
-CREATE TABLE public.practitioner
+CREATE TABLE practitioner
 (
   id bigint NOT NULL,
   organization_id bigint NOT NULL,
-  name character varying(1024) NOT NULL,
+  name character varying(1024),
   role_code character varying(50),
   role_desc character varying(255),
   CONSTRAINT pk_practitioner_id PRIMARY KEY (id),
   CONSTRAINT fk_practitioner_organisation_id FOREIGN KEY (organization_id)
-      REFERENCES public.organization (id) MATCH SIMPLE
+      REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.practitioner
+ALTER TABLE practitioner
   OWNER TO postgres;
 
--- Index: public.practitioner_id
+-- Index: practitioner_id
 
--- DROP INDEX public.practitioner_id;
+-- DROP INDEX practitioner_id;
 
 CREATE UNIQUE INDEX practitioner_id
-  ON public.practitioner
+  ON practitioner
   USING btree
   (id);
 
@@ -374,9 +374,9 @@ CREATE UNIQUE INDEX schedule_id
   USING btree
   (id);
   
--- Table: public.person
+-- Table: person
 
--- DROP TABLE public.person;
+-- DROP TABLE person;
 
 CREATE TABLE person
 (
@@ -394,30 +394,30 @@ CREATE TABLE person
   ethnic_code character(1),
   CONSTRAINT pk_person_id PRIMARY KEY (id),
   CONSTRAINT fk_person_person_gender_id FOREIGN KEY (patient_gender_id)
-      REFERENCES public.patient_gender (id) MATCH SIMPLE
+      REFERENCES patient_gender (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.person
+ALTER TABLE person
   OWNER TO postgres;
 
--- Index: public.person_id
+-- Index: person_id
 
--- DROP INDEX public.person_id;
+-- DROP INDEX person_id;
 
 CREATE UNIQUE INDEX person_id
-  ON public.person
+  ON person
   USING btree
   (id);
-ALTER TABLE public.person CLUSTER ON person_id;
+ALTER TABLE person CLUSTER ON person_id;
 
   
 
--- Table: public.patient
+-- Table: patient
 
--- DROP TABLE public.patient;
+-- DROP TABLE patient;
 
 CREATE TABLE patient
 (
@@ -437,31 +437,31 @@ CREATE TABLE patient
   ethnic_code character(1),
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (id, organization_id),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
-      REFERENCES public.organization (id) MATCH SIMPLE
+      REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_patient_patient_gender_id FOREIGN KEY (patient_gender_id)
-      REFERENCES public.patient_gender (id) MATCH SIMPLE
+      REFERENCES patient_gender (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.patient
+ALTER TABLE patient
   OWNER TO postgres;
 
--- Index: public.patient_id
+-- Index: patient_id
 
--- DROP INDEX public.patient_id;
+-- DROP INDEX patient_id;
 
 CREATE UNIQUE INDEX patient_id
-  ON public.patient
+  ON patient
   USING btree
   (id);
-ALTER TABLE public.patient CLUSTER ON patient_id;  
+ALTER TABLE patient CLUSTER ON patient_id;  
 
--- Table: public.episode_of_care
+-- Table: episode_of_care
 
--- DROP TABLE public.episode_of_care;
+-- DROP TABLE episode_of_care;
 
 CREATE TABLE episode_of_care
 (
@@ -475,19 +475,19 @@ CREATE TABLE episode_of_care
   usual_gp_practitioner_id bigint,
   CONSTRAINT pk_episode_of_care_id PRIMARY KEY (id),
   CONSTRAINT fk_episode_of_care_patient_id_organisation_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES public.patient (id, organization_id) MATCH SIMPLE
+      REFERENCES patient (id, organization_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_episode_of_care_practitioner_id FOREIGN KEY (usual_gp_practitioner_id)
-      REFERENCES public.practitioner (id) MATCH SIMPLE
+      REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_episode_of_care_registration_type_id FOREIGN KEY (registration_type_id)
-      REFERENCES public.registration_type (id) MATCH SIMPLE
+      REFERENCES registration_type (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.episode_of_care
+ALTER TABLE episode_of_care
   OWNER TO postgres;
 
 -- Index: episode_of_care_id
@@ -501,7 +501,7 @@ CREATE UNIQUE INDEX episode_of_care_id
 
 -- Table: appointment
 
-CREATE TABLE public.appointment
+CREATE TABLE appointment
 (
   id bigint NOT NULL,
   organization_id bigint NOT NULL,
@@ -519,19 +519,19 @@ CREATE TABLE public.appointment
   "left" date,
   CONSTRAINT pk_appointment_id PRIMARY KEY (id),
   CONSTRAINT fk_appointment_appointment_status_id FOREIGN KEY (appointment_status_id)
-      REFERENCES public.appointment_status (id) MATCH SIMPLE
+      REFERENCES appointment_status (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_appointment_organization_id FOREIGN KEY (organization_id)
-      REFERENCES public.organization (id) MATCH SIMPLE
+      REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_appointment_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES public.practitioner (id) MATCH SIMPLE
+      REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.appointment
+ALTER TABLE appointment
   OWNER TO postgres;
 
 -- Index: appointment_id
@@ -582,13 +582,13 @@ CREATE TABLE encounter
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_encounter_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_encounter_episode_of_care_id FOREIGN KEY (episode_of_care_id)
-      REFERENCES public.episode_of_care (id) MATCH SIMPLE
+      REFERENCES episode_of_care (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_encounter_service_provider_organization_id FOREIGN KEY (service_provider_organization_id)
-      REFERENCES public.organization (id) MATCH SIMPLE
+      REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -802,7 +802,7 @@ CREATE TABLE allergy_intolerance
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_allergy_intolerance_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -856,7 +856,7 @@ CREATE TABLE condition
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_condition_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION            
       
 )
@@ -910,7 +910,7 @@ CREATE TABLE specimen
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_specimen_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION            
       
 )
@@ -964,7 +964,7 @@ CREATE TABLE diagnostic_order
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_diagnostic_order_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION            
      
 )
@@ -1018,7 +1018,7 @@ CREATE TABLE diagnostic_report
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_diagnostic_report_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION            
            
 )
@@ -1073,7 +1073,7 @@ CREATE TABLE family_member_history
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_family_member_history_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION            
       
 )
@@ -1128,7 +1128,7 @@ CREATE TABLE immunization
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_immunization_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 )
 WITH (
@@ -1180,19 +1180,19 @@ CREATE TABLE medication_statement
   original_term character varying(1000),
   CONSTRAINT pk_medication_statement_id PRIMARY KEY (id),
   CONSTRAINT fk_medication_statement_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_medication_statement_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES public.encounter (id) MATCH SIMPLE
+      REFERENCES encounter (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_medication_statement_medication_statement_authorisation_type FOREIGN KEY (medication_statement_authorisation_type_id)
-      REFERENCES public.medication_statement_authorisation_type (id) MATCH SIMPLE
+      REFERENCES medication_statement_authorisation_type (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_medication_statement_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES public.patient (id, organization_id) MATCH SIMPLE
+      REFERENCES patient (id, organization_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_medication_statement_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES public.practitioner (id) MATCH SIMPLE
+      REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION                
 )
 WITH (
@@ -1254,7 +1254,7 @@ CREATE TABLE medication_order
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_medication_order_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 )
 WITH (
@@ -1313,7 +1313,7 @@ CREATE TABLE observation
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_observation_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 )
 WITH (
@@ -1366,7 +1366,7 @@ CREATE TABLE procedure
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_procedure_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 )
 WITH (
@@ -1423,10 +1423,10 @@ CREATE TABLE procedure_request
       REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_procedure_request_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_procedure_request_procedure_request_status_id FOREIGN KEY (procedure_request_status_id)
-      REFERENCES public.procedure_request_status (id) MATCH SIMPLE
+      REFERENCES procedure_request_status (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION                  
 )
 WITH (
@@ -1455,11 +1455,11 @@ CREATE INDEX procedure_request_patient_id
 ALTER TABLE procedure_request CLUSTER ON procedure_request_patient_id;
 
 
--- Table: public.referral_request
+-- Table: referral_request
 
--- DROP TABLE public.referral_request;
+-- DROP TABLE referral_request;
 
-CREATE TABLE public.referral_request
+CREATE TABLE referral_request
 (
   id bigint NOT NULL,
   organization_id bigint NOT NULL,
@@ -1481,54 +1481,54 @@ CREATE TABLE public.referral_request
   is_review boolean NOT NULL,
   CONSTRAINT pk_referral_request_id PRIMARY KEY (id),
   CONSTRAINT fk_referral_request_date_precision FOREIGN KEY (date_precision_id)
-      REFERENCES public.date_precision (id) MATCH SIMPLE
+      REFERENCES date_precision (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_encounter_id FOREIGN KEY (encounter_id)
-      REFERENCES public.encounter (id) MATCH SIMPLE
+      REFERENCES encounter (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
-      REFERENCES public.patient (id, organization_id) MATCH SIMPLE
+      REFERENCES patient (id, organization_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_practitioner_id FOREIGN KEY (practitioner_id)
-      REFERENCES public.practitioner (id) MATCH SIMPLE
+      REFERENCES practitioner (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_recipient_organization_id FOREIGN KEY (recipient_organization_id)
-      REFERENCES public.organization (id) MATCH SIMPLE
+      REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_requester_organization_id FOREIGN KEY (requester_organization_id)
-      REFERENCES public.organization (id) MATCH SIMPLE
+      REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_type_id FOREIGN KEY (type_id)
-      REFERENCES public.referral_request_type (id) MATCH SIMPLE
+      REFERENCES referral_request_type (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_referral_request_priority_id FOREIGN KEY (priority_id)
-      REFERENCES public.referral_request_priority (id) MATCH SIMPLE
+      REFERENCES referral_request_priority (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.referral_request
+ALTER TABLE referral_request
   OWNER TO postgres;
 
--- Index: public.referral_request_id
+-- Index: referral_request_id
 
--- DROP INDEX public.referral_request_id;
+-- DROP INDEX referral_request_id;
 
 CREATE UNIQUE INDEX referral_request_id
-  ON public.referral_request
+  ON referral_request
   USING btree
   (id);
 
--- Index: public.referral_request_patient_id
+-- Index: referral_request_patient_id
 
--- DROP INDEX public.referral_request_patient_id;
+-- DROP INDEX referral_request_patient_id;
 
 CREATE INDEX referral_request_patient_id
-  ON public.referral_request
+  ON referral_request
   USING btree
   (patient_id);
-ALTER TABLE public.referral_request CLUSTER ON referral_request_patient_id;
+ALTER TABLE referral_request CLUSTER ON referral_request_patient_id;
 
 
 

@@ -288,7 +288,7 @@ CREATE TABLE practitioner
 (
   id bigint NOT NULL,
   organization_id bigint NOT NULL,
-  name character varying(1024) NOT NULL,
+  name character varying(1024),
   role_code character varying(50),
   role_desc character varying(255),
   CONSTRAINT pk_practitioner_id PRIMARY KEY (id)

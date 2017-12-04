@@ -8,9 +8,12 @@ public final class PercentageCalculator {
     private static final NumberFormat FORMATTER = new DecimalFormat("##.##");
 
     public static double calculatePercentage(double denominator, double numerator) {
-        if (numerator > denominator) {
+        if (numerator > denominator)
             throw new IllegalArgumentException("Numerator " + numerator + " cannot be larger that denominator " + denominator);
-        }
+
+        if (denominator == 0)
+            return 0;
+
         return (numerator * 100d) / denominator;
     }
     public static String calculatorPercentString(double denominator, double numerator) {

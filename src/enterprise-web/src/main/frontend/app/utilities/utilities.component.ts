@@ -105,7 +105,7 @@ export class UtilitiesComponent {
 	}
 
 	indDash() {
-		IndDashChartDialog.open(this.$modal, 'Quality Indicator Dashboard');
+		IndDashChartDialog.open(this.$modal);
 	}
 
 	hca() {

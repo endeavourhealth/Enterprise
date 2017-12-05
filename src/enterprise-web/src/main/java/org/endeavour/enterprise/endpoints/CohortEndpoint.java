@@ -303,4 +303,36 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 				.build();
 	}
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("organisations")
+    public Response getReportOrganisations(@Context SecurityContext sc, @QueryParam("itemId") String libraryItemUuid) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<OrganizationEntity> orgs = CohortResultEntity.getCohortReportOrganisations(libraryItemUuid);
+
+        clearLogbackMarkers();
+
+        return Response
+            .ok()
+            .entity(orgs)
+            .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("graphData")
+    public Response getGraphData(@Context SecurityContext sc, @QueryParam("itemId") String libraryItemUuid, @QueryParam("orgId") List<Long> orgIds) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List results = CohortResultEntity.getReportData(libraryItemUuid, orgIds);
+
+        clearLogbackMarkers();
+
+        return Response
+            .ok()
+            .entity(results)
+            .build();    }
 }

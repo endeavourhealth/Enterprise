@@ -195,4 +195,42 @@ public class CohortResultEntity {
         return ent;
 
     }
+
+
+    public static List<OrganizationEntity> getCohortReportOrganisations(String queryItemUuid) throws Exception {
+        String where = "SELECT DISTINCT o " +
+            "from OrganizationEntity o " +
+            "join CohortResultEntity a on a.organisationId = o.id " +
+            "where a.queryItemUuid = :queryItemUuid";
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        List<OrganizationEntity> ent = entityManager.createQuery(where)
+            .setParameter("queryItemUuid", queryItemUuid)
+            .getResultList();
+
+        entityManager.close();
+
+        return ent;
+
+    }
+
+    public static List getReportData(String queryItemUuid, List<Long> orgIds) {
+        String where = "SELECT a.runDate, cast((a.enumeratorCount * 100) /a.denominatorCount as float) as pct, a.organisationId " +
+            "from CohortResultEntity a " +
+            "where a.queryItemUuid = :queryItemUuid " +
+            "and a.organisationId in :orgIds " +
+            "order by a.runDate, a.organisationId ";
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        List ent = entityManager.createQuery(where)
+            .setParameter("queryItemUuid", queryItemUuid)
+            .setParameter("orgIds", orgIds)
+            .getResultList();
+
+        entityManager.close();
+
+        return ent;
+    }
 }

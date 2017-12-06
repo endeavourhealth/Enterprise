@@ -10,7 +10,7 @@
 		<tbody>
 			<tr *ngFor="let series of data.series">
 				<td><b>{{series.name}}</b></td>
-				<td *ngFor="let data of series.data">{{data}}</td>
+				<td *ngFor="let data of getSeriesData(series)">{{data}}</td>
 			</tr>
 		</tbody>
 	</table>

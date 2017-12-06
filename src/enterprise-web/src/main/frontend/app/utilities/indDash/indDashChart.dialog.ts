@@ -96,7 +96,7 @@ export class IndDashChartDialog implements OnInit {
 			if (!orgSeries) {
 				orgSeries = new Series()
 					.setName(this.orgMap.get(row[2]).name);
-				series.set(row[1], orgSeries);
+				series.set(row[2], orgSeries);
 			}
 
 			orgSeries.addData({ name: thisDate, y: row[1]});

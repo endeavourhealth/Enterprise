@@ -215,7 +215,7 @@ public class HealthcareActivityUtilityManager {
         patientScripts.add(String.format("insert into enterprise_admin.healthcare_activity_patient_list (patient_id)\n" +
                 "select \n" +
                 "\tid \n" +
-                "from enterprise_data_pseudonymised.patient p \n" +
+                "from patient p \n" +
                 "%s \n" +
                 "%s;", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
@@ -274,10 +274,10 @@ public class HealthcareActivityUtilityManager {
                 "    e.service_provider_organization_id, \n " +
                 "    c.name \n " +
                 "from enterprise_admin.healthcare_activity_patient_list pl \n" +
-                "inner join enterprise_data_pseudonymised.patient p on p.id = pl.patient_id\n" +
-                "inner join enterprise_data_pseudonymised.encounter e FORCE INDEX(ix_encounter_compound) on e.patient_id = p.id\n" +
-                "inner JOIN enterprise_data_pseudonymised.organization org on org.id = p.organization_id \n" +
-                "inner JOIN enterprise_data_pseudonymised.organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
+                "inner join patient p on p.id = pl.patient_id\n" +
+                "inner join encounter e FORCE INDEX(ix_encounter_compound) on e.patient_id = p.id\n" +
+                "inner JOIN organization org on org.id = p.organization_id \n" +
+                "inner JOIN organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
                 "join enterprise_admin.expression_concept ec on ec.expression = e.snomed_concept_id\n" +
                 "join enterprise_admin.concepts c on c.id = ec.value_concept \n " +
                 " %s \n" +

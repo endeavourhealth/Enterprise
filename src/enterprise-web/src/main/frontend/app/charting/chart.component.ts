@@ -21,7 +21,7 @@ export class ChartComponent {
 				chart: {height: data.height},
 //				colors: data.colors,
 				title: {text: data.title},
-				xAxis: {categories: data.categories},
+				xAxis: {type: 'category', categories: data.categories},
 				yAxis: data.yAxis,
 				series: data.series,
 				legend: data.legend

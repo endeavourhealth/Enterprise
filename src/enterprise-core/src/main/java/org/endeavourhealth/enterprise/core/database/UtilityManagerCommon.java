@@ -47,8 +47,8 @@ public final class UtilityManagerCommon {
         String query = String.format("insert into %s " +
                 " select distinct coalesce(child.id, o.id) \n" +
                 "from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
-                "join enterprise_data_pseudonymised.organization o on o.ods_code = l.ods_code\n" +
-                "left outer join enterprise_data_pseudonymised.organization child on child.parent_organization_id = o.id and child.type_code = 'PR'\n" +
+                "join organization o on o.ods_code = l.ods_code\n" +
+                "left outer join organization child on child.parent_organization_id = o.id and child.type_code = 'PR'\n" +
                 "where l.group_id = %d;", tableName, organisationGroup);
 
 
@@ -88,19 +88,19 @@ public final class UtilityManagerCommon {
     private static String getJoinTableForDistinctValues(String column) {
         switch (column) {
             case "patient_gender_id":
-                return "enterprise_data_pseudonymised.patient_gender";
+                return "patient_gender";
             case "lsoa_code":
-                return "enterprise_data_pseudonymised.lsoa_lookup";
+                return "lsoa_lookup";
             case "msoa_code":
-                return "enterprise_data_pseudonymised.msoa_lookup";
+                return "msoa_lookup";
             case "ethnic_code":
-                return "enterprise_data_pseudonymised.ethnicity_lookup";
+                return "ethnicity_lookup";
             case "service_id":
-                return "enterprise_data_pseudonymised.organization";
+                return "organization";
             case "organisation_id":
-                return "enterprise_data_pseudonymised.organization";
+                return "organization";
             case "ccg":
-                return "enterprise_data_pseudonymised.organization";
+                return "organization";
         }
 
         return "";

@@ -12,13 +12,13 @@ export class TableComponent {
 	@Input() data : Chart;
 
 	getSeriesData(series: Series) {
-		if (series.data && series.data.length > 0 && !series.data[0].y)
+		if (series.data && series.data.length > 0 && series.data[0].y == null)
 			return series.data;
 
 		const result: any[] = [];
 		let i = 0;
 		for(const category of this.data.categories) {
-			if (series.data[i].name !== category) {
+			if (!series.data[i] || series.data[i].name !== category) {
 				result.push(null);
 			} else {
 				result.push(series.data[i].y);

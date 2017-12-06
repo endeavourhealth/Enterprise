@@ -259,7 +259,42 @@ export class PrevIncChartDialog implements OnInit {
 			return '';
 	}
 
-	private getGroupedChartData(title : string, results : any, graphAs : string) {
+	private getGroupedChartData(title: string, results: any, graphAs: string) {
+		const categories: string[] = [];
+		const seriesMap: Map<string, Series> = new Map();
+
+		let lastCategory: string = '';
+		for(const row of results) {
+			const thisCategory = row[0];
+			if (lastCategory !== thisCategory) {
+				lastCategory = thisCategory;
+				categories.push(thisCategory);
+			}
+
+			let series = seriesMap.get(row[2]);
+			if (!series) {
+				let filter = this.breakdown.filters.find(f => f.id == row[2]);
+				let title = (filter == null) ? 'Unknown' : filter.name;
+				series = new Series()
+					.setName(title)
+					.setType('spline');
+				seriesMap.set(row[2], series);
+			}
+
+			series.addData({ name: thisCategory, y: this.getSeriesDataGraphAsValue(graphAs, row, thisCategory, row[2])})
+		}
+
+		return new Chart()
+			.setCategories(categories)
+			.setHeight(this.height)
+			.setLegend(this.legend)
+			//.setTitle(title)
+			.addYAxis(title + this.getGraphAsSuffix(graphAs), false)
+			.setSeries(Array.from(seriesMap.values()));
+	}
+
+
+	private getGroupedChartData_old(title : string, results : any, graphAs : string) {
 		let categories : string[] = linq(results)
 			.Select(row => row[0])
 			.Distinct()

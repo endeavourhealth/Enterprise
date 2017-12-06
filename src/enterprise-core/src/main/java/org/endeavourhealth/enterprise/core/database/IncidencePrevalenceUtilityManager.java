@@ -322,7 +322,7 @@ public class IncidencePrevalenceUtilityManager {
         populateScripts.add(String.format("insert into enterprise_admin.incidence_prevalence_patient_list (patient_id)\n" +
                 "select \n" +
                 "\tid \n" +
-                "from enterprise_data_pseudonymised.patient p" +
+                "from patient p" +
                 "%s" +
                 "%s;", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
@@ -339,7 +339,7 @@ public class IncidencePrevalenceUtilityManager {
                 "    d.person_id, \n" +
                 "    min(IFNULL(d.clinical_effective_date, '1000-01-01')) as clinical_effective_date\n" +
                 "FROM enterprise_admin.incidence_prevalence_patient_list p \n" +
-                "JOIN enterprise_data_pseudonymised.observation d \n" +
+                "JOIN observation d \n" +
                 "\tON p.patient_id = d.patient_id\n" +
                 "JOIN enterprise_admin.CodeSet c\n" +
                 "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
@@ -355,7 +355,7 @@ public class IncidencePrevalenceUtilityManager {
                 "    d.person_id, \n" +
                 "    IFNULL(d.clinical_effective_date, '1000-01-01') as clinical_effective_date\n" +
                 "FROM enterprise_admin.incidence_prevalence_patient_list p \n" +
-                "JOIN enterprise_data_pseudonymised.observation d \n" +
+                "JOIN observation d \n" +
                 "\tON p.patient_id = d.patient_id\n" +
                 "JOIN enterprise_admin.CodeSet c\n" +
                 "    ON c.SnomedConceptId = d.snomed_concept_id\n" +
@@ -384,9 +384,9 @@ public class IncidencePrevalenceUtilityManager {
         List<String> personScripts = new ArrayList<>();
 
         personScripts.add("update enterprise_admin.incidence_prevalence_raw_data r\n" +
-                "inner join enterprise_data_pseudonymised.patient p on p.person_id = r.person_id\n" +
-                "inner JOIN enterprise_data_pseudonymised.organization org on org.id = p.organization_id \n" +
-                "inner JOIN enterprise_data_pseudonymised.organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
+                "inner join patient p on p.person_id = r.person_id\n" +
+                "inner JOIN organization org on org.id = p.organization_id \n" +
+                "inner JOIN organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
                 "set r.patient_gender_id = p.patient_gender_id,\n" +
                 "\tr.age_years = p.age_years,\n" +
                 "    r.postcode_prefix = p.postcode_prefix,\n" +
@@ -432,11 +432,11 @@ public class IncidencePrevalenceUtilityManager {
                 "    p.ethnic_code, \n " +
                 "    parentOrg.ods_code, \n " +
                 "    p.postcode_prefix \n" +
-                "from enterprise_data_pseudonymised.episode_of_care e\n" +
-                "join enterprise_data_pseudonymised.patient p \n" +
+                "from episode_of_care e\n" +
+                "join patient p \n" +
                 "\ton p.id = e.patient_id and e.organization_id = p.organization_id and e.person_id = p.person_id \n" +
-                "inner JOIN enterprise_data_pseudonymised.organization org on org.id = p.organization_id \n" +
-                "inner JOIN enterprise_data_pseudonymised.organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
+                "inner JOIN organization org on org.id = p.organization_id \n" +
+                "inner JOIN organization parentOrg on parentOrg.id = org.parent_organization_id \n" +
                 "%s" +
                 "%s", includeOrganisationQuery ? orgJoin : "", whereClauses));
 
@@ -461,7 +461,7 @@ public class IncidencePrevalenceUtilityManager {
         if (params.breakdown != null && !params.breakdown.isEmpty()) {
             select += ", IFNULL(" + params.breakdown+", 'Unknown')";
             group += ", IFNULL(" + params.breakdown+", 'Unknown')";
-            order = params.breakdown + ", " + order;
+            order = order + ", " + params.breakdown;
         }
 
         String sql = " SELECT " + select +
@@ -544,7 +544,7 @@ public class IncidencePrevalenceUtilityManager {
         if (params.breakdown != null && !params.breakdown.isEmpty()) {
             select += ", IFNULL(" + params.breakdown+", 'Unknown')";
             group += ", IFNULL(" + params.breakdown+", 'Unknown')";
-            order = params.breakdown + ", " + order;
+            order =  order + ", " + params.breakdown;
         }
 
         String sql = " SELECT " + select +
@@ -586,7 +586,7 @@ public class IncidencePrevalenceUtilityManager {
         if (params.breakdown != null && !params.breakdown.isEmpty()) {
             select += ", IFNULL(" + params.breakdown+", 'Unknown')";
             group += ", IFNULL(" + params.breakdown+", 'Unknown')";
-            order = params.breakdown + ", " + order;
+            order = order + ", " + params.breakdown;
         }
 
         String sql = " SELECT " + select +
@@ -628,7 +628,7 @@ public class IncidencePrevalenceUtilityManager {
 
         String query = String.format(
                 "select distinct o.ods_code, o.name from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
-                        " join enterprise_data_pseudonymised.organization o on o.ods_code = l.ods_code " +
+                        " join organization o on o.ods_code = l.ods_code " +
                         "where l.group_id = %d;", groupId);
         System.out.println(query);
         Query q = entityManager.createNativeQuery(query);
@@ -644,14 +644,14 @@ public class IncidencePrevalenceUtilityManager {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         Query q = entityManager.createNativeQuery("select distinct o.name, o.ods_code, ifnull(o.type_code, 'PR') as type_code\n" +
-                "from enterprise_data_pseudonymised.organization o\n" +
-                "join enterprise_data_pseudonymised.episode_of_care e on e.organization_id = o.id\n" +
+                "from organization o\n" +
+                "join episode_of_care e on e.organization_id = o.id\n" +
                 "union\n" +
                 "\n" +
                 "select distinct ccg.name, ccg.ods_code, ccg.type_code\n" +
-                "from enterprise_data_pseudonymised.organization o\n" +
-                "join enterprise_data_pseudonymised.episode_of_care e on e.organization_id = o.id\n" +
-                "join enterprise_data_pseudonymised.organization ccg on ccg.id = o.parent_organization_id\n" +
+                "from organization o\n" +
+                "join episode_of_care e on e.organization_id = o.id\n" +
+                "join organization ccg on ccg.id = o.parent_organization_id\n" +
                 "order by type_code, name;");
 
         List resultList = q.getResultList();

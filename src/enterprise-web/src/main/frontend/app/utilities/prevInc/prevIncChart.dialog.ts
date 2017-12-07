@@ -259,7 +259,7 @@ export class PrevIncChartDialog implements OnInit {
 			return '';
 	}
 
-	private getGroupedChartData(title: string, results: any, graphAs: string) {
+	private getGroupedChartData_new(title: string, results: any, graphAs: string) {
 		const categories: string[] = [];
 		const seriesMap: Map<string, Series> = new Map();
 
@@ -294,7 +294,7 @@ export class PrevIncChartDialog implements OnInit {
 	}
 
 
-	private getGroupedChartData_old(title : string, results : any, graphAs : string) {
+	private getGroupedChartData(title : string, results : any, graphAs : string) {
 		let categories : string[] = linq(results)
 			.Select(row => row[0])
 			.Distinct()

@@ -316,7 +316,7 @@ public class ReportManager {
 		featureRun.setPopulation(reportRun.getPopulation());
 		featureRun.setQueryItemUuid(featureUuid);
 
-		return CohortManager.runCohort(featureItem, featureRun, userUuid, runDate, baselineCohortId, report);
+		return CohortManager.runCohort(featureItem, featureRun, userUuid, runDate, baselineCohortId, report, true);
 	}
 
 	private List<QueryResult> runCohortFeature(String userUuid, JsonReportRun reportRun, String featureUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {

@@ -12,6 +12,7 @@ public final class JsonCohortRun {
     private String population = null;
     private String baselineDate = null;
     private String queryItemUuid = null;
+    private String baselineCohortId = null;
 
     public JsonCohortRun() {
     }
@@ -52,6 +53,15 @@ public final class JsonCohortRun {
 
     public JsonCohortRun setQueryItemUuid(String queryItemUuid) {
         this.queryItemUuid = queryItemUuid;
+        return this;
+    }
+
+    public String getBaselineCohortId() {
+        return baselineCohortId;
+    }
+
+    public JsonCohortRun setBaselineCohortId(String baselineCohortId) {
+        this.baselineCohortId = baselineCohortId;
         return this;
     }
 

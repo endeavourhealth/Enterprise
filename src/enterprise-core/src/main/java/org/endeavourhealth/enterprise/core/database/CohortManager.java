@@ -1,9 +1,11 @@
 package org.endeavourhealth.enterprise.core.database;
 
+import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.QueryMeta;
 import org.endeavourhealth.enterprise.core.database.models.data.*;
 import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
+import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 
 import javax.persistence.EntityManager;
@@ -54,95 +56,8 @@ public class CohortManager {
 
 	}
 
-	public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid) throws Exception {
-		Timestamp runDate = new Timestamp(System.currentTimeMillis());
-		runCohort(libraryItem, cohortRun, userUuid, runDate);
-	}
-
-	public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate) throws Exception {
-		runCohort(libraryItem, cohortRun, userUuid, runDate, null, false);
-	}
-
-	public static List<Long> runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {
-
-		List<QueryResult> queryResults = new ArrayList<>();
-		List<Long> allPatients = new ArrayList<>();
-
-		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId, report);
-
-		if (!report)
-			allPatients = calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baselineCohortId);
-
-		return allPatients;
-	}
-
-	public static List<QueryResult> runCohortFeature(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {
-
-		List<QueryResult> queryResults = new ArrayList<>();
-
-		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId, report);
-
-		if (!report)
-			calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baselineCohortId);
-
-		return queryResults;
-	}
-
-	private static List<Long> calculateAndStoreResults(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, String baselineCohortId) throws Exception {
-		// Calculate and store the results for each organisation in the cohort
-		List<JsonOrganisation> organisations = cohortRun.getOrganisation();
-
-		List<Long> allPatients = new ArrayList<>();
-
-		for (JsonOrganisation organisationInCohort : organisations) {
-			allPatients.addAll(getResultsForOrganisation(libraryItem, cohortRun, userUuid, runDate, queryResults, organisationInCohort, baselineCohortId));
-		} // next organisation in cohort
-
-		return allPatients;
-	}
-
-	private static List<Long> getResultsForOrganisation(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, JsonOrganisation organisationInCohort, String baselineCohortId) throws Exception {
-		// calculate cohort denominator count
-		String denominatorSQL = getDenominatorSQL(cohortRun.getPopulation(), baselineCohortId);
-
-		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
-		Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
-
-		TypedQuery<PatientEntity> query = entityManager.
-				createQuery(denominatorSQL, PatientEntity.class)
-				.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
-
-		if (baselineCohortId == null)
-			query.setParameter("baseline", baselineDate);
-		else
-			query.setParameter("runDate", runDate)
-				.setParameter("baselineCohortId", baselineCohortId);
-
-		List<PatientEntity> patients = query.getResultList();
-
-		// For each organisation - get the denominator list of patients (needed for FAILED rule conditions)
-		List<Long> denominatorPatients = new ArrayList<>();
-		for (PatientEntity patientEntity : patients) {
-			denominatorPatients.add(patientEntity.getId());
-		}
-
-		entityManager.close();
-
-		// for each organisation, calculate the final list of patients from the query rules
-		Integer ruleId = libraryItem.getQuery().getStartingRules().getRuleId().get(0);
-
-		Integer i = 0;
-
-		List<Long> finalPatients = calculateCohortFromRules(queryResults, organisationInCohort, denominatorPatients, ruleId, i);
-
-		saveIdentifiedPatientsIntoCohortPatientTable(cohortRun, runDate, organisationInCohort, finalPatients);
-		saveQueryCountsToCohortSummaryTable(cohortRun, userUuid, runDate, organisationInCohort, baselineDate, denominatorPatients, finalPatients);
-
-		return finalPatients;
-	}
-
 	private static String getDenominatorSQL(String cohortPopulation, String baselineCohortId) {
-		if (baselineCohortId != null)	// Cohort subset
+		if (baselineCohortId != null && !baselineCohortId.equals(""))	// Cohort subset
 			return "select distinct p " +
 					"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
 					"where p.organizationId = :organizationId " +
@@ -165,14 +80,119 @@ public class CohortManager {
 		return "";
 	}
 
-	private static void saveQueryCountsToCohortSummaryTable(JsonCohortRun cohortRun, String userUuid, Timestamp runDate, JsonOrganisation organisationInCohort, Timestamp baselineDate, List<Long> denominatorPatients, List<Long> finalPatients) throws Exception {
+	public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid) throws Exception {
+		Timestamp runDate = new Timestamp(System.currentTimeMillis());
+
+		// Re-run the baseline denominator cohort
+		String baselineCohortId = cohortRun.getBaselineCohortId();
+		if (!baselineCohortId.equals("")) {
+			ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(baselineCohortId);
+			String denominatorXml = featureEntity.getXmlContent();
+			LibraryItem denominatorItem = QueryDocumentSerializer.readLibraryItemFromXml(denominatorXml);
+			runCohort(denominatorItem, cohortRun, userUuid, runDate, null, false, true);
+		}
+
+		runCohort(libraryItem, cohortRun, userUuid, runDate, false);
+	}
+
+	public static void runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, Boolean baseline) throws Exception {
+		runCohort(libraryItem, cohortRun, userUuid, runDate, null, false, baseline);
+	}
+
+	public static List<Long> runCohort(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, String baselineCohortId, Boolean report, Boolean baseline) throws Exception {
+
+		List<QueryResult> queryResults = new ArrayList<>();
+		List<Long> allPatients = new ArrayList<>();
+
+		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId, report);
+
+		if (!report)
+			allPatients = calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baseline);
+
+		return allPatients;
+	}
+
+	public static List<QueryResult> runCohortFeature(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {
+
+		List<QueryResult> queryResults = new ArrayList<>();
+
+		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId, report);
+
+		if (!report)
+			calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, true);
+
+		return queryResults;
+	}
+
+	private static List<Long> calculateAndStoreResults(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, Boolean baseline) throws Exception {
+		// Calculate and store the results for each organisation in the cohort
+		List<JsonOrganisation> organisations = cohortRun.getOrganisation();
+
+		List<Long> allPatients = new ArrayList<>();
+
+		for (JsonOrganisation organisationInCohort : organisations) {
+			allPatients.addAll(getResultsForOrganisation(libraryItem, cohortRun, userUuid, runDate, queryResults, organisationInCohort, baseline));
+		} // next organisation in cohort
+
+		return allPatients;
+	}
+
+	private static List<Long> getResultsForOrganisation(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, JsonOrganisation organisationInCohort, Boolean baseline) throws Exception {
+		// for each organisation, calculate the final list of patients from the query rules
+		Integer ruleId = libraryItem.getQuery().getStartingRules().getRuleId().get(0);
+
+		Integer i = 0;
+
+		// Get baseline cohort
+		String denominatorCohortId = null;
+
+		if (!baseline)
+			denominatorCohortId = cohortRun.getBaselineCohortId();
+
+		String denominatorSQL = getDenominatorSQL(cohortRun.getPopulation(), denominatorCohortId);
+
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+		Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
+
+		TypedQuery<PatientEntity> query = entityManager.
+				createQuery(denominatorSQL, PatientEntity.class)
+				.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+
+		if (denominatorCohortId == null || denominatorCohortId.equals(""))
+			query.setParameter("baseline", baselineDate);
+		else
+			query.setParameter("runDate", runDate)
+					.setParameter("baselineCohortId", denominatorCohortId);
+
+		List<PatientEntity> patients = query.getResultList();
+
+		// For each organisation - get the denominator list of patients (needed for FAILED rule conditions)
+		List<Long> denominatorPatients = new ArrayList<>();
+		for (PatientEntity patientEntity : patients) {
+			denominatorPatients.add(patientEntity.getId());
+		}
+
+		entityManager.close();
+
+		List<Long> finalPatients = calculateCohortFromRules(queryResults, organisationInCohort, denominatorPatients, ruleId, i);
+
+		saveIdentifiedPatientsIntoCohortPatientTable(cohortRun, runDate, organisationInCohort, finalPatients, baseline);
+		saveQueryCountsToCohortSummaryTable(cohortRun, userUuid, runDate, organisationInCohort, baselineDate, denominatorPatients, finalPatients, baseline);
+
+		return finalPatients;
+	}
+
+	private static void saveQueryCountsToCohortSummaryTable(JsonCohortRun cohortRun, String userUuid, Timestamp runDate, JsonOrganisation organisationInCohort, Timestamp baselineDate, List<Long> denominatorPatients, List<Long> finalPatients, Boolean baseline) throws Exception {
 		// save the query counts to the cohort summary table
 		CohortResultEntity cohortResult = new CohortResultEntity();
 		cohortResult.setEndUserUuid(userUuid);
 		cohortResult.setBaselineDate(baselineDate);
 		cohortResult.setRunDate(runDate);
 		cohortResult.setOrganisationId(Long.parseLong(organisationInCohort.getId()));
-		cohortResult.setQueryItemUuid(cohortRun.getQueryItemUuid());
+		if (baseline && cohortRun.getBaselineCohortId()!=null && !cohortRun.getBaselineCohortId().equals(""))
+			cohortResult.setQueryItemUuid(cohortRun.getBaselineCohortId());
+		else
+			cohortResult.setQueryItemUuid(cohortRun.getQueryItemUuid());
 		cohortResult.setPopulationTypeId(Byte.parseByte(cohortRun.getPopulation()));
 		cohortResult.setEnumeratorCount(finalPatients.size());
 		cohortResult.setDenominatorCount(denominatorPatients.size());
@@ -181,12 +201,15 @@ public class CohortManager {
 		saveCohortResult(cohortResult);
 	}
 
-	private static void saveIdentifiedPatientsIntoCohortPatientTable(JsonCohortRun cohortRun, Timestamp runDate, JsonOrganisation organisationInCohort, List<Long> finalPatients) throws Exception {
+	private static void saveIdentifiedPatientsIntoCohortPatientTable(JsonCohortRun cohortRun, Timestamp runDate, JsonOrganisation organisationInCohort, List<Long> finalPatients, Boolean baseline) throws Exception {
 		// save each patient identified into the query cohort patient table
 		for (Long patient : finalPatients) {
 			CohortPatientsEntity cohortPatientsEntity = new CohortPatientsEntity();
 			cohortPatientsEntity.setRunDate(runDate);
-			cohortPatientsEntity.setQueryItemUuid(cohortRun.getQueryItemUuid());
+			if (baseline && cohortRun.getBaselineCohortId()!=null && !cohortRun.getBaselineCohortId().equals(""))
+				cohortPatientsEntity.setQueryItemUuid(cohortRun.getBaselineCohortId());
+			else
+				cohortPatientsEntity.setQueryItemUuid(cohortRun.getQueryItemUuid());
 			cohortPatientsEntity.setOrganisationId(Long.parseLong(organisationInCohort.getId()));
 			Long patientId = patient.longValue();
 			cohortPatientsEntity.setPatientId(patientId);

@@ -114,7 +114,8 @@ export class LibraryComponent {
 			organisation: [],
 			population: "",
 			baselineDate: "",
-			queryItemUuid: ""
+			queryItemUuid: "",
+			baselineCohortId: ""
 		};
 
 		CohortEditDialog.open(vm.$modal, reportRun, item)
@@ -151,7 +152,8 @@ export class LibraryComponent {
 			organisation: [],
 			population: "",
 			baselineDate: "",
-			queryItemUuid: ""
+			queryItemUuid: "",
+			baselineCohortId: ""
 		};
 
 		CohortViewDialog.open(vm.$modal, cohortRun, item)

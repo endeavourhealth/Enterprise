@@ -4,4 +4,5 @@ export class CohortRun {
     population: string;
     baselineDate : string;
     queryItemUuid : string;
+    baselineCohortId: string;
 }

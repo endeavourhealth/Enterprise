@@ -58,16 +58,19 @@
                                         <th style="padding: 5px">Organisation</th>
                                         <th style="padding: 5px">Patients in Enumerator</th>
                                         <th style="padding: 5px">Patients in Denominator</th>
+                                        <th style="padding: 5px">%</th>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: bold;width: 300px;padding: 5px;border: solid thin silver">All Organisations</td>
                                         <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{enumeratorTotal}}</td>
                                         <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{denominatorTotal}}</td>
+                                        <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{enumeratorTotal/denominatorTotal*100 | number}}%</td>
                                     </tr>
                                     <tr *ngFor="let result of cohortResult">
                                         <td style="width: 300px;padding: 5px;border: solid thin silver">{{getOrganisationName(result.organisationId)}}</td>
                                         <td style="padding: 5px;border: solid thin silver"><a (click)="getCohortPatients(result.queryItemUuid,result.runDate,result.organisationId)" style="cursor:pointer;">{{result.enumeratorCount}}</a></td>
                                         <td style="padding: 5px;border: solid thin silver">{{result.denominatorCount}}</td>
+                                        <td style="padding: 5px;border: solid thin silver">{{result.enumeratorCount/result.denominatorCount*100 | number}}%</td>
                                     </tr>
                                 </table>
                             </div>

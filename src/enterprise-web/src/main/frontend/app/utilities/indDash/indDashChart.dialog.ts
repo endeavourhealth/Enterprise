@@ -106,7 +106,7 @@ export class IndDashChartDialog implements OnInit {
 			.setCategories(dates)
 			.setHeight(this.height)
 			.setLegend(this.legend)
-			.addYAxis('% of cohort', false)
+			.addYAxis('% of denominator cohort', false)
 			.setSeries(Array.from(series.values()));
 
 		this.loading = false;

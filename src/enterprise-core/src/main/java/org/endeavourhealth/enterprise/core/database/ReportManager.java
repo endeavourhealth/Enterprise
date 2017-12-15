@@ -18,6 +18,8 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +52,19 @@ public class ReportManager {
 		return runDate;
 	}
 
+	public static String replaceNull(String input) {
+		return input == null ? "" : input;
+	}
+
+	public static String replaceDoubleNull(Double input) {
+		return input == null ? "" : input.toString();
+	}
+
+	public static String formatDate(Date inDate) {
+		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		return formatter.format(inDate);
+	}
+
 	public long runNow(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate, String cohortName) throws Exception {
 		LOG.info("Running report " + reportItem.getName());
 
@@ -74,7 +89,7 @@ public class ReportManager {
 
 		List<PatientEntity> patientEntities = getPatientDemographics(patients);
 		for (PatientEntity patient : patientEntities) {
-			String patientDemographics = Long.toString(patient.getId())+","+patient.getOrganizationId()+","+patient.getPatientGenderId()+","+patient.getAgeYears()+","+patient.getPostcodePrefix();
+			String patientDemographics = Long.toString(patient.getId())+","+patient.getOrganizationId()+","+patient.getPatientGenderId()+","+patient.getAgeYears()+","+replaceNull(patient.getPostcodePrefix());
 			reportOutput.add(patientDemographics);
 		}
 
@@ -89,17 +104,17 @@ public class ReportManager {
 					for (ObservationEntity observationEntity : featureObservations.getObservations()) {
 						if (Long.toString(observationEntity.getPatientId()).equals(patientId)) {
 							found = true;
-							reportOutput.set(r, row + "," + observationEntity.getClinicalEffectiveDate() + "," + observationEntity.getValue() + " " + observationEntity.getUnits());
+							reportOutput.set(r, row + "," + formatDate(observationEntity.getClinicalEffectiveDate()) + " " + replaceDoubleNull(observationEntity.getValue()) + " " + replaceNull(observationEntity.getUnits()));
 						}
 					}
 				}
 
 				if (!found&&r>2)
-					reportOutput.set(r, row + ",,");
+					reportOutput.set(r, row + ",");
 				r++;
 			}
 			String header = reportOutput.get(2);
-			reportOutput.set(2, header + "," + feature.getFieldName() + " date," + feature.getFieldName() + " value");
+			reportOutput.set(2, header + "," + feature.getFieldName());
 		}
 
 		long reportResultId = saveReport(userUuid, reportRun, reportItem, runDate, reportOutput);
@@ -316,7 +331,7 @@ public class ReportManager {
 		featureRun.setPopulation(reportRun.getPopulation());
 		featureRun.setQueryItemUuid(featureUuid);
 
-		return CohortManager.runCohort(featureItem, featureRun, userUuid, runDate, baselineCohortId, report);
+		return CohortManager.runCohort(featureItem, featureRun, userUuid, runDate, baselineCohortId, report, true);
 	}
 
 	private List<QueryResult> runCohortFeature(String userUuid, JsonReportRun reportRun, String featureUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {

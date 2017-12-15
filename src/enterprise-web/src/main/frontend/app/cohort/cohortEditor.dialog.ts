@@ -5,6 +5,8 @@ import {Organisation} from "./models/Organisation";
 import {CohortService} from "./cohort.service";
 import {LoggerService} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
+import {QuerySelection} from "../query/models/QuerySelection";
+import {QueryPickerDialog} from "../query/queryPicker.dialog";
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -27,10 +29,13 @@ export class CohortEditDialog implements OnInit {
     population: string = "";
     baselineDate: string = "";
     queryItemUuid: string = "";
+    baselineCohort : QuerySelection;
 
     orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
     ppTT: string = "Please select a patient population as the denominator.";
     rdTT: string = "Please specify a run date. i.e. patients registered on or before that date.";
+    bcTT: string = "Baseline denominator population.";
+
 
     populations = [
         {id: -1, type: ''},
@@ -41,6 +46,7 @@ export class CohortEditDialog implements OnInit {
     organisations = <any>[];
 
     constructor(protected cohortService: CohortService,
+                private $modal: NgbModal,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
 
@@ -54,6 +60,12 @@ export class CohortEditDialog implements OnInit {
                 (data) => {
                     vm.organisations = data;
                 });
+    }
+
+    pickBaselineCohort() {
+        let vm = this;
+        QueryPickerDialog.open(this.$modal, null)
+            .result.then((resultData: QuerySelection) => vm.baselineCohort = resultData);
     }
 
     setSelectedOrganisations(selectElement) {
@@ -85,6 +97,8 @@ export class CohortEditDialog implements OnInit {
     save() {
         var vm = this;
         vm.resultData.baselineDate = vm.baselineDate;
+        if (vm.baselineCohort)
+            vm.resultData.baselineCohortId = vm.baselineCohort.id;
 
         this.ok();
     }

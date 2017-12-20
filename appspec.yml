@@ -2,17 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: /src/enterprise-web/target/enterprise-web-1.0-SNAPSHOT.war
-    destination: /opt/tomcat/webapps/compass.war
+    destination: /opt/tomcat/webapps/enterprise.war
 hooks:
-  ApplicationStop:
-    - location: aws_scripts/stop_servers
-      timeout: 300
-      runas: root
   BeforeInstall:
     - location: aws_scripts/cleanup
-      timeout: 300
-      runas: root
-  ApplicationStart:
-    - location: aws_scripts/start_servers
       timeout: 300
       runas: root

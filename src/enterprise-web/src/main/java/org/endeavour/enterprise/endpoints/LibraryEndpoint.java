@@ -1,17 +1,18 @@
 package org.endeavour.enterprise.endpoints;
 
+import org.apache.commons.lang3.StringUtils;
 import org.endeavourhealth.common.security.SecurityUtils;
+import org.endeavourhealth.core.terminology.Snomed;
+import org.endeavourhealth.core.terminology.SnomedCode;
 import org.endeavourhealth.enterprise.core.DefinitionItemType;
 import org.endeavourhealth.enterprise.core.DependencyType;
 
-import org.endeavourhealth.enterprise.core.database.models.ActiveItemEntity;
-import org.endeavourhealth.enterprise.core.database.models.AuditEntity;
-import org.endeavourhealth.enterprise.core.database.models.ItemDependencyEntity;
-import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
+import org.endeavourhealth.enterprise.core.database.models.*;
 import org.endeavourhealth.enterprise.core.database.models.data.*;
 import org.endeavourhealth.enterprise.core.json.*;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
+import org.endeavourhealth.core.terminology.TerminologyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -496,4 +497,143 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
                 .entity(ret)
                 .build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getConceptsFromRead")
+    public Response getConceptsFromRead(@Context SecurityContext sc,
+                                        @QueryParam("inclusions") String inclusions,
+                                        @QueryParam("exclusions") String exclusions) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        return processReadLists(inclusions, exclusions);
+
+
+    }
+
+    private static Response processReadLists(String inclusions, String exclusions) throws Exception {
+
+	    List<String> inclusionCodes = convertStringToList(inclusions);
+        List<String> exclusionCodes = new ArrayList<>();
+
+	    if (exclusions != null && !exclusions.isEmpty()) {
+            exclusionCodes = convertStringToList(exclusions);
+        }
+
+	    List<String> allCodes = findChildCodes(inclusionCodes);
+	    List<String> excludedCodes = new ArrayList<>();
+
+	    if (exclusionCodes.size() > 0) {
+	        excludedCodes = findChildCodes(exclusionCodes);
+        }
+
+        removeExcludedCodes(allCodes, excludedCodes);
+
+	    List<SnomedCode> snomedCodes = getSnomedFromReadList(allCodes);
+
+	    List<JsonCode> codes = generateResultSet(snomedCodes);
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(codes)
+                .build();
+    }
+
+    private static List<String> convertStringToList(String codeString) throws Exception {
+	    codeString = codeString.replaceAll(" ", "");
+	    String[] codes = codeString.split(",");
+
+	    return Arrays.asList(codes);
+    }
+
+    private static void removeExcludedCodes(List<String> includedCodes, List<String> excludedCodes) throws Exception {
+	    includedCodes.removeAll(excludedCodes);
+    }
+
+    private static List<String> findChildCodes(List<String> codes) throws Exception {
+
+	    List<Long> parents = new ArrayList<>();
+	    List<String> childCodes = new ArrayList<>();
+
+	    for(String code : codes) {
+	        if (code.endsWith("%")) {
+	            String formattedCode = code.replace("%","");
+                formattedCode = padCode(formattedCode);
+	            childCodes.add(formattedCode);
+                parents.add(EmisCsvCodeMapEntity.findCodeIdFromReadCode(formattedCode));
+                while (parents.size() > 0) {
+                    parents = getChildren(parents, childCodes);
+                    System.out.println(childCodes);
+                }
+	        } else {
+	            childCodes.add(code);
+            }
+        }
+
+        return childCodes;
+    }
+
+    private static String padCode(String code) throws Exception {
+        return StringUtils.rightPad(code, 5, ".");
+    }
+
+    private static List<Long> getChildren(List<Long> parents, List<String> children) throws Exception {
+	    List<EmisCsvCodeMapEntity> codeMaps = EmisCsvCodeMapEntity.findChildCodes(parents);
+
+	    parents.clear();
+	    for (EmisCsvCodeMapEntity code : codeMaps) {
+	        children.add(code.getReadCode());
+	        parents.add(code.getCodeId());
+        }
+
+        return parents;
+    }
+
+    private static List<SnomedCode> getSnomedFromReadList(List<String> readCodes) throws Exception {
+
+	    removeSynonyms(readCodes);
+	    List<SnomedCode> snomedCodes = new ArrayList<>();
+	    for (String code : readCodes) {
+            System.out.println("getting the snomed for the following code : " + code);
+            try {
+                snomedCodes.add(TerminologyService.translateRead2ToSnomed(code));
+            } catch (Exception e) {
+                System.out.println("unable to find snomed for code : " + code);
+            }
+        }
+
+        return snomedCodes;
+    }
+
+    private static void removeSynonyms(List<String> readCodes) throws Exception {
+
+	    for (Iterator<String> iterator = readCodes.iterator(); iterator.hasNext();) {
+	        String code = iterator.next();
+	        if (code.contains("-")) {
+	            iterator.remove();
+            }
+        }
+    }
+
+    private static List<JsonCode> generateResultSet(List<SnomedCode> snomedCodes) throws Exception {
+
+	    List<JsonCode> codes = new ArrayList<>();
+        for (SnomedCode snomed : snomedCodes) {
+            JsonCode code =  new JsonCode();
+            code.setId(snomed.getConceptCode());
+            code.setLabel(snomed.getTerm());
+            code.setDataType("11");
+            code.setParentType("11");
+            code.setBaseType("2");
+            code.setPresent("1");
+            code.setUnits("");
+            codes.add(code);
+        }
+
+        return codes;
+    }
+
 }

@@ -28,6 +28,15 @@ values ('enterprise','data_sharing_manager',
 }');
 
 insert into config (app_id, config_id, config_data)
+values ('enterprise','publisher_common',
+      '{
+  	"driverClass" : "com.mysql.jdbc.Driver",
+	"enterprise_username" : "root",
+	"enterprise_password" : "",
+	"enterprise_url"	: "jdbc:mysql://localhost:3306/publisher_common"
+}');
+
+insert into config (app_id, config_id, config_data)
 values ('enterprise','application',
       '{ "appUrl" : "http://localhost:8080" }');
       

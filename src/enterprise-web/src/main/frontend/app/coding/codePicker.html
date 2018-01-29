@@ -3,162 +3,192 @@
 	<h4 class="modal-title">Concept Picker</h4>
 </div>
 <div class="modal-body">
-	<form endUserRole="form" class="container-fluid">
-		<!-- Search -->
-		<div class="row">
-			<div class="form-group col-md-4">
-				<label class="control-label">Search for Concept</label>
-				<div class="input-group">
-					<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
-						   [(ngModel)]="searchData" (keyup)="$event.keyCode == 13 && search()" autofocus name="searchData">
-					<span class="input-group-addon" (click)="search()" style="cursor: pointer">
-						<i class="fa fa-search" id="searchTerm" aria-hidden="true"></i>
-					</span>
+	<ngb-tabset #t="ngbTabset" (tabChange)="tabChange($event)">
+		<ngb-tab title="Snomed Picker" id="tab-snomed">
+			<template ngbTabContent>
+				<form endUserRole="form" class="container-fluid">
+					<!-- Search -->
+					<div class="row">
+						<div class="form-group col-md-4">
+							<label class="control-label">Search for Concept</label>
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
+									   [(ngModel)]="searchData" (keyup)="$event.keyCode == 13 && search()" autofocus name="searchData">
+								<span class="input-group-addon" (click)="search()" style="cursor: pointer">
+									<i class="fa fa-search" id="searchTerm" aria-hidden="true"></i>
+								</span>
 
-				</div>
-			</div>
+							</div>
+						</div>
 
-			<div class="form-group col-md-4"><span style="color:black;font-size:10px"><i class="fa fa-info-circle" aria-hidden="true"></i> Use % before the search term to extend the concept search (i.e. %height - will include the term 'height' anywhere within the concept term)</span>
-			</div>
+						<div class="form-group col-md-4"><span style="color:black;font-size:10px"><i class="fa fa-info-circle" aria-hidden="true"></i> Use % before the search term to extend the concept search (i.e. %height - will include the term 'height' anywhere within the concept term)</span>
+						</div>
 
-			<div class="form-group col-md-4"><span style="color:black;font-size:10px"><i class="fa fa-info-circle" aria-hidden="true"></i> Concepts displayed in </span>
-				<span style="color:green;font-size:10px">GREEN</span>
-				<span style="color:black;font-size:10px"> indicate that the concept is present in the EHR record</span>
-			</div>
-		</div>
-
-		<!-- Matches -->
-		<div class="row">
-			<div class="form-group col-md-4">
-				<label class="control-label">Parent Concepts</label> <small class="text-muted">(dbl-click to navigate up)</small>
-				<div class="scroll-box-150 form-control">
-					<div *ngFor="let parent of parents"
-							 (dblclick)="displayCode(parent, true)"
-							 class="hover-box show-child-on-hover striped"
-							 [ngClass]="{'previous-selection': parent?.code == previousSelection?.code}">
-						<span ngbTooltip="{{parent.code}}" *ngIf="parent.present=='0'" style="color:black;font-size:12px">{{ parent.term }}</span>
-						<span ngbTooltip="{{parent.code}}" *ngIf="parent.present=='1'" style="color:green;font-size:12px">{{ parent.term }}</span>
-						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
-							<span class="fa fa-sm fa-plus"></span>
-						</button>
+						<div class="form-group col-md-4"><span style="color:black;font-size:10px"><i class="fa fa-info-circle" aria-hidden="true"></i> Concepts displayed in </span>
+							<span style="color:green;font-size:10px">GREEN</span>
+							<span style="color:black;font-size:10px"> indicate that the concept is present in the EHR record</span>
+						</div>
 					</div>
-				</div>
-			</div>
-			<div class="form-group col-md-4">
-				<label class="control-label">Concepts</label>
-				<div class="scroll-box-150 form-control">
-					<div *ngFor="let match of searchResults"
-							 (click)="displayCode(match, false)"
-							 class="hover-box show-child-on-hover striped"
-							 [ngClass]="{'selection': match?.code == highlightedMatch?.code}">
-						<span *ngIf="match.baseType=='Patient'" style="cursor: pointer" class="fa fa-user fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span *ngIf="match.baseType=='Observation'" style="cursor: pointer" class="fa fa-stethoscope fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span *ngIf="match.baseType=='Medication Statement'" style="cursor: pointer" class="fa fa-medkit fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span *ngIf="match.baseType=='Allergy'" style="cursor: pointer" class="fa fa-exclamation-triangle fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span *ngIf="match.baseType=='Referral'" style="cursor: pointer" class="fa fa-h-square fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span *ngIf="match.baseType=='Encounter'" style="cursor: pointer" class="fa fa-user-md fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
-						<span ngbTooltip="{{match.code}}" *ngIf="match.present=='0'" style="color:black;font-size:12px">{{ match.term }}</span>
-						<span ngbTooltip="{{match.code}}" *ngIf="match.present=='1'" style="color:green;font-size:12px">{{ match.term }}</span>
-						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(match)">
-							<span class="fa fa-sm fa-plus"></span>
-						</button>
-					</div>
-				</div>
-			</div>
-			<div class="form-group col-md-4">
-				<label class="control-label">Child Concepts</label> <small class="text-muted">(dbl-click to navigate down)</small>
-				<div class="scroll-box-150 form-control">
-					<div *ngFor="let child of children"
-							 (dblclick)="displayCode(child, true)"
-							 class="hover-box show-child-on-hover striped"
-							 [ngClass]="{'previous-selection': child?.code == previousSelection?.code}">
-						<span ngbTooltip="{{child.code}}" *ngIf="child.present=='0'" style="color:black;font-size:12px">{{ child.term }}</span>
-						<span ngbTooltip="{{child.code}}" *ngIf="child.present=='1'" style="color:green;font-size:12px">{{ child.term }}</span>
-						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
-							<span class="fa fa-sm fa-plus"></span>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
 
-		<!-- Selection -->
-		<div class="row">
-			<div class="form-group col-md-6">
-				<label class="control-label">Selected Concept(s)</label>
-				<div class="scroll-box-150 form-control">
-					<div ngbTooltip="{{selection.code}}" *ngFor="let selection of resultData"
-							 (click)="displayExclusionTree(selection)"
-							 class="hover-box show-child-on-hover striped"
-							 [ngClass]="{'selection': selection == highlightedSelection}" style="color:black;font-size:12px">
-						{{ selection.term }}
-						<span class="label label-success" *ngIf="selection.includeChildren && (!selection.exclusion || selection.exclusion.length == 0)">All child codes</span>
-						<span class="label label-warning" *ngIf="selection.includeChildren && (selection.exclusion && selection.exclusion.length > 0)">Some child codes</span>
-						<span class="label label-danger" *ngIf="!selection.includeChildren">No child codes</span>
-						<button type="button" class="btn btn-xs btn-danger pull-right child-to-show" (click)="removeFromSelection(selection)">
-							<span class="fa fa-sm fa-minus"></span>
-						</button>
+					<!-- Matches -->
+					<div class="row">
+						<div class="form-group col-md-4">
+							<label class="control-label">Parent Concepts</label> <small class="text-muted">(dbl-click to navigate up)</small>
+							<div class="scroll-box-150 form-control">
+								<div *ngFor="let parent of parents"
+										 (dblclick)="displayCode(parent, true)"
+										 class="hover-box show-child-on-hover striped"
+										 [ngClass]="{'previous-selection': parent?.code == previousSelection?.code}">
+									<span ngbTooltip="{{parent.code}}" *ngIf="parent.present=='0'" style="color:black;font-size:12px">{{ parent.term }}</span>
+									<span ngbTooltip="{{parent.code}}" *ngIf="parent.present=='1'" style="color:green;font-size:12px">{{ parent.term }}</span>
+									<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
+										<span class="fa fa-sm fa-plus"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="form-group col-md-4">
+							<label class="control-label">Concepts</label>
+							<div class="scroll-box-150 form-control">
+								<div *ngFor="let match of searchResults"
+										 (click)="displayCode(match, false)"
+										 class="hover-box show-child-on-hover striped"
+										 [ngClass]="{'selection': match?.code == highlightedMatch?.code}">
+									<span *ngIf="match.baseType=='Patient'" style="cursor: pointer" class="fa fa-user fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
+									<span *ngIf="match.baseType=='Observation'" style="cursor: pointer" class="fa fa-stethoscope fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
+									<span *ngIf="match.baseType=='Medication Statement'" style="cursor: pointer" class="fa fa-medkit fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
+									<span *ngIf="match.baseType=='Allergy'" style="cursor: pointer" class="fa fa-exclamation-triangle fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
+									<span *ngIf="match.baseType=='Referral'" style="cursor: pointer" class="fa fa-h-square fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
+									<span *ngIf="match.baseType=='Encounter'" style="cursor: pointer" class="fa fa-user-md fa-right-pad text-muted" ngbTooltip="{{ match.baseType }}"></span>
+									<span ngbTooltip="{{match.code}}" *ngIf="match.present=='0'" style="color:black;font-size:12px">{{ match.term }}</span>
+									<span ngbTooltip="{{match.code}}" *ngIf="match.present=='1'" style="color:green;font-size:12px">{{ match.term }}</span>
+									<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(match)">
+										<span class="fa fa-sm fa-plus"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="form-group col-md-4">
+							<label class="control-label">Child Concepts</label> <small class="text-muted">(dbl-click to navigate down)</small>
+							<div class="scroll-box-150 form-control">
+								<div *ngFor="let child of children"
+										 (dblclick)="displayCode(child, true)"
+										 class="hover-box show-child-on-hover striped"
+										 [ngClass]="{'previous-selection': child?.code == previousSelection?.code}">
+									<span ngbTooltip="{{child.code}}" *ngIf="child.present=='0'" style="color:black;font-size:12px">{{ child.term }}</span>
+									<span ngbTooltip="{{child.code}}" *ngIf="child.present=='1'" style="color:green;font-size:12px">{{ child.term }}</span>
+									<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
+										<span class="fa fa-sm fa-plus"></span>
+									</button>
+								</div>
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
-			<div class="form-group col-md-6">
-				<label class="control-label">Inclusions/Exclusions</label>
-				<div class="scroll-box-150 form-control" style="color:black;font-size:12px">
-					<Tree [nodes]="exclusionTreeData" [options]="options">
-						<template #treeNodeTemplate let-node="node">
-								<span class="folder-item">
-									<span class="text-success fa fa-check-circle-o"
-												(click)="untickNode(node.data)"
-												*ngIf="node.data.codeSetValue.includeChildren && (!node.data.codeSetValue.exclusion || node.data.codeSetValue.exclusion.length == 0)"> </span>
-									<span class="text-warning fa fa-times-circle-o"
-												(click)="tickNode(node.data)"
-												*ngIf="node.data.codeSetValue.includeChildren && (node.data.codeSetValue.exclusion && node.data.codeSetValue.exclusion.length > 0)"> </span>
-									<span class="text-danger fa fa-ban"
-												(click)="tickNode(node.data)"
-												*ngIf="!node.data.codeSetValue.includeChildren"> </span>
-									<span ngbTooltip="{{node.data.codeSetValue.code}}">{{ node.data.codeSetValue.term }}</span>
+
+					<!-- Selection -->
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label class="control-label">Selected Concept(s)</label>
+							<div class="scroll-box-150 form-control">
+								<div ngbTooltip="{{selection.code}}" *ngFor="let selection of resultData"
+										 (click)="displayExclusionTree(selection)"
+										 class="hover-box show-child-on-hover striped"
+										 [ngClass]="{'selection': selection == highlightedSelection}" style="color:black;font-size:12px">
+									{{ selection.term }}
+									<span class="label label-success" *ngIf="selection.includeChildren && (!selection.exclusion || selection.exclusion.length == 0)">All child codes</span>
+									<span class="label label-warning" *ngIf="selection.includeChildren && (selection.exclusion && selection.exclusion.length > 0)">Some child codes</span>
+									<span class="label label-danger" *ngIf="!selection.includeChildren">No child codes</span>
+									<button type="button" class="btn btn-xs btn-danger pull-right child-to-show" (click)="removeFromSelection(selection)">
+										<span class="fa fa-sm fa-minus"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="form-group col-md-6">
+							<label class="control-label">Inclusions/Exclusions</label>
+							<div class="scroll-box-150 form-control" style="color:black;font-size:12px">
+								<Tree [nodes]="exclusionTreeData" [options]="options">
+									<template #treeNodeTemplate let-node="node">
+											<span class="folder-item">
+												<span class="text-success fa fa-check-circle-o"
+															(click)="untickNode(node.data)"
+															*ngIf="node.data.codeSetValue.includeChildren && (!node.data.codeSetValue.exclusion || node.data.codeSetValue.exclusion.length == 0)"> </span>
+												<span class="text-warning fa fa-times-circle-o"
+															(click)="tickNode(node.data)"
+															*ngIf="node.data.codeSetValue.includeChildren && (node.data.codeSetValue.exclusion && node.data.codeSetValue.exclusion.length > 0)"> </span>
+												<span class="text-danger fa fa-ban"
+															(click)="tickNode(node.data)"
+															*ngIf="!node.data.codeSetValue.includeChildren"> </span>
+												<span ngbTooltip="{{node.data.codeSetValue.code}}">{{ node.data.codeSetValue.term }}</span>
+										</span>
+									</template>
+								</Tree>
+
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-md-2">
+							<span>
+								<i class="fa fa-user" aria-hidden="true"></i> Patient
 							</span>
-						</template>
-					</Tree>
+						</div>
+						<div class="form-group col-md-2">
+							<span>
+								<i class="fa fa-stethoscope" aria-hidden="true"></i> Observation
+							</span>
+						</div>
+						<div class="form-group col-md-2">
+							<span>
+								<i class="fa fa-medkit" aria-hidden="true"></i> Medication
+							</span>
+						</div>
+						<div class="form-group col-md-2">
+							<span>
+								<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Allergy
+							</span>
+						</div>
+						<div class="form-group col-md-2">
+							<span>
+								<i class="fa fa-h-square" aria-hidden="true"></i> Referral
+							</span>
+						</div>
+						<div class="form-group col-md-2">
+							<span>
+								<i class="fa fa-user-md" aria-hidden="true"></i> Encounter
+							</span>
+						</div>
+					</div>
 
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-user" aria-hidden="true"></i> Patient
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-stethoscope" aria-hidden="true"></i> Observation
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-medkit" aria-hidden="true"></i> Medication
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Allergy
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-h-square" aria-hidden="true"></i> Referral
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-user-md" aria-hidden="true"></i> Encounter
-				</span>
-			</div>
-
-		</div>
-
-	</form>
+				</form>
+			</template>
+		</ngb-tab>
+		<ngb-tab title="Add using READ2" id="tab-read2">
+			<template ngbTabContent>
+				<form endUserRole="form" class="container-fluid">
+					<div class="row">
+						<div class="form-group col-md-6">
+							<label>Inclusions</label>
+							<div class="scroll-box-150 form-control" style="cursor: pointer;">
+								<textarea class="snomedAdder" [(ngModel)]="readInclusions" name="readInclusions"></textarea>
+							</div>
+						</div>
+						<div class="form-group col-md-6">
+							<label>Exclusions</label>
+							<div class="scroll-box-150 form-control" style="cursor: pointer;">
+								<textarea class="snomedAdder" [(ngModel)]="readExclusions" name="readExclusions"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<button type="button" class="btn btn-sm btn-success" (click)="findCodes()">Find Codes</button>
+						</div>
+					</div>
+				</form>
+			</template>
+		</ngb-tab>
+	</ngb-tabset>
 </div>
 <div class="modal-footer">
 	<button type="button" class="btn"

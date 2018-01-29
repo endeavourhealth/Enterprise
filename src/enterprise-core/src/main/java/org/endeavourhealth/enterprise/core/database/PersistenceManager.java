@@ -21,6 +21,7 @@ public class PersistenceManager implements ContextShutdownHook {
     private EntityManagerFactory emEnterpriseAdmin;
     private EntityManagerFactory emEnterpriseData;
 	private EntityManagerFactory emDataSharingManagerData;
+	private EntityManagerFactory emPublisherCommon;
 
     private PersistenceManager() {
         StartupConfig.registerShutdownHook("Enterprise Persistence Manager", this);
@@ -40,6 +41,12 @@ public class PersistenceManager implements ContextShutdownHook {
         System.out.println("Connecting to database (DSM)...");
 		emDataSharingManagerData = Persistence.createEntityManagerFactory("data_sharing_manager", override);
 
+
+		System.out.println("Fetching hibernate overrides (publisher)...");
+		override = getHibernateOverridesFromConfig("publisher_common");
+		System.out.println("Connecting to database (publisher)...");
+		emPublisherCommon = Persistence.createEntityManagerFactory("publisher_common", override);
+
 		System.out.println("Persistence manager initialized");
 	}
 
@@ -55,10 +62,15 @@ public class PersistenceManager implements ContextShutdownHook {
 		return emDataSharingManagerData.createEntityManager();
 	}
 
+	public EntityManager getEmPublisherCommonData() {
+		return emPublisherCommon.createEntityManager();
+	}
+
     public void close() {
         emEnterpriseAdmin.close();
         emEnterpriseData.close();
 		emDataSharingManagerData.close();
+		emPublisherCommon.close();
 
     }
 

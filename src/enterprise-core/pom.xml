@@ -30,6 +30,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.endeavourhealth.common</groupId>
+            <artifactId>core</artifactId>
+            <version>${eds-core.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.endeavourhealth.configmanager</groupId>
             <artifactId>configmanager</artifactId>
             <version>${endeavour-config.version}</version>

@@ -90,5 +90,27 @@ export class TermlexCodingService extends CodingService {
 		return codeSetValue;
 	}
 
+    getCodesFromReadList(inclusions : string, exclusions : string) : Observable<CodeSetValue[]> {
+        let vm = this;
+        let params = new URLSearchParams();
+        params.append('inclusions', inclusions);
+        params.append('exclusions', exclusions);
+
+        let observable = Observable.create(observer => {
+            vm.httpGet('api/library/getConceptsFromRead', { search : params })
+                .subscribe(
+                    (response) => {
+                        let termlexResult : TermlexCode[] = response as TermlexCode[];
+                        let matches : CodeSetValue[] = termlexResult.map((t) => vm.termlexCodeToCodeSetValue(t));
+
+                        observer.next(matches);
+                    },
+                    (exception) =>
+                        observer.error(exception)
+                );
+        });
+        return observable;
+    }
+
 
 }

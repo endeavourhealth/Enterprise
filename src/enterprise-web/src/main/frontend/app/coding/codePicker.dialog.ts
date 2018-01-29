@@ -1,5 +1,5 @@
 import {Input, Component} from "@angular/core";
-import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal, NgbActiveModal, NgbTabChangeEvent} from "@ng-bootstrap/ng-bootstrap";
 import {ITreeOptions} from "angular2-tree-component";
 import {CodeSetValue} from "../codeSet/models/CodeSetValue";
 import {ExclusionTreeNode} from "./models/ExclusionTreeNode";
@@ -35,6 +35,11 @@ export class CodePickerDialog {
 
 	exclusionTreeData : ExclusionTreeNode[];
 
+	readInclusions : string;
+	readExclusions : string;
+    readResults : CodeSetValue[];
+    activeTab : string = 'tab-snomed';
+
 	constructor(private logger : LoggerService,
 				protected activeModal : NgbActiveModal,
 				private codingService : CodingService) {
@@ -66,6 +71,7 @@ export class CodePickerDialog {
 		vm.codingService.searchCodes(vm.searchData)
 			.subscribe(
 				(result) => {
+					console.log(result);
 				vm.searchResults = result;
 				vm.parents = [];
 				vm.children = [];
@@ -99,8 +105,9 @@ export class CodePickerDialog {
 
 	}
 
-	addToSelection(match : CodeSetValue) {
+	addToSelection(match : CodeSetValue, includeChildren : boolean = true) {
 
+		console.log(match);
 		for (var i = 0; i < this.resultData.length; ++i) {
 			var baseType = this.resultData[i].baseType;
 
@@ -113,6 +120,7 @@ export class CodePickerDialog {
 
 		let item : CodeSetValue = {
 			code : match.code,
+            includeChildren : includeChildren,
 			term : match.term,
 			dataType : match.dataType,
 			parentType : match.parentType,
@@ -121,7 +129,6 @@ export class CodePickerDialog {
 			valueFrom : match.valueFrom,
 			valueTo : match.valueTo,
 			units : match.units,
-			includeChildren : true,
 			exclusion : []
 		};
 		this.resultData.push(item);
@@ -252,4 +259,31 @@ export class CodePickerDialog {
 		this.activeModal.dismiss('cancel');
 		console.log('Cancel Pressed');
 	}
+
+    findCodes() {
+        let vm = this;
+        console.log('getting codes');
+        vm.codingService.getCodesFromReadList(vm.readInclusions, vm.readExclusions)
+            .subscribe(
+                (result) => {
+                	console.log('here are the results');
+                	console.log(result);
+                    vm.readResults = result;
+                    vm.parents = [];
+                    vm.children = [];
+                    vm.addCodesToCodeSet();
+                });
+	}
+
+	addCodesToCodeSet() {
+		let vm = this;
+        for (let i = 0; i < vm.readResults.length; i += 1) {
+         	vm.addToSelection(vm.readResults[i], false);
+        }
+	}
+
+    tabChange($event : NgbTabChangeEvent) {
+        this.activeTab = $event.nextId;
+        console.log(this.activeTab);
+    }
 }

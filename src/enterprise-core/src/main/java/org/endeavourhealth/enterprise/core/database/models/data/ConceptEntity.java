@@ -172,7 +172,7 @@ public class ConceptEntity {
         String where = "select c.conceptId,c.definition, "+
                 "c2.definition as parentType,c2.conceptId as parentTypeId, "+
                 "c3.definition as baseType,c3.conceptId as baseTypeId, "+
-                "c.dataTypeId,c.conceptTypeId,c.present,' ' as units "+
+                "c.dataTypeId,c.conceptTypeId,c.present,'' as units "+
                 "from ConceptEntity c "+
                 "left join ConceptEntity c2 on c2.conceptId = c.parentTypeConceptId "+
                 "left join ConceptEntity c3 on c3.conceptId = c.baseTypeConceptId "+
@@ -187,6 +187,35 @@ public class ConceptEntity {
 
         List<Object[]> ent = entityManager.createQuery(where)
                 .setParameter("term", term+"%").getResultList();
+
+        entityManager.close();
+
+        return ent;
+
+    }
+
+    public static List<Object[]> findConceptsFromSnomedList(String term) throws Exception {
+        if (term.isEmpty()) {
+            return new ArrayList<Object[]>();
+        }
+
+        String where = String.format("select c.conceptId,c.definition, "+
+                "c2.definition as parentType,c2.conceptId as parentTypeId, "+
+                "c3.definition as baseType,c3.conceptId as baseTypeId, "+
+                "c.dataTypeId,c.conceptTypeId,c.present,' ' as units "+
+                "from ConceptEntity c "+
+                "left join ConceptEntity c2 on c2.conceptId = c.parentTypeConceptId "+
+                "left join ConceptEntity c3 on c3.conceptId = c.baseTypeConceptId "+
+                "WHERE c.conceptId in (%s) "+
+                "group by c.conceptId,c.definition," +
+                "c2.definition,c2.conceptId," +
+                "c3.definition,c3.conceptId," +
+                "c.dataTypeId,c.conceptTypeId,c.present "+
+                "order by c.present desc, c.definition", term);
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        List<Object[]> ent = entityManager.createQuery(where).getResultList();
 
         entityManager.close();
 

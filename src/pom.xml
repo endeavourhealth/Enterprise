@@ -16,7 +16,7 @@
         <npm.version>3.3.12</npm.version>
         <maven.compiler.version>3.1</maven.compiler.version>
         <eds-api.version>1.7-SNAPSHOT</eds-api.version>
-        <eds-core.version>1.96-SNAPSHOT</eds-core.version>
+        <eds-core.version>1.99-SNAPSHOT</eds-core.version>
         <eds-security.version>1.0-SNAPSHOT</eds-security.version>
         <endeavour-config.version>1.08-SNAPSHOT</endeavour-config.version>
 

@@ -1,6 +1,9 @@
 package org.endeavour.enterprise.endpoints;
 
 import org.endeavourhealth.common.security.SecurityUtils;
+import org.endeavourhealth.core.database.rdbms.ehr.RdbmsResourceDal;
+import org.endeavourhealth.core.database.rdbms.subscriberTransform.RdbmsPseudoIdDal;
+import org.endeavourhealth.enterprise.core.Resources;
 import org.endeavourhealth.enterprise.core.database.ReportManager;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.data.CohortPatientsEntity;
@@ -10,6 +13,8 @@ import org.endeavourhealth.enterprise.core.json.JsonReportRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.Query;
+import org.hl7.fhir.instance.model.Resource;
+import org.hl7.fhir.instance.model.ResourceType;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +25,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Path("/report")
 public final class ReportEndpoint extends AbstractItemEndpoint {
@@ -112,6 +119,41 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 		return Response
 				.ok()
 				.entity(results)
+				.build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/reverseLookupPatient")
+	public Response reverseLookupPatient(@Context SecurityContext sc, @QueryParam("psuedoIds") List<String> pseudoIds,
+										 @QueryParam("serviceUUID") String serviceUUID,
+										 @QueryParam("subscriberConfigName") String subscriberConfigName) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		String configName = "ceg_enterprise";
+
+		if (subscriberConfigName != null)
+			configName = subscriberConfigName;
+
+		RdbmsPseudoIdDal pseudo = new RdbmsPseudoIdDal(configName);
+
+		List<String> patientIdList = pseudo.findPatientIdsFromPseudoIds(pseudoIds);
+
+		List<Resource> resources = new ArrayList<>();
+
+		for (String patient : patientIdList) {
+			RdbmsResourceDal resourceDal = new RdbmsResourceDal();
+			Resource resource = resourceDal.getCurrentVersionAsResource(UUID.fromString(serviceUUID), ResourceType.Patient, patient);
+			resources.add(resource);
+		}
+
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(resources)
 				.build();
 	}
 

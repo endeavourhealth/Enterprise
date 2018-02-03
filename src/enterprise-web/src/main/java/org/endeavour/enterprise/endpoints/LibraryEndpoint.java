@@ -626,8 +626,8 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
             code.setId(snomed.getConceptCode());
             code.setLabel(snomed.getTerm());
             code.setDataType("11");
-            code.setParentType("11");
-            code.setBaseType("2");
+            code.setParentType("");
+            code.setBaseType("Observation");
             code.setPresent("1");
             code.setUnits("");
             codes.add(code);

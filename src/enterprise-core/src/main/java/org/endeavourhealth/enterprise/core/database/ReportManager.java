@@ -104,17 +104,17 @@ public class ReportManager {
 					for (ObservationEntity observationEntity : featureObservations.getObservations()) {
 						if (Long.toString(observationEntity.getPatientId()).equals(patientId)) {
 							found = true;
-							reportOutput.set(r, row + "," + formatDate(observationEntity.getClinicalEffectiveDate()) + " " + replaceDoubleNull(observationEntity.getValue()) + " " + replaceNull(observationEntity.getUnits()));
+							reportOutput.set(r, row + "," + formatDate(observationEntity.getClinicalEffectiveDate()) + "," + replaceDoubleNull(observationEntity.getValue()) + "," + replaceNull(observationEntity.getUnits()));
 						}
 					}
 				}
 
 				if (!found&&r>2)
-					reportOutput.set(r, row + ",");
+					reportOutput.set(r, row + ",,,");
 				r++;
 			}
 			String header = reportOutput.get(2);
-			reportOutput.set(2, header + "," + feature.getFieldName());
+			reportOutput.set(2, header + "," + feature.getFieldName()+ ",Value,Units");
 		}
 
 		long reportResultId = saveReport(userUuid, reportRun, reportItem, runDate, reportOutput);

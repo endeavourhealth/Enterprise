@@ -172,7 +172,7 @@ public class ConceptEntity {
         String where = "select c.conceptId,c.definition, "+
                 "c2.definition as parentType,c2.conceptId as parentTypeId, "+
                 "c3.definition as baseType,c3.conceptId as baseTypeId, "+
-                "c.dataTypeId,c.conceptTypeId,c.present,'' as units "+
+                "c.dataTypeId,c.conceptTypeId,c.present,' ' as units "+
                 "from ConceptEntity c "+
                 "left join ConceptEntity c2 on c2.conceptId = c.parentTypeConceptId "+
                 "left join ConceptEntity c3 on c3.conceptId = c.baseTypeConceptId "+

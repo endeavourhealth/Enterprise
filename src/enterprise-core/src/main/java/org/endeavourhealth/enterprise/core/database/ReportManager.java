@@ -61,8 +61,16 @@ public class ReportManager {
 	}
 
 	public static String formatDate(Date inDate) {
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		return formatter.format(inDate);
+		try {
+			if (inDate==null)
+				return "";
+			DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			return formatter.format(inDate);
+
+		} catch (Exception e) {
+			return "";
+		}
+
 	}
 
 	public long runNow(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate, String cohortName) throws Exception {

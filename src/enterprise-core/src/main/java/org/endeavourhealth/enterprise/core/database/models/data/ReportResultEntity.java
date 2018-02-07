@@ -14,7 +14,6 @@ public class ReportResultEntity {
     private String reportItemUuid;
     private Timestamp runDate;
     private String reportRunParams;
-    private String reportOutput;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,17 +71,6 @@ public class ReportResultEntity {
         return this;
     }
 
-    @Basic
-    @Column(name = "ReportOutput", nullable = false)
-    public String getReportOutput() {
-        return reportOutput;
-    }
-
-    public ReportResultEntity setReportOutput(String reportOutput) {
-        this.reportOutput = reportOutput;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -96,7 +84,6 @@ public class ReportResultEntity {
         if (reportItemUuid != null ? !reportItemUuid.equals(that.reportItemUuid) : that.reportItemUuid != null)
             return false;
         if (reportRunParams != null ? !reportRunParams.equals(that.reportRunParams) : that.reportRunParams != null) return false;
-        if (reportOutput != null ? !reportOutput.equals(that.reportOutput) : that.reportOutput != null) return false;
 
         return true;
     }
@@ -108,7 +95,6 @@ public class ReportResultEntity {
         result = 31 * result + (runDate != null ? runDate.hashCode() : 0);
         result = 31 * result + (reportItemUuid != null ? reportItemUuid.hashCode() : 0);
         result = 31 * result + (reportRunParams != null ? reportRunParams.hashCode() : 0);
-        result = 31 * result + (reportOutput != null ? reportOutput.hashCode() : 0);
         return result;
     }
 

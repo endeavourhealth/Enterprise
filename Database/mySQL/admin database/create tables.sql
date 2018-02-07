@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportSchedule;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResult;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultQuery;
 DROP TABLE IF EXISTS enterprise_data_pseudonymised.ReportResultOrganisation;
+DROP TABLE IF EXISTS enterprise_data_pseudonymised.reportrow;
 DROP TABLE IF EXISTS enterprise_admin.incidence_prevalence_result;
 DROP TABLE IF EXISTS enterprise_admin.incidence_prevalence_organisation_group_lookup;
 DROP TABLE IF EXISTS enterprise_admin.incidence_prevalence_organisation_group;
@@ -65,31 +66,31 @@ CREATE TABLE enterprise_admin.CodeSet (
 	PRIMARY KEY (ItemUuid, SnomedConceptId)
 );
 
-CREATE TABLE enterprise_data_pseudonymised.`CohortPatients` (
-  `CohortPatientId` int(11) NOT NULL AUTO_INCREMENT,
-  `RunDate` timestamp(3) NULL DEFAULT NULL,
-  `QueryItemUuid` char(36) NOT NULL,
-  `OrganisationId` BIGINT(20) NOT NULL,
-  `PatientId` BIGINT(20) NOT NULL,
-  PRIMARY KEY (`CohortPatientId`),
-  KEY `RunDate` (`RunDate`),
-  KEY `QueryItemUuid` (`QueryItemUuid`),
-  KEY `OrganisationId` (`OrganisationId`)
+CREATE TABLE enterprise_data_pseudonymised.CohortPatients (
+  CohortPatientId int(11) NOT NULL AUTO_INCREMENT,
+  RunDate timestamp(3) NULL DEFAULT NULL,
+  QueryItemUuid char(36) NOT NULL,
+  OrganisationId BIGINT(20) NOT NULL,
+  PatientId BIGINT(20) NOT NULL,
+  PRIMARY KEY (CohortPatientId),
+  KEY RunDate (RunDate),
+  KEY QueryItemUuid (QueryItemUuid),
+  KEY OrganisationId (OrganisationId)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-CREATE TABLE enterprise_data_pseudonymised.`CohortResult` (
-  `CohortResultId` int(11) NOT NULL AUTO_INCREMENT,
-  `EndUserUuid` char(36) NOT NULL,
-  `BaselineDate` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
-  `RunDate` timestamp(3) NULL DEFAULT NULL,
-  `OrganisationId` BIGINT(20) NOT NULL,
-  `QueryItemUuid` char(36) NOT NULL,
-  `PopulationTypeId` tinyint(1) NOT NULL,
-  `DenominatorCount` int(11) DEFAULT NULL,
-  `EnumeratorCount` int(11) DEFAULT NULL,
-  PRIMARY KEY (`CohortResultId`),
-  KEY `RunDate` (`RunDate`),
-  KEY `QueryItemUuid` (`QueryItemUuid`)
+CREATE TABLE enterprise_data_pseudonymised.CohortResult (
+  CohortResultId int(11) NOT NULL AUTO_INCREMENT,
+  EndUserUuid char(36) NOT NULL,
+  BaselineDate timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  RunDate timestamp(3) NULL DEFAULT NULL,
+  OrganisationId BIGINT(20) NOT NULL,
+  QueryItemUuid char(36) NOT NULL,
+  PopulationTypeId tinyint(1) NOT NULL,
+  DenominatorCount int(11) DEFAULT NULL,
+  EnumeratorCount int(11) DEFAULT NULL,
+  PRIMARY KEY (CohortResultId),
+  KEY RunDate (RunDate),
+  KEY QueryItemUuid (QueryItemUuid)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 INSERT INTO enterprise_admin.ItemType(ItemTypeId, Description) VALUES (5, 'CodeSet');
@@ -109,10 +110,9 @@ CREATE TABLE enterprise_data_pseudonymised.ReportResult (
   ReportItemUuid char(36) NOT NULL,
   RunDate timestamp NULL DEFAULT NULL,
   ReportRunParams text NOT NULL,
-  ReportOutput LONGTEXT NULL,
-  PRIMARY KEY (`ReportResultId`),
-  KEY `RunDate` (`RunDate`),
-  KEY `ReportItemUuid` (`ReportItemUuid`)
+  PRIMARY KEY (ReportResultId),
+  KEY RunDate (RunDate),
+  KEY ReportItemUuid (ReportItemUuid)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 CREATE TABLE enterprise_data_pseudonymised.ReportResultQuery (
@@ -132,8 +132,27 @@ CREATE TABLE enterprise_data_pseudonymised.ReportSchedule (
     ReportItemUuid char(36) NOT NULL,
     ReportRunParams text NOT NULL,
     ReportResultId int (11) NULL DEFAULT NULL,
-    PRIMARY KEY (`ReportScheduleId`)
+    PRIMARY KEY (ReportScheduleId)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+CREATE TABLE reportrow (
+  ReportRowId bigint(20) NOT NULL AUTO_INCREMENT,
+  ReportResultId int(11) NOT NULL,
+  PatientId bigint(20) NOT NULL,
+  OrganisationId bigint(20) NOT NULL,
+  Label varchar(250) NULL,
+  ClinicalEffectiveDate DATE NULL,
+  OriginalTerm varchar(1000) NULL,
+  OriginalCode varchar(20) NULL,
+  SnomedConceptId bigint(20) NULL,
+  Value double NULL,
+  Units varchar(50) NULL,
+  PRIMARY KEY (ReportRowId),
+  KEY ReportResultId (ReportResultId),
+  KEY PatientId (PatientId),
+  KEY OrganisationId (OrganisationId)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
 
 CREATE TABLE enterprise_admin.incidence_prevalence_result (
 	query_id char(36) not null,

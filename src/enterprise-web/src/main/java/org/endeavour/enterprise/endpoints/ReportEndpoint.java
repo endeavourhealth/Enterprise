@@ -70,27 +70,6 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("/reportResult")
-	public Response reportResult(@Context SecurityContext sc, @QueryParam("reportItemUuid") String reportItemUuid) {
-		super.setLogbackMarkers(sc);
-
-		List<ReportResultEntity> reportResultEntityList = new ReportManager().getReportResultList(reportItemUuid);
-
-		for (ReportResultEntity reportResult : reportResultEntityList) {
-			LOG.info("Result Id : " + reportResult.getReportResultId());
-		}
-
-		clearLogbackMarkers();
-
-		return Response
-				.ok()
-				.entity(null)
-				.build();
-	}
-
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/getResults")
 	public Response getResults(@Context SecurityContext sc, @QueryParam("reportItemUuid") String reportItemUuid, @QueryParam("runDate") String runDate) throws Exception {
 		super.setLogbackMarkers(sc);

@@ -74,8 +74,7 @@ public class CohortManager {
 			return "select distinct p " +
 					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 					"where p.organizationId = :organizationId " +
-					"and e.dateRegistered <= :baseline " +
-					"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
+					"and e.dateRegistered <= :baseline ";
 
 		return "";
 	}
@@ -1014,15 +1013,13 @@ public class CohortManager {
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
 						"where p.organizationId = :organizationId " +
-						"and e.dateRegistered <= :baseline " +
-						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere;
+						"and e.dateRegistered <= :baseline " + q.sqlWhere;
 			} else {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
 						"where p.organizationId = :organizationId " +
-						"and e.dateRegistered <= :baseline " +
-						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
+						"and e.dateRegistered <= :baseline " + q.sqlWhere +
 						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;

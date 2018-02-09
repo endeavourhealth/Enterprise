@@ -14,7 +14,12 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CohortManager {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CohortManager.class);
 
 	public static void saveCohortPatients(CohortPatientsEntity result) throws Exception {
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
@@ -623,6 +628,8 @@ public class CohortManager {
 			queryResult.setPatients(queryPatients);
 			queryResult.setObservations(patientObservations2);
 			queryResults.add(queryResult);
+
+			LOG.info("Running cohort: " + libraryItem.getName() + ", for organisation: "+organisationInCohort.getName());
 
 		} // next organisation in cohort
 		entityManager.close();

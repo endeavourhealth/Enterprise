@@ -88,6 +88,8 @@ public class ReportManager {
 		}
 
 		for (ReportCohortFeature feature : reportItem.getReport().getCohortFeature()) {
+			LOG.info("Running report feature: " + feature.getFieldName());
+
 			reportFeatureData = runCohortFeature(userUuid, reportRun, feature.getCohortFeatureUuid(), runDate, reportRun.getBaselineCohortId(), true);
 			for (QueryResult featureObservations : reportFeatureData) {
 				for (ObservationEntity observationEntity : featureObservations.getObservations()) {

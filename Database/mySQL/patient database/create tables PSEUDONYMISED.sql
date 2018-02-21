@@ -877,7 +877,7 @@ CREATE INDEX observation_snomed_concept_id_is_problem
 
 CREATE INDEX observation_snomed_concept_id_value
   ON observation
-  (`snomed_concept_id`,`value`);
+  (`snomed_concept_id`,`result_value`);
 
 CREATE INDEX observation_original_code
   ON observation

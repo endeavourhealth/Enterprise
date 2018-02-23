@@ -879,6 +879,19 @@ CREATE INDEX observation_original_code
   ON observation
   (original_code);
     
+CREATE INDEX ix_observation_organization_id
+  ON observation
+  (organization_id);
+  
+CREATE INDEX ix_observation_clinical_effective_date
+  ON observation
+  (clinical_effective_date);
+  
+  
+CREATE INDEX ix_observation_person_id
+  ON observation
+  (person_id);	
+	
 -- Table: procedure_request
 
 CREATE TABLE procedure_request

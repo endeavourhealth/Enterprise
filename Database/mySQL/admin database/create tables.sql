@@ -135,7 +135,7 @@ CREATE TABLE enterprise_data_pseudonymised.ReportSchedule (
     PRIMARY KEY (ReportScheduleId)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
-CREATE TABLE reportrow (
+CREATE TABLE ReportRow (
   ReportRowId bigint(20) NOT NULL AUTO_INCREMENT,
   ReportResultId int(11) NOT NULL,
   PatientId bigint(20) NOT NULL,

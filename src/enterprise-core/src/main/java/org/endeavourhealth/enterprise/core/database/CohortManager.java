@@ -401,9 +401,9 @@ public class CohortManager {
 								patientObservations2.add(observationEntity);
 							}
 						} else if (field.contains("VALUE")) {
-							if (observationEntity.getValue()!=null &&
-									observationEntity.getValue() >= Double.parseDouble(valueFrom) &&
-									observationEntity.getValue() <= Double.parseDouble(valueTo)) {
+							if (observationEntity.getResultValue()!=null &&
+									observationEntity.getResultValue() >= Double.parseDouble(valueFrom) &&
+									observationEntity.getResultValue() <= Double.parseDouble(valueTo)) {
 								patientObservations2.add(observationEntity);
 							}
 						}
@@ -427,8 +427,8 @@ public class CohortManager {
 								patientObservations2.add(observationEntity);
 							}
 						} else if (field.contains("VALUE")) {
-							if (observationEntity.getValue()!=null &&
-									observationEntity.getValue() >= Double.parseDouble(valueFrom)) {
+							if (observationEntity.getResultValue()!=null &&
+									observationEntity.getResultValue() >= Double.parseDouble(valueFrom)) {
 								patientObservations2.add(observationEntity);
 							}
 						}
@@ -452,8 +452,8 @@ public class CohortManager {
 								patientObservations2.add(observationEntity);
 							}
 						} else if (field.contains("VALUE")) {
-							if (observationEntity.getValue()!=null &&
-									observationEntity.getValue() <= Double.parseDouble(valueTo)) {
+							if (observationEntity.getResultValue()!=null &&
+									observationEntity.getResultValue() <= Double.parseDouble(valueTo)) {
 								patientObservations2.add(observationEntity);
 							}
 						}

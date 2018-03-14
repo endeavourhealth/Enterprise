@@ -214,8 +214,8 @@ public class ReportManager {
 				.setOriginalTerm(observation.getOriginalTerm())
 				.setOriginalCode(observation.getOriginalCode())
 				.setSnomedConceptId(observation.getSnomedConceptId())
-				.setValue(observation.getValue())
-				.setUnits(observation.getUnits());
+				.setValue(observation.getResultValue())
+				.setUnits(observation.getResultValueUnits());
 
 
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();

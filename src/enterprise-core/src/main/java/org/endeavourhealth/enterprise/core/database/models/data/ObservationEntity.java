@@ -18,12 +18,21 @@ public class ObservationEntity {
     private Date clinicalEffectiveDate;
     private Short datePrecisionId;
     private Long snomedConceptId;
-    private Double value;
-    private String units;
     private String originalCode;
     private byte isProblem;
     private String originalTerm;
     private Byte isReview;
+    private Double resultValue;
+    private String resultValueUnits;
+    private Date resultDate;
+    private String resultText;
+    private Long resultConceptId;
+    private Date problemEndDate;
+    private Long parentObservationId;
+
+    public void setIsReview(byte isReview) {
+        this.isReview = isReview;
+    }
 
     @Id
     @Column(name = "id", nullable = false)
@@ -116,26 +125,6 @@ public class ObservationEntity {
     }
 
     @Basic
-    @Column(name = "value", nullable = true, precision = 0)
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
-        this.value = value;
-    }
-
-    @Basic
-    @Column(name = "units", nullable = true, length = 50)
-    public String getUnits() {
-        return units;
-    }
-
-    public void setUnits(String units) {
-        this.units = units;
-    }
-
-    @Basic
     @Column(name = "original_code", nullable = true, length = 20)
     public String getOriginalCode() {
         return originalCode;
@@ -186,8 +175,6 @@ public class ObservationEntity {
             return false;
         if (snomedConceptId != null ? !snomedConceptId.equals(that.snomedConceptId) : that.snomedConceptId != null)
             return false;
-        if (value != null ? !value.equals(that.value) : that.value != null) return false;
-        if (units != null ? !units.equals(that.units) : that.units != null) return false;
         if (originalCode != null ? !originalCode.equals(that.originalCode) : that.originalCode != null) return false;
         if (originalTerm != null ? !originalTerm.equals(that.originalTerm) : that.originalTerm != null) return false;
 
@@ -205,8 +192,6 @@ public class ObservationEntity {
         result = 31 * result + (clinicalEffectiveDate != null ? clinicalEffectiveDate.hashCode() : 0);
         result = 31 * result + (datePrecisionId != null ? datePrecisionId.hashCode() : 0);
         result = 31 * result + (snomedConceptId != null ? snomedConceptId.hashCode() : 0);
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-        result = 31 * result + (units != null ? units.hashCode() : 0);
         result = 31 * result + (originalCode != null ? originalCode.hashCode() : 0);
         result = 31 * result + (int) isProblem;
         result = 31 * result + (originalTerm != null ? originalTerm.hashCode() : 0);
@@ -214,12 +199,82 @@ public class ObservationEntity {
     }
 
     @Basic
-    @Column(name = "is_review", nullable = true)
+    @Column(name = "is_review", nullable = false)
     public Byte getIsReview() {
         return isReview;
     }
 
     public void setIsReview(Byte isReview) {
         this.isReview = isReview;
+    }
+
+    @Basic
+    @Column(name = "result_value", nullable = true, precision = 0)
+    public Double getResultValue() {
+        return resultValue;
+    }
+
+    public void setResultValue(Double resultValue) {
+        this.resultValue = resultValue;
+    }
+
+    @Basic
+    @Column(name = "result_value_units", nullable = true, length = 50)
+    public String getResultValueUnits() {
+        return resultValueUnits;
+    }
+
+    public void setResultValueUnits(String resultValueUnits) {
+        this.resultValueUnits = resultValueUnits;
+    }
+
+    @Basic
+    @Column(name = "result_date", nullable = true)
+    public Date getResultDate() {
+        return resultDate;
+    }
+
+    public void setResultDate(Date resultDate) {
+        this.resultDate = resultDate;
+    }
+
+    @Basic
+    @Column(name = "result_text", nullable = true, length = -1)
+    public String getResultText() {
+        return resultText;
+    }
+
+    public void setResultText(String resultText) {
+        this.resultText = resultText;
+    }
+
+    @Basic
+    @Column(name = "result_concept_id", nullable = true)
+    public Long getResultConceptId() {
+        return resultConceptId;
+    }
+
+    public void setResultConceptId(Long resultConceptId) {
+        this.resultConceptId = resultConceptId;
+    }
+
+    @Basic
+    @Column(name = "problem_end_date", nullable = true)
+    public Date getProblemEndDate() {
+        return problemEndDate;
+    }
+
+    public void setProblemEndDate(Date problemEndDate) {
+        this.problemEndDate = problemEndDate;
+    }
+
+    @Basic
+    @Column(name = "parent_observation_id", nullable = true)
+    public Long getParentObservationId() {
+        return parentObservationId;
+    }
+
+    public void setParentObservationId(Long parentObservationId) {
+        this.parentObservationId = parentObservationId;
     }
 }

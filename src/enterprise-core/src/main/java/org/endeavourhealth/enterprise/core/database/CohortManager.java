@@ -811,11 +811,11 @@ public class CohortManager {
 		if (valueFrom.equals("") && valueTo.equals(""))
 			q.sqlWhere += pref + " d.snomedConceptId = '" + code + "'";
 		if (!valueFrom.equals("") && valueTo.equals(""))
-			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.value >= '" + valueFrom + "')";
+			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.resultValue >= '" + valueFrom + "')";
 		if (valueFrom.equals("") && !valueTo.equals(""))
-			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.value <= '" + valueTo + "')";
+			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.resultValue <= '" + valueTo + "')";
 		if (!valueFrom.equals("") && !valueTo.equals(""))
-			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.value >= '" + valueFrom + "' and d.value <= '" + valueTo + "')";
+			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.resultValue >= '" + valueFrom + "' and d.resultValue <= '" + valueTo + "')";
 	}
 
 	private static void buildConceptPatientFilter(QueryMeta q, String term, String parentType, String valueFrom, String valueTo) {

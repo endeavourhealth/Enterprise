@@ -18,4 +18,4 @@ artifacts:
   files:
     - appspec.yml
     - aws_scripts/**/*
-    - src/enterprise-web/target/enterprise-web-1.0-SNAPSHOT.war
+    - src/enterprise-web/target/population-health.war

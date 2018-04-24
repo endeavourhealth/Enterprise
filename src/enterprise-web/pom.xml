@@ -153,6 +153,7 @@
     </dependencies>
 
     <build>
+        <finalName>population-health</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

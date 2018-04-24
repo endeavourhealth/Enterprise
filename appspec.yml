@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /src/enterprise-web/target/enterprise-web-1.0-SNAPSHOT.war
-    destination: /opt/tomcat/webapps/enterprise.war
+    destination: /opt/tomcat/webapps/population-health.war
 hooks:
   BeforeInstall:
     - location: aws_scripts/cleanup

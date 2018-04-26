@@ -37,7 +37,7 @@
 													  class="fa fa-sm"
 													  [ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
-											<th style="width:100px">Options</th>
+											<th style="width:50px"></th>
 										</tr>
 									</thead>
 									<tbody>
@@ -53,8 +53,8 @@
 												<span *ngIf="item.isRunning" style="color:darkgreen">running...</span>
 											</td>
 											<td>
-												<div ngbDropdown >
-													<button type="button" class="btn btn-xs btn-default" ngbDropdownToggle id="itemMenu">...</button>
+												<div ngbDropdown>
+													<button type="button" class="child-to-show btn btn-xs btn-default pull-right" ngbDropdownToggle id="itemMenu">...</button>
 													<ul class="dropdown-menu dropdown-menu-right" style="cursor:pointer" aria-labelledby="itemMenu">
 														<li *ngIf="item.type==2"><a (click)="runCohort(item)">Run Cohort Totals</a></li>
 														<li *ngIf="item.type==1"><a (click)="runReport(item)">Run Report</a></li>

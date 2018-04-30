@@ -314,7 +314,7 @@ CREATE TABLE schedule
   start_date date,
   type character varying(255),
   location character varying(255),
-  CONSTRAINT pk_schedule_id PRIMARY KEY (organisation_id, id),
+  CONSTRAINT pk_schedule_id PRIMARY KEY (organization_id, id),
   CONSTRAINT fk_schedule_organization_id FOREIGN KEY (organization_id)
       REFERENCES organization (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION

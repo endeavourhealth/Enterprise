@@ -308,7 +308,7 @@ CREATE TABLE schedule
   start_date date,
   type character varying(255),
   location character varying(255),
-  CONSTRAINT pk_schedule_id PRIMARY KEY (organisation_id, id)
+  CONSTRAINT pk_schedule_id PRIMARY KEY (organization_id, id)
 );
 
 -- Index: schedule_id

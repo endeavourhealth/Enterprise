@@ -145,15 +145,6 @@ export class CohortViewDialog implements OnInit {
         return null;
     }
 
-    save() {
-        var vm = this;
-        this.ok();
-    }
-
-    ok() {
-        this.$uibModalInstance.close(this.resultData);
-    }
-
     cancel() {
         this.$uibModalInstance.dismiss('cancel');
     }

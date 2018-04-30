@@ -79,15 +79,6 @@ export class ReportViewDialog implements OnInit {
         return str;
     }
 
-    save() {
-        var vm = this;
-        this.ok();
-    }
-
-    ok() {
-        this.$uibModalInstance.close(this.resultData);
-    }
-
     cancel() {
         this.$uibModalInstance.dismiss('cancel');
     }

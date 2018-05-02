@@ -31,6 +31,8 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 
 		List<Object[]> organisations = OrganizationEntity.getOrganisations();
 
+		Set<String> orgList = SecurityUtils.getUserAllowedOrganisationIdsFromSecurityContext(sc);
+
 		List<JsonOrganisation> results = new ArrayList<>();
 
 		for (Object[] orgEntity : organisations) {

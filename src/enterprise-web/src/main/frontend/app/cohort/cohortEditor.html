@@ -20,6 +20,9 @@
                                     <option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
                                 </select>
                                 <br/>
+                                <input type="checkbox" id="allOrgs" name="allOrgs" [(ngModel)]="allOrgs">&nbsp;Run against all organisations
+                                <br/>
+                                <br/>
                                 <label>Patient Population: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
                                 <select class="form-control" style="width:300px" (change)="setSelectedPopulation($event.target)">
                                     <option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>

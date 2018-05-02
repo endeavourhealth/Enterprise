@@ -30,6 +30,7 @@ export class CohortEditDialog implements OnInit {
     baselineDate: string = "";
     queryItemUuid: string = "";
     baselineCohort : QuerySelection;
+    allOrgs: boolean;
 
     orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
     ppTT: string = "Please select a patient population as the denominator.";
@@ -104,6 +105,9 @@ export class CohortEditDialog implements OnInit {
     }
 
     ok() {
+        var vm = this;
+        if (vm.allOrgs)
+            vm.resultData.organisation = <any>[];
         this.$uibModalInstance.close(this.resultData);
     }
 

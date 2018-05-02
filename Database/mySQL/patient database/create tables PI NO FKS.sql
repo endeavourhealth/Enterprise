@@ -38,6 +38,8 @@ DROP TABLE IF EXISTS patient_gender;
 DROP TABLE IF EXISTS registration_type;
 DROP TABLE IF EXISTS lsoa_lookup;
 DROP TABLE IF EXISTS msoa_lookup;
+DROP TABLE IF EXISTS ward_lookup;
+DROP TABLE IF EXISTS local_authority_lookup;
 DROP TABLE IF EXISTS ethnicity_lookup;
 
 CREATE TABLE ethnicity_lookup
@@ -97,6 +99,20 @@ CREATE TABLE msoa_lookup
   msoa_code character(9) NOT NULL,
   msoa_name character varying(255),
   CONSTRAINT pk_msoa_lookup PRIMARY KEY (msoa_code)
+);
+
+CREATE TABLE local_authority_lookup
+(
+  local_authority_code varchar(9) NOT NULL,
+  local_authority_name varchar(255),
+  CONSTRAINT pk_local_authority_lookup PRIMARY KEY (local_authority_code)
+);
+
+CREATE TABLE ward_lookup
+(
+  ward_code varchar(9) NOT NULL,
+  ward_name varchar(255),
+  CONSTRAINT pk_ward_lookup PRIMARY KEY (ward_code)
 );
 
 -- Table: date_precision

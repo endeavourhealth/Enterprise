@@ -347,13 +347,15 @@ public class CohortManager {
 
 		String ruleSQL = "";
 
-		if (organisations.isEmpty()) {
+		if (organisations.isEmpty() || organisations.get(0).getId().equals("0")) {
 			ruleSQL = getRuleSQLAllOrganisations(baselineCohortId, cohortPopulation, q, restriction);
-			JsonOrganisation org = new JsonOrganisation();
-			org.setId("0");
-			org.setName("All");
-			org.setOdsCode("All");
-			organisations.add(org);
+			if (organisations.isEmpty()) {
+				JsonOrganisation org = new JsonOrganisation();
+				org.setId("0");
+				org.setName("All");
+				org.setOdsCode("All");
+				organisations.add(org);
+			}
 		}
 		else
 			ruleSQL = getRuleSQL(baselineCohortId, cohortPopulation, q, restriction);

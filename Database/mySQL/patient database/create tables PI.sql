@@ -362,6 +362,9 @@ CREATE TABLE person
   lsoa_code character varying(50),
   msoa_code character varying(50),
   ethnic_code character(1),
+  ward_code varchar(50),
+  local_authority_code varchar(50),
+  registered_practice_organization_id bigint;
   CONSTRAINT pk_person_id PRIMARY KEY (id),
   CONSTRAINT fk_person_patient_gender_id FOREIGN KEY (patient_gender_id)
       REFERENCES patient_gender (id) MATCH SIMPLE
@@ -392,6 +395,9 @@ CREATE TABLE patient
   lsoa_code character varying(50),
   msoa_code character varying(50),
   ethnic_code character(1),
+  ward_code varchar(50),
+  local_authority_code varchar(50),
+  registered_practice_organization_id bigint;
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
   CONSTRAINT fk_patient_organization_id FOREIGN KEY (organization_id)
       REFERENCES organization (id) MATCH SIMPLE

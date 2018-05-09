@@ -354,7 +354,7 @@ CREATE TABLE person
   ethnic_code character(1),
   ward_code varchar(50),
   local_authority_code varchar(50),
-  registered_practice_organization_id bigint;
+  registered_practice_organization_id bigint,
   CONSTRAINT pk_person_id PRIMARY KEY (id)
 );
 
@@ -384,7 +384,7 @@ CREATE TABLE patient
   ethnic_code character(1),
   ward_code varchar(50),
   local_authority_code varchar(50),
-  registered_practice_organization_id bigint;  
+  registered_practice_organization_id bigint,
   CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (`organization_id`,`person_id`,`id`)
 );
 

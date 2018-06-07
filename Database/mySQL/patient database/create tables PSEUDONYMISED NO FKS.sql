@@ -847,8 +847,12 @@ CREATE INDEX referral_request_snomed_concept_id
 
 CREATE TABLE link_distributor
 (
-  source_skid bigint NOT NULL,
+  source_skid character varying(255) NOT NULL,
   target_salt_key_name varchar(50) NOT NULL,
-  target_skid bigint NOT NULL,
-  CONSTRAINT pk_link_distributor PRIMARY KEY (`source_skid`,`target_skid`)              
+  target_skid character varying(255) NULL,
+  CONSTRAINT pk_link_distributor PRIMARY KEY (`source_skid`)             
 );
+
+CREATE INDEX link_distributor_target_skid
+  ON link_distributor
+  (target_skid);

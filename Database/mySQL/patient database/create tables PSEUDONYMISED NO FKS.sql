@@ -41,6 +41,7 @@ DROP TABLE IF EXISTS msoa_lookup;
 DROP TABLE IF EXISTS ward_lookup;
 DROP TABLE IF EXISTS local_authority_lookup;
 DROP TABLE IF EXISTS ethnicity_lookup;
+DROP TABLE IF EXISTS link_distributor;
 
 CREATE TABLE ethnicity_lookup
 (
@@ -842,3 +843,12 @@ CREATE INDEX referral_request_snomed_concept_id
   ON referral_request
   (snomed_concept_id);
   
+-- Table: link_distributor
+
+CREATE TABLE link_distributor
+(
+  source_skid bigint NOT NULL,
+  target_salt_key_name varchar(50) NOT NULL,
+  target_skid bigint NOT NULL,
+  CONSTRAINT pk_link_distributor PRIMARY KEY (`source_skid`,`target_skid`)              
+);

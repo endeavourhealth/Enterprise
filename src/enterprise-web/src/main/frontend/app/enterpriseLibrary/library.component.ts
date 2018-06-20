@@ -38,7 +38,8 @@ export class LibraryComponent {
 			{type: ItemType.Query, text: 'Add cohort'},
 			{type: ItemType.Query, text: 'Add report feature'},
 			{type: ItemType.CodeSet, text: 'Add code set '},
-			{type: ItemType.Report, text: 'Add report'}
+			{type: ItemType.Report, text: 'Add report'},
+			{type: ItemType.System, text: 'Paste item into this folder'}
 		];
 	}
 
@@ -78,6 +79,9 @@ export class LibraryComponent {
 				break;
 			case ItemType.Report:
 				this.$state.go('app.reportEdit', {itemUuid: actionItemProp.uuid, itemAction: actionItemProp.action});
+				break;
+			case ItemType.System:
+				this.pasteItem(actionItemProp.uuid);
 				break;
 			default:
 				this.logger.error('Invalid item type', actionItemProp.type, 'Item ' + actionItemProp.action);
@@ -258,17 +262,19 @@ export class LibraryComponent {
 			);
 	}
 
-	pasteItem(node: FolderNode) {
+	pasteItem(uuid) {
 		var vm = this;
 		var libraryItem: EnterpriseLibraryItem = vm.moduleStateService.getState('libraryClipboard') as EnterpriseLibraryItem;
+		console.log(uuid);
+		console.log(libraryItem);
 		if (libraryItem) {
-			libraryItem.folderUuid = node.uuid;
+			libraryItem.folderUuid = uuid;
 			vm.libraryService.saveLibraryItem(libraryItem)
 				.subscribe(
 					(result) => {
 						vm.logger.success('Item pasted to folder', libraryItem, 'Paste');
 						// reload folder if still selection
-						if (vm.selectedFolder.uuid === node.uuid) {
+						if (vm.selectedFolder.uuid === uuid) {
 							vm.refresh();
 						}
 					},

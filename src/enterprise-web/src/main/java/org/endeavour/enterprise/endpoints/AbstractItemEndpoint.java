@@ -250,7 +250,8 @@ public abstract class AbstractItemEndpoint extends AbstractEndpoint {
         db.saveItems(audit, item, activeItem, itemdependencyEntities);
 
         //if the document contains a code set, then populate the CodeSet table accordingly
-        populateCodeSets(queryDocument, itemUuid);
+        if (queryDocument != null)
+            populateCodeSets(queryDocument, itemUuid);
     }
 
     private void populateCodeSets(QueryDocument queryDocument, String itemUuid) throws Exception {

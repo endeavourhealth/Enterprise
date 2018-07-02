@@ -76,5 +76,11 @@ export class CohortService extends BaseHttp2Service {
 		return this.httpPost('api/cohort/run', result);
 	}
 
+	getFrailty(pseudoId : string):Observable<Boolean> {
+		var params : URLSearchParams = new URLSearchParams();
+		params.append('pseudoId', pseudoId);
+		return this.httpGet('api/cohort/getFrailty', {search : params});
+	}
+
 
 }

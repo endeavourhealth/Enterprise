@@ -55,6 +55,20 @@
 							</div>
 						</loadingIndicator>
 					</div>
+					<div><hr/></div>
+					<div class="row">
+						<div class="col-md-4">
+							<h4>Frailty Tester</h4>
+							<div style="color:grey">
+								This utility checks the frailty status for a given patient. It is used to test the NHS111 Frailty API. If the specified patient has an observation for severe or moderate frailty then the utility API returns a value of TRUE.
+							</div>
+						</div>
+						<loadingIndicator [done]="!frailtyRunning" [text]="'Loading frailty result, please wait...'">
+							<div class="col-md-3">
+								<button class="btn btn-success btn-sm pull-left" (click)="frailty()"><i class="fa fa-play-circle-o"></i> Check Frailty Status</button>
+							</div>
+						</loadingIndicator>
+					</div>
 				</div>
 			</form>
 		</div>

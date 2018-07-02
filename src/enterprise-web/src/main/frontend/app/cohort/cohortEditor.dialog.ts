@@ -61,6 +61,8 @@ export class CohortEditDialog implements OnInit {
                 (data) => {
                     vm.organisations = data;
                 });
+
+
     }
 
     pickBaselineCohort() {

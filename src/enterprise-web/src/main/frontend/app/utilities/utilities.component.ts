@@ -12,6 +12,9 @@ import {IndDashChartDialog} from "./indDash/indDashChart.dialog";
 import {PrevIncService} from "./prevInc/prevInc.service";
 import {HealthCareActivityChart} from "./healthCareActivity/healthCareActivityChart.dialog";
 import {HealthCareActivityService} from "./healthCareActivity/healthCareActivity.service";
+import {CohortService} from "../cohort/cohort.service";
+import {InputBoxDialog} from 'eds-common-js';
+import {MessageBoxDialog} from 'eds-common-js';
 
 @Component({
 	template : require('./utilities.html')
@@ -26,7 +29,8 @@ export class UtilitiesComponent {
 							private transition: Transition,
 							private logger: LoggerService,
 							private $modal: NgbModal,
-							private $state: StateService) {
+							private $state: StateService,
+							protected cohortService: CohortService) {
 
 		this.performAction(transition.params()['utilId']);
 
@@ -106,6 +110,31 @@ export class UtilitiesComponent {
 
 	indDash() {
 		IndDashChartDialog.open(this.$modal);
+	}
+
+	frailty() {
+		let vm = this;
+
+		InputBoxDialog.open(this.$modal, 'NHS111 Frailty Checker', 'Patient Pseudo Id', '0')
+			.result.then(
+			(result) => this.checkFrailty(result)
+		);
+
+
+	}
+
+	checkFrailty(pseudoId: string) {
+		let vm = this;
+		vm.cohortService.getFrailty(pseudoId)
+			.subscribe(
+				(data) => {
+					var message = "Patient is not frail";
+					if (data)
+						message = "Patient is frail";
+
+					MessageBoxDialog.open(this.$modal, 'NHS111 Frailty Checker', message, 'Ok', 'Cancel');
+					console.log(data)
+				});
 	}
 
 	hca() {

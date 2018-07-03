@@ -234,10 +234,11 @@ public class CohortResultEntity {
         return ent;
     }
 
-    public static Boolean getFrailty(String pseudoId) {
+    public static String getFrailty(String pseudoId) {
 
         // setup snomed frailty concepts
 
+        Long cshaFrailtyScale = Long.parseLong("445414007");
         Long fiFrailtyIndex = Long.parseLong("713634000");
         Long severeFrailty = Long.parseLong("925861000000102");
         Long qFrailtySevereFrailty = Long.parseLong("2010301000006105");
@@ -255,44 +256,52 @@ public class CohortResultEntity {
         String severeFrailtyQuery = "SELECT p FROM PatientEntity p " +
                 "join ObservationEntity o on o.patientId = p.id " +
                 "where p.pseudoId = :pseudoId " +
-                "and " +
+                "and (" +
                 "(o.snomedConceptId = :fiFrailtyIndex and o.resultValue > '0.36') " +
                 "or " +
-                "(o.snomedConceptId = :severeFrailty or o.snomedConceptId = :qFrailtySevereFrailty)";
+                "(o.snomedConceptId = :cshaFrailtyScale and o.resultValue > '6') " +
+                "or " +
+                "(o.snomedConceptId = :severeFrailty or o.snomedConceptId = :qFrailtySevereFrailty))";
 
         String moderateFrailtyQuery = "SELECT p FROM PatientEntity p " +
                 "join ObservationEntity o on o.patientId = p.id " +
                 "where p.pseudoId = :pseudoId " +
-                "and " +
+                "and (" +
                 "(o.snomedConceptId = :fiFrailtyIndex and o.resultValue >= '0.24' and o.resultValue <= '0.36') " +
                 "or " +
-                "(o.snomedConceptId = :moderateFrailty or o.snomedConceptId = :onFrailtyRegister or o.snomedConceptId = :frailPerson or o.snomedConceptId = :frailty or o.snomedConceptId = :frailElderlyPeople1 or o.snomedConceptId = :frailElderlyPeople2 or o.snomedConceptId = :qFrailtyModerateFrailty)";
+                "(o.snomedConceptId = :cshaFrailtyScale and o.resultValue > '4' and o.resultValue < '6') " +
+                "or " +
+                "(o.snomedConceptId = :moderateFrailty or o.snomedConceptId = :onFrailtyRegister or o.snomedConceptId = :frailPerson or o.snomedConceptId = :frailty or o.snomedConceptId = :frailElderlyPeople1 or o.snomedConceptId = :frailElderlyPeople2 or o.snomedConceptId = :qFrailtyModerateFrailty))";
 
         String mildFrailtyQuery = "SELECT p FROM PatientEntity p " +
                 "join ObservationEntity o on o.patientId = p.id " +
                 "where p.pseudoId = :pseudoId " +
-                "and " +
+                "and (" +
                 "(o.snomedConceptId = :fiFrailtyIndex and o.resultValue >= '0.13' and o.resultValue <= '0.24') " +
                 "or " +
-                "(o.snomedConceptId = :mildFrailty)";
+                "(o.snomedConceptId = :cshaFrailtyScale and o.resultValue = '4') " +
+                "or " +
+                "(o.snomedConceptId = :mildFrailty))";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List ent = entityManager.createQuery(severeFrailtyQuery)
                 .setParameter("pseudoId", pseudoId)
                 .setParameter("fiFrailtyIndex", fiFrailtyIndex)
+                .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                 .setParameter("severeFrailty", severeFrailty)
                 .setParameter("qFrailtySevereFrailty", qFrailtySevereFrailty)
                 .getResultList();
 
-        Boolean isFrail = false;
+        String frailtyCategory = "NONE";
 
         if (!ent.isEmpty())
-            isFrail = true; // patient has severe frailty
+            frailtyCategory = "SEVERE"; // patient has severe frailty
         else {
             ent = entityManager.createQuery(moderateFrailtyQuery)
                     .setParameter("pseudoId", pseudoId)
                     .setParameter("fiFrailtyIndex", fiFrailtyIndex)
+                    .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                     .setParameter("moderateFrailty", moderateFrailty)
                     .setParameter("onFrailtyRegister", onFrailtyRegister)
                     .setParameter("frailPerson", frailPerson)
@@ -302,11 +311,21 @@ public class CohortResultEntity {
                     .setParameter("qFrailtyModerateFrailty", qFrailtyModerateFrailty)
                     .getResultList();
             if (!ent.isEmpty())
-                isFrail = true; // patient has moderate frailty
+                frailtyCategory = "MODERATE"; // patient has moderate frailty
+            else {
+                ent = entityManager.createQuery(mildFrailtyQuery)
+                        .setParameter("pseudoId", pseudoId)
+                        .setParameter("fiFrailtyIndex", fiFrailtyIndex)
+                        .setParameter("cshaFrailtyScale", cshaFrailtyScale)
+                        .setParameter("mildFrailty", mildFrailty)
+                        .getResultList();
+                if (!ent.isEmpty())
+                    frailtyCategory = "MILD"; // patient has mild frailty
+            }
         }
 
         entityManager.close();
 
-        return isFrail;
+        return frailtyCategory;
     }
 }

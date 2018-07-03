@@ -128,9 +128,7 @@ export class UtilitiesComponent {
 		vm.cohortService.getFrailty(pseudoId)
 			.subscribe(
 				(data) => {
-					var message = "Patient is not frail";
-					if (data)
-						message = "Patient is frail";
+					var message = "Patient frailty category = "+data;
 
 					MessageBoxDialog.open(this.$modal, 'NHS111 Frailty Checker', message, 'Ok', 'Cancel');
 					console.log(data)

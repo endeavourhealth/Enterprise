@@ -340,19 +340,19 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	}
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN )
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/getFrailty")
 	public Response getFrailty(@Context SecurityContext sc, @QueryParam("pseudoId") String pseudoId) throws Exception {
 		super.setLogbackMarkers(sc);
 
-		Boolean isFrail = CohortResultEntity.getFrailty(pseudoId);
+		String frailtyCategory = CohortResultEntity.getFrailty(pseudoId);
 
 		clearLogbackMarkers();
 
 		return Response
 				.ok()
-				.entity(isFrail)
+				.entity(frailtyCategory)
 				.build();
 	}
 }

@@ -2,6 +2,7 @@ import {OnInit, Input, Component} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 
 import {CodePickerDialog} from "../coding/codePicker.dialog";
+import {TermPickerDialog} from "../coding/termPicker.dialog";
 import {Test} from "./models/Test";
 import {CodeSetValue} from "../codeSet/models/CodeSetValue";
 import {Restriction} from "../expressions/models/Restriction";
@@ -390,7 +391,7 @@ export class TestEditDialog implements OnInit{
 	showCodePicker() {
 		var vm = this;
 
-		CodePickerDialog.open(this.$modal, vm.codeSelection)
+		TermPickerDialog.open(this.$modal, vm.codeSelection)
 			.result.then(function(resultData : CodeSetValue[]){
 
 			if (vm.codeSelection.length>0) {

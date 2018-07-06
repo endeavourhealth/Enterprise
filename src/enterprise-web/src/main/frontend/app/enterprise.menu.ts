@@ -8,7 +8,7 @@ export class EnterpriseMenuService implements  MenuService {
 		return 'eds-compass';
 	}
 	getApplicationTitle(): string {
-		return 'Population Health v1.6';
+		return 'Population Health v1.7';
 	}
 	getMenuOptions():MenuOption[] {
 		return [

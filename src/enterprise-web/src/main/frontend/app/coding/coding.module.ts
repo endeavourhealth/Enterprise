@@ -6,7 +6,9 @@ import {TreeModule} from "angular2-tree-component";
 import {CodePickerDialog} from "./codePicker.dialog";
 import {TermlexCodingService} from "./termlex/termlexCoding.service";
 import {CodingService} from "./coding.service";
+import {TermService} from "./term.service";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {TermPickerDialog} from "./termPicker.dialog";
 
 @NgModule({
 	imports : [
@@ -16,13 +18,13 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 		NgbModule
 	],
 	declarations : [
-		CodePickerDialog
+		CodePickerDialog, TermPickerDialog
 	],
 	entryComponents : [
-		CodePickerDialog
+		CodePickerDialog, TermPickerDialog
 	],
 	providers : [
-		{ provide : CodingService, useClass : TermlexCodingService}
+		TermService, { provide : CodingService, useClass : TermlexCodingService}
 	],
 })
 export class CodingModule {}

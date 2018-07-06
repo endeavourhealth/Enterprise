@@ -81,7 +81,7 @@
 			<div class="col-xs-12">
 				<div class="form-group">
 					<label>
-						<a class="queryLink" (click)="showCodePicker()"><i class="fa fa-search"></i> Select Concept(s)</a>
+						<a class="queryLink" (click)="showCodePicker()"><i class="fa fa-search"></i> Select Coded Terms(s)</a>
 						<a style='margin-left: 20px' class="queryLink" (click)="showCodeSetPicker()"><i class="fa fa-tags"></i> Select Code Set</a>
 					</label>
 
@@ -89,7 +89,6 @@
 						<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px;width:830px">
 							<tr *ngIf="showConceptResults">
 								<th style="width: 150px">Data Source</th>
-								<th style="width: 200px">Parent Concept</th>
 								<th style="width: 200px">Concept Term</th>
 								<th style="width: 140px">Value >=</th>
 								<th style="width: 140px">Value <=</th>
@@ -97,12 +96,6 @@
 							<tr style="height:40px" *ngFor="let selection of codeSelection; let isLast=last">
 								<td style="color:black;font-size:12px">
 									{{ selection.baseType }}
-								</td>
-								<td *ngIf="selection.parentType!=selection.baseType"  style="color:black;font-size:12px">
-									{{ selection.parentType }}
-								</td>
-								<td *ngIf="selection.parentType==selection.baseType">
-
 								</td>
 								<td style="color:black;font-size:12px">
 									{{ selection.term.split("(")[0] }}

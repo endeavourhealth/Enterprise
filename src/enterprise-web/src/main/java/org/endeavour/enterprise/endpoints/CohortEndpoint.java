@@ -348,7 +348,7 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 
 		LOG.debug("Frailty API called for pseudo ID " + pseudoId);
 		String frailtyCategory = CohortResultEntity.getFrailty(pseudoId);
-		LOG.debug("Frailty Calculated as " + pseudoId);
+		LOG.debug("Frailty Calculated as " + frailtyCategory);
 
 		clearLogbackMarkers();
 

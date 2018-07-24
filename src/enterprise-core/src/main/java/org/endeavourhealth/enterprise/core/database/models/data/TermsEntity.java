@@ -113,6 +113,15 @@ public class TermsEntity {
             return new ArrayList<Object[]>();
         }
 
+        String[] parts = term.split(" ");
+        String part1 = parts[0];
+        String part2 = "";
+
+        if (parts.length>1)
+            part2 = parts[1];
+        else
+            part2 = parts[0];
+
         String where = "select t.originalTerm,t.snomedTerm,t.snomedConceptId,t.originalCode, "+
                 "case when t.recordType=0 then 'Observation' "+
                 "when t.recordType=1 then 'Medication' "+
@@ -120,13 +129,15 @@ public class TermsEntity {
                 "when t.recordType=3 then 'Referral' "+
                 "when t.recordType=4 then 'Encounter' END as recordType "+
                 "from TermsEntity t "+
-                "WHERE t.originalTerm like :term "+
+                "WHERE (t.originalTerm like :term1 or t.originalTerm like :term2 or t.snomedTerm like :term1 or t.snomedTerm like :term2 or t.originalCode like :term1 or t.snomedConceptId like :term1)"+
                 "order by t.originalTerm";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
-                .setParameter("term", term).getResultList();
+                .setParameter("term1", term)
+                .setParameter("term2", part2+" "+part1)
+                .getResultList();
 
         entityManager.close();
 

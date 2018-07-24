@@ -16,29 +16,48 @@
 
 				</div>
 			</div>
-			<div class="form-group col-md-4"><span style="color:black;font-size:10px"><i class="fa fa-info-circle" aria-hidden="true"></i> Use % as a wildcard (i.e. %height, asthma%, %serum%)</span>
+			<div class="form-group col-md-4"><span style="color:black;font-size:12px"><i class="fa fa-info-circle" aria-hidden="true"></i> Use % as a wildcard (i.e. %height, asthma%, %serum%)</span>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="form-group col-md-8">
 				<label class="control-label">Terms</label>
-				<div class="scroll-box-150 form-control">
-					<div *ngFor="let match of searchTerms"
-							 (click)="displayCode(match, false)"
-							 class="hover-box show-child-on-hover striped"
-							 [ngClass]="{'selection': match?.originalTerm == highlightedMatch?.originalTerm}">
-						<span *ngIf="match.recordType=='Patient'" style="cursor: pointer" class="fa fa-user fa-right-pad text-muted" ngbTooltip="{{ match.recordType }}"></span>
-						<span *ngIf="match.recordType=='Observation'" style="cursor: pointer" class="fa fa-stethoscope fa-right-pad text-muted" ngbTooltip="{{ match.recordType }}"></span>
-						<span *ngIf="match.recordType=='Medication'" style="cursor: pointer" class="fa fa-medkit fa-right-pad text-muted" ngbTooltip="{{ match.recordType }}"></span>
-						<span *ngIf="match.recordType=='Allergy'" style="cursor: pointer" class="fa fa-exclamation-triangle fa-right-pad text-muted" ngbTooltip="{{ match.recordType }}"></span>
-						<span *ngIf="match.recordType=='Referral'" style="cursor: pointer" class="fa fa-h-square fa-right-pad text-muted" ngbTooltip="{{ match.recordType }}"></span>
-						<span *ngIf="match.recordType=='Encounter'" style="cursor: pointer" class="fa fa-user-md fa-right-pad text-muted" ngbTooltip="{{ match.recordType }}"></span>
-						<span ngbTooltip="{{match.snomedTerm}} {{match.snomedConceptId}} {{match.originalCode}}" style="color:black;font-size:12px">{{ match.originalTerm }}</span>
-						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(match)">
-							<span class="fa fa-sm fa-plus"></span>
-						</button>
-					</div>
+				<div class="scroll-box-450 form-control">
+					<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px">
+						<tr>
+							<th style="width: 100px">Select</th>
+							<th style="width: 400px">Original Term</th>
+							<th style="width: 400px">Snomed Term</th>
+							<th style="width: 250px">Snomed Concept ID</th>
+							<th style="width: 200px">Original Code</th>
+							<th style="width: 200px">Record Type</th>
+
+						</tr>
+						<tr style="height:40px" *ngFor="let match of searchTerms">
+							<td>
+								<button type="button" class="btn btn-xs btn-success pull-left child-to-show" (click)="addToSelection(match)">
+									<span class="fa fa-sm fa-plus"></span>
+								</button>
+							</td>
+							<td style="color:black;font-size:12px">
+								{{ match.originalTerm }}
+							</td>
+							<td style="color:black;font-size:12px">
+								{{ match.snomedTerm }}
+							</td>
+							<td style="color:black;font-size:12px">
+								{{ match.snomedConceptId }}
+							</td>
+							<td style="color:black;font-size:12px">
+								{{ match.originalCode }}
+							</td>
+							<td style="color:black;font-size:12px">
+								{{ match.recordType }}
+							</td>
+
+						</tr>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -58,38 +77,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-user" aria-hidden="true"></i> Patient
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-stethoscope" aria-hidden="true"></i> Observation
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-medkit" aria-hidden="true"></i> Medication
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Allergy
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-h-square" aria-hidden="true"></i> Referral
-				</span>
-			</div>
-			<div class="form-group col-md-2">
-				<span>
-					<i class="fa fa-user-md" aria-hidden="true"></i> Encounter
-				</span>
-			</div>
-		</div>
+
 
 	</form>
 </div>

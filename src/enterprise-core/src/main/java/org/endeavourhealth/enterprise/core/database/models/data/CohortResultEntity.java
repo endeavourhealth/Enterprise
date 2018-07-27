@@ -313,7 +313,7 @@ public class CohortResultEntity {
                 .setParameter("severeFrailty", severeFrailty)
                 .setParameter("qFrailtySevereFrailty", qFrailtySevereFrailty)
                 .setParameter("qFrailtySevereFrailtyEstimate", qFrailtySevereFrailtyEstimate);
-        LOG.debug("Severe SQL = " + query);
+        //LOG.debug("Severe SQL = " + query);
         List ent = query.getResultList();
 
         String frailtyCategory = "NONE";
@@ -325,7 +325,7 @@ public class CohortResultEntity {
             query = entityManager.createQuery(moderateFrailtyQuery)
                     .setParameter("pseudoId", pseudoId)
                     .setParameter("fiFrailtyIndex", fiFrailtyIndex)
-                    .setParameter("fiFrailtyIndex2", fiFrailtyIndex)
+                    .setParameter("fiFrailtyIndex2", fiFrailtyIndex2)
                     .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                     .setParameter("moderateFrailty", moderateFrailty)
                     .setParameter("onFrailtyRegister", onFrailtyRegister)
@@ -335,7 +335,7 @@ public class CohortResultEntity {
                     .setParameter("frailElderlyPeople2", frailElderlyPeople2)
                     .setParameter("qFrailtyModerateFrailty", qFrailtyModerateFrailty)
                     .setParameter("qFrailtyModerateFrailtyEstimate", qFrailtyModerateFrailtyEstimate);
-            LOG.debug("Moderate SQL = " + query);
+            //LOG.debug("Moderate SQL = " + query);
             ent = query.getResultList();
 
             if (!ent.isEmpty())
@@ -344,12 +344,12 @@ public class CohortResultEntity {
                 query = entityManager.createQuery(mildFrailtyQuery)
                         .setParameter("pseudoId", pseudoId)
                         .setParameter("fiFrailtyIndex", fiFrailtyIndex)
-                        .setParameter("fiFrailtyIndex2", fiFrailtyIndex)
+                        .setParameter("fiFrailtyIndex2", fiFrailtyIndex2)
                         .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                         .setParameter("mildFrailty", mildFrailty)
                         .setParameter("qFrailtyMildFrailty", qFrailtyMildFrailty)
                         .setParameter("qFrailtyMildFrailtyEstimate", qFrailtyMildFrailtyEstimate);
-                LOG.debug("Mild SQL = " + mildFrailtyQuery);
+                //LOG.debug("Mild SQL = " + mildFrailtyQuery);
                 ent = query.getResultList();
 
                 if (!ent.isEmpty())

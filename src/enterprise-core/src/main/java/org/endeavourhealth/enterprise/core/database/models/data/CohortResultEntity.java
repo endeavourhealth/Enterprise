@@ -241,6 +241,7 @@ public class CohortResultEntity {
         //frailty indexes
         Long cshaFrailtyScale = Long.parseLong("445414007");
         Long fiFrailtyIndex = Long.parseLong("713634000");
+        Long fiFrailtyIndex2 = Long.parseLong("713636003"); //Emis now use this Snomed code as of Jul 2018
 
         //severe frailty
         Long severeFrailty = Long.parseLong("925861000000102");
@@ -268,6 +269,8 @@ public class CohortResultEntity {
                 "and (" +
                 "(o.snomedConceptId = :fiFrailtyIndex and o.resultValue > '0.36') " +
                 "or " +
+                "(o.snomedConceptId = :fiFrailtyIndex2 and o.resultValue > '0.36') " +
+                "or " +
                 "(o.snomedConceptId = :cshaFrailtyScale and o.resultValue >= '7') " +
                 "or " +
                 "(o.snomedConceptId = :severeFrailty or o.snomedConceptId = :qFrailtySevereFrailty or o.snomedConceptId = :qFrailtySevereFrailtyEstimate))";
@@ -277,6 +280,8 @@ public class CohortResultEntity {
                 "where p.pseudoId = :pseudoId " +
                 "and (" +
                 "(o.snomedConceptId = :fiFrailtyIndex and o.resultValue > '0.24' and o.resultValue <= '0.36') " +
+                "or " +
+                "(o.snomedConceptId = :fiFrailtyIndex2 and o.resultValue > '0.24' and o.resultValue <= '0.36') " +
                 "or " +
                 "(o.snomedConceptId = :cshaFrailtyScale and o.resultValue >= '6' and o.resultValue < '7') " +
                 "or " +
@@ -288,6 +293,8 @@ public class CohortResultEntity {
                 "and (" +
                 "(o.snomedConceptId = :fiFrailtyIndex and o.resultValue > '0.13' and o.resultValue <= '0.24') " +
                 "or " +
+                "(o.snomedConceptId = :fiFrailtyIndex2 and o.resultValue > '0.13' and o.resultValue <= '0.24') " +
+                "or " +
                 "(o.snomedConceptId = :cshaFrailtyScale and o.resultValue >= 5 and o.resultValue < 6) " +
                 "or " +
                 "(o.snomedConceptId = :mildFrailty or o.snomedConceptId = :qFrailtyMildFrailty or o.snomedConceptId = :qFrailtyMildFrailtyEstimate))";
@@ -297,6 +304,7 @@ public class CohortResultEntity {
         List ent = entityManager.createQuery(severeFrailtyQuery)
                 .setParameter("pseudoId", pseudoId)
                 .setParameter("fiFrailtyIndex", fiFrailtyIndex)
+                .setParameter("fiFrailtyIndex2", fiFrailtyIndex2)
                 .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                 .setParameter("severeFrailty", severeFrailty)
                 .setParameter("qFrailtySevereFrailty", qFrailtySevereFrailty)
@@ -311,6 +319,7 @@ public class CohortResultEntity {
             ent = entityManager.createQuery(moderateFrailtyQuery)
                     .setParameter("pseudoId", pseudoId)
                     .setParameter("fiFrailtyIndex", fiFrailtyIndex)
+                    .setParameter("fiFrailtyIndex2", fiFrailtyIndex)
                     .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                     .setParameter("moderateFrailty", moderateFrailty)
                     .setParameter("onFrailtyRegister", onFrailtyRegister)
@@ -327,6 +336,7 @@ public class CohortResultEntity {
                 ent = entityManager.createQuery(mildFrailtyQuery)
                         .setParameter("pseudoId", pseudoId)
                         .setParameter("fiFrailtyIndex", fiFrailtyIndex)
+                        .setParameter("fiFrailtyIndex2", fiFrailtyIndex)
                         .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                         .setParameter("mildFrailty", mildFrailty)
                         .setParameter("qFrailtyMildFrailty", qFrailtyMildFrailty)

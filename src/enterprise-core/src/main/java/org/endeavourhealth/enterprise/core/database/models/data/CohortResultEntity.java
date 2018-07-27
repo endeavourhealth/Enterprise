@@ -1,6 +1,8 @@
 package org.endeavourhealth.enterprise.core.database.models.data;
 
 import org.endeavourhealth.enterprise.core.database.PersistenceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -12,6 +14,8 @@ import java.util.List;
 @Entity
 @Table(name = "CohortResult", schema = "enterprise_data_pseudonymised", catalog = "")
 public class CohortResultEntity {
+    private static final Logger LOG = LoggerFactory.getLogger(CohortResultEntity.class);
+
     private int cohortResultId;
     private String endUserUuid;
     private Timestamp baselineDate;
@@ -298,6 +302,10 @@ public class CohortResultEntity {
                 "(o.snomedConceptId = :cshaFrailtyScale and o.resultValue >= 5 and o.resultValue < 6) " +
                 "or " +
                 "(o.snomedConceptId = :mildFrailty or o.snomedConceptId = :qFrailtyMildFrailty or o.snomedConceptId = :qFrailtyMildFrailtyEstimate))";
+
+        LOG.debug("Severe SQL = " + severeFrailtyQuery);
+        LOG.debug("Moderate SQL = " + moderateFrailtyQuery);
+        LOG.debug("Mild SQL = " + mildFrailtyQuery);
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 

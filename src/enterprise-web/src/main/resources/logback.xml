@@ -10,12 +10,12 @@
 
 
   <!-- appender for log file-->
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+  <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>EnterpriseWebServer.log</file>
     <encoder>
       <pattern>%date %level [%thread] %logger{10}:%line %X{UserUuid} - %msg%n</pattern>
     </encoder>
-  </appender>
+  </appender>-->
 
   <!--================================-->
   <!--logging settings for development-->
@@ -27,7 +27,8 @@
   <logger name="com.datastax" level="ERROR"/>
 
   <!-- enable TRACE logging for Endeavour code -->
-  <logger name="org.endeavour.enterprise" level="TRACE"/>
+  <logger name="org.endeavour" level="TRACE"/>
+  <logger name="org.endeavourhealth" level="TRACE"/>
 
   <!-- only log to stdout with INFO level -->
   <root level="INFO">

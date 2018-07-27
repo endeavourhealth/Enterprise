@@ -303,28 +303,26 @@ public class CohortResultEntity {
                 "or " +
                 "(o.snomedConceptId = :mildFrailty or o.snomedConceptId = :qFrailtyMildFrailty or o.snomedConceptId = :qFrailtyMildFrailtyEstimate))";
 
-        LOG.debug("Severe SQL = " + severeFrailtyQuery);
-        LOG.debug("Moderate SQL = " + moderateFrailtyQuery);
-        LOG.debug("Mild SQL = " + mildFrailtyQuery);
-
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        List ent = entityManager.createQuery(severeFrailtyQuery)
+        Query query = entityManager.createQuery(severeFrailtyQuery)
                 .setParameter("pseudoId", pseudoId)
                 .setParameter("fiFrailtyIndex", fiFrailtyIndex)
                 .setParameter("fiFrailtyIndex2", fiFrailtyIndex2)
                 .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                 .setParameter("severeFrailty", severeFrailty)
                 .setParameter("qFrailtySevereFrailty", qFrailtySevereFrailty)
-                .setParameter("qFrailtySevereFrailtyEstimate", qFrailtySevereFrailtyEstimate)
-                .getResultList();
+                .setParameter("qFrailtySevereFrailtyEstimate", qFrailtySevereFrailtyEstimate);
+        LOG.debug("Severe SQL = " + query);
+        List ent = query.getResultList();
 
         String frailtyCategory = "NONE";
 
         if (!ent.isEmpty())
             frailtyCategory = "SEVERE"; // patient has severe frailty
         else {
-            ent = entityManager.createQuery(moderateFrailtyQuery)
+
+            query = entityManager.createQuery(moderateFrailtyQuery)
                     .setParameter("pseudoId", pseudoId)
                     .setParameter("fiFrailtyIndex", fiFrailtyIndex)
                     .setParameter("fiFrailtyIndex2", fiFrailtyIndex)
@@ -336,20 +334,24 @@ public class CohortResultEntity {
                     .setParameter("frailElderlyPeople1", frailElderlyPeople1)
                     .setParameter("frailElderlyPeople2", frailElderlyPeople2)
                     .setParameter("qFrailtyModerateFrailty", qFrailtyModerateFrailty)
-                    .setParameter("qFrailtyModerateFrailtyEstimate", qFrailtyModerateFrailtyEstimate)
-                    .getResultList();
+                    .setParameter("qFrailtyModerateFrailtyEstimate", qFrailtyModerateFrailtyEstimate);
+            LOG.debug("Moderate SQL = " + query);
+            ent = query.getResultList();
+
             if (!ent.isEmpty())
                 frailtyCategory = "MODERATE"; // patient has moderate frailty
             else {
-                ent = entityManager.createQuery(mildFrailtyQuery)
+                query = entityManager.createQuery(mildFrailtyQuery)
                         .setParameter("pseudoId", pseudoId)
                         .setParameter("fiFrailtyIndex", fiFrailtyIndex)
                         .setParameter("fiFrailtyIndex2", fiFrailtyIndex)
                         .setParameter("cshaFrailtyScale", cshaFrailtyScale)
                         .setParameter("mildFrailty", mildFrailty)
                         .setParameter("qFrailtyMildFrailty", qFrailtyMildFrailty)
-                        .setParameter("qFrailtyMildFrailtyEstimate", qFrailtyMildFrailtyEstimate)
-                        .getResultList();
+                        .setParameter("qFrailtyMildFrailtyEstimate", qFrailtyMildFrailtyEstimate);
+                LOG.debug("Mild SQL = " + mildFrailtyQuery);
+                ent = query.getResultList();
+
                 if (!ent.isEmpty())
                     frailtyCategory = "MILD"; // patient has mild frailty
             }

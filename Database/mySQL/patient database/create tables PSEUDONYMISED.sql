@@ -259,6 +259,10 @@ INSERT INTO registration_type (id, code, description) VALUES (10, 'CHS', 'Child 
 INSERT INTO registration_type (id, code, description) VALUES (11, 'N', 'Contraceptive Services');
 INSERT INTO registration_type (id, code, description) VALUES (12, 'Y', 'Yellow Fever');
 INSERT INTO registration_type (id, code, description) VALUES (13, 'M', 'Maternity Services');
+INSERT INTO registration_type (id, code, description) VALUES (14, 'PR', 'Pre-Registration');
+INSERT INTO registration_type (id, code, description) VALUES (15, 'SH', 'Sexual Health');
+INSERT INTO registration_type (id, code, description) VALUES (16, 'V', 'Vasectomy');
+INSERT INTO registration_type (id, code, description) VALUES (17, 'OH', 'Out of Hours');
 
 -- Table: organization
 

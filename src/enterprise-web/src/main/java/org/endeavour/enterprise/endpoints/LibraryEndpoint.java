@@ -505,6 +505,78 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getTermChildren")
+    public Response getTermChildren(@Context SecurityContext sc, @QueryParam("code") String code) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<Object[]> terms = TermsEntity.getTermChildren(code);
+
+        List<JsonTerm> results = new ArrayList<>();
+
+        for (Object[] termEntity: terms) {
+            String originalTerm = termEntity[0].toString();
+            String snomedTerm = termEntity[1]==null?"":termEntity[1].toString();
+            String snomedConceptId = termEntity[2]==null?"":termEntity[2].toString();
+            String originalCode = termEntity[3]==null?"":termEntity[3].toString();
+            String recordType = termEntity[4].toString();
+
+            JsonTerm jTerm = new JsonTerm();
+            jTerm.setOriginalTerm(originalTerm);
+            jTerm.setSnomedTerm(snomedTerm);
+            jTerm.setSnomedConceptId(snomedConceptId);
+            jTerm.setOriginalCode(originalCode);
+            jTerm.setRecordType(recordType);
+
+            results.add(jTerm);
+        }
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/getTermParents")
+    public Response getTermParents(@Context SecurityContext sc, @QueryParam("code") String code) throws Exception {
+        super.setLogbackMarkers(sc);
+
+        List<Object[]> terms = TermsEntity.getTermParents(code);
+
+        List<JsonTerm> results = new ArrayList<>();
+
+        for (Object[] termEntity: terms) {
+            String originalTerm = termEntity[0].toString();
+            String snomedTerm = termEntity[1]==null?"":termEntity[1].toString();
+            String snomedConceptId = termEntity[2]==null?"":termEntity[2].toString();
+            String originalCode = termEntity[3]==null?"":termEntity[3].toString();
+            String recordType = termEntity[4].toString();
+
+            JsonTerm jTerm = new JsonTerm();
+            jTerm.setOriginalTerm(originalTerm);
+            jTerm.setSnomedTerm(snomedTerm);
+            jTerm.setSnomedConceptId(snomedConceptId);
+            jTerm.setOriginalCode(originalCode);
+            jTerm.setRecordType(recordType);
+
+            results.add(jTerm);
+        }
+
+        clearLogbackMarkers();
+
+        return Response
+                .ok()
+                .entity(results)
+                .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getCodeSets")
     public Response getCodeSets(@Context SecurityContext sc) throws Exception {
         super.setLogbackMarkers(sc);

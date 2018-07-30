@@ -97,7 +97,13 @@
 }
 
 .scroll-box-150 {
-    height: 150px;
+      height: 150px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+  }
+
+.scroll-box-175 {
+    height: 175px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -116,6 +122,12 @@
 
 .scroll-box-500 {
     height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.scroll-box-600 {
+    height: 615px;
     overflow-y: scroll;
     overflow-x: hidden;
 }

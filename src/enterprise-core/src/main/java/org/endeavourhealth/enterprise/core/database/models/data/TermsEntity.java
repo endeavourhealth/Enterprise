@@ -144,4 +144,60 @@ public class TermsEntity {
         return ent;
 
     }
+
+    public static List<Object[]> getTermChildren(String code) throws Exception {
+        if (code.isEmpty()) {
+            return new ArrayList<Object[]>();
+        }
+
+        String where = "select sd.term,sd.term,sd.conceptId,'','Observation' "+
+                "from Sct2RelationshipEntity sr " +
+                "JOIN Sct2DescriptionEntity sd " +
+                "on sd.conceptId = sr.sourceId " +
+                "JOIN Sct2ConceptEntity sc on sc.id = sd.conceptId " +
+                "where sr.destinationId = :code " +
+                "and sr.typeId = 116680003 " +
+                "and sr.active = 1 " +
+                "and sd.typeId = 900000000000003001 "+
+                "order by sd.term";
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmRf2();
+
+        List<Object[]> ent = entityManager.createQuery(where)
+                .setParameter("code", code)
+                .getResultList();
+
+        entityManager.close();
+
+        return ent;
+
+    }
+
+    public static List<Object[]> getTermParents(String code) throws Exception {
+        if (code.isEmpty()) {
+            return new ArrayList<Object[]>();
+        }
+
+        String where = "select sd.term,sd.term,sd.conceptId,'','Observation' "+
+                "from Sct2RelationshipEntity sr " +
+                "JOIN Sct2DescriptionEntity sd " +
+                "on sd.conceptId = sr.destinationId " +
+                "JOIN Sct2ConceptEntity sc on sc.id = sd.conceptId " +
+                "where sr.sourceId = :code " +
+                "and sr.typeId = 116680003 " +
+                "and sr.active = 1 " +
+                "and sd.typeId = 900000000000003001 "+
+                "order by sd.term";
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmRf2();
+
+        List<Object[]> ent = entityManager.createQuery(where)
+                .setParameter("code", code)
+                .getResultList();
+
+        entityManager.close();
+
+        return ent;
+
+    }
 }

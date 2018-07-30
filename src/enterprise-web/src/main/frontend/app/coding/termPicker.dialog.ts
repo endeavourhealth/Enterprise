@@ -22,15 +22,10 @@ export class TermPickerDialog {
 	@Input() resultData;
 	options : ITreeOptions;
 
-	highlightedMatch : Term;
-	previousSelection : Term;
-	highlightedSelection : Term;
-
 	searchTerm : string;
-	searchResults : Term[];
 	searchTerms : Term[];
-	parents : CodeSetValue[];
-	children : CodeSetValue[];
+	parents : Term[];
+	children : Term[];
 
 	termCache : any;
 
@@ -56,7 +51,6 @@ export class TermPickerDialog {
 				(result) => {
 					console.log(result);
 				vm.searchTerms = result;
-				vm.searchResults = [];
 				vm.parents = [];
 				vm.children = [];
 			});
@@ -65,15 +59,23 @@ export class TermPickerDialog {
 	displayCode(itemToDisplay : Term, replace : boolean) {
 		let vm = this;
 
-		if (vm.highlightedMatch) {
-			vm.previousSelection = vm.highlightedMatch;
-		}
-
 		if (replace) {
-			vm.searchResults = [itemToDisplay];
+			vm.searchTerms = [itemToDisplay];
+
 		}
 
-		vm.highlightedMatch = itemToDisplay;
+		vm.termService.getTermChildren(itemToDisplay.snomedConceptId)
+			.subscribe(
+				(result) => vm.children = result
+
+			);
+
+		vm.termService.getTermParents(itemToDisplay.snomedConceptId)
+			.subscribe(
+				(result) => vm.parents = result
+			);
+
+
 
 
 	}

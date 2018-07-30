@@ -23,7 +23,7 @@
 		<div class="row">
 			<div class="form-group col-md-8">
 				<label class="control-label">Terms</label>
-				<div class="scroll-box-450 form-control">
+				<div class="scroll-box-600 form-control">
 					<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px">
 						<tr>
 							<th style="width: 100px">Select</th>
@@ -40,7 +40,7 @@
 									<span class="fa fa-sm fa-plus"></span>
 								</button>
 							</td>
-							<td style="color:black;font-size:12px">
+							<td style="color:blue;font-size:12px;cursor:pointer" (click)="displayCode(match, false)">
 								{{ match.originalTerm }}
 							</td>
 							<td style="color:black;font-size:12px">
@@ -60,23 +60,44 @@
 					</table>
 				</div>
 			</div>
-		</div>
-
-		<div class="row">
-			<div class="form-group col-md-8">
+			<div class="form-group col-md-4">
+				<label class="control-label">Parent Terms</label> <small class="text-muted">(double-click to navigate up the hierarchy)</small>
+				<div class="scroll-box-175 form-control">
+					<div *ngFor="let parent of parents"
+						 (dblclick)="displayCode(parent, true)"
+						 class="hover-box show-child-on-hover striped">
+						<span ngbTooltip="{{parent.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ parent.originalTerm }}</span>
+						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
+							<span class="fa fa-sm fa-plus"></span>
+						</button>
+					</div>
+				</div>
+				<br/>
+				<label class="control-label">Child Terms</label> <small class="text-muted">(double-click to navigate down the hierarchy)</small>
+				<div class="scroll-box-175 form-control">
+					<div *ngFor="let child of children"
+						 (dblclick)="displayCode(child, true)"
+						 class="hover-box show-child-on-hover striped">
+						<span ngbTooltip="{{child.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ child.originalTerm }}</span>
+						<button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
+							<span class="fa fa-sm fa-plus"></span>
+						</button>
+					</div>
+				</div>
+				<br/>
 				<label class="control-label">Selected Term(s)</label>
-				<div class="scroll-box-150 form-control">
+				<div class="scroll-box-175 form-control">
 					<div ngbTooltip="{{selection.code}}" *ngFor="let selection of resultData"
-							 class="hover-box show-child-on-hover striped"
-							 [ngClass]="{'selection': selection == highlightedSelection}" style="color:black;font-size:12px">
-						{{ selection.term }}
+						 class="hover-box show-child-on-hover striped">
+						<span ngbTooltip="{{selection.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ selection.term }}</span>
 						<button type="button" class="btn btn-xs btn-danger pull-right child-to-show" (click)="removeFromSelection(selection)">
 							<span class="fa fa-sm fa-minus"></span>
 						</button>
 					</div>
 				</div>
-			</div>
 		</div>
+		</div>
+
 
 
 	</form>

@@ -14,5 +14,17 @@ export class TermService extends BaseHttp2Service {
 		return this.httpGet('api/library/getTerms', {search : params});
 	}
 
+	getTermChildren(code : string): Observable<Term[]>{
+		var params : URLSearchParams = new URLSearchParams();
+		params.append('code', code);
+		return this.httpGet('api/library/getTermChildren', {search : params});
+	}
+
+	getTermParents(code : string): Observable<Term[]>{
+		var params : URLSearchParams = new URLSearchParams();
+		params.append('code', code);
+		return this.httpGet('api/library/getTermParents', {search : params});
+	}
+
 
 }

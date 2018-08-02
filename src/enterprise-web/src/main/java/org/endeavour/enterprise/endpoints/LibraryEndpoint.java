@@ -470,10 +470,15 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/getTerms")
-    public Response getTerms(@Context SecurityContext sc, @QueryParam("term") String term) throws Exception {
+    public Response getTerms(@Context SecurityContext sc, @QueryParam("term") String term, @QueryParam("snomed") String snomed) throws Exception {
         super.setLogbackMarkers(sc);
 
-        List<Object[]> terms = TermsEntity.findTerms(term);
+        List<Object[]> terms = null;
+
+        if (snomed.equals("true"))
+            terms = TermsEntity.findSnomedTerms(term);
+        else
+            terms = TermsEntity.findTerms(term);
 
         List<JsonTerm> results = new ArrayList<>();
 

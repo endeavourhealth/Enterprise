@@ -6,30 +6,33 @@
 	<form endUserRole="form" class="container-fluid">
 		<div class="row">
 			<div class="form-group col-md-4">
-				<label class="control-label">Search for Terms</label>
+				<label class="control-label">Search for Terms (Use % as a pre-fix wildcard i.e. %serum)</label>
 				<div class="input-group">
 					<input type="text" class="form-control" placeholder="Search term" aria-describedby="searchTerm"
 						   [(ngModel)]="searchTerm" (keyup)="$event.keyCode == 13 && search()" autofocus name="searchTerm">
 					<span class="input-group-addon" (click)="search()" style="cursor: pointer">
 						<i class="fa fa-search" id="searchTerm" aria-hidden="true"></i>
 					</span>
-
 				</div>
 			</div>
-			<div class="form-group col-md-4"><span style="color:black;font-size:12px"><i class="fa fa-info-circle" aria-hidden="true"></i> Use % as a wildcard (i.e. %height, asthma%, %serum%)</span>
+			<div class="form-group col-md-4">
+				<span style="color:black;font-size:14px">
+					<br/>
+					<input type="checkbox" id="snomed" name="snomed" [(ngModel)]="snomed" (change)="search()">&nbsp;Search SNOMED CT
+				</span>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="form-group col-md-8">
 				<label class="control-label">Terms</label>
-				<div class="scroll-box-600 form-control">
+				<div class="scroll-box-200 form-control">
 					<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px">
 						<tr>
 							<th style="width: 100px">Select</th>
 							<th style="width: 400px">Original Term</th>
 							<th style="width: 400px">Snomed Term</th>
-							<th style="width: 250px">Snomed Concept ID</th>
+							<th style="width: 250px">Concept ID</th>
 							<th style="width: 200px">Original Code</th>
 							<th style="width: 200px">Record Type</th>
 
@@ -59,10 +62,26 @@
 						</tr>
 					</table>
 				</div>
+				<br/>
+
+				<label class="control-label">Selected Term(s)</label>
+				<div class="scroll-box-200 form-control" style="color:black;font-size:12px">
+					<Tree #inclusionTree [nodes]="inclusionTreeData" [options]="options">
+						<template #treeNodeTemplate let-node="node">
+							<input ngbTooltip="{{node.data.id}}"
+									(change)="check(node, !node.data.checked)"
+									type="checkbox"
+									[indeterminate]="node.data.indeterminate"
+									[checked]="node.data.checked">
+
+							{{ node.data.name }}
+						</template>
+					</Tree>
+				</div>
 			</div>
 			<div class="form-group col-md-4">
 				<label class="control-label">Parent Terms</label> <small class="text-muted">(double-click to navigate up the hierarchy)</small>
-				<div class="scroll-box-175 form-control">
+				<div class="scroll-box-200 form-control">
 					<div *ngFor="let parent of parents"
 						 (dblclick)="displayCode(parent, true)"
 						 class="hover-box show-child-on-hover striped">
@@ -74,7 +93,7 @@
 				</div>
 				<br/>
 				<label class="control-label">Child Terms</label> <small class="text-muted">(double-click to navigate down the hierarchy)</small>
-				<div class="scroll-box-175 form-control">
+				<div class="scroll-box-200 form-control">
 					<div *ngFor="let child of children"
 						 (dblclick)="displayCode(child, true)"
 						 class="hover-box show-child-on-hover striped">
@@ -84,20 +103,8 @@
 						</button>
 					</div>
 				</div>
-				<br/>
-				<label class="control-label">Selected Term(s)</label>
-				<div class="scroll-box-175 form-control">
-					<div ngbTooltip="{{selection.code}}" *ngFor="let selection of resultData"
-						 class="hover-box show-child-on-hover striped">
-						<span ngbTooltip="{{selection.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ selection.term }}</span>
-						<button type="button" class="btn btn-xs btn-danger pull-right child-to-show" (click)="removeFromSelection(selection)">
-							<span class="fa fa-sm fa-minus"></span>
-						</button>
-					</div>
-				</div>
+			</div>
 		</div>
-		</div>
-
 
 
 	</form>

@@ -8,9 +8,11 @@ import {BaseHttp2Service} from "eds-common-js";
 export class TermService extends BaseHttp2Service {
 	constructor(http : Http) { super(http); }
 
-	getTerms(term : string):Observable<Term[]> {
+	getTerms(term : string, snomed : string):Observable<Term[]> {
+		console.log(snomed);
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('term', term);
+		params.append('snomed', snomed);
 		return this.httpGet('api/library/getTerms', {search : params});
 	}
 

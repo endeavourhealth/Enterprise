@@ -500,7 +500,7 @@ public class CohortManager {
 							}
 						}
 					} else if (field.contains("CODE")) {
-						if (codes.contains(observationEntity.getSnomedConceptId().toString()+",")) // TODO: temp solution - need to join on child concepts, and calculate exclusions too
+						if (codes.contains(observationEntity.getSnomedConceptId().toString()+","))
 							patientObservations2.add(observationEntity);
 					}
 

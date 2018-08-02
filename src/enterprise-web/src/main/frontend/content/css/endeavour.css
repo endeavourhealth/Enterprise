@@ -102,8 +102,20 @@
       overflow-x: hidden;
   }
 
+.scroll-box-140 {
+    height: 140px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 .scroll-box-175 {
     height: 175px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.scroll-box-200 {
+    height: 210px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -126,8 +138,14 @@
     overflow-x: hidden;
 }
 
+.scroll-box-510 {
+    height: 510px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 .scroll-box-600 {
-    height: 615px;
+    height: 600px;
     overflow-y: scroll;
     overflow-x: hidden;
 }

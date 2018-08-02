@@ -124,7 +124,7 @@ public class TermsEntity {
 
         String where = "select t.originalTerm,t.snomedTerm,t.snomedConceptId,t.originalCode, "+
                 "case when t.recordType=0 then 'Observation' "+
-                "when t.recordType=1 then 'Medication' "+
+                "when t.recordType=1 then 'Medication Statement' "+
                 "when t.recordType=2 then 'Allergy' "+
                 "when t.recordType=3 then 'Referral' "+
                 "when t.recordType=4 then 'Encounter' END as recordType "+
@@ -135,8 +135,44 @@ public class TermsEntity {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
-                .setParameter("term1", term)
-                .setParameter("term2", part2+" "+part1)
+                .setParameter("term1", term+"%")
+                .setParameter("term2", part2+" "+part1+"%")
+                .getResultList();
+
+        entityManager.close();
+
+        return ent;
+
+    }
+
+    public static List<Object[]> findSnomedTerms(String term) throws Exception {
+        if (term.isEmpty()) {
+            return new ArrayList<Object[]>();
+        }
+
+        String[] parts = term.split(" ");
+        String part1 = parts[0];
+        String part2 = "";
+
+        if (parts.length>1)
+            part2 = parts[1];
+        else
+            part2 = parts[0];
+
+        String where = "select sd.term,sd.term,sd.conceptId,'','Observation' "+
+                "from Sct2DescriptionEntity sd " +
+                "JOIN Sct2ConceptEntity sc on sc.id = sd.conceptId " +
+                "where (sd.term like :term1 or sd.term like :term2 or sd.conceptId like :term1) "+
+                "and sd.active = 1 " +
+                "and sc.active = 1 " +
+                "and sd.typeId = 900000000000003001 " +
+                "order by sd.term";
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmRf2();
+
+        List<Object[]> ent = entityManager.createQuery(where)
+                .setParameter("term1", term+"%")
+                .setParameter("term2", part2+" "+part1+"%")
                 .getResultList();
 
         entityManager.close();
@@ -158,6 +194,8 @@ public class TermsEntity {
                 "where sr.destinationId = :code " +
                 "and sr.typeId = 116680003 " +
                 "and sr.active = 1 " +
+                "and sd.active = 1 "+
+                "and sc.active = 1 "+
                 "and sd.typeId = 900000000000003001 "+
                 "order by sd.term";
 
@@ -186,6 +224,8 @@ public class TermsEntity {
                 "where sr.sourceId = :code " +
                 "and sr.typeId = 116680003 " +
                 "and sr.active = 1 " +
+                "and sd.active = 1 "+
+                "and sc.active = 1 "+
                 "and sd.typeId = 900000000000003001 "+
                 "order by sd.term";
 

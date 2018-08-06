@@ -1,4 +1,4 @@
-import {Input, Component, ViewChild} from "@angular/core";
+import {OnInit, Input, Component, ViewChild} from "@angular/core";
 import {NgbModal, NgbActiveModal, NgbTabChangeEvent} from "@ng-bootstrap/ng-bootstrap";
 import {ITreeOptions, TreeComponent} from "angular2-tree-component";
 import {CodeSetValue} from "../codeSet/models/CodeSetValue";
@@ -12,7 +12,7 @@ import {InclusionTreeNode} from "./models/InclusionTreeNode";
 	selector: 'ngbd-modal-content',
 	template: require('./termPicker.html')
 })
-export class TermPickerDialog {
+export class TermPickerDialog implements OnInit{
 
 	public static open(modalService: NgbModal,   selection : CodeSetValue[]) {
 		const modalRef = modalService.open(TermPickerDialog, { backdrop : "static", size : "lg"});
@@ -29,6 +29,7 @@ export class TermPickerDialog {
 	highlightedSelection : CodeSetValue;
 
 	snomed: string = "";
+	treeCount: number = 0;
 
 	searchTerm : string;
 	searchTerms : Term[];
@@ -53,9 +54,27 @@ export class TermPickerDialog {
 			childrenField : 'children',
 			idField : 'id'
 		};
+	}
 
+	ngOnInit(): void {
 		this.inclusionTreeData = [];
 		this.selectedCodes = [];
+
+		for (const term of this.resultData) {
+			let rootNode : InclusionTreeNode = {
+				id : term.code,
+				name : term.term,
+				recordType : term.baseType,
+				checked : true,
+				indeterminate : false,
+				children : []
+			} as InclusionTreeNode;
+
+			this.selectedCodes.push(term.code);
+			this.inclusionTreeData.push(rootNode);
+			this.inclusionTree.treeModel.update();
+		}
+
 	}
 
 	search() {
@@ -67,6 +86,7 @@ export class TermPickerDialog {
 				vm.searchTerms = result;
 				vm.parents = [];
 				vm.children = [];
+
 			});
 	}
 
@@ -89,13 +109,12 @@ export class TermPickerDialog {
 				(result) => vm.parents = result
 			);
 
+
+
 	}
 
 	addChildren(match : Term, rootNode : InclusionTreeNode) {
 		let vm = this;
-
-		console.log(match);
-		console.log(this.selectedCodes);
 
 		vm.termService.getTermChildren(match.snomedConceptId)
 			.subscribe(
@@ -104,7 +123,9 @@ export class TermPickerDialog {
 						let childNode : InclusionTreeNode = {
 							id : child.snomedConceptId,
 							name : child.originalTerm,
+							recordType : child.recordType,
 							checked : true,
+							indeterminate : false,
 							children : []
 						} as InclusionTreeNode;
 
@@ -115,22 +136,10 @@ export class TermPickerDialog {
 						rootNode.children.push(childNode);
 						this.inclusionTree.treeModel.update();
 
+						this.treeCount++;
+
 						this.addChildren(child, childNode);
 
-						let item : CodeSetValue = {
-							code : child.snomedConceptId,
-							includeChildren : true,
-							term : child.originalTerm,
-							dataType : 11,
-							parentType : '',
-							baseType : child.recordType,
-							present : '1',
-							valueFrom : '',
-							valueTo : '',
-							units : '',
-							exclusion : []
-						};
-						this.resultData.push(item);
 					});
 				});
 	}
@@ -138,19 +147,21 @@ export class TermPickerDialog {
 	addToSelection(match : Term) {
 		let vm = this;
 
-		/*for (var i = 0; i < this.resultData.length; ++i) {
+		for (var i = 0; i < this.resultData.length; ++i) {
 			var baseType = this.resultData[i].baseType;
 
 			if (baseType!=match.recordType) {
 				this.logger.error('Each rule must have concepts of the same base type (i.e. Patient and Observation concepts cannot be mixed in the same rule)');
 				return;
 			}
-		}*/
+		}
 
 		let rootNode : InclusionTreeNode = {
 			id : match.snomedConceptId,
 			name : match.originalTerm,
+			recordType : match.recordType,
 			checked : true,
+			indeterminate : false,
 			children : []
 		} as InclusionTreeNode;
 
@@ -166,28 +177,8 @@ export class TermPickerDialog {
 		this.inclusionTreeData.push(rootNode);
 		this.inclusionTree.treeModel.update();
 
-		let item : CodeSetValue = {
-			code : match.snomedConceptId,
-			includeChildren : true,
-			term : match.originalTerm,
-			dataType : 11,
-			parentType : '',
-			baseType : match.recordType,
-			present : '1',
-			valueFrom : '',
-			valueTo : '',
-			units : '',
-			exclusion : []
-		};
-		this.resultData.push(item);
+		this.treeCount++;
 
-	}
-
-	removeFromSelection(item : CodeSetValue) {
-		let i = this.resultData.indexOf(item);
-		if (i !== -1) {
-			this.resultData.splice(i, 1);
-		}
 	}
 
 	check(node, checked) {
@@ -222,17 +213,56 @@ export class TermPickerDialog {
 		if (allChildrenChecked) {
 			node.data.checked = true;
 			node.data.indeterminate = false;
+			node.indeterminate = false;
 		} else if (noChildChecked) {
-			node.data.checked = false;
+			node.data.checked = true;
 			node.data.indeterminate = false;
+			node.indeterminate = false;
 		} else {
 			node.data.checked = false;
 			node.data.indeterminate = true;
+			node.indeterminate = true;
 		}
 		this.updateParentNodeCheckbox(node.parent);
 	}
 
+	setResultData(node) {
+		let item : CodeSetValue = {
+			code : node.id,
+			includeChildren : true,
+			term : node.name,
+			dataType : 11,
+			parentType : '',
+			baseType : node.recordType,
+			present : '1',
+			valueFrom : '',
+			valueTo : '',
+			units : '',
+			exclusion : []
+		};
+		this.resultData.push(item);
+	}
+
+	updateResultData() {
+		this.resultData = [];
+		this.inclusionTreeData.forEach((node) => {
+				this.updateChildren(node);
+			}
+		);
+	}
+
+	updateChildren(node) {
+		if (node.checked||node.indeterminate)
+			this.setResultData(node);
+		if (node.children) {
+			node.children.forEach((child) => this.updateChildren(child));
+		}
+	}
+
 	ok() {
+		this.updateResultData();
+		console.log(this.resultData);
+
 		this.activeModal.close(this.resultData);
 		console.log('OK Pressed');
 	}

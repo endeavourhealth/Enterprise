@@ -1,4 +1,4 @@
-import {CodePickerDialog} from "../coding/codePicker.dialog";
+import {TermPickerDialog} from "../coding/termPicker.dialog";
 import {Component} from "@angular/core";
 import {Transition, StateService} from "ui-router-ng2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
@@ -45,7 +45,7 @@ export class CodeSetEditComponent {
 
 	showCodePicker() {
 		let vm = this;
-		CodePickerDialog.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
+		TermPickerDialog.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)
 			.result.then(function(result) {
 				vm.libraryItem.codeSet.codeSetValue = result;
 		});

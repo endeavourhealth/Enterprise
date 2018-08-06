@@ -85,11 +85,11 @@
 						<a style='margin-left: 20px' class="queryLink" (click)="showCodeSetPicker()"><i class="fa fa-tags"></i> Select Code Set</a>
 					</label>
 
-					<div *ngIf="type=='1'" style="cursor: pointer; height:auto; overflow-y:scroll; min-height: 30px; max-height: 150px;" >
+					<div *ngIf="type=='1'" style="cursor: pointer; height:auto; overflow-y:scroll; min-height: 30px; max-height: 350px;" >
 						<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px;width:830px">
 							<tr *ngIf="showConceptResults">
 								<th style="width: 150px">Data Source</th>
-								<th style="width: 200px">Concept Term</th>
+								<th style="width: 200px">Concept Terms - {{codeSelection.length}} Selected</th>
 								<th style="width: 140px">Value >=</th>
 								<th style="width: 140px">Value <=</th>
 							</tr>

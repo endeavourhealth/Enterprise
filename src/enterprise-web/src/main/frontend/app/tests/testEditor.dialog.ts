@@ -290,7 +290,7 @@ export class TestEditDialog implements OnInit{
 			}
 		}
 
-		CodePickerDialog.open(this.$modal, vm.codeCompareSelection)
+		TermPickerDialog.open(this.$modal, vm.codeCompareSelection)
 			.result.then(function(result : CodeSetValue[]) {
 
 			var codeSet : CodeSet = {

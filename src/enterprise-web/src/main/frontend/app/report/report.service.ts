@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {BaseHttp2Service} from "eds-common-js";
 import {ReportRun} from "./models/ReportRun";
 import {ReportResult} from "./models/ReportResult";
+import {ReportRow} from "./models/ReportRow";
 import {ReportResultSummary} from "./models/ReportResultSummary";
 
 @Injectable()
@@ -21,7 +22,7 @@ export class ReportService extends BaseHttp2Service {
 		return this.httpGet('api/report/getAllResults', {search : params});
 	}
 
-	getReportResults(reportItemUuid : string, runDate):Observable<ReportResult[]> {
+	getReportResults(reportItemUuid : string, runDate):Observable<ReportRow[]> {
 		var params : URLSearchParams = new URLSearchParams();
 		params.append('reportItemUuid', reportItemUuid);
 		params.append('runDate', runDate);

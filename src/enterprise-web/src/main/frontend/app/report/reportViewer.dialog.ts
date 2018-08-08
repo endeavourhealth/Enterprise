@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import {ReportRun} from "./models/ReportRun";
+import {ReportRow} from "./models/ReportRow";
 import {ReportResult} from "./models/ReportResult";
 import {ReportResultSummary} from "./models/ReportResultSummary";
 import {ReportService} from "./report.service";
@@ -28,9 +29,13 @@ export class ReportViewDialog implements OnInit {
     runDate: string = "";
 
     reportResult: ReportResult[];
+    reportRow: ReportRow[];
     allReportResults: ReportResultSummary;
 
+    organisations = <any>[];
+
     constructor(protected reportService: ReportService,
+                protected cohortService: CohortService,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
 
@@ -38,6 +43,12 @@ export class ReportViewDialog implements OnInit {
 
     ngOnInit(): void {
         var vm = this;
+
+        vm.cohortService.getOrganisations()
+            .subscribe(
+                (data) => {
+                    vm.organisations = data;
+                });
 
         vm.reportService.getAllReportResults(vm.item.uuid)
             .subscribe(
@@ -52,14 +63,52 @@ export class ReportViewDialog implements OnInit {
         vm.reportService.getReportResults(uuid, lastRun)
             .subscribe(
                 (data) => {
-                    vm.reportResult = data;
-                    var csvData = this.ConvertToCSV(vm.reportResult[0].reportOutput);
-                    var blob = new Blob([csvData], { type: 'text/csv' });
-                    var url= window.URL.createObjectURL(blob);
-                    window.open(url);
+                    vm.reportRow = data;
+                    console.log(vm.reportRow);
                 });
     }
 
+    getOrganisationName(id) {
+        var vm = this;
+        for (var i = 0, len = vm.organisations.length; i < len; i++) {
+            if (vm.organisations[i].id == id) {
+                return vm.organisations[i].name;
+            }
+        }
+        return null;
+    }
+
+    getSex(id) {
+        var sex = "";
+        switch(id) {
+            case "0":
+                sex =  "Male"
+                break;
+            case "1":
+                sex = "Female"
+                break;
+            default:
+                sex = "unknown"
+                break;
+        }
+
+        return sex;
+
+    }
+
+    getAge(ageYears, ageMonths, ageWeeks) {
+        var age = "";
+
+        if (ageYears!=null)
+            age = ageYears+" years";
+        else if (ageMonths!=null)
+            age = ageMonths+" months";
+        else if (ageWeeks!=null)
+            age = ageWeeks+" weeks";
+
+        return age;
+
+    }
 
     getCohortName(params:string) {
         var json = JSON.parse(params);

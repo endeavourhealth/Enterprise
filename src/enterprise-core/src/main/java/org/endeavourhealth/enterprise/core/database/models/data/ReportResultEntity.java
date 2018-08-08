@@ -118,9 +118,12 @@ public class ReportResultEntity {
 
     }
 
-    public static List<ReportResultEntity[]> getReportResults(String reportItemUuid, String runDate) throws Exception {
-        String where = "select r " +
-                "from ReportResultEntity r where reportItemUuid = :reportItemUuid and runDate = :runDate";
+    public static  List<Object[]> getReportResults(String reportItemUuid, String runDate) throws Exception {
+        String where = "select r.patientId, r.organisationId, r.label, r.clinicalEffectiveDate, r.originalTerm, r.originalCode," +
+                "r.snomedConceptId, r.value, r.units, p.patientGenderId, p.ageYears,p.ageMonths,p.ageWeeks,p.dateOfDeath,p.postcodePrefix  from ReportrowEntity r " +
+                "join ReportResultEntity e on e.reportResultId = r.reportResultId "+
+                "join PatientEntity p on p.id = r.patientId "+
+                "where e.reportItemUuid = :reportItemUuid and e.runDate = :runDate order by r.patientId,r.organisationId,r.label";
 
         Timestamp runDate1 = null;
 
@@ -134,7 +137,7 @@ public class ReportResultEntity {
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
-        List<ReportResultEntity[]> ent = entityManager.createQuery(where)
+        List<Object[]> ent = entityManager.createQuery(where)
                 .setParameter("reportItemUuid", reportItemUuid)
                 .setParameter("runDate", runDate1)
                 .getResultList();

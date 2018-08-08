@@ -6,6 +6,7 @@ import {Lsoa} from "./models/Lsoa";
 import {Msoa} from "./models/Msoa";
 import {Region} from "./models/Region";
 import {CohortResult} from "./models/CohortResult";
+import {CohortPatient} from "./models/CohortPatient";
 import {CohortRun} from "./models/CohortRun";
 import {BaseHttp2Service} from "eds-common-js";
 
@@ -62,9 +63,8 @@ export class CohortService extends BaseHttp2Service {
 		return this.httpGet('api/cohort/getAllResults', {search : params});
 	}
 
-	getCohortPatients(type : string, queryItemUuid : string, runDate, organisationId):Observable<any[]> {
+	getCohortPatients(queryItemUuid : string, runDate, organisationId):Observable<CohortPatient[]> {
 		var params : URLSearchParams = new URLSearchParams();
-		params.append('type', type);
 		params.append('queryItemUuid', queryItemUuid);
 		params.append('runDate', runDate);
 		params.append('organisationId', organisationId);

@@ -36,7 +36,7 @@ export class CohortViewDialog implements OnInit {
     organisations = <any>[];
     cohortResult: CohortResult[];
     allCohortResults: CohortResult;
-    cohortPatient: CohortPatient;
+    cohortPatient: CohortPatient[];
 
     enumeratorTotal : number = 0;
     denominatorTotal : number = 0;
@@ -90,12 +90,10 @@ export class CohortViewDialog implements OnInit {
                 });
     }
 
-    getCohortPatients(uuid:string, lastRun:number, organisationId:string) {
+    getCohortPatientsCSV(uuid:string, lastRun:number, organisationId:string) {
         var vm = this;
 
-        var type = "PATIENT";
-
-        vm.cohortService.getCohortPatients(type, uuid, lastRun, organisationId)
+        vm.cohortService.getCohortPatients(uuid, lastRun, organisationId)
             .subscribe(
                 (data) => {
                     console.log(data);
@@ -103,6 +101,16 @@ export class CohortViewDialog implements OnInit {
                     var blob = new Blob([csvData], { type: 'text/csv' });
                     var url= window.URL.createObjectURL(blob);
                     window.open(url);
+                });
+    }
+
+    getCohortPatients(uuid:string, lastRun:number, organisationId:string) {
+        var vm = this;
+
+        vm.cohortService.getCohortPatients(uuid, lastRun, organisationId)
+            .subscribe(
+                (data) => {
+                    vm.cohortPatient = data;
                 });
     }
 
@@ -144,6 +152,40 @@ export class CohortViewDialog implements OnInit {
         }
         return null;
     }
+
+    getSex(id) {
+        var sex = "";
+
+        switch(id) {
+            case 0:
+                sex =  "Male"
+                break;
+            case 1:
+                sex = "Female"
+                break;
+            default:
+                sex = "unknown"
+                break;
+        }
+
+        return sex;
+
+    }
+
+    getAge(ageYears, ageMonths, ageWeeks) {
+        var age = "";
+
+        if (ageYears!=null)
+            age = ageYears+" years";
+        else if (ageMonths!=null)
+            age = ageMonths+" months";
+        else if (ageWeeks!=null)
+            age = ageWeeks+" weeks";
+
+        return age;
+
+    }
+
 
     cancel() {
         this.$uibModalInstance.dismiss('cancel');

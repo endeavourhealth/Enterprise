@@ -250,25 +250,16 @@ public final class CohortEndpoint extends AbstractItemEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/getPatients")
-	public Response getPatients(@Context SecurityContext sc, @QueryParam("type") String type, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Long organisationId) throws Exception {
+	public Response getPatients(@Context SecurityContext sc, @QueryParam("queryItemUuid") String queryItemUuid, @QueryParam("runDate") String runDate, @QueryParam("organisationId") Long organisationId) throws Exception {
 
-		List<Object[]> results = null;
+		List<PatientEntity> results = null;
 
 		LOG.trace("Called cohort/getPatients", "");
 
 		try {
 			super.setLogbackMarkers(sc);
 
-			results = CohortPatientsEntity.getCohortPatients(type, queryItemUuid, runDate, organisationId);
-
-			Object[] header = null;
-
-			if (type.equals("EHR"))
-				header = new Object[]{"patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "observation_clinical_effective_date", "observation_snomed_concept_id", "observation_original_code", "observation_original_term", "observation_value", "observation_units", "observation_is_problem", "organisation_name", "organisation_ods_code", "organisation_type", "practitioner_name", "practitioner_role_code", "practitioner_role_description"};
-			else
-				header = new Object[]{"patient_id", "patient_pseudo_id", "patient_sex", "patient_age_years", "patient_age_months", "patient_age_weeks", "patient_date_of_death", "patient_postcode_prefix", "patient_household_id", "patient_lsoa_code", "patient_msoa_code", "organisation_name", "organisation_ods_code", "organisation_type"};
-
-			results.add(0, header);
+			results = CohortPatientsEntity.getCohortPatients(queryItemUuid, runDate, organisationId);
 
 			clearLogbackMarkers();
 

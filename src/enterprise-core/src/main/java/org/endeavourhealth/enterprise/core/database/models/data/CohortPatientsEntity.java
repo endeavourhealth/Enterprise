@@ -95,7 +95,7 @@ public class CohortPatientsEntity {
         return result;
     }
 
-    public static List<Object[]> getCohortPatients(String type, String queryItemUuid, String runDate, Long organisationId) throws Exception {
+    public static List<Object[]> getCohortPatientsOld(String type, String queryItemUuid, String runDate, Long organisationId) throws Exception {
         String where = "";
 
         if (type.equals("EHR"))
@@ -132,6 +132,35 @@ public class CohortPatientsEntity {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         List<Object[]> ent = entityManager.createQuery(where)
+                .setParameter("queryItemUuid", queryItemUuid)
+                .setParameter("runDate", runDate1)
+                .setParameter("organisationId", organisationId)
+                .getResultList();
+
+        entityManager.close();
+
+        return ent;
+
+    }
+
+    public static List<PatientEntity> getCohortPatients(String queryItemUuid, String runDate, Long organisationId) throws Exception {
+        String where = "select p "+
+                    "from PatientEntity p " +
+                    "join CohortPatientsEntity r on r.patientId = p.id "+
+                    "where r.queryItemUuid = :queryItemUuid "+
+                    "and r.runDate = :runDate and r.organisationId = :organisationId order by p.id";
+
+        Timestamp runDate1 = null;
+
+        try{
+            runDate1 = new java.sql.Timestamp(Long.parseLong(runDate));
+        }catch(Exception e){
+
+        }
+
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+        List<PatientEntity> ent = entityManager.createQuery(where,PatientEntity.class)
                 .setParameter("queryItemUuid", queryItemUuid)
                 .setParameter("runDate", runDate1)
                 .setParameter("organisationId", organisationId)

@@ -44,6 +44,73 @@
                 </td>
             </tr>
         </table>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label class="control-label">Report Results</label>
+                <div class="scroll-box-500 form-control">
+                    <table border=1 frame=void rules=rows  class="table table-striped table-condensed">
+                        <tr>
+                            <th style="width: 400px">Patient ID</th>
+                            <th style="width: 250px">Gender</th>
+                            <th style="width: 200px">Age</th>
+                            <th style="width: 200px">Postcode Prefix</th>
+                            <th style="width: 200px">Date Of Death</th>
+                            <th style="width: 400px">Organisation</th>
+                            <th style="width: 250px">Label</th>
+                            <th style="width: 200px">Original Term</th>
+                            <th style="width: 200px">Date</th>
+                            <th style="width: 200px">Value</th>
+                            <th style="width: 200px">Units</th>
+                            <th style="width: 200px">Snomed Concept ID</th>
+                            <th style="width: 200px">Original Code</th>
+
+                        </tr>
+                        <tr style="height:40px" *ngFor="let row of reportRow">
+                            <td style="color:blue;font-size:12px;cursor:pointer" (click)="displayPatient(row)">
+                                {{ row.patientId }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ getSex(row.patientGenderId) }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ getAge(row.ageYears, row.ageMonths, row.ageWeeks) }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.postcodePrefix }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.dateOfDeath }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ getOrganisationName(row.organisationId) }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.label }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.originalTerm }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.clinicalEffectiveDate }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.value }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.units }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.snomedConceptId }}
+                            </td>
+                            <td style="color:black;font-size:12px">
+                                {{ row.originalCode }}
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
 
     </form>
 

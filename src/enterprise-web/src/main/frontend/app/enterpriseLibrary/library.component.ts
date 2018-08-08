@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, OnInit, ChangeDetectorRef} from "@angular/core";
 import {StateService} from "ui-router-ng2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {EnterpriseLibraryItem} from "./models/EnterpriseLibraryItem";
@@ -21,11 +21,13 @@ import {ReportService} from "../report/report.service";
 @Component({
 	template : require('./library.html')
 })
-export class LibraryComponent {
+export class LibraryComponent implements OnInit {
 	treeData: FolderNode[];
 	selectedFolder: FolderNode;
+	folderName: string;
 	itemSummaryList: ItemSummaryList;
 	actionMenuItems: ActionMenuItem[];
+	recentDocumentsData:FolderItem[];
 
 	constructor(protected libraryService: LibraryService,
 							protected cohortService: CohortService,
@@ -33,7 +35,8 @@ export class LibraryComponent {
 							protected logger: LoggerService,
 							private $modal: NgbModal,
 							protected moduleStateService: ModuleStateService,
-							protected $state: StateService) {
+							protected $state: StateService,
+							private cdRef:ChangeDetectorRef) {
 		this.actionMenuItems = [
 			{type: ItemType.Query, text: 'Add cohort'},
 			{type: ItemType.Query, text: 'Add report feature'},
@@ -41,15 +44,30 @@ export class LibraryComponent {
 			{type: ItemType.Report, text: 'Add report'},
 			{type: ItemType.System, text: 'Paste item into this folder'}
 		];
+
+		this.folderName = "";
+
+	}
+
+	ngAfterViewChecked()
+	{
+		if (this.selectedFolder!=null)
+			this.folderName = this.selectedFolder.folderName;
+
+		this.cdRef.detectChanges();
+	}
+
+	ngOnInit(): void {
+		this.getRecentDocumentsData();
 	}
 
 	folderChanged($event) {
 		this.selectedFolder = $event.selectedFolder;
+
 		this.refresh();
 	}
 
 	protected getContents() {
-		// TODO : Implement ordering
 		if (this.itemSummaryList)
 			return this.itemSummaryList.contents;
 		else
@@ -58,14 +76,37 @@ export class LibraryComponent {
 
 	protected refresh() {
 		var vm = this;
-		vm.selectedFolder.loading = true;
 
 		vm.libraryService.getFolderContents(vm.selectedFolder.uuid)
 			.subscribe(
 				(data) => {
 					vm.itemSummaryList = data;
-					vm.selectedFolder.loading = false;
 				});
+
+		this.getRecentDocumentsData();
+
+	}
+
+	getRecentDocumentsData() {
+		this.recentDocumentsData = null;
+		this.reportService.getRecentDocumentsData()
+			.subscribe(
+				(data:FolderItem[]) => this.recentDocumentsData = data
+			);
+	}
+
+	actionDashboardItem(item : FolderItem, action : string) {
+		switch (item.type) {
+			case ItemType.Query:
+				this.$state.go('app.queryEdit', {itemUuid: item.uuid, itemAction: action});
+				break;
+			case ItemType.CodeSet:
+				this.$state.go('app.codeSetEdit', {itemUuid: item.uuid, itemAction: action});
+				break;
+			case ItemType.Report:
+				this.$state.go('app.reportEdit', {itemUuid: item.uuid, itemAction: action});
+				break;
+		}
 	}
 
 	actionItem(actionItemProp: ActionItem) {

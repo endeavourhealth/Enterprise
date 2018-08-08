@@ -6,6 +6,7 @@ import {ReportRun} from "./models/ReportRun";
 import {ReportResult} from "./models/ReportResult";
 import {ReportRow} from "./models/ReportRow";
 import {ReportResultSummary} from "./models/ReportResultSummary";
+import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 
 @Injectable()
 export class ReportService extends BaseHttp2Service {
@@ -28,6 +29,13 @@ export class ReportService extends BaseHttp2Service {
 		params.append('runDate', runDate);
 
 		return this.httpGet('api/report/getResults', {search : params});
+	}
+
+	getRecentDocumentsData():Observable<FolderItem[]> {
+		var params : URLSearchParams = new URLSearchParams();
+		params.append('count', '10');
+
+		return this.httpGet('api/dashboard/getRecentDocuments', { search : params });
 	}
 
 }

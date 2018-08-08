@@ -45,7 +45,7 @@ import {ChartModule} from "./charting/chart.module";
 			{ name: 'app.queryEdit', url: '/queryEdit/:itemAction/:itemUuid', component: QueryEditComponent },
 			{ name : 'app.reportEdit', url: '/reportEdit/:itemAction/:itemUuid', component: ReportEditComponent }
 		],
-		defaultState : { state: 'app.dashboard', params: {} },
+		defaultState : { state: 'app.library', params: {} },
 		menuManager : EnterpriseMenuService
 	})
 )

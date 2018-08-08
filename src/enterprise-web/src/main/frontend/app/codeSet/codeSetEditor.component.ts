@@ -36,13 +36,6 @@ export class CodeSetEditComponent {
 		}
 	}
 
-	termShorten(term : string) {
-		term = term.replace(' (disorder)', '');
-		term = term.replace(' (observable entity)', '');
-		term = term.replace(' (finding)', '');
-		return term;
-	}
-
 	showCodePicker() {
 		let vm = this;
 		TermPickerDialog.open(vm.$modal, vm.libraryItem.codeSet.codeSetValue)

@@ -144,6 +144,12 @@
     overflow-x: hidden;
 }
 
+.scroll-box-550 {
+    height: 550px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 .scroll-box-600 {
     height: 600px;
     overflow-y: scroll;

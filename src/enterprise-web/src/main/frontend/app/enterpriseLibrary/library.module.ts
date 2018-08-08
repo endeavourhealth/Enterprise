@@ -9,7 +9,6 @@ import {CohortService} from "../cohort/cohort.service";
 import {FolderModule, LibraryModule} from "eds-common-js";
 import {ReportModule} from "../report/report.module";
 
-
 @NgModule({
 	imports : [
 		BrowserModule,

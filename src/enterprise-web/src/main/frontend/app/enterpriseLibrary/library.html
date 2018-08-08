@@ -2,45 +2,83 @@
 	<div class="container-fluid">
 		<div class="module-heading">
 			<i class="fa fa-book"></i> Library Items
+			<button class="btn btn-success btn-sm pull-right" (click)="refresh()">Refresh</button>
 		</div>
 		<div class="module-body">
 			<form>
 				<div class="form-group">
 					<div class="row">
-
 						<div class="col-md-3">
-							<library-folder [showMenu]="true" [actionMenuItems]="actionMenuItems" (selectionChange)="folderChanged($event)" (itemActioned)="actionItem($event)"></library-folder>
+							<div class="row">
+								<div class="panel panel-primary">
+									<div class="panel-heading">Library Folders</div>
+									<div class="panel-body" style="height:auto; overflow-y:scroll; max-height: 350px;">
+										<library-folder [showMenu]="true" [actionMenuItems]="actionMenuItems" (selectionChange)="folderChanged($event)" (itemActioned)="actionItem($event)"></library-folder>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="panel panel-primary">
+									<div class="panel-heading">Recently Opened Library Items</div>
+									<div class="panel-body" style="height:auto; overflow-y:scroll; max-height: 205px;">
+										<div class="table">
+											<table class="table table-striped table-condensed">
+												<thead>
+												<tr>
+													<th>Name</th>
+													<th>Modified</th>
+													<th>Type</th>
+												</tr>
+												</thead>
+												<tbody>
+												<tr *ngFor="let item of recentDocumentsData">
+													<td>
+														<a style="cursor:pointer" (click)="actionDashboardItem(item,'edit')">{{item.name}}</a>
+														<span class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{item.description}}" *ngIf="item.description"></span>
+													</td>
+													<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
+													<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span></td>
+												</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+
 						</div>
 
 						<div class="col-md-9">
-							<div class="table scroll-box-600">
-								<table class="table table-striped table-condensed">
-									<thead>
+							<div class="panel panel-primary">
+								<div class="panel-heading">Library Items - {{folderName}}</div>
+								<div class="panel-body" style="height:auto; overflow-y:scroll; max-height: 620px;">
+									<table class="table table-striped table-condensed">
+										<thead>
 										<tr>
 											<th style="width:250px" (click)="sortField='name'; sortReverse=!sortReverse">Title
-												<span *ngIf="sortField == 'name'"
-															class="fa fa-sm"
-															[ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
+											<span *ngIf="sortField == 'name'"
+												  class="fa fa-sm"
+												  [ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
 											<th style="width:150px" (click)="sortField='lastModified'; sortReverse=!sortReverse">Date modified
-												<span *ngIf="sortField == 'lastModified'"
-															class="fa fa-sm"
-															[ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
+											<span *ngIf="sortField == 'lastModified'"
+												  class="fa fa-sm"
+												  [ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
 											<th style="width:100px" (click)="sortField='type'; sortReverse=!sortReverse">Type
-												<span *ngIf="sortField == 'type'"
-															class="fa fa-sm"
-															[ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
+											<span *ngIf="sortField == 'type'"
+												  class="fa fa-sm"
+												  [ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
 											<th style="width:150px" (click)="sortField='name'; sortReverse=!sortReverse">Last Report Run
-												<span *ngIf="sortField == 'name'"
-													  class="fa fa-sm"
-													  [ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
+											<span *ngIf="sortField == 'name'"
+												  class="fa fa-sm"
+												  [ngClass]="{'fa-chevron-down':!sortReverse, 'fa-chevron-up':sortReverse}"></span>
 											</th>
 											<th style="width:50px"></th>
 										</tr>
-									</thead>
-									<tbody>
+										</thead>
+										<tbody>
 										<tr class="hover-box show-child-on-hover" *ngFor="let item of getContents()">
 											<td>
 												<a style="cursor: pointer" (click)="actionItemEdit(item.uuid, item.type, 'edit')">{{item.name}}</a>
@@ -69,8 +107,9 @@
 												</div>
 											</td>
 										</tr>
-									</tbody>
-								</table>
+										</tbody>
+									</table>
+								</div>
 							</div>
 						</div>
 					</div>

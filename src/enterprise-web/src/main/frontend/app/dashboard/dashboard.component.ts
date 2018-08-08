@@ -9,8 +9,6 @@ import {ItemType} from "eds-common-js/dist/folder/models/ItemType";
 	template : require('./dashboard.html')
 })
 export class DashboardComponent {
-	recentDocumentsData:FolderItem[];
-
 	constructor(private dashboardService:DashboardService,
 							private logger:LoggerService,
 							private $state : StateService) {
@@ -18,31 +16,7 @@ export class DashboardComponent {
 	}
 
 	refresh() {
-		this.getRecentDocumentsData();
-
 	}
 
-	getRecentDocumentsData() {
-		var vm:DashboardComponent = this;
-		vm.recentDocumentsData = null;
-		vm.dashboardService.getRecentDocumentsData()
-			.subscribe(
-				(data:FolderItem[]) => vm.recentDocumentsData = data
-			);
-	}
-
-	actionItem(item : FolderItem, action : string) {
-		switch (item.type) {
-			case ItemType.Query:
-				this.$state.go('app.queryEdit', {itemUuid: item.uuid, itemAction: action});
-				break;
-			case ItemType.CodeSet:
-				this.$state.go('app.codeSetEdit', {itemUuid: item.uuid, itemAction: action});
-				break;
-			case ItemType.Report:
-				this.$state.go('app.reportEdit', {itemUuid: item.uuid, itemAction: action});
-				break;
-		}
-	}
 }
 

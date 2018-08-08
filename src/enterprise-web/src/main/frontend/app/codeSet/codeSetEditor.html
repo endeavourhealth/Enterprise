@@ -28,9 +28,6 @@
 						<div class="scroll-box-150 form-control" style="cursor: pointer;" (click)="showCodePicker()">
 							<span *ngFor="let selection of libraryItem.codeSet.codeSetValue">
 								{{ selection.term }}
-								<span class="label label-success" *ngIf="selection.includeChildren && (!selection.exclusion || selection.exclusion.length == 0)">All children</span>
-								<span class="label label-warning" *ngIf="selection.includeChildren && (selection.exclusion && selection.exclusion.length > 0)">Some children</span>
-								<span class="label label-danger" *ngIf="!selection.includeChildren">No children</span>
 								<span *ngIf="!this.$last">  |  </span>
 							</span>
 						</div>

@@ -15,9 +15,11 @@
                     <div class='row'>
                         <div class="col-xs-12">
                             <div class="form-group">
-                                <label>Organisations: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ orgTT }}"></span>
-                                <select multiple class="form-control" style="width:400px" (change)="setSelectedOrganisations($event.target)">
-                                    <option *ngFor="let organisation of organisations" value="{{organisation.id}}">{{organisation.name}}</option>
+                                <label>Choose an organisation group: </label>
+                                <button class="btn btn-success btn-sm pull-right" (click)="orgManager()"><i class="fa fa-hospital-o"></i> Manage Organisation Groups</button>
+                                <br><br>
+                                <select class="form-control" [(ngModel)]="selectedGroupId" name="selectedGroupId" [ngModelOptions]="{standalone: true}">
+                                    <option *ngFor="let group of orgGroups" [ngValue]="group.id">{{group.name}}</option>
                                 </select>
                                 <br/>
                                 <input type="checkbox" id="allOrgs" name="allOrgs" [(ngModel)]="allOrgs">&nbsp;Run against all organisations

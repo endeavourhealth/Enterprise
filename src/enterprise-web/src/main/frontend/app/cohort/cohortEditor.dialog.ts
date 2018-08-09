@@ -7,6 +7,9 @@ import {LoggerService} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {QuerySelection} from "../query/models/QuerySelection";
 import {QueryPickerDialog} from "../query/queryPicker.dialog";
+import {OrganisationGroup} from "../organisationGroup/models/OrganisationGroup";
+import {OrgGroupPickerComponent} from "../organisationGroup/orgGroupPicker.component";
+import {OrganisationGroupService} from "../organisationGroup/organisationGroup.service";
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -25,28 +28,26 @@ export class CohortEditDialog implements OnInit {
     @Input() resultData;
     @Input() item = FolderItem;
 
-    organisation: Organisation = <any>[];
     population: string = "";
     baselineDate: string = "";
     queryItemUuid: string = "";
     baselineCohort : QuerySelection;
     allOrgs: boolean;
 
-    orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
     ppTT: string = "Please select a patient population as the denominator.";
     rdTT: string = "Please specify a run date. i.e. patients registered on or before that date.";
     bcTT: string = "Baseline denominator population.";
 
+    selectedGroupId: number = 1;
+    orgGroups: OrganisationGroup[] = [];
 
     populations = [
-        {id: -1, type: ''},
         {id: 0, type: 'Currently registered'},
         {id: 1, type: 'All patients'}
     ];
 
-    organisations = <any>[];
-
     constructor(protected cohortService: CohortService,
+                private orgGroupService: OrganisationGroupService,
                 private $modal: NgbModal,
                 protected $uibModalInstance : NgbActiveModal,
                 private logger : LoggerService) {
@@ -56,13 +57,53 @@ export class CohortEditDialog implements OnInit {
     ngOnInit(): void {
         var vm = this;
 
-        vm.cohortService.getOrganisations()
+        vm.resultData.population = 0;
+        vm.baselineDate = this.formatDate(new Date());
+        console.log(vm.baselineDate);
+
+        vm.getOrganisationGroups();
+    }
+
+    getOrganisationGroups() {
+        var vm = this;
+        vm.orgGroups = [];
+        vm.orgGroupService.getOrganisationGroups()
             .subscribe(
-                (data) => {
-                    vm.organisations = data;
+                (result) => {
+                    for (let value of result) {
+                        if (value != null) {
+                            vm.orgGroups.push({id: value[0], name: value[1]});
+                        }
+                    }
                 });
+    }
 
+    orgManager() {
+        var vm = this;
+        OrgGroupPickerComponent.open(this.$modal, vm.selectedGroupId ).result.then(
+            (result) => {
+                if (result) {
+                    vm.selectedGroupId = result;
+                    vm.getOrganisationGroups();
+                    console.log(vm.selectedGroupId);
+                }
+                else
+                    console.log('Cancelled');
+            },
+            (error) => vm.logger.error("Error running utility", error)
+        );
+    }
 
+    formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [year, month, day].join('-');
     }
 
     pickBaselineCohort() {
@@ -71,22 +112,7 @@ export class CohortEditDialog implements OnInit {
             .result.then((resultData: QuerySelection) => vm.baselineCohort = resultData);
     }
 
-    setSelectedOrganisations(selectElement) {
-        var vm = this;
-        vm.resultData.organisation = <any>[];
-        for (var i = 0; i < selectElement.options.length; i++) {
-            var optionElement = selectElement.options[i];
-            if (optionElement.selected) {
-                let org = {
-                    id: optionElement.value,
-                    name: optionElement.text
-                };
-                vm.resultData.organisation.push(org);
-            }
-        }
-    }
-
-    setSelectedPopulation(selectElement) {
+       setSelectedPopulation(selectElement) {
         var vm = this;
         vm.resultData.population = "";
         for (var i = 0; i < selectElement.options.length; i++) {
@@ -100,6 +126,7 @@ export class CohortEditDialog implements OnInit {
     save() {
         var vm = this;
         vm.resultData.baselineDate = vm.baselineDate;
+        vm.resultData.organisationGroup = vm.selectedGroupId;
         if (vm.baselineCohort)
             vm.resultData.baselineCohortId = vm.baselineCohort.id;
 
@@ -109,7 +136,7 @@ export class CohortEditDialog implements OnInit {
     ok() {
         var vm = this;
         if (vm.allOrgs)
-            vm.resultData.organisation = <any>[];
+            vm.resultData.organisationGroup = "0";
         this.$uibModalInstance.close(this.resultData);
     }
 

@@ -156,7 +156,7 @@ export class LibraryComponent implements OnInit {
 		var vm = this;
 
 		let reportRun: CohortRun = {
-			organisation: [],
+			organisationGroup: "",
 			population: "",
 			baselineDate: "",
 			queryItemUuid: "",
@@ -169,6 +169,8 @@ export class LibraryComponent implements OnInit {
 			item.isRunning = true;
 
 			resultData.queryItemUuid = item.uuid;
+
+			console.log(resultData);
 
 			vm.cohortService.runCohort(resultData)
 				.subscribe(
@@ -194,7 +196,7 @@ export class LibraryComponent implements OnInit {
 		console.log(item);
 
 		let cohortRun: CohortRun = {
-			organisation: [],
+			organisationGroup: "",
 			population: "",
 			baselineDate: "",
 			queryItemUuid: "",
@@ -214,7 +216,7 @@ export class LibraryComponent implements OnInit {
 		console.log(item);
 
 		let reportRun: ReportRun = {
-			organisation: [],
+			organisationGroup: "",
 			population: "",
 			baselineCohortId: "",
 			cohortName: "",
@@ -234,7 +236,7 @@ export class LibraryComponent implements OnInit {
 
 	runReport(item: FolderItem) {
 		let reportRun: ReportRun = {
-			organisation: [],
+			organisationGroup: "",
 			population: "",
 			baselineDate: "",
 			reportItemUuid: item.uuid,
@@ -247,6 +249,7 @@ export class LibraryComponent implements OnInit {
 		let vm = this;
 		ReportRunnerDialog.open(vm.$modal, reportRun, item).result.then(
 			(result) => {
+				console.log(result);
 				if (result) vm.executeReport(item, result)
 			},
 			(error) => vm.logger.error("Error running report", error)

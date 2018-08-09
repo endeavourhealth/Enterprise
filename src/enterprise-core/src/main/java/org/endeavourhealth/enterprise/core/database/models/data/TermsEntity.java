@@ -127,7 +127,8 @@ public class TermsEntity {
                 "when t.recordType=1 then 'Medication Statement' "+
                 "when t.recordType=2 then 'Allergy' "+
                 "when t.recordType=3 then 'Referral' "+
-                "when t.recordType=4 then 'Encounter' END as recordType "+
+                "when t.recordType=4 then 'Encounter' "+
+                "when t.recordType=5 then 'Patient' END as recordType "+
                 "from TermsEntity t "+
                 "WHERE (t.originalTerm like :term1 or t.originalTerm like :term2 or t.snomedTerm like :term1 or t.snomedTerm like :term2 or t.originalCode like :term1 or t.snomedConceptId like :term1)"+
                 "order by t.originalTerm";

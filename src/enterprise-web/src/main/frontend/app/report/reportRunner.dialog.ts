@@ -7,6 +7,9 @@ import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
 import {CohortService} from "../cohort/cohort.service";
 import {QueryPickerDialog} from "../query/queryPicker.dialog";
 import {QuerySelection} from "../query/models/QuerySelection";
+import {OrganisationGroup} from "../organisationGroup/models/OrganisationGroup";
+import {OrgGroupPickerComponent} from "../organisationGroup/orgGroupPicker.component";
+import {OrganisationGroupService} from "../organisationGroup/organisationGroup.service";
 
 @Component({
 	selector: 'ngbd-modal-content',
@@ -25,7 +28,6 @@ export class ReportRunnerDialog implements OnInit {
 	@Input() resultData;
 	@Input() item = FolderItem;
 
-	organisation: Organisation = <any>[];
 	population: string = "";
 	baselineDate: string = "";
 	baselineCohort : QuerySelection;
@@ -34,21 +36,21 @@ export class ReportRunnerDialog implements OnInit {
 	scheduleDate: string = "";
 	scheduleTime:string = "";
 
-	orgTT: string = "Please select one or more organisations to include. The query will run against every organisation selected. To select multiple organisation please use Shift and Click.";
 	ppTT: string = "Please select a patient population as the denominator.";
 	rdTT: string = "Please specify a baseline date. i.e. patients registered on or before that date.";
 	srTT: string = "Please specify an execution date/time.";
 	bcTT: string = "[Optional] restrict patient population by a cohort definition.";
 
 	populations = [
-		{id: -1, type: ''},
 		{id: 0, type: 'Currently registered'},
 		{id: 1, type: 'All patients'},
 	];
 
-	organisations = <any>[];
+	selectedGroupId: number = 1;
+	orgGroups: OrganisationGroup[] = [];
 
 	constructor(protected cohortService: CohortService,
+							private orgGroupService: OrganisationGroupService,
 							private $modal: NgbModal,
 							protected $uibModalInstance : NgbActiveModal,
 							private logger : LoggerService) {
@@ -57,23 +59,53 @@ export class ReportRunnerDialog implements OnInit {
 	ngOnInit(): void {
 		var vm = this;
 
-		vm.cohortService.getOrganisations()
+		vm.resultData.population = 0;
+		vm.baselineDate = this.formatDate(new Date());
+		console.log(vm.baselineDate);
+
+		vm.getOrganisationGroups();
+	}
+
+	getOrganisationGroups() {
+		var vm = this;
+		vm.orgGroups = [];
+		vm.orgGroupService.getOrganisationGroups()
 			.subscribe(
-				(data) => {
-					vm.organisations = data;
+				(result) => {
+					for (let value of result) {
+						if (value != null) {
+							vm.orgGroups.push({id: value[0], name: value[1]});
+						}
+					}
 				});
 	}
 
-	setSelectedOrganisations(selectElement) {
+	orgManager() {
 		var vm = this;
-		vm.resultData.organisation = <any>[];
-		for (let optionElement of selectElement.selectedOptions) {
-			let org = {
-				id: optionElement.value,
-				name: optionElement.text
-			};
-			vm.resultData.organisation.push(org);
-		}
+		OrgGroupPickerComponent.open(this.$modal, vm.selectedGroupId ).result.then(
+			(result) => {
+				if (result) {
+					vm.selectedGroupId = result;
+					vm.getOrganisationGroups();
+					console.log(vm.selectedGroupId);
+				}
+				else
+					console.log('Cancelled');
+			},
+			(error) => vm.logger.error("Error running utility", error)
+		);
+	}
+
+	formatDate(date) {
+		var d = new Date(date),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+
+		if (month.length < 2) month = '0' + month;
+		if (day.length < 2) day = '0' + day;
+
+		return [year, month, day].join('-');
 	}
 
 	setSelectedPopulation(selectElement) {
@@ -92,6 +124,7 @@ export class ReportRunnerDialog implements OnInit {
 	run() {
 		var vm = this;
 		vm.resultData.baselineDate = vm.baselineDate;
+		vm.resultData.organisationGroup = vm.selectedGroupId;
 		vm.resultData.scheduled = vm.scheduled;
 		vm.resultData.scheduleDateTime = new Date(vm.scheduleDate + " " + vm.scheduleTime);
 		if (vm.baselineCohort)

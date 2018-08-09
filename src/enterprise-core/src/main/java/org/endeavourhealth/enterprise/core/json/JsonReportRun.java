@@ -9,7 +9,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonReportRun {
 
-	private List<JsonOrganisation> organisation = new ArrayList<>();
+	private String organisationGroup = null;
 	private String population = null;
 	private String cohortName = null;
 	private String baselineCohortId = null;
@@ -24,12 +24,12 @@ public final class JsonReportRun {
 	/**
 	 * gets/sets
 	 */
-	public List<JsonOrganisation> getOrganisation() {
-		return organisation;
+	public String getOrganisationGroup() {
+		return organisationGroup;
 	}
 
-	public void setOrganisation(List<JsonOrganisation> organisation) {
-		this.organisation = organisation;
+	public void setOrganisationGroup(String organisationGroup) {
+		this.organisationGroup = organisationGroup;
 	}
 
 	public String getPopulation() {

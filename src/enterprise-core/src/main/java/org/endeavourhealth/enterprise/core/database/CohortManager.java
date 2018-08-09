@@ -3,6 +3,7 @@ package org.endeavourhealth.enterprise.core.database;
 import org.endeavourhealth.enterprise.core.database.models.ItemEntity;
 import org.endeavourhealth.enterprise.core.database.models.QueryMeta;
 import org.endeavourhealth.enterprise.core.database.models.data.*;
+import org.endeavourhealth.enterprise.core.json.JsonCode;
 import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
@@ -151,7 +152,8 @@ public class CohortManager {
 
 	private static List<Long> calculateAndStoreResults(LibraryItem libraryItem, JsonCohortRun cohortRun, String userUuid, Timestamp runDate, List<QueryResult> queryResults, Boolean baseline) throws Exception {
 		// Calculate and store the results for each organisation in the cohort
-		List<JsonOrganisation> organisations = cohortRun.getOrganisation();
+		String organisationGroup = cohortRun.getOrganisationGroup();
+		List<JsonOrganisation> organisations = getOrganisationsFromGroup(organisationGroup);
 
 		List<Long> allPatients = new ArrayList<>();
 
@@ -213,6 +215,23 @@ public class CohortManager {
 		saveQueryCountsToCohortSummaryTable(cohortRun, userUuid, runDate, organisationInCohort, baselineDate, denominatorPatients, finalPatients, baseline);
 
 		return finalPatients;
+	}
+
+	public static List<JsonOrganisation> getOrganisationsFromGroup(String organisationGroupId) throws Exception {
+		List<JsonOrganisation> organisations = new ArrayList<>();
+
+		List<Object[]> results = new IncidencePrevalenceUtilityManager().getOrganisationsInGroup(Integer.parseInt(organisationGroupId));
+
+		for (Object[] org: results) {
+			JsonOrganisation organisation = new JsonOrganisation();
+			organisation.setOdsCode(org[0].toString());
+			organisation.setName(org[1].toString());
+			organisation.setId(org[2].toString());
+
+			organisations.add(organisation);
+
+		}
+		return organisations;
 	}
 
 	private static void saveQueryCountsToCohortSummaryTable(JsonCohortRun cohortRun, String userUuid, Timestamp runDate, JsonOrganisation organisationInCohort, Timestamp baselineDate, List<Long> denominatorPatients, List<Long> finalPatients, Boolean baseline) throws Exception {
@@ -335,7 +354,8 @@ public class CohortManager {
 	}
 
 	private static void runRuleForOrganisations(LibraryItem libraryItem, JsonCohortRun cohortRun, List<QueryResult> queryResults, Rule rule, QueryMeta q, String baselineCohortId, Timestamp runDate, List<Filter> filters, Boolean report) throws Exception {
-		List<JsonOrganisation> organisations = cohortRun.getOrganisation();
+		String organisationGroup = cohortRun.getOrganisationGroup();
+		List<JsonOrganisation> organisations = getOrganisationsFromGroup(organisationGroup);
 
 		String cohortPopulation = cohortRun.getPopulation();
 		Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
@@ -347,9 +367,9 @@ public class CohortManager {
 
 		String ruleSQL = "";
 
-		if (organisations.isEmpty() || organisations.get(0).getId().equals("0")) {
+		if (organisationGroup.isEmpty() || organisationGroup.equals("0")) {
 			ruleSQL = getRuleSQLAllOrganisations(baselineCohortId, cohortPopulation, q, restriction);
-			if (organisations.isEmpty()) {
+			if (organisationGroup.isEmpty()) {
 				JsonOrganisation org = new JsonOrganisation();
 				org.setId("0");
 				org.setName("All");
@@ -875,13 +895,11 @@ public class CohortManager {
 	private static void buildConceptPatientFilter(QueryMeta q, String term, String parentType, String valueFrom, String valueTo) {
 		q.patientJoinField = "id";
 		q.dataTable = "PatientEntity";
-		if ((parentType.equals("Sex") && term.equals("Male")) ||
-				(term.equals("Sex") && valueFrom.equals("Male"))) {
+		if (term.equals("Male")) {
 			q.sqlWhere += " and p.patientGenderId = '0'";
-		} else if ((parentType.equals("Sex") && term.equals("Female")) ||
-				(term.equals("Sex") && valueFrom.equals("Female"))) {
+		} else if (term.equals("Female")) {
 			q.sqlWhere += " and p.patientGenderId = '1'";
-		} else if (term.equals("Post Code Prefix")) {
+		} else if (term.equals("Post Code")) {
 			q.sqlWhere += " and p.postcodePrefix like '" + valueFrom + "%'";
 		} else if (term.equals("Age Years")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))

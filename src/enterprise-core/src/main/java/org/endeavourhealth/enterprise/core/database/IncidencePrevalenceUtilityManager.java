@@ -627,7 +627,7 @@ public class IncidencePrevalenceUtilityManager {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         String query = String.format(
-                "select distinct o.ods_code, o.name from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
+                "select distinct o.ods_code, o.name, o.id from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
                         " join organization o on o.ods_code = l.ods_code " +
                         "where l.group_id = %d;", groupId);
         System.out.println(query);
@@ -645,14 +645,14 @@ public class IncidencePrevalenceUtilityManager {
 
         Query q = entityManager.createNativeQuery("select distinct o.name, o.ods_code, ifnull(o.type_code, 'PR') as type_code\n" +
                 "from organization o\n" +
-                "join episode_of_care e on e.organization_id = o.id\n" +
+                "join patient p on p.organization_id = o.id\n" +
                 "union\n" +
                 "\n" +
                 "select distinct ccg.name, ccg.ods_code, ccg.type_code\n" +
                 "from organization o\n" +
-                "join episode_of_care e on e.organization_id = o.id\n" +
+                "join patient p on p.organization_id = o.id\n" +
                 "join organization ccg on ccg.id = o.parent_organization_id\n" +
-                "order by type_code, name;");
+                "order by name;");
 
         List resultList = q.getResultList();
 

@@ -100,16 +100,16 @@
 								<td style="color:black;font-size:12px">
 									{{ selection.term.split("(")[0] }}
 								</td>
-								<td *ngIf="selection.dataType=='8'||selection.dataType=='13'||selection.baseType=='Observation'">
+								<td *ngIf="selection.term.indexOf('Date')==-1">
 									<input type="text" style="width:100px;background: lightyellow" [(ngModel)]="selection.valueFrom" [ngModelOptions]="{standalone: true}"><span style="font-size: 10px;"> {{selection.units}}</span>
 								</td>
-								<td *ngIf="selection.dataType=='13'||selection.baseType=='Observation'">
+								<td *ngIf="selection.term.indexOf('Date')==-1">
 									<input type="text" style="width:100px;background: lightyellow" [(ngModel)]="selection.valueTo" [ngModelOptions]="{standalone: true}"><span style="font-size: 10px;"> {{selection.units}}</span>
 								</td>
-								<td *ngIf="selection.dataType=='2'||selection.dataType=='14'">
+								<td *ngIf="selection.term.indexOf('Date')>-1">
 									<input type="date" style="width:140px;background: lightyellow" [(ngModel)]="selection.valueFrom" [ngModelOptions]="{standalone: true}">
 								</td>
-								<td *ngIf="selection.dataType=='14'">
+								<td *ngIf="selection.term.indexOf('Date')>-1">
 									<input type="date" style="width:140px;background: lightyellow" [(ngModel)]="selection.valueTo" [ngModelOptions]="{standalone: true}">
 								</td>
 							</tr>

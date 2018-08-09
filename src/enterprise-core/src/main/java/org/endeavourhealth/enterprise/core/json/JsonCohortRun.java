@@ -8,7 +8,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonCohortRun {
 
-    private List<JsonOrganisation> organisation = new ArrayList<>();
+    private String organisationGroup = null;
     private String population = null;
     private String baselineDate = null;
     private String queryItemUuid = null;
@@ -20,12 +20,12 @@ public final class JsonCohortRun {
     /**
      * gets/sets
      */
-    public List<JsonOrganisation> getOrganisation() {
-        return organisation;
+    public String getOrganisationGroup() {
+        return organisationGroup;
     }
 
-    public JsonCohortRun setOrganisation(List<JsonOrganisation> organisation) {
-        this.organisation = organisation;
+    public JsonCohortRun setOrganisationGroup(String organisationGroup) {
+        this.organisationGroup = organisationGroup;
         return this;
     }
 

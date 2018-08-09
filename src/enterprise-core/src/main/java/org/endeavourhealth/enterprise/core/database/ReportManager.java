@@ -120,7 +120,7 @@ public class ReportManager {
 
 		JsonCohortRun featureRun = new JsonCohortRun();
 		featureRun.setBaselineDate(reportRun.getBaselineDate());
-		featureRun.setOrganisation(reportRun.getOrganisation());
+		featureRun.setOrganisationGroup(reportRun.getOrganisationGroup());
 		featureRun.setPopulation(reportRun.getPopulation());
 		featureRun.setQueryItemUuid(featureUuid);
 
@@ -134,7 +134,7 @@ public class ReportManager {
 
 		JsonCohortRun featureRun = new JsonCohortRun();
 		featureRun.setBaselineDate(reportRun.getBaselineDate());
-		featureRun.setOrganisation(reportRun.getOrganisation());
+		featureRun.setOrganisationGroup(reportRun.getOrganisationGroup());
 		featureRun.setPopulation(reportRun.getPopulation());
 		featureRun.setQueryItemUuid(featureUuid);
 
@@ -160,7 +160,7 @@ public class ReportManager {
 		return reportResultId;
 	}
 
-	private long saveReportResults(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws JsonProcessingException {
+	private long saveReportResults(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws Exception, JsonProcessingException {
 		String reportRunJson = ObjectMapperPool.getInstance().writeValueAsString(reportRun);
 
 		ReportResultEntity reportResult = new ReportResultEntity()
@@ -186,7 +186,10 @@ public class ReportManager {
 			entityManager.persist(reportResultQuery);
 		}
 
-		for (JsonOrganisation organisation : reportRun.getOrganisation()) {
+		String organisationGroup = reportRun.getOrganisationGroup();
+		List<JsonOrganisation> organisations = CohortManager.getOrganisationsFromGroup(organisationGroup);
+
+		for (JsonOrganisation organisation : organisations) {
 			ReportResultOrganisationEntity reportResultOrganisation = new ReportResultOrganisationEntity()
 					.setId(
 							new ReportResultOrganisationEntityKey()

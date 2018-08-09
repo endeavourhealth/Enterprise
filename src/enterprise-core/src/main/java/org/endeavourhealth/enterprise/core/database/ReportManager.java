@@ -189,6 +189,14 @@ public class ReportManager {
 		String organisationGroup = reportRun.getOrganisationGroup();
 		List<JsonOrganisation> organisations = CohortManager.getOrganisationsFromGroup(organisationGroup);
 
+		if (organisationGroup.equals("0")) {
+			JsonOrganisation org = new JsonOrganisation();
+			org.setId("0");
+			org.setName("All");
+			org.setOdsCode("All");
+			organisations.add(org);
+		}
+
 		for (JsonOrganisation organisation : organisations) {
 			ReportResultOrganisationEntity reportResultOrganisation = new ReportResultOrganisationEntity()
 					.setId(

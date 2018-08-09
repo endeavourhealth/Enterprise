@@ -155,6 +155,14 @@ public class CohortManager {
 		String organisationGroup = cohortRun.getOrganisationGroup();
 		List<JsonOrganisation> organisations = getOrganisationsFromGroup(organisationGroup);
 
+		if (organisationGroup.equals("0")) {
+			JsonOrganisation org = new JsonOrganisation();
+			org.setId("0");
+			org.setName("All");
+			org.setOdsCode("All");
+			organisations.add(org);
+		}
+
 		List<Long> allPatients = new ArrayList<>();
 
 		for (JsonOrganisation organisationInCohort : organisations) {
@@ -367,15 +375,13 @@ public class CohortManager {
 
 		String ruleSQL = "";
 
-		if (organisationGroup.isEmpty() || organisationGroup.equals("0")) {
+		if (organisationGroup.equals("0")) {
 			ruleSQL = getRuleSQLAllOrganisations(baselineCohortId, cohortPopulation, q, restriction);
-			if (organisationGroup.isEmpty()) {
-				JsonOrganisation org = new JsonOrganisation();
-				org.setId("0");
-				org.setName("All");
-				org.setOdsCode("All");
-				organisations.add(org);
-			}
+			JsonOrganisation org = new JsonOrganisation();
+			org.setId("0");
+			org.setName("All");
+			org.setOdsCode("All");
+			organisations.add(org);
 		}
 		else
 			ruleSQL = getRuleSQL(baselineCohortId, cohortPopulation, q, restriction);

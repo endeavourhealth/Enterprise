@@ -6,6 +6,7 @@ use enterprise_pi;
 
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;
+DROP TABLE IF EXISTS flag;
 DROP TABLE IF EXISTS allergy_intolerance;
 DROP TABLE IF EXISTS `condition`;
 DROP TABLE IF EXISTS specimen;
@@ -849,7 +850,28 @@ CREATE INDEX medication_order_patient_id
 CREATE INDEX medication_order_dmd_id
   ON medication_order
   (dmd_id);
-  
+
+-- Table: flag/alert
+CREATE TABLE flag
+(
+  id bigint NOT NULL,
+  organization_id bigint NOT NULL,
+  patient_id bigint NOT NULL,
+  person_id bigint NOT NULL,
+  effective_date date,
+  date_precision_id smallint,
+  is_active boolean NOT NULL,
+  flag_text text,
+  CONSTRAINT pk_flag_id PRIMARY KEY (`organization_id`,`person_id`,`id`),
+  CONSTRAINT fk_flag_patient_id_organization_id FOREIGN KEY (patient_id, organization_id)
+  REFERENCES patient (id, organization_id) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_flag_date_precision FOREIGN KEY (date_precision_id)
+  REFERENCES date_precision (id) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+
 -- Table: observation
 
 CREATE TABLE observation

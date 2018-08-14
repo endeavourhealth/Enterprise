@@ -851,7 +851,8 @@ CREATE INDEX medication_order_dmd_id
   ON medication_order
   (dmd_id);
 
--- Table: flag/alert
+-- Table: flag
+
 CREATE TABLE flag
 (
   id bigint NOT NULL,
@@ -871,6 +872,13 @@ CREATE TABLE flag
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+CREATE UNIQUE INDEX flag_id
+  ON flag
+  (id);
+
+CREATE INDEX flag_patient_id
+  ON flag
+  (patient_id);
 
 -- Table: observation
 

@@ -42,6 +42,7 @@ DROP TABLE IF EXISTS msoa_lookup;
 DROP TABLE IF EXISTS ward_lookup;
 DROP TABLE IF EXISTS local_authority_lookup;
 DROP TABLE IF EXISTS ethnicity_lookup;
+DROP TABLE IF EXISTS patient_uprn;
 
 CREATE TABLE ethnicity_lookup
 (
@@ -1062,3 +1063,25 @@ CREATE INDEX referral_request_snomed_concept_id
   ON referral_request
   (snomed_concept_id);
   
+create table patient_uprn (
+	patient_id bigint,
+    organization_id bigint,
+    person_id bigint,
+    lsoa_code varchar(50),
+    uprn bigint,
+    qualifier varchar(50),
+    `algorithm` varchar(255),
+    `match` varchar(255),
+    no_address boolean,
+    invalid_address boolean,
+    missing_postcode boolean,
+    invalid_postcode boolean,
+    CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (`organization_id`,`person_id`,`patient_id`),
+    CONSTRAINT fk_patient_uprn_patient_id_organisation_id FOREIGN KEY (patient_id, organization_id)
+      REFERENCES patient (id, organization_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE UNIQUE INDEX patient_uprn_id
+  ON patient_uprn
+  (patient_id);

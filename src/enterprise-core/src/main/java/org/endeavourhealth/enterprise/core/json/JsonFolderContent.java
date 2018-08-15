@@ -18,6 +18,7 @@ public final class JsonFolderContent implements Comparable {
     private Date lastModified = null;
     private Date lastRun = null; //only applicable when showing reports
     private Boolean isScheduled = null; //only applicable when showing reports
+    private Boolean isRunning = null;
 
     public JsonFolderContent() {
 
@@ -31,6 +32,7 @@ public final class JsonFolderContent implements Comparable {
         this.uuid = item.getItemUuid();
         this.name = item.getTitle();
         this.description = item.getDescription();
+        this.isRunning = false;
 
         if (audit != null) {
             this.lastModified = new Date(audit.getTimeStamp().getTime());
@@ -38,6 +40,8 @@ public final class JsonFolderContent implements Comparable {
 
         if (cohort != null) {
             this.lastRun = new Date(cohort.getRunDate().getTime());
+            if (this.lastRun.after(new Date()))
+                this.isRunning = true;
         }
     }
 
@@ -112,6 +116,14 @@ public final class JsonFolderContent implements Comparable {
 
     public void setIsScheduled(Boolean scheduled) {
         isScheduled = scheduled;
+    }
+
+    public Boolean getIsRunning() {
+        return isRunning;
+    }
+
+    public void setIsRunning(Boolean isRunning) {
+        this.isRunning = isRunning;
     }
 
     @Override

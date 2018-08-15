@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectorRef} from "@angular/core";
+import {Component, OnInit, ChangeDetectorRef, OnDestroy} from "@angular/core";
 import {StateService} from "ui-router-ng2";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {EnterpriseLibraryItem} from "./models/EnterpriseLibraryItem";
@@ -21,13 +21,14 @@ import {ReportService} from "../report/report.service";
 @Component({
 	template : require('./library.html')
 })
-export class LibraryComponent implements OnInit {
+export class LibraryComponent implements OnInit, OnDestroy {
 	treeData: FolderNode[];
 	selectedFolder: FolderNode;
 	folderName: string;
 	itemSummaryList: ItemSummaryList;
 	actionMenuItems: ActionMenuItem[];
 	recentDocumentsData:FolderItem[];
+	timer: any;
 
 	constructor(protected libraryService: LibraryService,
 							protected cohortService: CohortService,
@@ -47,6 +48,8 @@ export class LibraryComponent implements OnInit {
 
 		this.folderName = "";
 
+		this.timer = setInterval(() => { this.refresh(); }, 1000 * 15 * 1);
+
 	}
 
 	ngAfterViewChecked()
@@ -59,6 +62,12 @@ export class LibraryComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.getRecentDocumentsData();
+
+	}
+
+	ngOnDestroy(): void {
+		console.log('cancelling refresh...');
+		clearInterval(this.timer);
 	}
 
 	folderChanged($event) {
@@ -68,6 +77,7 @@ export class LibraryComponent implements OnInit {
 	}
 
 	protected getContents() {
+
 		if (this.itemSummaryList)
 			return this.itemSummaryList.contents;
 		else
@@ -75,6 +85,8 @@ export class LibraryComponent implements OnInit {
 	}
 
 	protected refresh() {
+		console.log('refreshing...');
+
 		var vm = this;
 
 		vm.libraryService.getFolderContents(vm.selectedFolder.uuid)
@@ -166,17 +178,26 @@ export class LibraryComponent implements OnInit {
 		CohortEditDialog.open(vm.$modal, reportRun, item)
 			.result.then(function (resultData: CohortRun) {
 
-			item.isRunning = true;
-
 			resultData.queryItemUuid = item.uuid;
 
 			console.log(resultData);
 
-			vm.cohortService.runCohort(resultData)
-				.subscribe(
-					(data) => {
-						vm.refresh();
-					});
+			vm.logger.info("Running cohort " + item.name);
+			item.isRunning = true;
+
+			vm.cohortService.runCohort(resultData).subscribe(
+				(data) => {
+					vm.logger.success(item.name+" cohort run");
+					vm.refresh();
+					item.isRunning = false;
+				},
+				(error) => {
+					vm.logger.error(item.name+"cohort failed", error);
+					item.isRunning = false;
+				}
+			);
+
+
 		});
 	}
 
@@ -235,6 +256,8 @@ export class LibraryComponent implements OnInit {
 	}
 
 	runReport(item: FolderItem) {
+		let vm = this;
+
 		let reportRun: ReportRun = {
 			organisationGroup: "",
 			population: "",
@@ -246,31 +269,28 @@ export class LibraryComponent implements OnInit {
 			cohortName: ""
 		};
 
-		let vm = this;
-		ReportRunnerDialog.open(vm.$modal, reportRun, item).result.then(
-			(result) => {
-				console.log(result);
-				if (result) vm.executeReport(item, result)
-			},
-			(error) => vm.logger.error("Error running report", error)
-		);
-	}
+		ReportRunnerDialog.open(vm.$modal, reportRun, item)
+			.result.then(function (resultData: ReportRun) {
 
-	executeReport(report : FolderItem, reportRun : ReportRun) {
-		let vm = this;
-		vm.logger.info("Running report " + report.name);
-		report.isRunning = true;
-		vm.reportService.runReport(reportRun).subscribe(
-			(result) => {
-				vm.logger.success("Report run");
-				report.lastRun = result;
-				report.isRunning = false;
-			},
-			(error) => {
-				vm.logger.error("Report failed", error);
-				report.isRunning = false;
-			}
-		);
+			vm.logger.info("Running report " + item.name);
+			item.isRunning = true;
+
+			vm.reportService.runReport(resultData).subscribe(
+				(data) => {
+					vm.logger.success(item.name+" report run");
+					item.lastRun = data;
+					item.isRunning = false;
+					vm.refresh();
+				},
+				(error) => {
+					vm.logger.error(item.name+"report failed", error);
+					item.isRunning = false;
+				}
+			);
+
+
+		});
+
 	}
 
 	saveState() {

@@ -88,7 +88,8 @@
 											<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span>{{item.type | itemTypeIdToString}}</td>
 											<td>
 												<a *ngIf="!item.isRunning" style="cursor: pointer" (click)="viewLastRun(item)">{{item.lastRun | date:'dd-MMM-yyyy HH:mm:ss'}}</a>
-												<span *ngIf="item.isRunning" style="color:darkgreen">running...</span>
+												<span *ngIf="item.isRunning" style="color:darkgreen"><i class="fa fa-hourglass-start" aria-hidden="true"></i> running...</span>
+
 											</td>
 											<td>
 												<div ngbDropdown>

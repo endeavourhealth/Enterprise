@@ -85,8 +85,14 @@ public final class LibraryEndpoint extends AbstractItemEndpoint {
 			} else if (itemType == DefinitionItemType.Report.getValue()) {
 				LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(item.getXmlContent());
 				Report report = libraryItem.getReport();
-				if (report != null && report.getLastRunDate() != null)
-					c.setLastRun(new Date(report.getLastRunDate()));
+				if (report != null && report.getLastRunDate() != null) {
+                    if (new Date(report.getLastRunDate()).after(new Date()))
+                        c.setIsRunning(true);
+                    else
+                        c.setIsRunning(false);
+                    c.setLastRun(new Date(report.getLastRunDate()));
+
+                }
 			} else {
 				//throw new RuntimeException("Unexpected content " + item + " in folder");
 			}

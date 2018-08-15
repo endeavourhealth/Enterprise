@@ -8,4 +8,5 @@ export class ReportRun {
 	reportItemUuid: string;
 	scheduled: boolean;
 	scheduleDateTime: Date;
+
 }

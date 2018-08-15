@@ -6,13 +6,15 @@ import org.endeavourhealth.enterprise.core.database.models.data.*;
 import org.endeavourhealth.enterprise.core.json.JsonCode;
 import org.endeavourhealth.enterprise.core.json.JsonOrganisation;
 import org.endeavourhealth.enterprise.core.json.JsonCohortRun;
+import org.endeavourhealth.enterprise.core.json.JsonOrganisationGroup;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.slf4j.Logger;
@@ -44,6 +46,23 @@ public class CohortManager {
 		entityManager.getTransaction().commit();
 
 		entityManager.close();
+	}
+
+	public static void cleanUpQuery(String queryItemUuid) throws Exception {
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+		entityManager.getTransaction().begin();
+
+		String query = "delete from cohortresult where RunDate > now() and QueryItemUuid = '"+queryItemUuid+"'";
+		System.out.println(query);
+		javax.persistence.Query q = entityManager.createNativeQuery(query);
+
+		q.executeUpdate();
+
+		entityManager.getTransaction().commit();
+
+		entityManager.close();
+
 	}
 
 	public static Timestamp convertToDate(String date) {
@@ -130,10 +149,27 @@ public class CohortManager {
 		List<QueryResult> queryResults = new ArrayList<>();
 		List<Long> allPatients = new ArrayList<>();
 
+		String organisationGroup = cohortRun.getOrganisationGroup();
+		List<JsonOrganisation> organisations = getOrganisationsFromGroup(organisationGroup);
+		List<Long> denominatorPatients = new ArrayList<>();
+		List<Long> finalPatients = new ArrayList<>();
+		Timestamp baselineDate = convertToDate(cohortRun.getBaselineDate());
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DATE, 1);
+		DateFormat formatter;
+		formatter = new SimpleDateFormat("yyyy/MM/dd");
+		Timestamp tomorrow = new Timestamp(c.getTime().getTime());
+
+		for (JsonOrganisation organisationInCohort : organisations) {
+			saveQueryCountsToCohortSummaryTable(cohortRun, userUuid, tomorrow, organisationInCohort, baselineDate, denominatorPatients, finalPatients, baseline);
+		}
+
 		executeRules(userUuid, libraryItem, cohortRun, queryResults, runDate, baselineCohortId, report);
 
 		if (!report)
 			allPatients = calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baseline);
+
+		cleanUpQuery(cohortRun.getQueryItemUuid());
 
 		return allPatients;
 	}

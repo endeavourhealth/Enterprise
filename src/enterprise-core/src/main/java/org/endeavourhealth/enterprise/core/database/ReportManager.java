@@ -77,7 +77,14 @@ public class ReportManager {
 		LOG.info("Running report " + reportItem.getName());
 
 		reportRun.setCohortName(cohortName);
-		long reportResultId = saveReport(userUuid, reportRun, reportItem, runDate);
+
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DATE, 1);
+		DateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+		Timestamp tomorrow = new Timestamp(c.getTime().getTime());
+		saveLibraryItemReportDate(reportItem, tomorrow);
+
+		Long reportResultId = saveReport(userUuid, reportRun, reportItem, tomorrow);
 
 		List<QueryResult> reportFeatureData = new ArrayList<>();
 
@@ -98,7 +105,40 @@ public class ReportManager {
 			}
 		}
 
+		saveLibraryItemReportDate(reportItem, runDate);
+		setReportResultDate(reportResultId, runDate);
+
 		return reportResultId;
+	}
+
+	public void saveLibraryItemReportDate(LibraryItem reportItem, Timestamp reportDate) throws Exception {
+
+		ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(reportItem.getUuid());
+		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(featureEntity.getXmlContent());
+		libraryItem.getReport().setLastRunDate(reportDate.getTime());
+		featureEntity.setXmlContent(QueryDocumentSerializer.writeToXml(libraryItem));
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
+		entityManager.getTransaction().begin();
+		entityManager.merge(featureEntity);
+		entityManager.getTransaction().commit();
+		entityManager.close();
+	}
+
+	public static void setReportResultDate(Long reportResultId, Timestamp reportDate) throws Exception {
+		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
+
+		entityManager.getTransaction().begin();
+
+		String query = "update reportresult set RunDate = '"+reportDate+"' where reportResultId = '"+reportResultId+"'";
+		System.out.println(query);
+		javax.persistence.Query q = entityManager.createNativeQuery(query);
+
+		q.executeUpdate();
+
+		entityManager.getTransaction().commit();
+
+		entityManager.close();
+
 	}
 
 	public List<PatientEntity> getPatientDemographics(List<String> patients) {
@@ -142,21 +182,7 @@ public class ReportManager {
 	}
 
 	private long saveReport(String userUuid, JsonReportRun reportRun, LibraryItem reportItem, Timestamp runDate) throws Exception {
-		ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(reportItem.getUuid());
-		LibraryItem libraryItem = QueryDocumentSerializer.readLibraryItemFromXml(featureEntity.getXmlContent());
-		libraryItem.getReport().setLastRunDate(runDate.getTime());
-
-		featureEntity.setXmlContent(QueryDocumentSerializer.writeToXml(libraryItem));
-
-		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseAdmin();
-		entityManager.getTransaction().begin();
-		entityManager.merge(featureEntity);
-
 		long reportResultId = saveReportResults(userUuid, reportRun, reportItem, runDate);
-
-		entityManager.getTransaction().commit();
-		entityManager.close();
-
 		return reportResultId;
 	}
 

@@ -53,7 +53,7 @@ public class CohortManager {
 
 		entityManager.getTransaction().begin();
 
-		String query = "delete from cohortresult where RunDate > now() and QueryItemUuid = '"+queryItemUuid+"'";
+		String query = "delete from CohortResult where RunDate > now() and QueryItemUuid = '"+queryItemUuid+"'";
 		System.out.println(query);
 		javax.persistence.Query q = entityManager.createNativeQuery(query);
 

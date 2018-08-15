@@ -129,7 +129,7 @@ public class ReportManager {
 
 		entityManager.getTransaction().begin();
 
-		String query = "update reportresult set RunDate = '"+reportDate+"' where reportResultId = '"+reportResultId+"'";
+		String query = "update ReportResult set RunDate = '"+reportDate+"' where ReportResultId = '"+reportResultId+"'";
 		System.out.println(query);
 		javax.persistence.Query q = entityManager.createNativeQuery(query);
 

@@ -629,6 +629,7 @@ public class IncidencePrevalenceUtilityManager {
         String query = String.format(
                 "select distinct o.ods_code, o.name, o.id from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
                         " join organization o on o.ods_code = l.ods_code " +
+                        " join patient p on p.organization_id = o.id " +
                         "where l.group_id = %d;", groupId);
         System.out.println(query);
         Query q = entityManager.createNativeQuery(query);

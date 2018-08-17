@@ -53,9 +53,10 @@ public class CohortManager {
 
 		entityManager.getTransaction().begin();
 
-		String query = "delete from CohortResult where RunDate > DATE_ADD(NOW(), INTERVAL 2 HOUR) and QueryItemUuid = '"+queryItemUuid+"'";
+		String query = "delete from CohortResult where RunDate > DATE_ADD(NOW(), INTERVAL 2 HOUR) and QueryItemUuid = ?1";
 		System.out.println(query);
 		javax.persistence.Query q = entityManager.createNativeQuery(query);
+		q.setParameter(1, queryItemUuid);
 
 		q.executeUpdate();
 

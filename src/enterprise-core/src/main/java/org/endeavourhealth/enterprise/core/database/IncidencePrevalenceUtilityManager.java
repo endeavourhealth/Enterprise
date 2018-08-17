@@ -589,15 +589,14 @@ public class IncidencePrevalenceUtilityManager {
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 
         String query =
-            "select distinct o.ods_code, o.name, o.id from enterprise_admin.incidence_prevalence_organisation_group_lookup l\n" +
-                " join organization o on o.ods_code = l.ods_code " +
-                " join patient p on p.organization_id = o.id " +
-                "where l.group_id = ?1;";
-        System.out.println(query);
-        Query q = entityManager.createNativeQuery(query);
-        q.setParameter(1, groupId);
+            "select distinct o.ods_code, o.name, o.id from enterprise_admin.incidence_prevalence_organisation_group_lookup l " +
+                "join organization o on o.ods_code = l.ods_code " +
+                "join patient p on p.organization_id = o.id " +
+                "where l.group_id = :groupId";
 
-        List resultList = q.getResultList();
+        List resultList = entityManager.createNativeQuery(query)
+                .setParameter("groupId", groupId)
+                .getResultList();
 
         entityManager.close();
 
@@ -631,7 +630,7 @@ public class IncidencePrevalenceUtilityManager {
         String query =
             "update enterprise_admin.incidence_prevalence_organisation_group \n" +
                 " set group_name = ?1 " +
-                "where group_id = ?2;";
+                "where group_id = ?2";
         System.out.println(query);
         Query q = entityManager.createNativeQuery(query);
 
@@ -676,7 +675,7 @@ public class IncidencePrevalenceUtilityManager {
 
         String query =
             "delete from enterprise_admin.incidence_prevalence_organisation_group_lookup \n" +
-                "where group_id = ?1;";
+                "where group_id = ?1";
 
         System.out.println(query);
         Query q = entityManager.createNativeQuery(query);

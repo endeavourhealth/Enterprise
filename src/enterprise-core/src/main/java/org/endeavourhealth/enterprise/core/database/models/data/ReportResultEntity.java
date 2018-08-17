@@ -123,7 +123,7 @@ public class ReportResultEntity {
                 "r.snomedConceptId, r.value, r.units, p.patientGenderId, p.ageYears,p.ageMonths,p.ageWeeks,p.dateOfDeath,p.postcodePrefix  from ReportrowEntity r " +
                 "join ReportResultEntity e on e.reportResultId = r.reportResultId "+
                 "join PatientEntity p on p.id = r.patientId "+
-                "where e.reportItemUuid = :reportItemUuid and e.runDate = :runDate order by r.patientId,r.organisationId,r.label";
+                "where e.reportItemUuid = :reportItemUuid and e.runDate = :runDate order by r.organisationId,r.patientId,r.label";
 
         Timestamp runDate1 = null;
 

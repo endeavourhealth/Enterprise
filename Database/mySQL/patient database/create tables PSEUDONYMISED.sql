@@ -1105,3 +1105,4 @@ CREATE UNIQUE INDEX patient_uprn_id
   ON patient_uprn
   (patient_id);
   
+create index ix_patient_uprn_patient_org_uprn on patient_uprn (patient_id, organization_id, pseudo_uprn);

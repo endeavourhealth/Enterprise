@@ -4,6 +4,7 @@
 
 use enterprise_pi;
 
+DROP TABLE IF EXISTS patient_uprn;
 DROP TABLE IF EXISTS medication_order;
 DROP TABLE IF EXISTS medication_statement;
 DROP TABLE IF EXISTS flag;
@@ -42,7 +43,7 @@ DROP TABLE IF EXISTS msoa_lookup;
 DROP TABLE IF EXISTS ward_lookup;
 DROP TABLE IF EXISTS local_authority_lookup;
 DROP TABLE IF EXISTS ethnicity_lookup;
-DROP TABLE IF EXISTS patient_uprn;
+
 
 CREATE TABLE ethnicity_lookup
 (

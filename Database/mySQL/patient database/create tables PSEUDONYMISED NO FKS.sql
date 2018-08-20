@@ -38,6 +38,7 @@ DROP TABLE IF EXISTS referral_request_type;
 DROP TABLE IF EXISTS medication_statement_authorisation_type;
 DROP TABLE IF EXISTS patient_gender;
 DROP TABLE IF EXISTS registration_type;
+DROP TABLE IF EXISTS registration_status;
 DROP TABLE IF EXISTS lsoa_lookup;
 DROP TABLE IF EXISTS msoa_lookup;
 DROP TABLE IF EXISTS ward_lookup;
@@ -238,6 +239,56 @@ INSERT INTO patient_gender (id, value) VALUES (1, 'Female');
 INSERT INTO patient_gender (id, value) VALUES (2, 'Other');
 INSERT INTO patient_gender (id, value) VALUES (3, 'Unknown');
 
+-- Table: registration_status
+
+CREATE TABLE registration_status
+(
+  id smallint NOT NULL,
+  code character varying(10) NOT NULL,
+  description character varying(50) NOT NULL,
+  is_active boolean NOT NULL,
+  CONSTRAINT pk_registration_status_id PRIMARY KEY (id)
+);
+
+INSERT INTO registration_status VALUES (0, 'PR1', 'Patient has presented', false);
+INSERT INTO registration_status VALUES (1, 'PR2', 'Medical card received', false);
+INSERT INTO registration_status VALUES (2, 'PR3', 'Application Form FP1 submitted', false);
+INSERT INTO registration_status VALUES (3, 'R1', 'Registered', true);
+INSERT INTO registration_status VALUES (4, 'R2', 'Medical record sent by FHSA', true);
+INSERT INTO registration_status VALUES (5, 'R3', 'Record Received', true);
+INSERT INTO registration_status VALUES (6, 'R4', 'Left Practice. Still Registered', true);
+INSERT INTO registration_status VALUES (7, 'R5', 'Correctly registered', true);
+INSERT INTO registration_status VALUES (8, 'R6', 'Short stay', true);
+INSERT INTO registration_status VALUES (9, 'R7', 'Long stay', true);
+INSERT INTO registration_status VALUES (10, 'D1', 'Death', false);
+INSERT INTO registration_status VALUES (11, 'D2', 'Dead (Practice notification)', false);
+INSERT INTO registration_status VALUES (12, 'D3', 'Record Requested by FHSA', false);
+INSERT INTO registration_status VALUES (13, 'D4', 'Removal to New HA/HB', false);
+INSERT INTO registration_status VALUES (14, 'D5', 'Internal transfer', false);
+INSERT INTO registration_status VALUES (15, 'D6', 'Mental hospital', false);
+INSERT INTO registration_status VALUES (16, 'D7', 'Embarkation', false);
+INSERT INTO registration_status VALUES (17, 'D8', 'New HA/HB - same GP', false);
+INSERT INTO registration_status VALUES (18, 'D9', 'Adopted child', false);
+INSERT INTO registration_status VALUES (19, 'R8', 'Services', true);
+INSERT INTO registration_status VALUES (20, 'D10', 'Deduction at GP''s request', false);
+INSERT INTO registration_status VALUES (21, 'D11', 'Registration cancelled', false);
+INSERT INTO registration_status VALUES (22, 'R9', 'Service dependant', true);
+INSERT INTO registration_status VALUES (23, 'D12', 'Deduction at patient''s request', false);
+INSERT INTO registration_status VALUES (24, 'D13', 'Other reason', false);
+INSERT INTO registration_status VALUES (25, 'D14', 'Returned undelivered', false);
+INSERT INTO registration_status VALUES (26, 'D15', 'Internal transfer - address change', false);
+INSERT INTO registration_status VALUES (27, 'D16', 'Internal transfer within partnership', false);
+INSERT INTO registration_status VALUES (28, 'D17', 'Correspondence states ''gone away''', false);
+INSERT INTO registration_status VALUES (29, 'D18', 'Practice advise outside of area', false);
+INSERT INTO registration_status VALUES (30, 'D19', 'Practice advise patient no longer resident', false);
+INSERT INTO registration_status VALUES (31, 'D20', 'Practice advise removal via screening system', false);
+INSERT INTO registration_status VALUES (32, 'D21', 'Practice advise removal via vaccination data', false);
+INSERT INTO registration_status VALUES (33, 'R10', 'Removal from Residential Institute', true);
+INSERT INTO registration_status VALUES (34, 'D22', 'Records sent back to FHSA', false);
+INSERT INTO registration_status VALUES (35, 'D23', 'Records received by FHSA', false);
+INSERT INTO registration_status VALUES (36, 'D24', 'Registration expired', false);
+
+
 -- Table: registration_type
 
 CREATE TABLE registration_type
@@ -427,6 +478,7 @@ CREATE TABLE episode_of_care
   patient_id bigint NOT NULL,
   person_id bigint NOT NULL,
   registration_type_id smallint,
+  registration_status_id smallint,
   date_registered date,
   date_registered_end date,
   usual_gp_practitioner_id bigint,

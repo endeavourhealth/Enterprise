@@ -11,6 +11,7 @@ import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer
 import org.endeavourhealth.enterprise.core.querydocument.models.*;
 
 import javax.persistence.*;
+import javax.persistence.Query;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -86,21 +87,21 @@ public class CohortManager {
 		if (baselineCohortId != null && !baselineCohortId.equals(""))	// Cohort subset
 			return "select distinct p " +
 					"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
-					"where p.organizationId = :organizationId " +
-					"and c.queryItemUuid = :baselineCohortId " +
-					"and c.runDate = :runDate ";
+					"where p.organizationId = ?0 " +
+					"and c.queryItemUuid = ?3 " +
+					"and c.runDate = ?2 ";
 		else if (cohortPopulation.equals("0")) // currently registered
 			return "select distinct p " +
 					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
-					"where p.dateOfDeath IS NULL and p.organizationId = :organizationId " +
+					"where p.dateOfDeath IS NULL and p.organizationId = ?0 " +
 					"and e.registrationTypeId = 2 " +
-					"and e.dateRegistered <= :baseline " +
-					"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
+					"and e.dateRegistered <= ?1 " +
+					"and (e.dateRegisteredEnd > ?1 or e.dateRegisteredEnd IS NULL)";
 		else if (cohortPopulation.equals("1")) // all patients
 			return "select distinct p " +
 					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
-					"where p.organizationId = :organizationId " +
-					"and e.dateRegistered <= :baseline ";
+					"where p.organizationId = ?0 " +
+					"and e.dateRegistered <= ?1 ";
 
 		return "";
 	}
@@ -109,19 +110,19 @@ public class CohortManager {
 		if (baselineCohortId != null && !baselineCohortId.equals(""))	// Cohort subset
 			return "select distinct p " +
 					"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId " +
-					"where c.queryItemUuid = :baselineCohortId " +
-					"and c.runDate = :runDate ";
+					"where c.queryItemUuid = ?3 " +
+					"and c.runDate = ?2 ";
 		else if (cohortPopulation.equals("0")) // currently registered
 			return "select distinct p " +
 					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 					"where p.dateOfDeath IS NULL " +
 					"and e.registrationTypeId = 2 " +
-					"and e.dateRegistered <= :baseline " +
-					"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL)";
+					"and e.dateRegistered <= ?1 " +
+					"and (e.dateRegisteredEnd > ?1 or e.dateRegisteredEnd IS NULL)";
 		else if (cohortPopulation.equals("1")) // all patients
 			return "select distinct p " +
 					"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
-					"where e.dateRegistered <= :baseline ";
+					"where e.dateRegistered <= ?1 ";
 
 		return "";
 	}
@@ -236,13 +237,13 @@ public class CohortManager {
 				createQuery(denominatorSQL, PatientEntity.class);
 
 		if (!organisationInCohort.getId().equals("0"))
-			query.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+			query.setParameter(0, Long.parseLong(organisationInCohort.getId()));
 
 		if (denominatorCohortId == null || denominatorCohortId.equals(""))
-			query.setParameter("baseline", baselineDate);
+			query.setParameter(1, baselineDate);
 		else
-			query.setParameter("runDate", runDate)
-					.setParameter("baselineCohortId", denominatorCohortId);
+			query.setParameter(2, runDate)
+					.setParameter(3, denominatorCohortId);
 
 		List<PatientEntity> patients = query.getResultList();
 
@@ -578,14 +579,15 @@ public class CohortManager {
 						createQuery(ruleSQL, ObservationEntity.class);
 
 					if (!organisationInCohort.getId().equals("0"))
-						query.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+						query.setParameter(0, Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query.setParameter("baseline", baselineDate);
+						query.setParameter(1, baselineDate);
 					else
-						query.setParameter("runDate", runDate)
-						.setParameter("baselineCohortId", baselineCohortId);
+						query.setParameter(2, runDate)
+						.setParameter(3, baselineCohortId);
 
+					setQueryParams(query, q.whereParams);
 					patientObservations = query.getResultList();
 
 				} else if (ruleSQL.contains("JOIN MedicationStatementEntity")) {
@@ -593,14 +595,15 @@ public class CohortManager {
 						createQuery(ruleSQL, MedicationStatementEntity.class);
 
 					if (!organisationInCohort.getId().equals("0"))
-						query.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+						query.setParameter(0, Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query.setParameter("baseline", baselineDate);
+						query.setParameter(1, baselineDate);
 					else
-						query.setParameter("runDate", runDate)
-						.setParameter("baselineCohortId", baselineCohortId);
+						query.setParameter(2, runDate)
+						.setParameter(3, baselineCohortId);
 
+					setQueryParams(query, q.whereParams);
 					patientMedicationStatements = query.getResultList();
 
 				} else if (ruleSQL.contains("JOIN AllergyIntoleranceEntity")) {
@@ -608,14 +611,15 @@ public class CohortManager {
 							createQuery(ruleSQL, AllergyIntoleranceEntity.class);
 
 					if (!organisationInCohort.getId().equals("0"))
-						query.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+						query.setParameter(0, Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query.setParameter("baseline", baselineDate);
+						query.setParameter(1, baselineDate);
 					else
-						query.setParameter("runDate", runDate)
-								.setParameter("baselineCohortId", baselineCohortId);
+						query.setParameter(2, runDate)
+								.setParameter(3, baselineCohortId);
 
+					setQueryParams(query, q.whereParams);
 					patientAllergyIntolerances = query.getResultList();
 
 				} else if (ruleSQL.contains("JOIN ReferralRequestEntity")) {
@@ -623,14 +627,15 @@ public class CohortManager {
 							createQuery(ruleSQL, ReferralRequestEntity.class);
 
 					if (!organisationInCohort.getId().equals("0"))
-						query.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+						query.setParameter(0, Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query.setParameter("baseline", baselineDate);
+						query.setParameter(1, baselineDate);
 					else
-						query.setParameter("runDate", runDate)
-								.setParameter("baselineCohortId", baselineCohortId);
+						query.setParameter(2, runDate)
+								.setParameter(3, baselineCohortId);
 
+					setQueryParams(query, q.whereParams);
 					patientReferralRequests = query.getResultList();
 
 				} else if (ruleSQL.contains("JOIN EncounterEntity")) {
@@ -638,14 +643,15 @@ public class CohortManager {
 							createQuery(ruleSQL, EncounterEntity.class);
 
 					if (!organisationInCohort.getId().equals("0"))
-						query.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+						query.setParameter(0, Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query.setParameter("baseline", baselineDate);
+						query.setParameter(1, baselineDate);
 					else
-						query.setParameter("runDate", runDate)
-								.setParameter("baselineCohortId", baselineCohortId);
+						query.setParameter(2, runDate)
+								.setParameter(3, baselineCohortId);
 
+					setQueryParams(query, q.whereParams);
 					patientEncounters = query.getResultList();
 
 				} else if (ruleSQL.contains("JOIN PatientEntity")) {
@@ -653,19 +659,19 @@ public class CohortManager {
 						createQuery(ruleSQL, PatientEntity.class);
 
 					if (!organisationInCohort.getId().equals("0"))
-						query.setParameter("organizationId", Long.parseLong(organisationInCohort.getId()));
+						query.setParameter(0, Long.parseLong(organisationInCohort.getId()));
 
 					if (baselineCohortId == null)
-						query.setParameter("baseline", baselineDate);
+						query.setParameter(1, baselineDate);
 					else
-						query.setParameter("runDate", runDate)
-						.setParameter("baselineCohortId", baselineCohortId);
+						query.setParameter(2, runDate)
+						.setParameter(3, baselineCohortId);
 
+					setQueryParams(query, q.whereParams);
 					patients = query.getResultList();
 
 				}
 			}
-
 
 			// For each organisation - add the rule's identified list of patients to the overall Query Result list
 			QueryResult queryResult = new QueryResult();
@@ -807,14 +813,14 @@ public class CohortManager {
 				dateFrom = "-" + dateFrom;
 				dateFrom = getRelativeDateFromBaselineAsString(filter.getValueFrom().getRelativeUnit().value(),convertToDate(cohortRun.getBaselineDate()),dateFrom);
 			}
-			q.sqlWhere += " and d.clinicalEffectiveDate >= '" + dateFrom + "'";
+			q.sqlWhere += " and d.clinicalEffectiveDate >= " + parameterize(q.whereParams, convertToDate(dateFrom));
 		} else if (filter.getValueTo() != null) {
 			String dateTo = filter.getValueTo().getConstant();
 			if (filter.getValueTo().getRelativeUnit() != null) {
 				dateTo = "-" + dateTo;
 				dateTo = getRelativeDateFromBaselineAsString(filter.getValueTo().getRelativeUnit().value(),convertToDate(cohortRun.getBaselineDate()),dateTo);
 			}
-			q.sqlWhere += " and d.clinicalEffectiveDate <= '" + dateTo + "'";
+			q.sqlWhere += " and d.clinicalEffectiveDate <= " + parameterize(q.whereParams, convertToDate(dateTo));
 		}
 	}
 
@@ -877,7 +883,7 @@ public class CohortManager {
 			String valueFrom = codeSetValue.getValueFrom();
 			String valueTo = codeSetValue.getValueTo();
 			Boolean includeChildren = codeSetValue.isIncludeChildren();
-			codes += code+","; // TODO: temp solution - need to join on child concepts, and calculate exclusions too
+			codes += code+",";
 		}
 		return codes;
 	}
@@ -893,27 +899,27 @@ public class CohortManager {
 			case "Medication Statement":
 				q.patientJoinField = "patientId";
 				q.dataTable = "MedicationStatementEntity";
-				q.sqlWhere += " or d.dmdId = '" + code + "'";
+				q.sqlWhere += " or d.dmdId = " + parameterize(q.whereParams, Long.valueOf(code));
 				break;
 			case "Medication Order":
 				q.patientJoinField = "patientId";
 				q.dataTable = "MedicationOrderEntity";
-				q.sqlWhere += " or d.dmdId = '" + code + "'";
+				q.sqlWhere += " or d.dmdId = " + parameterize(q.whereParams, Long.valueOf(code));
 				break;
 			case "Allergy":
 				q.patientJoinField = "patientId";
 				q.dataTable = "AllergyIntoleranceEntity";
-				q.sqlWhere += " or d.snomedConceptId = '" + code + "'";
+				q.sqlWhere += " or d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code));
 				break;
 			case "Referral":
 				q.patientJoinField = "patientId";
 				q.dataTable = "ReferralRequestEntity";
-				q.sqlWhere += " or d.snomedConceptId = '" + code + "'";
+				q.sqlWhere += " or d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code));
 				break;
 			case "Encounter":
 				q.patientJoinField = "patientId";
 				q.dataTable = "EncounterEntity";
-				q.sqlWhere += " or d.snomedConceptId = '" + code + "'";
+				q.sqlWhere += " or d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code));
 				break;
 		}
 	}
@@ -926,13 +932,24 @@ public class CohortManager {
 			pref = "";
 
 		if (valueFrom.equals("") && valueTo.equals(""))
-			q.sqlWhere += pref + " d.snomedConceptId = '" + code + "'";
-		if (!valueFrom.equals("") && valueTo.equals(""))
-			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.resultValue >= '" + valueFrom + "')";
-		if (valueFrom.equals("") && !valueTo.equals(""))
-			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.resultValue <= '" + valueTo + "')";
-		if (!valueFrom.equals("") && !valueTo.equals(""))
-			q.sqlWhere += pref + " (d.snomedConceptId = '" + code + "' and d.resultValue >= '" + valueFrom + "' and d.resultValue <= '" + valueTo + "')";
+			q.sqlWhere += pref + " d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code));
+
+		if (valueFrom.contains("-")||valueTo.contains("-")) {
+			if (!valueFrom.equals("") && valueTo.equals(""))
+				q.sqlWhere += pref + " (d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code)) + " and d.resultDate >= " + parameterize(q.whereParams, convertToDate(valueFrom))+")";
+			if (valueFrom.equals("") && !valueTo.equals(""))
+				q.sqlWhere += pref + " (d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code)) + " and d.resultDate <= " + parameterize(q.whereParams, convertToDate(valueTo))+")";
+			if (!valueFrom.equals("") && !valueTo.equals(""))
+				q.sqlWhere += pref + " (d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code)) + " and d.resultDate >= " + parameterize(q.whereParams, convertToDate(valueFrom)) + " and d.resultDate <= " + parameterize(q.whereParams,convertToDate(valueTo)) + ")";
+
+		} else {
+			if (!valueFrom.equals("") && valueTo.equals(""))
+				q.sqlWhere += pref + " (d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code)) + " and d.resultValue >= " + parameterize(q.whereParams, Double.valueOf(valueFrom))+")";
+			if (valueFrom.equals("") && !valueTo.equals(""))
+				q.sqlWhere += pref + " (d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code)) + " and d.resultValue <= " + parameterize(q.whereParams, Double.valueOf(valueTo))+")";
+			if (!valueFrom.equals("") && !valueTo.equals(""))
+				q.sqlWhere += pref + " (d.snomedConceptId = " + parameterize(q.whereParams, Long.valueOf(code)) + " and d.resultValue >= " + parameterize(q.whereParams, Double.valueOf(valueFrom)) + " and d.resultValue <= " + parameterize(q.whereParams, Double.valueOf(valueTo)) + ")";
+		}
 	}
 
 	private static void buildConceptPatientFilter(QueryMeta q, String term, String parentType, String valueFrom, String valueTo) {
@@ -942,41 +959,41 @@ public class CohortManager {
 			q.sqlWhere += " and p.patientGenderId = '0'";
 		} else if (term.equals("Female")) {
 			q.sqlWhere += " and p.patientGenderId = '1'";
-		} else if (term.equals("Post Code")) {
-			q.sqlWhere += " and p.postcodePrefix like '" + valueFrom + "%'";
+		} else if (term.equals("Post Code Prefix")||term.equals("Post Code")) {
+			q.sqlWhere += " and p.postcodePrefix = " + parameterize(q.whereParams, valueFrom);
 		} else if (term.equals("Age Years")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.ageYears between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.ageYears between " + parameterize(q.whereParams, Integer.valueOf(valueFrom))+" and "+ parameterize(q.whereParams, Integer.valueOf(valueTo));
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and p.ageYears >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.ageYears >= " + parameterize(q.whereParams, Integer.valueOf(valueFrom));
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.ageYears <= '" + valueTo + "'";
+				q.sqlWhere += " and p.ageYears <= " + parameterize(q.whereParams, Integer.valueOf(valueTo));
 
 		} else if (term.equals("Age Months")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.ageMonths between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.ageMonths between " + parameterize(q.whereParams, Integer.valueOf(valueFrom))+" and "+ parameterize(q.whereParams, Integer.valueOf(valueTo));
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and p.ageMonths >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.ageMonths >= " + parameterize(q.whereParams, Integer.valueOf(valueFrom));
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.ageMonths <= '" + valueTo + "'";
+				q.sqlWhere += " and p.ageMonths <= " + parameterize(q.whereParams, Integer.valueOf(valueTo));
 		} else if (term.equals("Age Weeks")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.ageWeeks between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.ageWeeks between " + parameterize(q.whereParams, Integer.valueOf(valueFrom))+" and "+ parameterize(q.whereParams, Integer.valueOf(valueTo));
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and p.ageWeeks >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.ageWeeks >= " + parameterize(q.whereParams, Integer.valueOf(valueFrom));
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.ageWeeks <= '" + valueTo + "'";
+				q.sqlWhere += " and p.ageWeeks <= " + parameterize(q.whereParams, Integer.valueOf(valueTo));
 		} else if (term.equals("LSOA Code")) {
-			q.sqlWhere += " and p.lsoaCode like '" + valueFrom + "%'";
+			q.sqlWhere += " and p.lsoaCode = " + parameterize(q.whereParams, valueFrom);
 		} else if (term.equals("MSOA Code")) {
-			q.sqlWhere += " and p.msoaCode like '" + valueFrom + "%'";
+			q.sqlWhere += " and p.msoaCode = " + parameterize(q.whereParams, valueFrom);
 		} else if (term.equals("Date of Death")) {
 			if (!valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.dateOfDeath between '" + valueFrom + "' and '" + valueTo + "'";
+				q.sqlWhere += " and p.dateOfDeath between " + parameterize(q.whereParams, convertToDate(valueFrom))+" and "+ parameterize(q.whereParams, convertToDate(valueTo));
 			else if (!valueFrom.equals("") && valueTo.equals(""))
-				q.sqlWhere += " and p.dateOfDeath >= '" + valueFrom + "'";
+				q.sqlWhere += " and p.dateOfDeath >= " + parameterize(q.whereParams, convertToDate(valueFrom));
 			else if (valueFrom.equals("") && !valueTo.equals(""))
-				q.sqlWhere += " and p.dateOfDeath <= '" + valueTo + "'";
+				q.sqlWhere += " and p.dateOfDeath <= " + parameterize(q.whereParams, convertToDate(valueTo));
 		}
 	}
 
@@ -1094,16 +1111,16 @@ public class CohortManager {
 				sql = "select d " +
 						"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where p.organizationId = :organizationId " +
-						"and c.queryItemUuid = :baselineCohortId " +
-						"and c.runDate = :runDate " + q.sqlWhere;
+						"where p.organizationId = ?0 " +
+						"and c.queryItemUuid = ?3 " +
+						"and c.runDate = ?2 "+q.sqlWhere;
 			} else {
 				sql = "select d " +
 						"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where p.organizationId = :organizationId " +
-						"and c.queryItemUuid = :baselineCohortId " +
-						"and c.runDate = :runDate " + q.sqlWhere+
+						"where p.organizationId = ?0 " +
+						"and c.queryItemUuid = ?3 " +
+						"and c.runDate = ?2 "+q.sqlWhere+
 						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
@@ -1113,18 +1130,18 @@ public class CohortManager {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where p.dateOfDeath IS NULL and p.organizationId = :organizationId " +
+						"where p.dateOfDeath IS NULL and p.organizationId = ?0 " +
 						"and e.registrationTypeId = 2 " +
-						"and e.dateRegistered <= :baseline " +
-						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere;
+						"and e.dateRegistered <= ?1 " +
+						"and (e.dateRegisteredEnd > ?1 or e.dateRegisteredEnd IS NULL) "+q.sqlWhere;
 			} else {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where p.dateOfDeath IS NULL and p.organizationId = :organizationId " +
+						"where p.dateOfDeath IS NULL and p.organizationId = ?0 " +
 						"and e.registrationTypeId = 2 " +
-						"and e.dateRegistered <= :baseline " +
-						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
+						"and e.dateRegistered <= ?1 " +
+						"and (e.dateRegisteredEnd > ?1 or e.dateRegisteredEnd IS NULL) "+q.sqlWhere+
 						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
@@ -1134,14 +1151,14 @@ public class CohortManager {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where p.organizationId = :organizationId " +
-						"and e.dateRegistered <= :baseline " + q.sqlWhere;
+						"where p.organizationId = ?0 " +
+						"and e.dateRegistered <= ?1 "+q.sqlWhere;
 			} else {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where p.organizationId = :organizationId " +
-						"and e.dateRegistered <= :baseline " + q.sqlWhere +
+						"where p.organizationId = ?0 " +
+						"and e.dateRegistered <= ?1 "+q.sqlWhere+
 						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
@@ -1163,14 +1180,14 @@ public class CohortManager {
 				sql = "select d " +
 						"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where c.queryItemUuid = :baselineCohortId " +
-						"and c.runDate = :runDate " + q.sqlWhere;
+						"where c.queryItemUuid = ?3 " +
+						"and c.runDate = ?2 "+q.sqlWhere;
 			} else {
 				sql = "select d " +
 						"from CohortPatientsEntity c JOIN PatientEntity p ON p.id = c.patientId AND p.organizationId = c.organisationId " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where c.queryItemUuid = :baselineCohortId " +
-						"and c.runDate = :runDate " + q.sqlWhere+
+						"where c.queryItemUuid = ?3 " +
+						"and c.runDate = ?2 "+q.sqlWhere+
 						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
@@ -1182,16 +1199,16 @@ public class CohortManager {
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
 						"where p.dateOfDeath IS NULL " +
 						"and e.registrationTypeId = 2 " +
-						"and e.dateRegistered <= :baseline " +
-						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere;
+						"and e.dateRegistered <= ?1 " +
+						"and (e.dateRegisteredEnd > ?1 or e.dateRegisteredEnd IS NULL) "+q.sqlWhere;
 			} else {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
 						"where p.dateOfDeath IS NULL " +
 						"and e.registrationTypeId = 2 " +
-						"and e.dateRegistered <= :baseline " +
-						"and (e.dateRegisteredEnd > :baseline or e.dateRegisteredEnd IS NULL) " + q.sqlWhere +
+						"and e.dateRegistered <= ?1 " +
+						"and (e.dateRegisteredEnd > ?1 or e.dateRegisteredEnd IS NULL) "+q.sqlWhere+
 						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
@@ -1201,12 +1218,12 @@ public class CohortManager {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where e.dateRegistered <= :baseline " + q.sqlWhere;
+						"where e.dateRegistered <= ?1 "+q.sqlWhere;
 			} else {
 				sql = "select d " +
 						"from PatientEntity p JOIN EpisodeOfCareEntity e on e.patientId = p.id " +
 						"JOIN " + q.dataTable + " d on d." + q.patientJoinField + " = p.id " +
-						"where e.dateRegistered <= :baseline " + q.sqlWhere +
+						"where e.dateRegistered <= ?1 "+q.sqlWhere+
 						" order by p.id, d.clinicalEffectiveDate "+order;
 			}
 			return sql;
@@ -1249,6 +1266,18 @@ public class CohortManager {
 		return dateFormat.format(calDate.getTime());
 	}
 
+	public static void setQueryParams(Query q, List<Object> params) {
+		for (int i = 0; i < params.size(); i++) {
+			if (params.get(i) instanceof Calendar)
+				q.setParameter(i + 4, (Calendar) params.get(i), TemporalType.TIMESTAMP);
+			else
+				q.setParameter(i + 4, params.get(i));
+		}
+	}
 
+	private static String parameterize(List<Object> list, Object value) {
+		list.add(value);
+		return " ?" + (list.size()+3) + " ";
+	}
 
 }

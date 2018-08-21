@@ -143,7 +143,7 @@ public class ReportManager {
 
 	}
 
-	public List<PatientEntity> getPatientDemographics(List<String> patients) {
+	/*public List<PatientEntity> getPatientDemographics(List<String> patients) {
 		EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseData();
 		String listPatients = "("+StringUtils.join(patients, ',')+")";
 		String sql = "SELECT p from PatientEntity p where p.id in "+listPatients+" order by organizationId";
@@ -153,7 +153,7 @@ public class ReportManager {
 
 		return query.getResultList();
 
-	}
+	}*/
 
 	private List<Long> runCohort(String userUuid, JsonReportRun reportRun, String featureUuid, Timestamp runDate, String baselineCohortId, Boolean report) throws Exception {
 		ItemEntity featureEntity = ItemEntity.retrieveLatestForUUid(featureUuid);

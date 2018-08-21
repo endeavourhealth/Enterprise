@@ -171,6 +171,8 @@ public class CohortManager {
 		if (!report)
 			allPatients = calculateAndStoreResults(libraryItem, cohortRun, userUuid, runDate, queryResults, baseline);
 
+		if (cohortRun.getBaselineCohortId()!=null)
+			cleanUpQuery(cohortRun.getBaselineCohortId());
 		cleanUpQuery(cohortRun.getQueryItemUuid());
 
 		return allPatients;

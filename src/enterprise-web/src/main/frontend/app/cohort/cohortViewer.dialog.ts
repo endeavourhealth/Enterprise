@@ -196,7 +196,7 @@ export class CohortViewDialog implements OnInit {
                     console.log(result)
                     for (let value of result)
                         if (value != null) {
-                            var message = "Patient NHS Number = "+value[0];
+                            var message = "Patient NHS Number = "+value;
                             MessageBoxDialog.open(this.$modal, 'Cohort Patient', message, 'Ok', 'Cancel');
                         }
                 });

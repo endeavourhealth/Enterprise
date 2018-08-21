@@ -82,5 +82,10 @@ export class CohortService extends BaseHttp2Service {
 		return this.httpGet('api/cohort/getFrailty', {search : params});
 	}
 
+	getNHSNo(pseudoId: string): Observable<any> {
+		var params: URLSearchParams = new URLSearchParams();
+		params.append('pseudoId', pseudoId);
+		return this.httpGet('api/report/getNHSNo', {search: params});
+	}
 
 }

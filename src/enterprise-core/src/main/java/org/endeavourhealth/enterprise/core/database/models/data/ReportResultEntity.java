@@ -147,4 +147,19 @@ public class ReportResultEntity {
         return ent;
 
     }
+
+    public static List getNHSNo(String pseudoId) throws Exception {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseDemographic();
+
+        Query q = entityManager.createNativeQuery("SELECT distinct(nhs_number) FROM subscriber_transform_ceg_enterprise.pseudo_id_map s " +
+                "join eds.patient_search p on p.patient_id = s.patient_id "+
+                "where s.pseudo_id = :pseudoId");
+
+        q.setParameter("pseudoId",pseudoId);
+        List resultList = q.getResultList();
+
+        entityManager.close();
+
+        return resultList;
+    }
 }

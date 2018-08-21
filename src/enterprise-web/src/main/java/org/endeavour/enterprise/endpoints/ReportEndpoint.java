@@ -179,5 +179,22 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 	}
 
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/getNHSNo")
+	public Response getNHSNo(@Context SecurityContext sc, @QueryParam("pseudoId") String pseudoId) throws Exception {
+		super.setLogbackMarkers(sc);
+
+		List resultList = ReportResultEntity.getNHSNo(pseudoId);
+
+		clearLogbackMarkers();
+
+		return Response
+				.ok()
+				.entity(resultList)
+				.build();
+	}
+
 
 }

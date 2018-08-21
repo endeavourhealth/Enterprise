@@ -562,6 +562,8 @@ public class IncidencePrevalenceUtilityManager {
 
         Query q = entityManager.createNativeQuery(sql);
 
+        UtilityManagerCommon.setQueryParams(q, sqlParams);
+
         List resultList = q.getResultList();
 
         System.out.println(resultList.size() + " rows affected");

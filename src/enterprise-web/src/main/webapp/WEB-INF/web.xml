@@ -31,7 +31,6 @@
     <servlet-mapping>
         <servlet-name>Endeavour Enterprise</servlet-name>
         <url-pattern>/api/*</url-pattern>
-        <url-pattern>/machine-api/*</url-pattern>
     </servlet-mapping>
 
     <!-- public resources, no auth needed -->
@@ -71,6 +70,14 @@
         <listener-class>org.endeavourhealth.enterprise.core.scheduler.ReportRunner</listener-class>
     </listener>
 
+    <session-config>
+        <session-timeout>60</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
 
     <filter>
         <filter-name>CorsFilter</filter-name>
@@ -96,24 +103,11 @@
         <web-resource-collection>
             <web-resource-name>api</web-resource-name>
             <url-pattern>/api/*</url-pattern>
-            <url-pattern>/machine-api/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>enterprise:api</role-name>
         </auth-constraint>
     </security-constraint>
-
-    <!-- API docs require an admin user -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>api-docs</web-resource-name>
-            <url-pattern>/api-docs/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>enterprise:api</role-name>
-        </auth-constraint>
-    </security-constraint>
-
 
     <!-- use Keycloak authentication valve installed in the container -->
     <login-config>

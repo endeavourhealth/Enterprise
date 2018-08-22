@@ -82,7 +82,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 		List<JsonReportRow> results = new ArrayList<>();
 
 		for (Object[] rowEntity: rows) {
-			String patientId = rowEntity[0]==null?"":rowEntity[0].toString();
+			String pseudoId = rowEntity[0]==null?"":rowEntity[0].toString();
 			String organisationId = rowEntity[1]==null?"":rowEntity[1].toString();
 			String label = rowEntity[2]==null?"":rowEntity[2].toString();
 			String clinicalEffectiveDate = rowEntity[3]==null?"":rowEntity[3].toString();
@@ -99,7 +99,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 			String postcodePrefix = rowEntity[14]==null?"":rowEntity[14].toString();
 
 			JsonReportRow jRow = new JsonReportRow();
-			jRow.setPatientId(patientId);
+			jRow.setPseudoId(pseudoId);
 			jRow.setOrganisationId(organisationId);
 			jRow.setLabel(label);
 			jRow.setClinicalEffectiveDate(clinicalEffectiveDate);

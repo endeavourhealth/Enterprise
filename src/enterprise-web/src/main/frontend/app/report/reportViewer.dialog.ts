@@ -8,6 +8,7 @@ import {ReportService} from "./report.service";
 import {CohortService} from "../cohort/cohort.service";
 import {LoggerService} from "eds-common-js";
 import {FolderItem} from "eds-common-js/dist/folder/models/FolderItem";
+import {MessageBoxDialog} from 'eds-common-js';
 
 @Component({
     selector: 'ngbd-modal-content',
@@ -37,6 +38,7 @@ export class ReportViewDialog implements OnInit {
     constructor(protected reportService: ReportService,
                 protected cohortService: CohortService,
                 protected $uibModalInstance : NgbActiveModal,
+                private $modal: NgbModal,
                 private logger : LoggerService) {
 
     }
@@ -126,6 +128,21 @@ export class ReportViewDialog implements OnInit {
         }
 
         return str;
+    }
+
+    displayPatient(pseudoId) {
+        let vm = this;
+        vm.cohortService.getNHSNo(pseudoId)
+            .subscribe(
+                (result) => {
+                    console.log(result)
+                    for (let value of result)
+                        if (value != null) {
+                            var message = "Patient NHS Number = "+value;
+                            MessageBoxDialog.open(this.$modal, 'Cohort Patient', message, 'Ok', 'Cancel');
+                        }
+                });
+
     }
 
     cancel() {

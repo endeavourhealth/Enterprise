@@ -1,6 +1,6 @@
 export class ReportRow {
 
-    patientId : string;
+    pseudoId : string;
     organisationId : string;
     label : string;
     clinicalEffectiveDate : string;

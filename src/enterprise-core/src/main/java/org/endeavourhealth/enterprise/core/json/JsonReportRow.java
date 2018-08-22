@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public final class JsonReportRow {
 
-    private String patientId = null;
+    private String pseudoId = null;
     private String organisationId = null;
     private String label = null;
     private String clinicalEffectiveDate = null;
@@ -27,12 +27,12 @@ public final class JsonReportRow {
     /**
      * gets/sets
      */
-    public String getPatientId() {
-        return patientId;
+    public String getPseudoId() {
+        return pseudoId;
     }
 
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
+    public void setPseudoId(String pseudoId) {
+        this.pseudoId = pseudoId;
     }
 
     public String getOrganisationId() {

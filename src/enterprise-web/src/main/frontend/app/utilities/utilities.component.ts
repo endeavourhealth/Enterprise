@@ -115,7 +115,7 @@ export class UtilitiesComponent {
 	frailty() {
 		let vm = this;
 
-		InputBoxDialog.open(this.$modal, 'NHS111 Frailty Checker', 'Patient Pseudo Id', '0')
+		InputBoxDialog.open(this.$modal, 'NHS111 Frailty Checker', 'Patient Pseudo Id', '0', 'OK', 'Cancel')
 			.result.then(
 			(result) => this.checkFrailty(result)
 		);

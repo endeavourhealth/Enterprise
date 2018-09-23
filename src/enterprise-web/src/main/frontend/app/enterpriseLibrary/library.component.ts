@@ -48,7 +48,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
 
 		this.folderName = "";
 
-		this.timer = setInterval(() => { this.refresh(); }, 1000 * 15 * 1);
+		// this.timer = setInterval(() => { this.refresh(); }, 1000 * 15 * 1);
 
 	}
 

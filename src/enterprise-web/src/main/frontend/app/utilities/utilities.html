@@ -9,12 +9,12 @@
 					<div class="row">
 						<div class="col-md-4">
 							<h4>Incidence and Prevalence</h4>
-							<div style="color:grey">
+							<div class="text-muted">
 								The utility consists of a simple representation of the incidence and prevalence of a selected chronic or acute disease group as a graphical trend over time, involving a regionally defined denominator population.
 							</div>
 						</div>
 						<loadingIndicator [done]="!incPrevRunning" [text]="'Running report, please wait...'">
-							<div class="col-md-3">
+                            <div class="col-md-3">
 								<button class="btn btn-success btn-sm pull-left" (click)="pi()"><i class="fa fa-play-circle-o"></i> Run Prevalence and Incidence Report</button>
 							</div>
 							<div class="col-md-5">
@@ -27,7 +27,7 @@
 					<div class="row">
 						<div class="col-md-4">
 							<h4>Health Care Activity</h4>
-							<div style="color:grey">
+							<div class="text-muted">
 								The utility consists of a simple representation of  encounters that have occurred for a given population of patients over a selected period of time.
 							</div>
 						</div>
@@ -45,7 +45,7 @@
 					<div class="row">
 						<div class="col-md-4">
 							<h4>Cohort Results Trend Dashboard</h4>
-							<div style="color:grey">
+							<div class="text-muted">
 								This utility compares cohort results (i.e. quality indicators) between organisations trended over a period of time. The results are displayed as a trended percentage of the enumerator cohort compared to the denominator cohort.
 							</div>
 						</div>
@@ -59,7 +59,7 @@
 					<div class="row">
 						<div class="col-md-4">
 							<h4>Frailty Checker</h4>
-							<div style="color:grey">
+							<div class="text-muted">
 								This utility checks the frailty status for a given patient. It is used to test the NHS111 Frailty API. If the specified patient has an observation for severe or moderate frailty then the utility API returns a value of TRUE.
 							</div>
 						</div>

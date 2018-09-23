@@ -1,42 +1,39 @@
-<style>
-	.form-group { margin-bottom: 10px; }
-	dropdown { display: inline-block; }
-</style>
 <div class="modal-header">
-	<button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
 	<h4 class="modal-title">{{title}}</h4>
+    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
 </div>
 <div class="modal-body">
 	<form role="form">
-		<div class="show-child-on-hover">
-			<div class="panel panel-default show-child-on-hover">
-				<div class="panel-heading" (click)="showFilter = !showFilter">Breakdown / filter options <i class="fa fa-caret-down"></i> </div>
-				<div class="panel-body bordered-box" style="z-index: 10; position: absolute; width: 98%; background: white" [hidden]="!showFilter">
+		<div class="row mb-3">
+            <div class="col-md-12">
+			<div class="card">
+				<div class="card-header" (click)="showFilter = !showFilter">Breakdown / filter options <i class="fa fa-caret-down"></i> </div>
+				<div class="card-body-popover" [hidden]="!showFilter">
 					<div class="row">
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Breakdown: </label>
+							<label class="control-label">Breakdown: </label>
 							<select class="form-control" [(ngModel)]="breakdown" name="breakdown">
 								<option *ngFor="let set of breakdownOptions" [ngValue]="set">{{set.name}}</option>
 							</select>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Gender: </label>
+							<label class="control-label">Gender: </label>
 							<multiSelectDropdown [data]="filterGender" [(ngModel)]="genders" name="genderFilter"></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Ethnicity: </label>
+							<label class="control-label">Ethnicity: </label>
 							<multiSelectDropdown [data]="filterEthnicity" [(ngModel)]="ethnicity" name="ethnicityFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Postcode: </label>
+							<label class="control-label">Postcode: </label>
 							<multiSelectDropdown [data]="filterPostcode" [(ngModel)]="postcode" name="postcodeFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Age: </label>
+							<label class="control-label">Age: </label>
 							<multiSelectDropdown [data]="filterAgex10" [(ngModel)]="agex10" name="agex10Filter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Options: </label>
+							<label class="control-label">Options: </label>
 							<div>
 								<button class="btn btn-sm btn-warning" (click)="clear()">Reset</button>
 								<button class="btn btn-sm btn-primary" (click)="refresh()">Apply</button>
@@ -45,32 +42,33 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Encounter Type: </label>
+							<label class="control-label">Encounter Type: </label>
 							<multiSelectDropdown [data]="filterEncounterType" [(ngModel)]="encounterType" name="encounterTypeFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>LSOA: </label>
+							<label class="control-label">LSOA: </label>
 							<multiSelectDropdown [data]="filterLsoa" [(ngModel)]="lsoa" name="lsoaFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>MSOA: </label>
+							<label class="control-label">MSOA: </label>
 							<multiSelectDropdown [data]="filterMsoa" [(ngModel)]="msoa" name="msoaFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Service: </label>
+							<label class="control-label">Service: </label>
 							<multiSelectDropdown [data]="filterServices" [(ngModel)]="services" name="serviceFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>Organisation: </label>
+							<label class="control-label">Organisation: </label>
 							<multiSelectDropdown [data]="filterOrgs" [(ngModel)]="orgs" name="orgFilter" ></multiSelectDropdown>
 						</div>
 						<div class="form-group col-md-2 col-sm-3">
-							<label>CCG: </label>
+							<label class="control-label">CCG: </label>
 							<multiSelectDropdown [data]="filterCcg" [(ngModel)]="ccgs" name="ccgFilter" ></multiSelectDropdown>
 						</div>
 					</div>
 				</div>
 			</div>
+            </div>
 		</div>
 		<div class="row">
 			<div class="col-md-12">
@@ -102,6 +100,6 @@
 </div>
 
 <div class="modal-footer">
-	<button type="button" class="btn btn-primary" (click)="export()">Export</button>
-	<button type="button" class="btn btn-default" (click)="cancel()">Close</button>
+	<button type="button" class="btn btn-success" (click)="export()">Export</button>
+	<button type="button" class="btn btn-danger" (click)="cancel()">Close</button>
 </div>

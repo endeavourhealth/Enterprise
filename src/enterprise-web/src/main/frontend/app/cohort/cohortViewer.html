@@ -1,152 +1,116 @@
-<style>
-    .form-group {
-        margin-bottom: 10px;
-    }
-</style>
 <div class="modal-header">
-    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
-    <h4 class="modal-title">Cohort Results Viewer</h4>
+  <h4 class="modal-title">Cohort Results Viewer</h4>
+  <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
 </div>
 <div class="modal-body">
-    <form role="form">
-        <table class="expressionTable">
-            <tr>
-                <td style="width: 75%; padding-right: 15px; padding-left: 15px; vertical-align: top;">
-                    <div style="vertical-align: top; display: inline-block; width:280px">
-                        <div class='row'>
-                            <div class="col-xs-12">
-                                <div class="form-group">
-                                    <label>Time of Run</label>
-                                    <div>{{runDate | date:'dd-MMM-yyyy HH:mm:ss'}}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class='row'>
-                            <div class="col-xs-12">
-                                <div class="form-group">
-                                    <label>Denominator Baseline</label>
-                                    <div>{{getPopulationName(population)}} on or before {{baselineDate | date:'dd-MMM-yyyy'}}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="vertical-align: top;display: inline-block;">
-                        <div class='row' style="margin-left:20px; height:auto; overflow-y:scroll; max-height: 150px;">
-                            <table style="border: solid thin silver; table-layout:fixed; width:296px">
-                                <tr style="border: solid thin silver">
-                                    <th style="width:110px;padding: 5px">Previous Runs</th>
-                                    <th style="width:186px;padding: 5px">Denominator Baseline</th>
-                                </tr>
-                                <tr *ngFor="let result of allCohortResults">
-                                    <td style="padding: 5px;border: solid thin silver"><a (click)="getCohortResults(result.queryItemUuid,result.runDate)" style="cursor:pointer;">{{result.runDate | date:'dd-MMM-yyyy HH:mm:ss'}}</a></td>
-                                    <td style="padding: 5px;border: solid thin silver">{{getPopulationName(result.populationTypeId)}} on or before {{result.baselineDate | date:'dd-MMM-yyyy'}}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class='row'>
-                        <div class="col-xs-12">
-                            <label><u>Results</u></label>
-                        </div>
-                    </div>
-                    <div class='row' style="height:auto; overflow-y:scroll; max-height: 300px;">
-                        <div class="col-xs-12">
-                            <div class="form-group">
-                                <table style="border: solid thin silver">
-                                    <tr style="border: solid thin silver">
-                                        <th style="padding: 5px">Organisation</th>
-                                        <th style="padding: 5px">Patients in Enumerator</th>
-                                        <th style="padding: 5px">Patients in Denominator</th>
-                                        <th style="padding: 5px">%</th>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: bold;width: 300px;padding: 5px;border: solid thin silver">All Organisations</td>
-                                        <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{enumeratorTotal}}</td>
-                                        <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{denominatorTotal}}</td>
-                                        <td style="font-weight: bold;padding: 5px;border: solid thin silver">{{enumeratorTotal/denominatorTotal*100 | number}}%</td>
-                                    </tr>
-                                    <tr *ngFor="let result of cohortResult">
-                                        <td style="width: 300px;padding: 5px;border: solid thin silver">{{getOrganisationName(result.organisationId)}}</td>
-                                        <td style="padding: 5px;border: solid thin silver"><a (click)="getCohortPatients(result.queryItemUuid,result.runDate,result.organisationId)" style="cursor:pointer;">{{result.enumeratorCount}}</a></td>
-                                        <td style="padding: 5px;border: solid thin silver">{{result.denominatorCount}}</td>
-                                        <td style="padding: 5px;border: solid thin silver">{{result.enumeratorCount/result.denominatorCount*100 | number}}%</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td style="width: 25%; padding-right: 15px; padding-left: 15px; vertical-align: top; border: solid thin silver">
-                    <div class='row'>
-                        <div class="col-xs-12">
-                            <div class="form-group">
-                                <br/>
-                                <label>Cohort Name:</label>
-                                <p>{{ item.name }}</p>
-                                <br/>
-                                <label>Cohort Description:</label>
-                                <p>{{ item.description }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+  <form role="form">
+    <div class="row">
+      <div class="form-group col-md-9 border-right">
         <div class="row">
-            <div class="form-group col-md-12">
-                <label class="control-label">Cohort Results</label>
-                <div class="scroll-box-500 form-control">
-                    <table border=1 frame=void rules=rows  class="table table-striped table-condensed">
-                        <tr>
-                            <th style="width: 400px">Pseudo ID</th>
-                            <th style="width: 250px">Gender</th>
-                            <th style="width: 200px">Age</th>
-                            <th style="width: 200px">Postcode Prefix</th>
-                            <th style="width: 200px">Date Of Death</th>
-                            <th style="width: 400px">Organisation</th>
-                            <th style="width: 200px">Lsoa Code</th>
-                            <th style="width: 200px">Msoa Code</th>
-                            <th style="width: 200px">Household ID</th>
-                        </tr>
-                        <tr style="height:40px" *ngFor="let row of cohortPatient">
-                            <td style="color:blue;font-size:12px;cursor:pointer" (click)="displayPatient(row.pseudoId)">
-                                {{ row.pseudoId }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ getSex(row.patientGenderId) }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ getAge(row.ageYears, row.ageMonths, row.ageWeeks) }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ row.postcodePrefix }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ row.dateOfDeath }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ getOrganisationName(row.organizationId) }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ row.lsoaCode }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ row.msoaCode }}
-                            </td>
-                            <td style="color:black;font-size:12px">
-                                {{ row.householdId }}
-                            </td>
-
-                        </tr>
-                    </table>
-                </div>
+          <div class="form-group col-md-6">
+            <div class="row">
+              <div class="form-group col-md-12">
+                <label class="control-label">Time of Run</label>
+                <div class="form-control">{{runDate | date:'dd-MMM-yyyy HH:mm:ss'}}</div>
+              </div>
+              <div class="form-group col-md-12">
+                <label class="control-label">Denominator Baseline</label>
+                <div class="form-control">{{getPopulationName(population)}} on or before {{baselineDate | date:'dd-MMM-yyyy'}}</div>
+              </div>
             </div>
+          </div>
+          <div class="form-group col-md-6">
+            <label class="control-label">Previous runs</label>
+            <div class="scroll-box-100">
+              <table class="table table-striped table-sm">
+                <tr class="d-flex">
+                  <th class="col-5">Date</th>
+                  <th class="col-7">Denominator Baseline</th>
+                </tr>
+                <tr *ngFor="let result of allCohortResults" class="d-flex">
+                  <td class="col-5 text-primary" (click)="getCohortResults(result.queryItemUuid,result.runDate)" style="cursor:pointer;">{{result.runDate | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
+                  <td class="col-7">{{getPopulationName(result.populationTypeId)}} on or before {{result.baselineDate | date:'dd-MMM-yyyy'}}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
         </div>
-    </form>
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="control-label">Results</label>
+            <div class="scroll-box-100">
+              <table class="table table-striped table-sm">
+                <tr class="d-flex">
+                  <th class="col-6">Organisation</th>
+                  <th class="col-2">Patients in Enumerator</th>
+                  <th class="col-3">Patients in Denominator</th>
+                  <th class="col-1">%</th>
+                </tr>
+                <tr class="d-flex">
+                  <td class="col-6">All Organisations</td>
+                  <td class="col-2">{{enumeratorTotal}}</td>
+                  <td class="col-3">{{denominatorTotal}}</td>
+                  <td class="col-1">{{enumeratorTotal/denominatorTotal*100 | number}}%</td>
+                </tr>
+                <tr *ngFor="let result of cohortResult" class="d-flex">
+                  <td class="col-6">{{getOrganisationName(result.organisationId)}}</td>
+                  <td class="col-2 text-primary" (click)="getCohortPatients(result.queryItemUuid,result.runDate,result.organisationId)" style="cursor:pointer;">{{result.enumeratorCount}}</td>
+                  <td class="col-3">{{result.denominatorCount}}</td>
+                  <td class="col-1">{{result.enumeratorCount/result.denominatorCount*100 | number}}%</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-3">
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="control-label">Cohort name</label>
+            <div class="form-control">{{ item.name }}</div>
+          </div>
+          <div class="form-group col-md-12">
+            <label class="control-label">Cohort description</label>
+            <div class="scroll-box-150 form-control">{{ item.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-12">
+        <label class="control-label">Cohort Results</label>
+        <div class="scroll-box-300">
+          <table class="table table-striped table-sm">
+            <tr>
+              <th>Pseudo ID</th>
+              <th>Gender</th>
+              <th>Age</th>
+              <th>Postcode Prefix</th>
+              <th>Date Of Death</th>
+              <th>Organisation</th>
+              <th>Lsoa Code</th>
+              <th>Msoa Code</th>
+              <th>Household ID</th>
+            </tr>
+            <tr *ngFor="let row of cohortPatient">
+              <td class=" text-primary" style="cursor: pointer" (click)="displayPatient(row.pseudoId)">{{ row.pseudoId }}</td>
+              <td>{{ getSex(row.patientGenderId) }}</td>
+              <td>{{ getAge(row.ageYears, row.ageMonths, row.ageWeeks) }}</td>
+              <td>{{ row.postcodePrefix }}</td>
+              <td>{{ row.dateOfDeath }}</td>
+              <td>{{ getOrganisationName(row.organizationId) }}</td>
+              <td>{{ row.lsoaCode }}</td>
+              <td>{{ row.msoaCode }}</td>
+              <td>{{ row.householdId }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </form>
 
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-default"
-            (click)="cancel()">Close</button>
+  <button type="button" class="btn btn-danger" (click)="cancel()">Close</button>
 </div>

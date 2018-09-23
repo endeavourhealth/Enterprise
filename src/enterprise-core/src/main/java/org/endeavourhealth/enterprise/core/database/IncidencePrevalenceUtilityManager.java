@@ -431,6 +431,7 @@ public class IncidencePrevalenceUtilityManager {
         System.out.println(sql);
 
         Query q = entityManager.createNativeQuery(sql);
+        UtilityManagerCommon.setQueryParams(q, sqlParams);
 
         List resultList = q.getResultList();
 
@@ -516,6 +517,7 @@ public class IncidencePrevalenceUtilityManager {
         System.out.println(sql);
 
         Query q = entityManager.createNativeQuery(sql);
+        UtilityManagerCommon.setQueryParams(q, sqlParams);
 
         List resultList = q.getResultList();
 

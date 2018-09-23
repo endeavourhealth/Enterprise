@@ -18,7 +18,7 @@ import {OrganisationGroupService} from "../organisationGroup/organisationGroup.s
 export class CohortEditDialog implements OnInit {
 
     public static open(modalService: NgbModal, cohortRun: CohortRun, item: FolderItem) {
-        const modalRef = modalService.open(CohortEditDialog, { backdrop : "static", size : "lg"});
+        const modalRef = modalService.open(CohortEditDialog, { backdrop : "static"});
         modalRef.componentInstance.resultData = cohortRun;
         modalRef.componentInstance.item = item;
 

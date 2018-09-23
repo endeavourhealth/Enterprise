@@ -16,7 +16,7 @@ export class OrgGroupPickerComponent implements OnInit {
     codeSets:FolderItem[];
 
     public static open(modalService: NgbModal, groupId: number) {
-        const modalRef = modalService.open(OrgGroupPickerComponent, { backdrop : "static", size : "lg"});
+        const modalRef = modalService.open(OrgGroupPickerComponent, { backdrop : "static"});
         modalRef.componentInstance.groupId = groupId;
 
         return modalRef;

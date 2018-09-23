@@ -1,71 +1,63 @@
-<style>
-    .form-group {
-        margin-bottom: 10px;
-    }
-</style>
 <div class="modal-header">
-    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
-    <h4 class="modal-title">Enumerator Cohort Parameters</h4>
+  <h4 class="modal-title">Enumerator Cohort Parameters</h4>
+  <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
 </div>
 <div class="modal-body">
-    <form role="form">
-        <table class="expressionTable">
-            <tr>
-                <td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top;">
-                    <div class='row'>
-                        <div class="col-xs-12">
-                            <div class="form-group">
-                                <label>Choose an organisation group: </label>
-                                <button class="btn btn-success btn-sm pull-right" (click)="orgManager()"><i class="fa fa-hospital-o"></i> Manage Organisation Groups</button>
-                                <br><br>
-                                <select class="form-control" [(ngModel)]="selectedGroupId" name="selectedGroupId" [ngModelOptions]="{standalone: true}">
-                                    <option *ngFor="let group of orgGroups" [ngValue]="group.id">{{group.name}}</option>
-                                </select>
-                                <br/>
-                                <input type="checkbox" id="allOrgs" name="allOrgs" [(ngModel)]="allOrgs">&nbsp;Run against all organisations
-                                <br/>
-                                <br/>
-                                <label>Patient Population: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ ppTT }}"></span>
-                                <select class="form-control" style="width:300px" (change)="setSelectedPopulation($event.target)">
-                                    <option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
-                                </select>
-                                <br/>
-                                <label>Denominator Cohort: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ bcTT }}"></span>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="baselineCohort" name="baselineCohort" readonly [ngModel]="baselineCohort?.name">
-                                    <span class="input-group-addon" (click)="baselineCohort = null"><i class="fa fa-times" id="clearBaselineCohort" aria-hidden="true"></i></span>
-                                    <span class="input-group-addon" (click)="pickBaselineCohort()"><i class="fa fa-search" id="pickBaselineCohort" aria-hidden="true"></i></span>
-                                </div>
-                                <br/>
-                                <label>Baseline Run Date: </label> <span style="cursor: pointer" class="fa fa-info-circle fa-right-pad text-muted" ngbTooltip="{{ rdTT }}"></span>
-                                <input type="date" class="form-control" style="width:200px" [(ngModel)]="baselineDate" name="baselineDate">
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td style="width: 50%; padding-right: 15px; padding-left: 15px; vertical-align: top; border: solid thin silver">
-                    <div class='row'>
-                        <div class="col-xs-12">
-                            <div class="form-group">
-                                <br/>
-                                <label>Enumerator Cohort:</label>
-                                <p>{{ item.name }}</p>
-                                <br/>
-                                <label>Enumerator Description:</label>
-                                <p>{{ item.description }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </form>
+  <form role="form">
+    <div class="row ">
+      <div class="form-group col-md-6 border-right">
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="control-label">Choose an organisation group</label>
+            <button class="btn btn-success btn-sm pull-right" (click)="orgManager()"><i class="fa fa-hospital-o"></i> Manage Organisation Groups</button>
+            <select class="form-control" [(ngModel)]="selectedGroupId" name="selectedGroupId" [ngModelOptions]="{standalone: true}">
+              <option *ngFor="let group of orgGroups" [ngValue]="group.id">{{group.name}}</option>
+            </select>
+          </div>
+          <div class="form-group col-md-12">
+            <div class="form-control-plaintext custom-control custom-checkbox">
+              <input class="custom-control-input" type="checkbox" id="allOrgs" name="allOrgs" [(ngModel)]="allOrgs">
+              <label class="custom-control-label" for="allOrgs">Run against all organisations</label>
+            </div>
+          </div>
+          <div class="form-group col-md-12">
+            <label class="control-label">Patient Population </label> <span class="info-icon" ngbTooltip="{{ ppTT }}"></span>
+            <select class="form-control" (change)="setSelectedPopulation($event.target)">
+              <option *ngFor="let population of populations" value="{{population.id}}">{{population.type}}</option>
+            </select>
+          </div>
+          <div class="form-group col-md-12">
+            <label class="control-label">Denominator Cohort </label> <span class="info-icon" ngbTooltip="{{ bcTT }}"></span>
+            <div class="input-group">
+              <input type="text" class="form-control" id="baselineCohort" name="baselineCohort" readonly [ngModel]="baselineCohort?.name">
+              <span class="input-group-append" (click)="pickBaselineCohort()"><i class="input-group-text fa fa-search" id="pickBaselineCohort" aria-hidden="true"></i></span>
+              <span class="input-group-append" (click)="baselineCohort = null"><i class="input-group-text fa fa-times" id="clearBaselineCohort" aria-hidden="true"></i></span>
+            </div>
+          </div>
+          <div class="form-group col-md-12">
+            <label class="control-label">Baseline Run Date</label> <span class="info-icon" ngbTooltip="{{ rdTT }}"></span>
+            <input type="date" class="form-control" [(ngModel)]="baselineDate" name="baselineDate">
+          </div>
+        </div>
+      </div>
 
+      <div class="form-group col-md-6">
+        <div class="row">
+          <div class="form-group col-md-12">
+              <label class="control-label">Enumerator Cohort</label>
+              <div class="form-control">{{ item.name }}</div>
+          </div>
+          <div class="form-group col-md-12">
+              <label class="control-label">Enumerator Description</label>
+              <div class="scroll-box-150 form-control">{{ item.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-default"
-            (click)="cancel()">Cancel</button>
-    <button type="button" class="btn btn-primary"
-            (click)="save();">Run Now</button>
+  <button type="button" class="btn btn-success" (click)="save();">Run Now</button>
+  <button type="button" class="btn btn-danger" (click)="cancel()">Cancel</button>
 </div>

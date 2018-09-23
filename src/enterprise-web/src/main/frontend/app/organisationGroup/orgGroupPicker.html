@@ -1,11 +1,6 @@
-<style>
-    .form-group {
-        margin-bottom: 10px;
-    }
-</style>
 <div class="modal-header">
-    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
     <h4 class="modal-title">Organisation Group Manager</h4>
+    <button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
 </div>
 <div class="modal-body">
     <form role="form">
@@ -17,8 +12,9 @@
         <div *ngIf="orgGroups" class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>Choose an organisation group: </label>
-                    <select class="form-control" [(ngModel)]="selectedGroup" name="selectedGroup" (change)="groupChanged()" [ngModelOptions]="{standalone: true}">
+                    <label class="control-label">Choose an organisation group: </label>
+                    <select class="form-control" [(ngModel)]="selectedGroup" name="selectedGroup"
+                            (change)="groupChanged()" [ngModelOptions]="{standalone: true}">
                         <option *ngFor="let group of orgGroups" [ngValue]="group">{{group.name}}</option>
                     </select>
                 </div>
@@ -28,20 +24,22 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group">
-                    <label>Group Name: </label> <span style="cursor: pointer" ></span>
-                    <input type="text" class="form-control"  placeholder="Group Name" [(ngModel)]="selectedGroup.name" [ngModelOptions]="{standalone: true}">
+                    <label class="control-label">Group Name: </label>
+                    <input type="text" class="form-control" placeholder="Group Name" [(ngModel)]="selectedGroup.name"
+                           [ngModelOptions]="{standalone: true}">
                 </div>
             </div>
         </div>
 
         <div class="row">
             <div class="form-group col-md-12">
-                <label class="control-label">Available Organisations</label> <small class="text-muted"></small>
+                <label class="control-label">Available Organisations</label>
                 <div class="scroll-box-150 form-control">
                     <div *ngFor="let avail of availableOrganisations"
                          class="hover-box show-child-on-hover striped">
                         {{ avail.name }}
-                        <button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(avail)">
+                        <button type="button" class="btn btn-xs btn-success pull-right child-to-show"
+                                (click)="addToSelection(avail)">
                             <span class="fa fa-sm fa-plus"></span>
                         </button>
                     </div>
@@ -51,12 +49,13 @@
 
         <div class="row">
             <div class="form-group col-md-12">
-                <label class="control-label">Selected Organisations</label> <small class="text-muted"></small>
+                <label class="control-label">Selected Organisations</label>
                 <div class="scroll-box-150 form-control">
                     <div *ngFor="let org of selectedGroup.organisations"
                          class="hover-box show-child-on-hover striped">
                         {{ org.name }}
-                        <button type="button" class="btn btn-xs btn-danger pull-right child-to-show" (click)="removeFromSelection(org)">
+                        <button type="button" class="btn btn-xs btn-danger pull-right child-to-show"
+                                (click)="removeFromSelection(org)">
                             <span class="fa fa-sm fa-remove"></span>
                         </button>
                     </div>
@@ -67,8 +66,8 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-default" (click)="cancel()">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="save()">Save</button>
-    <button type="button" class="btn btn-primary" (click)="saveClose()">Save and Select</button>
     <button type="button" class="btn btn-success" (click)="ok()">Select</button>
+    <button type="button" class="btn btn-success" (click)="saveClose()">Save and Select</button>
+    <button type="button" class="btn btn-warning" (click)="save()">Save</button>
+    <button type="button" class="btn btn-danger" (click)="cancel()">Cancel</button>
 </div>

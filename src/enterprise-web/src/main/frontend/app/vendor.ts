@@ -2,6 +2,7 @@
 require('zone.js');
 import 'reflect-metadata';
 import 'ng2-datetime/ng2-datetime.js';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 require('ng2-datetime/src/vendor/bootstrap-datepicker/bootstrap-datepicker.min.js');
 require('ng2-datetime/src/vendor/bootstrap-datepicker/bootstrap-datepicker3.min.css');
 

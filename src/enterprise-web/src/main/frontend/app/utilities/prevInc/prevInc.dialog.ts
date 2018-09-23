@@ -50,7 +50,7 @@ export class PrevIncDialog implements OnInit {
 
 	orgTT: string = "To select multiples please use Shift and Click.";
 	ppTT: string = "Please select a patient population as the denominator";
-	ppTM: string = "Please select the time period over which prevalence and incidence trend is to be measured. NOTE: Older population counts are skewed due to missing historical data.";
+	ppTM: string = "NOTE: Older population counts are skewed due to missing historical data.";
 	ppCT: string = "In chronic disease incidence is measured as the “first occurrence” of that disease in the record. "+
 	"In acute disease, prevalence cannot be practically measured because illnesses are short lived and their end date is not recorded. Incidence is measured by the presence of an entry that is not marked as a review/end.";
 	ppPC: string = "Please select a major post code area";

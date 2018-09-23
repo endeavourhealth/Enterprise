@@ -1,273 +1,269 @@
-<style>
-	.form-group {
-		margin-bottom: 0px;
-	}
-</style>
-
 <div class="modal-header">
+	<h4 class="modal-title">{{title}} editor</h4>
 	<button type="button" class="close" (click)="cancel()" aria-hidden="true">&times;</button>
-	<h4 class="modal-title">{{title}}</h4>
 </div>
 <div class="modal-body">
 	<form role="form">
-		<div class='row' *ngIf="type=='3'">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<table style="margin-top:10px;margin-left:15px;width:830px">
-						<tr>
-							<th><u>Entries you can test</u></th>
-							<th><u>Test the Entry is</u></th>
-							<th></th>
-						</tr>
-						<tr style="height:100px" *ngFor="let restriction of restrictions; let isLast=last">
-							<td style="font-size: 12px; width:220px">
-								{{ restriction.field }}
-							</td>
-							<td style="font-size: 12px">
-								<div class="form-group">
-									<div class="input-group">
-										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') >= 0"><=&nbsp;&nbsp;</div>
-										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('VALUE') >= 0">>=&nbsp;&nbsp;</div>
-										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('CODE') >= 0">=&nbsp;&nbsp;</div>
-										<div *ngIf="restriction.field.indexOf('CODE') >= 0 && restriction.filter.codeSet!=null">
-											<div style='float:left' *ngFor="let codeSetValue of restriction.filter.codeSet.codeSetValue">
-												{{codeSetValue.term}},
-											</div>
-										</div>
-										<label *ngIf="restriction.field.indexOf('CODE') >= 0">
-											<a class="queryLink" (click)="pickCompareCode(restriction.field)"><i class="fa fa-search"></i> Select Concept(s)</a>
-											<a style='margin-left: 20px' class="queryLink" (click)="pickCompareCodeSet(restriction.field)"><i class="fa fa-tags"></i> Select Code Set</a>
-										</label>
-										<input *ngIf="restriction.field.indexOf('CODE') < 0" type="text" class="form-control" style="width:150px;margin-right:10px" [(ngModel)]="restriction.filter.valueFrom.constant" [ngModelOptions]="{standalone: true}">
-										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
-											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueFrom.relativeUnit" [ngModelOptions]="{standalone: true}">
-												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-											</select>&nbsp;&nbsp;before the
-											<select class="form-control" style="width: 280px;margin-top:5px" [(ngModel)]="restriction.filter.valueFrom.testField" [ngModelOptions]="{standalone: true}">
-												<option value=""></option>
-												<option value="BASELINE_DATE">BASELINE_DATE</option>
-												<option *ngFor="let against of restrictions" value="{{against.field}}">{{against.field}}</option>
-											</select>
-										</div>
-									</div>
-								</div>
-							</td>
-							<td style="font-size: 12px" *ngIf="restriction.field.indexOf('CODE') < 0">
-								<div class="form-group">
-									<div class="input-group">
-										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('DATE') >= 0">>=&nbsp;&nbsp;</div>
-										<div style='font-size:18px;float:left' *ngIf="restriction.field.indexOf('VALUE') >= 0"><=&nbsp;&nbsp;</div>
-										<input type="text" class="form-control" style="width:150px;margin-right:10px"  [(ngModel)]="restriction.filter.valueTo.constant" [ngModelOptions]="{standalone: true}">
-										<div *ngIf="restriction.field.indexOf('DATE') >= 0">
-											<select class="form-control" style="width:100px" [(ngModel)]="restriction.filter.valueTo.relativeUnit" [ngModelOptions]="{standalone: true}">
-												<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-											</select>&nbsp;&nbsp;before the
-											<select class="form-control" style="width: 280px;margin-top:5px" [(ngModel)]="restriction.filter.valueTo.testField" [ngModelOptions]="{standalone: true}">
-												<option value=""></option>
-												<option value="BASELINE_DATE">BASELINE_DATE</option>
-												<option *ngFor="let against of restrictions" value="{{against.field}}">{{against.field}}</option>
-											</select>
-										</div>
-									</div>
-								</div>
-							</td>
-						</tr>
-					</table>
+
+		<!-- TODO -->
+		<div *ngIf="type=='3'">
+			<div class="row">
+				<label class="control-label col-md-2">Alias-value</label>
+				<label class="control-label col-md-10">Test definition</label>
+			</div>
+			<div class="row" *ngFor="let restriction of restrictions">
+				<div class="form-group col-md-2">
+					<input type="text" class="form-control-plaintext form-control-sm" value="{{ restriction.field }}" readonly>
 				</div>
+
+				<ng-container *ngIf="restriction.field.indexOf('DATE') >= 0">
+					<div class="col-md-5">
+						<div class="row">
+							<div class="input-group input-group-sm col-md-2">
+								<div class="input-group-prepend"><span class="input-group-text"><=</span></div>
+								<input [(ngModel)]="restriction.filter.valueFrom.constant" type="text" class="form-control" [ngModelOptions]="{standalone: true}">
+							</div>
+							<div class="form-group col-md-3">	<select [(ngModel)]="restriction.filter.valueFrom.relativeUnit" class="form-control form-control-sm" [ngModelOptions]="{standalone: true}">
+									<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+								</select></div>
+							<div class="form-group col-md-2"><input value="before the" class="form-control-plaintext form-control-sm text-center" type="text" readonly></div>
+							<div class="form-group col-md-5"><select [(ngModel)]="restriction.filter.valueFrom.testField" class="form-control form-control-sm" [ngModelOptions]="{standalone: true}">
+									<option value=""></option>
+									<option value="BASELINE_DATE">BASELINE_DATE</option>
+									<option *ngFor="let against of restrictions" value="{{against.field}}">{{against.field}}</option>
+								</select></div>
+						</div>
+					</div>
+					<div class="col-md-5">
+						<div class="row">
+							<div class="input-group input-group-sm col-md-2">
+								<div class="input-group-prepend"><span class="input-group-text">>=</span></div>
+								<input [(ngModel)]="restriction.filter.valueTo.constant" type="text" class="form-control" [ngModelOptions]="{standalone: true}">
+							</div>
+							<div class="form-group col-md-3"><select [(ngModel)]="restriction.filter.valueTo.relativeUnit" class="form-control form-control-sm" [ngModelOptions]="{standalone: true}">
+								<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+							</select></div>
+							<div class="form-group col-md-2"><input type="text" class="form-control-plaintext form-control-sm text-center" value="after the" readonly></div>
+							<div class="form-group col-md-5"><select [(ngModel)]="restriction.filter.valueTo.testField" class="form-control form-control-sm" [ngModelOptions]="{standalone: true}">
+								<option value=""></option>
+								<option value="BASELINE_DATE">BASELINE_DATE</option>
+								<option *ngFor="let against of restrictions" value="{{against.field}}">{{against.field}}</option>
+							</select></div>
+						</div>
+					</div>
+				</ng-container>
+				<ng-container *ngIf="restriction.field.indexOf('VALUE') >= 0">
+					<div class="input-group input-group-sm col-md-5">
+						<div class="input-group-prepend"><span class="input-group-text"><=</span></div>
+						<input [(ngModel)]="restriction.filter.valueFrom.constant" type="text" class="form-control" [ngModelOptions]="{standalone: true}">
+					</div>
+					<div class="input-group input-group-sm col-md-5">
+						<div class="input-group-prepend"><span class="input-group-text">>=</span></div>
+						<input [(ngModel)]="restriction.filter.valueTo.constant" type="text" class="form-control" [ngModelOptions]="{standalone: true}">
+					</div>
+				</ng-container>
+				<ng-container *ngIf="restriction.field.indexOf('CODE') >= 0">
+					<div *ngIf="restriction.filter.codeSet==null" class="form-group col-md-10">
+						<button type="button" class="btn btn-sm btn-success" (click)="pickCompareCode(restriction.field)"><i class="fa fa-search"></i> Select Concept(s)</button>
+						<button type="button" class="btn btn-sm btn-success" (click)="pickCompareCodeSet(restriction.field)"><i class="fa fa-tags"></i> Select Code Set</button>
+					</div>
+					<div *ngIf="restriction.filter.codeSet!=null" class="input-group input-group-sm col-md-10 mb-3">
+						<div class="input-group-prepend"><span class="input-group-text align-items-sm-start" style="height: 100% !important">in</span></div>
+						<div class="scroll-box-100 form-control">{{getCodeTermList(restriction)}}</div>
+						<div class="input-group-append" (click)="restriction.filter.codeSet=null">
+							<span class="input-group-text align-items-sm-start" style="height: 100% !important"><i class="fa fa-fw fa-times"></i></span>
+						</div>
+					</div>
+				</ng-container>
 			</div>
 		</div>
 
-		<div class='row' *ngIf="type=='1' ">
-			<div class="col-xs-12">
-				<div class="form-group">
-					<label>
-						<a class="queryLink" (click)="showCodePicker()"><i class="fa fa-search"></i> Select Coded Terms(s)</a>
-						<a style='margin-left: 20px' class="queryLink" (click)="showCodeSetPicker()"><i class="fa fa-tags"></i> Select Code Set</a>
-					</label>
-
-					<div *ngIf="type=='1'" style="cursor: pointer; height:auto; overflow-y:scroll; min-height: 30px; max-height: 350px;" >
-						<table border=1 frame=void rules=rows style="border-color: silver; margin-top:10px;margin-left:15px;width:830px">
-							<tr *ngIf="showConceptResults">
-								<th style="width: 150px">Data Source</th>
-								<th style="width: 200px">Concept Terms - {{codeSelection.length}} Selected</th>
-								<th style="width: 140px">Value >=</th>
-								<th style="width: 140px">Value <=</th>
+		<div *ngIf="type=='1'">
+			<div class="row">
+				<div class="form-group col-md-12">
+					<button type="button" class="btn btn-success" (click)="showCodePicker()"><i class="fa fa-fw fa-search"></i> Select coded term(s)</button>
+					<button type="button" class="btn btn-success" (click)="showCodeSetPicker()"><i class="fa fa-tags"></i> Select code set</button>
+				</div>
+				<div class="form-group col-md-12" *ngIf="showConceptResults">
+					<label class="control-label">Value filter</label>
+					<div class="scroll-box" style="max-height: 350px">
+						<table class="table table-striped table-sm">
+							<tr class="d-flex">
+								<th class="col-4">Data source</th>
+								<th class="col-4">Concept terms - {{codeSelection.length}} selected</th>
+								<th class="col-2">Values from</th>
+								<th class="col-2">to (inclusive)</th>
 							</tr>
-							<tr style="height:40px" *ngFor="let selection of codeSelection; let isLast=last">
-								<td style="color:black;font-size:12px">
+							<tr class="d-flex" *ngFor="let selection of codeSelection; let isLast=last">
+								<td class="col-4">
 									{{ selection.baseType }}
 								</td>
-								<td style="color:black;font-size:12px">
+								<td class="col-4">
 									{{ selection.term.split("(")[0] }}
 								</td>
-								<td *ngIf="selection.term.indexOf('Date')==-1">
-									<input type="text" style="width:100px;background: lightyellow" [(ngModel)]="selection.valueFrom" [ngModelOptions]="{standalone: true}"><span style="font-size: 10px;"> {{selection.units}}</span>
+								<td class="col-2" *ngIf="selection.term.indexOf('Date')==-1">
+									<input type="text" class="form-control form-control-sm" [(ngModel)]="selection.valueFrom" [ngModelOptions]="{standalone: true}">{{selection.units}}
 								</td>
-								<td *ngIf="selection.term.indexOf('Date')==-1">
-									<input type="text" style="width:100px;background: lightyellow" [(ngModel)]="selection.valueTo" [ngModelOptions]="{standalone: true}"><span style="font-size: 10px;"> {{selection.units}}</span>
+								<td class="col-2" *ngIf="selection.term.indexOf('Date')==-1">
+									<input type="text" class="form-control form-control-sm" [(ngModel)]="selection.valueTo" [ngModelOptions]="{standalone: true}">{{selection.units}}
 								</td>
-								<td *ngIf="selection.term.indexOf('Date')>-1">
-									<input type="date" style="width:140px;background: lightyellow" [(ngModel)]="selection.valueFrom" [ngModelOptions]="{standalone: true}">
+								<td class="col-2" *ngIf="selection.term.indexOf('Date')>-1">
+									<input type="date" class="form-control form-control-sm" [(ngModel)]="selection.valueFrom" [ngModelOptions]="{standalone: true}">
 								</td>
-								<td *ngIf="selection.term.indexOf('Date')>-1">
-									<input type="date" style="width:140px;background: lightyellow" [(ngModel)]="selection.valueTo" [ngModelOptions]="{standalone: true}">
+								<td class="col-2" *ngIf="selection.term.indexOf('Date')>-1">
+									<input type="date" class="form-control form-control-sm" [(ngModel)]="selection.valueTo" [ngModelOptions]="{standalone: true}">
 								</td>
 							</tr>
 						</table>
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<div class='row' *ngIf="type=='1' && problemEditor" style="margin-top:10px">
-
-			<div class="col-xs-12" style="margin-left:16px;">
-				<div class="form-group">
-					<div style="float: left;font-weight: bold;">
-						Problem?
+			<div class="row" *ngIf="problemEditor">
+				<div class="form-group col-md-2">
+					<label class="control-label">Problem filter</label>
+					<div class="form-control-plaintext custom-control custom-radio">
+						<input type="radio" class="custom-control-input" [(ngModel)]="problem" [value]="false" id="noProblem" name="problem">
+						<label class="custom-control-label" for="noProblem">All (no filter)</label>
 					</div>
-					<div class="input-group" style="margin-left:10px; float: left;">
-						<input type="checkbox" [(ngModel)]="problem" name="problem" (change)="problemChange($event)">
+				</div>
+				<div class="form-group col-md-2">
+					<label class="control-label">&nbsp;</label>
+					<div class="form-control-plaintext custom-control custom-radio">
+						<input type="radio" class="custom-control-input" [(ngModel)]="problem" [value]="true" id="problemCheck" name="problem">
+						<label class="custom-control-label" for="problemCheck">Problems only</label>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class='row' *ngIf="type=='1' && activeEditor" style="margin-top:10px">
-
-			<div class="col-xs-12" style="margin-left:16px;">
-				<div class="form-group">
-					<div style="float: left;font-weight: bold;">
-						Active Medication?
-					</div>
-					<div class="input-group" style="margin-left:10px; float: left;">
-						<input type="checkbox" [(ngModel)]="active" name="active" (change)="activeChange($event)">
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class='row' *ngIf="type=='1' && authTypeEditor" style="margin-top:15px">
-
-			<div class="col-xs-12" style="margin-left:16px;">
-				<div class="form-group">
-					<div style="float: left;font-weight: bold;">
-						Acute
-					</div>
-					<div class="input-group" style="margin-left:10px; float: left;">
-						<input type="checkbox" [(ngModel)]="acute" name="acute" (change)="acuteChange($event)">
-					</div>
-					<div style="margin-left:30px;float: left;font-weight: bold;">
-						Repeat
-					</div>
-					<div class="input-group" style="margin-left:10px; float: left;">
-						<input type="checkbox" [(ngModel)]="repeat" name="repeat" (change)="repeatChange($event)">
-					</div>
-					<div style="margin-left:30px;float: left;font-weight: bold;">
-						Repeat Dispensing
-					</div>
-					<div class="input-group" style="margin-left:10px; float: left;">
-						<input type="checkbox" [(ngModel)]="repeatDispensing" name="repeatDispensing" (change)="repeatDispensingChange($event)">
-					</div>
-					<div style="margin-left:30px;float: left;font-weight: bold;">
-						Automatic
-					</div>
-					<div class="input-group" style="margin-left:10px; float: left;">
-						<input type="checkbox" [(ngModel)]="automatic" name="automatic" (change)="automaticChange($event)">
+			<div class="row"> <!-- TODO: These two!! -->
+				<div class="form-group col-md-12" *ngIf="activeEditor">
+					<div class="form-group">
+						<div style="float: left;font-weight: bold;">
+							Active Medication?
+						</div>
+						<div class="input-group" style="margin-left:10px; float: left;">
+							<input type="checkbox" [(ngModel)]="active" name="active" (change)="activeChange($event)">
+						</div>
 					</div>
 				</div>
+				<div class="form-group col-md-12" *ngIf="authTypeEditor">
+					<div class="form-group">
+						<div style="float: left;font-weight: bold;">
+							Acute
+						</div>
+						<div class="input-group" style="margin-left:10px; float: left;">
+							<input type="checkbox" [(ngModel)]="acute" name="acute" (change)="acuteChange($event)">
+						</div>
+						<div style="margin-left:30px;float: left;font-weight: bold;">
+							Repeat
+						</div>
+						<div class="input-group" style="margin-left:10px; float: left;">
+							<input type="checkbox" [(ngModel)]="repeat" name="repeat" (change)="repeatChange($event)">
+						</div>
+						<div style="margin-left:30px;float: left;font-weight: bold;">
+							Repeat Dispensing
+						</div>
+						<div class="input-group" style="margin-left:10px; float: left;">
+							<input type="checkbox" [(ngModel)]="repeatDispensing" name="repeatDispensing" (change)="repeatDispensingChange($event)">
+						</div>
+						<div style="margin-left:30px;float: left;font-weight: bold;">
+							Automatic
+						</div>
+						<div class="input-group" style="margin-left:10px; float: left;">
+							<input type="checkbox" [(ngModel)]="automatic" name="automatic" (change)="automaticChange($event)">
+						</div>
+					</div>
+				</div>
+				<!----------------------->
 			</div>
-		</div>
+			<div class="row" *ngIf="dateEditor">
+				<div class="form-group col-md-2">
+					<label class="control-label">Date filter</label>
+					<div class="form-control-plaintext custom-control custom-radio" (click)="removeFilter('date')">
+						<input type="radio" class="custom-control-input" [(ngModel)]="datetype" value="" id="allDates" name="dateType">
+						<label class="custom-control-label" for="allDates">All (no filter)</label>
+					</div>
+				</div>
 
-		<div class='row' *ngIf="(dateEditor&&type=='1')" style="margin-left: 1px; margin-top: 15px;">
-			<div class="col-xs-12">
-				<div class="form-group">
+				<div class="form-group col-md-2">
+					<label class="control-label">&nbsp;</label>
+					<div class="form-control-plaintext custom-control custom-radio">
+						<input type="radio" class="custom-control-input" [(ngModel)]="datetype" value="relative" id="relativeDate" name="dateType">
+						<label class="custom-control-label" for="relativeDate">Relative to baseline</label>
+					</div>
+				</div>
+				<div class="form-group col-md-2">
+					<label class="control-label">&nbsp;</label>
+					<div class="form-control-plaintext custom-control custom-radio">
+						<input type="radio" class="custom-control-input" [(ngModel)]="datetype" value="absolute" id="absoluteDate" name="dateType">
+						<label class="custom-control-label" for="absoluteDate">Specific date range</label>
+					</div>
+				</div>
+
+				<div class="form-group col-md-2" *ngIf="datetype == 'relative'">
+					<label class="control-label">Before baseline date</label>
+					<div class="input-group" *ngIf="datetype == 'relative'">
+						<input type="text" class="form-control form-control-sm" placeholder="no." [(ngModel)]="filterDateFromRelativeValue" name="dateFromRelativeValue">
+						<select class="form-control form-control-sm" [(ngModel)]="filterDateFromRelativePeriod" name="dateFromRelativePeriod">
+							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group col-md-2" *ngIf="datetype == 'relative'">
+					<label class="control-label">After baseline date</label>
+					<div class="input-group" *ngIf="datetype == 'relative'">
+						<input type="text" class="form-control form-control-sm" placeholder="no." [(ngModel)]="filterDateToRelativeValue" name="dateToRelativeValue">
+						<select class="form-control form-control-sm" [(ngModel)]="filterDateToRelativePeriod" name="dateToRelativePeriod">
+							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
+						</select>
+					</div>
+
+				</div>
+
+				<div class="form-group col-md-2" *ngIf="datetype == 'absolute'">
+					<label class="control-label">Dates from</label>
 					<div class="input-group">
-						<span for="relative">Use relative dates</span>&nbsp;&nbsp;
-						<input id="relative" type="radio" name="datetype" [(ngModel)]="datetype" value="relative" name="dateRelative">
-						&nbsp;
-						<span for="absolute">or absolute dates</span>&nbsp;&nbsp;
-						<input id="absolute" type="radio" name="datetype" [(ngModel)]="datetype" value="absolute" name="dateAbsolute">
-						<a style='margin-left: 20px' class="queryLink" (click)="removeFilter('date')"><i class="fa fa-times"></i> Remove filter</a>
+						<input type="date" class="form-control form-control-sm" [(ngModel)]="filterDateFrom" name="dateFrom">
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class='row' *ngIf="(dateEditor&&type=='1')" style="margin-left: 1px;">
-			<div class="col-xs-6">
-				<div class="form-group">
-					<span *ngIf="datetype == 'absolute'">Greater Than or Equal To:</span>
-					<p class="input-group" *ngIf="datetype == 'absolute'">
-						<input type="date" class="form-control" [(ngModel)]="filterDateFrom" name="dateFrom">
-					</p>
-					<span *ngIf="datetype == 'relative'">Less Than or Equal To:</span>
-					<p class="input-group" *ngIf="datetype == 'relative'">
-						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateFromRelativeValue" name="dateFromRelativeValue">
-						<select class="form-control" style="width:100px" [(ngModel)]="filterDateFromRelativePeriod" name="dateFromRelativePeriod">
-							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;before the baseline date
-					</p>
+				<div class="form-group col-md-2" *ngIf="datetype == 'absolute'">
+					<label class="control-label">Dates to</label>
+					<div class="input-group">
+						<input type="date" class="form-control form-control-sm" [(ngModel)]="filterDateTo" name="dateTo">
+					</div>
 				</div>
-			</div>
-			<div class="col-xs-6">
-				<div class="form-group">
-					<span *ngIf="datetype == 'absolute'">Less Than or Equal To:</span>
-					<p class="input-group" *ngIf="datetype == 'absolute'">
-						<input type="date" class="form-control" [(ngModel)]="filterDateTo" name="dateTo">
-					</p>
-					<span *ngIf="datetype == 'relative'">Greater Than or Equal To:</span>
-					<p class="input-group" *ngIf="datetype == 'relative'">
-						<input type="text" class="form-control" style="width:80px;margin-right:10px" placeholder="no." [(ngModel)]="filterDateToRelativeValue" name="dateToRelativeValue">
-						<select class="form-control" style="width:100px" [(ngModel)]="filterDateToRelativePeriod" name="dateToRelativePeriod">
-							<option *ngFor="let period of periods" value="{{period}}">{{period}}</option>
-						</select>&nbsp;&nbsp;before the baseline date
-					</p>
-				</div>
+
+				<div class="form-group col-md-2"></div>
 			</div>
 		</div>
 
-		<div class='row' style="margin-left:2px;"><br/>
-			<div class="col-xs-3">
-				<div class="form-group">
-					<label>Keep Entries</label>
-					<select class="form-control" [(ngModel)]="restriction" (ngModelChange)="restrictionChange(restriction)" name="restriction">
-						<option *ngFor="let restriction of restrictionTypes" value="{{restriction}}">{{restriction}}</option>
-					</select>
-				</div>
+		<div class="row">
+			<div class="form-group col-md-2">
+				<label class="control-label">Output</label>
+				<select class="form-control form-control-sm" [(ngModel)]="restriction" (ngModelChange)="restrictionChange(restriction)" name="restriction">
+					<option *ngFor="let restriction of restrictionTypes" value="{{restriction}}">{{restriction}}</option>
+				</select>
 			</div>
-			<div class="col-xs-2">
-				<div class="form-group">
-					<label>How Many?</label>
-					<input type="text" class="form-control" [(ngModel)]="restrictionCount" placeholder="1" (blur)="restrictionChange(restrictionCount)" name="restrictionCount" DISABLED>
-				</div>
+			<div class="form-group col-md-2">
+				<label class="control-label">&nbsp;</label>
+				<input type="text" class="form-control form-control-sm" [(ngModel)]="restrictionCount" placeholder="1" (blur)="restrictionChange(restrictionCount)" name="restrictionCount" DISABLED>
 			</div>
-			<div class="col-xs-3">
-				<div class="form-group">
-					<label>Test Alias:</label>
-					<input type="text" style="width:190px" class="form-control" [(ngModel)]="fieldPrefix" (blur)="restrictionChange(fieldPrefix)" name="fieldPrefix">
-				</div>
+			<div class="form-group col-md-2">
+				<label class="control-label">Alias</label>
+				<input type="text" class="form-control form-control-sm" [(ngModel)]="fieldPrefix" (blur)="restrictionChange(fieldPrefix)" name="fieldPrefix">
 			</div>
-			<div class="col-xs-4">
-				<div class="form-group">
-					<label>Keep the Fields<br/>(for further tests or for display columns in reports):</label>
-					<div *ngFor="let field of keepFields">
-						<input type="checkbox"
-							   value="{field}}"
-							   name="keepFields"
-							   [checked]="fields.indexOf(field) >= 0"
-							   (change)="setSelectedFields(field, $event)"/>
-						{{field}}
-					</div>
-				</div>
-			</div>
+			<div class="form-group col-md-1" *ngFor="let field of keepFields; let i = index">
+				<label class="control-label"><span *ngIf="i==0">Remember</span>&nbsp;</label>
 
-			<a class="queryLink" (click)="removeFilter('restriction')"><i class="fa fa-times"></i> Remove Entries</a>
+				<div class="form-control-plaintext custom-control custom-checkbox">
+					<input type="checkbox" class="custom-control-input" [value]="field" [checked]="fields.indexOf(field) >= 0" (change)="setSelectedFields(field, $event)" name="keepFields" [attr.id]="'keep'+i">
+					<label class="custom-control-label" [attr.for]="'keep'+i">{{field}}</label>
+				</div>
+			</div>
 		</div>
-		<br/>
 	</form>
 
 </div>
 <div class="modal-footer">
-	<button type="button" class="btn btn-default"
-			(click)="cancel()">Cancel</button>
-	<button type="button" class="btn btn-primary"
-			(click)="save();">Ok</button>
+	<button type="button" class="btn btn-success" (click)="save();">Save {{title.toLowerCase()}}</button>
+	<button type="button" class="btn btn-danger" (click)="cancel()">Cancel</button>
 </div>

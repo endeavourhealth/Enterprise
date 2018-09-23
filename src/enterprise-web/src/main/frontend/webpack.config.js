@@ -19,6 +19,7 @@ module.exports = {
 			{ test: /\.html/, loader: 'raw-loader' },
 			{ test: /\.css$/, loader: "style-loader!css-loader" },
 			{ test: /\.less$/, loader: "style-loader!css-loader!less-loader" },
+			{ test: /\.scss$/, loader: "style-loader!css-loader!sass-loader" },
 			{	test: /\.(eot|svg|ttf|woff(2)?)(\?v=\d+\.\d+\.\d+)?/, loader: 'url-loader' },
 			{ test:  /\.(jpe?g|png|gif|svg)$/i, loader: 'file-loader' }
 		]

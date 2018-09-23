@@ -45,7 +45,7 @@ export class TestEditDialog implements OnInit{
 	filterValueTo : string;
 	dateEditor : boolean = false;
 	problemEditor : boolean = false;
-	problem : boolean;
+	problem : boolean = false;
 	activeEditor : boolean = false;
 	active : boolean;
 	authTypeEditor : boolean = false;
@@ -53,7 +53,7 @@ export class TestEditDialog implements OnInit{
 	repeat : boolean;
 	repeatDispensing : boolean;
 	automatic : boolean;
-	datetype: String;
+	datetype: String = '';
 	filterDateFrom : String;
 	filterDateTo : String;
 	filterDateFromRelativeValue : String;
@@ -96,9 +96,9 @@ export class TestEditDialog implements OnInit{
 			this.initialiseEditMode(this.resultData);
 
 		if (this.type=="1")
-			this.title = "Feature Editor";
+			this.title = "Feature";
 		else if (this.type=="3")
-			this.title = "Test Editor";
+			this.title = "Test";
 
 	}
 
@@ -912,6 +912,9 @@ export class TestEditDialog implements OnInit{
 	restrictionChange(value : any) {
 		var vm = this;
 
+		if (value == '' || value == 'ALL')
+			vm.removeFilter('restriction');
+
 		if (!value || vm.restriction=="") {
 			vm.resultData.restriction = null;
 			return;
@@ -927,6 +930,12 @@ export class TestEditDialog implements OnInit{
 		vm.resultData.restriction = restriction;
 
 		console.log(vm.resultData.restriction);
+	}
+
+	getCodeTermList(restriction) {
+		return restriction.filter.codeSet.codeSetValue
+			.map(val => val.term)
+			.join(', ')
 	}
 
 	ok() {

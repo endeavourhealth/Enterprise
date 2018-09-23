@@ -1,5 +1,6 @@
 // Styling
-import '../content/css/index.css';
+import '../styles.css';
+import '../scssStyles.scss';
 
 // Core
 import {NgModule} from '@angular/core';

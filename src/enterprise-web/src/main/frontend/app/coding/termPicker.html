@@ -23,11 +23,10 @@
         </div>
       </div>
     </div>
-
     <div class="row">
       <div class="form-group col-md-9">
         <label class="control-label">Terms</label>
-        <div class="scroll-box-350 bordered-box">
+        <div class="scroll-box-250 bordered-box">
           <loadingIndicator [done]="searchTerms">
             <table class="table table-striped table-sm">
             <tr>
@@ -57,42 +56,22 @@
         </div>
       </div>
       <div class="form-group col-md-3">
-        <div class="row">
-          <div class="form-group col-md-12">
-            <label class="control-label">Parent Terms</label>
-            <small class="text-muted">(double-click to navigate up the hierarchy)</small>
-            <div class="scroll-box-150 form-control">
-              <div *ngFor="let parent of parents"
-                   (dblclick)="displayCode(parent, true)"
-                   class="hover-box show-child-on-hover striped">
-                <span ngbTooltip="{{parent.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ parent.originalTerm }}</span>
-                <button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
-                  <span class="fa fa-sm fa-plus"></span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="form-group col-md-12">
-            <label class="control-label">Child Terms</label>
-            <small class="text-muted">(double-click to navigate down the hierarchy)</small>
-            <div class="scroll-box-150 form-control">
-              <div *ngFor="let child of children"
-                   (dblclick)="displayCode(child, true)"
-                   class="hover-box show-child-on-hover striped">
-                <span ngbTooltip="{{child.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ child.originalTerm }}</span>
-                <button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
-                  <span class="fa fa-sm fa-plus"></span>
-                </button>
-              </div>
-            </div>
+        <label class="control-label">Parent Terms</label>
+        <small class="text-muted">(double-click to navigate up the hierarchy)</small>
+        <div class="scroll-box-250 form-control">
+          <div *ngFor="let parent of parents"
+               (dblclick)="displayCode(parent, true)"
+               class="hover-box show-child-on-hover striped">
+            <span ngbTooltip="{{parent.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ parent.originalTerm }}</span>
+            <button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
+              <span class="fa fa-sm fa-plus"></span>
+            </button>
           </div>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="form-group col-md-12">
+      <div class="form-group col-md-9">
         <label class="control-label">Selected Term(s) - Adding {{ treeCount }} terms to hierarchy</label>
-        <div class="scroll-box-200 bordered-box">
+        <div class="scroll-box-250 bordered-box">
           <Tree #inclusionTree [nodes]="inclusionTreeData" [options]="options">
             <template #treeNodeTemplate let-node="node">
               <div class="custom-control custom-checkbox">
@@ -108,6 +87,20 @@
               </div>
             </template>
           </Tree>
+        </div>
+      </div>
+      <div class="form-group col-md-3">
+        <label class="control-label">Child Terms</label>
+        <small class="text-muted">(double-click to navigate down the hierarchy)</small>
+        <div class="scroll-box-250 form-control">
+          <div *ngFor="let child of children"
+               (dblclick)="displayCode(child, true)"
+               class="hover-box show-child-on-hover striped">
+            <span ngbTooltip="{{child.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ child.originalTerm }}</span>
+            <button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
+              <span class="fa fa-sm fa-plus"></span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

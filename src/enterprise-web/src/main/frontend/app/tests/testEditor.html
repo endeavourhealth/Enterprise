@@ -251,13 +251,17 @@
 				<label class="control-label">Alias</label>
 				<input type="text" class="form-control form-control-sm" [(ngModel)]="fieldPrefix" (blur)="restrictionChange(fieldPrefix)" name="fieldPrefix">
 			</div>
-			<div class="form-group col-md-1" *ngFor="let field of keepFields; let i = index">
-				<label class="control-label"><span *ngIf="i==0">Remember</span>&nbsp;</label>
+			<div class="form-group col-md-6">
+				<label class="control-label">Remember</label>
 
-				<div class="form-control-plaintext custom-control custom-checkbox">
-					<input type="checkbox" class="custom-control-input" [value]="field" [checked]="fields.indexOf(field) >= 0" (change)="setSelectedFields(field, $event)" name="keepFields" [attr.id]="'keep'+i">
-					<label class="custom-control-label" [attr.for]="'keep'+i">{{field}}</label>
-				</div>
+        <div class="row">
+          <div class="col-md-3"  *ngFor="let field of keepFields; let i = index">
+            <div class="form-control-plaintext custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" [value]="field" [checked]="fields.indexOf(field) >= 0" (change)="setSelectedFields(field, $event)" name="keepFields" [attr.id]="'keep'+i">
+              <label class="custom-control-label" [attr.for]="'keep'+i">{{field}}</label>
+            </div>
+          </div>
+        </div>
 			</div>
 		</div>
 	</form>

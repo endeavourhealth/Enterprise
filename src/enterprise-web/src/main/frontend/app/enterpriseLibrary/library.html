@@ -14,7 +14,7 @@
 								<div class="card">
 									<div class="card-header">Library Folders</div>
 									<div class="card-body">
-										<div class="">
+										<div class="scroll-box-350">
 											<library-folder [showMenu]="true" [actionMenuItems]="actionMenuItems" (selectionChange)="folderChanged($event)" (itemActioned)="actionItem($event)"></library-folder>
 										</div>
 									</div>
@@ -24,7 +24,7 @@
 								<div class="card">
 									<div class="card-header">Recently Edited Library Items</div>
 									<div class="card-body">
-										<div class="scroll-box-250">
+										<div>
 											<div class="table">
 											<table class="table table-striped table-sm">
 												<thead>
@@ -55,7 +55,7 @@
 							<div class="card">
 								<div class="card-header">Library Items - {{folderName}}</div>
 								<div class="card-body">
-									<div class="scroll-box-500">
+									<div>
 										<table class="table table-striped table-sm">
 										<thead>
 										<tr>
@@ -91,7 +91,7 @@
 											<td>{{item.lastModified | date:'dd-MMM-yyyy HH:mm:ss'}}</td>
 											<td><span class="fa fa-right-pad {{item.type | itemTypeIdToIcon}} text-muted"></span> {{item.type | itemTypeIdToString}}</td>
 											<td>
-												<a *ngIf="!item.isRunning" style="cursor: pointer" (click)="viewLastRun(item)">{{item.lastRun | date:'dd-MMM-yyyy HH:mm:ss'}}</a>
+												<a *ngIf="!item.isRunning" style="cursor: pointer; color:blue" (click)="viewLastRun(item)">{{item.lastRun | date:'dd-MMM-yyyy HH:mm:ss'}}</a>
 												<span *ngIf="item.isRunning" style="color:darkgreen"><i class="fa fa-hourglass-start" aria-hidden="true"></i> running...</span>
 
 											</td>

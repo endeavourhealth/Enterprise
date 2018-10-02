@@ -44,7 +44,7 @@
                   <span class="fa fa-sm fa-plus"></span>
                 </button>
               </td>
-              <td (click)="displayCode(match, false)">{{ match.originalTerm }}</td>
+              <td (click)="displayCode(match, false)" style="cursor:pointer; color:blue">{{ match.originalTerm }}</td>
               <td>{{ match.snomedTerm }}</td>
               <td>{{ match.snomedConceptId }}</td>
               <td>{{ match.originalCode }}</td>
@@ -56,16 +56,16 @@
         </div>
       </div>
       <div class="form-group col-md-3">
-        <label class="control-label">Parent Terms</label>
+        <label class="control-label">Parent Terms</label><br/>
         <small class="text-muted">(double-click to navigate up the hierarchy)</small>
         <div class="scroll-box-250 form-control">
           <div *ngFor="let parent of parents"
                (dblclick)="displayCode(parent, true)"
                class="hover-box show-child-on-hover striped">
-            <span ngbTooltip="{{parent.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ parent.originalTerm }}</span>
             <button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(parent)">
               <span class="fa fa-sm fa-plus"></span>
             </button>
+            <span ngbTooltip="{{parent.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ parent.originalTerm }}</span>
           </div>
         </div>
       </div>
@@ -90,16 +90,16 @@
         </div>
       </div>
       <div class="form-group col-md-3">
-        <label class="control-label">Child Terms</label>
+        <label class="control-label">Child Terms</label><br/>
         <small class="text-muted">(double-click to navigate down the hierarchy)</small>
         <div class="scroll-box-250 form-control">
           <div *ngFor="let child of children"
                (dblclick)="displayCode(child, true)"
                class="hover-box show-child-on-hover striped">
-            <span ngbTooltip="{{child.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ child.originalTerm }}</span>
             <button type="button" class="btn btn-xs btn-success pull-right child-to-show" (click)="addToSelection(child)">
               <span class="fa fa-sm fa-plus"></span>
             </button>
+            <span ngbTooltip="{{child.snomedConceptId}}" style="color:black;font-size:12px;cursor:pointer">{{ child.originalTerm }}</span>
           </div>
         </div>
       </div>

@@ -166,7 +166,7 @@ public class TermsEntity {
                 "where (sd.term like :term1 or sd.term like :term2 or sd.conceptId like :term1) "+
                 "and sd.active = 1 " +
                 "and sc.active = 1 " +
-                "and sd.typeId = 900000000000003001 " +
+                //"and sd.typeId = 900000000000003001 " +
                 "order by sd.term";
 
         EntityManager entityManager = PersistenceManager.INSTANCE.getEmRf2();

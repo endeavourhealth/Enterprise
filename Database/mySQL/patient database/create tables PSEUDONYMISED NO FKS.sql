@@ -936,7 +936,7 @@ CREATE TABLE link_distributor
   source_skid character varying(255) NOT NULL,
   target_salt_key_name varchar(50) NOT NULL,
   target_skid character varying(255) NULL,
-  CONSTRAINT pk_link_distributor PRIMARY KEY (`source_skid`)             
+  CONSTRAINT pk_link_distributor PRIMARY KEY (`source_skid`, `target_salt_key_name`)             
 );
 
 CREATE INDEX link_distributor_target_skid

@@ -974,6 +974,7 @@ create table patient_uprn (
     invalid_address boolean,
     missing_postcode boolean,
     invalid_postcode boolean,
+	property_class varchar(10),
     CONSTRAINT pk_patient_id_organization_id PRIMARY KEY (`organization_id`,`person_id`,`patient_id`)
 );
 

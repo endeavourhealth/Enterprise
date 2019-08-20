@@ -14,7 +14,7 @@ export class EnterpriseMenuService implements  MenuService {
 		return [
 			{caption: 'Library', state: 'app.library', icon: 'fa fa-book'},
 			{caption: 'Utilities', state: 'app.utilities', icon: 'fa fa-wrench'},
-			{caption: 'Dashboard', state: 'app.dashboard', icon: 'fa fa-tachometer', role: 'eds-compass:dashboard'}
+			{caption: 'FHIR® APIs', state: 'app.dashboard', icon: 'fa fa-cogs', role: 'eds-compass:dashboard'}
 		];
 	}
 }

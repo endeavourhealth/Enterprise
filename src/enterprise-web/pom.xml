@@ -17,6 +17,13 @@
     <packaging>war</packaging>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/ca.uhn.hapi.fhir/hapi-fhir-structures-dstu3 -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-structures-dstu3</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.endeavourhealth.common</groupId>
             <artifactId>api</artifactId>

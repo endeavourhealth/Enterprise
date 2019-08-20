@@ -16,8 +16,6 @@ import org.endeavourhealth.enterprise.core.json.JsonTerm;
 import org.endeavourhealth.enterprise.core.querydocument.QueryDocumentSerializer;
 import org.endeavourhealth.enterprise.core.querydocument.models.LibraryItem;
 import org.endeavourhealth.enterprise.core.querydocument.models.Query;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceType;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,7 +141,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 				.build();
 	}
 
-	@GET
+	/*@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/reverseLookupPatient")
@@ -176,7 +174,7 @@ public final class ReportEndpoint extends AbstractItemEndpoint {
 				.ok()
 				.entity(resources)
 				.build();
-	}
+	}*/
 
 
 	@GET

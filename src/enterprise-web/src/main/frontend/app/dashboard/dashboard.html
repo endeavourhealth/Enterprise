@@ -1,9 +1,75 @@
 <div class="module">
 	<div class="module-heading">
-		<i class="fa fa-tachometer"></i> Dashboard
+		<i class="fa fa-cogs"></i> FHIR® APIs (STU3)
 	</div>
 	<div class="module-body">
 		<div class="container-fluid">
+			<!-- Get patient resource(s) -->
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card" id="patientResources">
+						<div class="card-header">
+							<h3>Retrieve a patient’s record in FHIR® structured format
+								<div class="pull-right">
+									<button class="btn btn-sm btn-info" (click)="exampleResources()">Example</button>
+									<button class="btn btn-sm btn-success" (click)="getStructuredRecord()">Run</button>
+								</div>
+							</h3>
+						</div>
+
+						<div class="card-body">
+							<div class="card-title">
+								<table class="table table-sm">
+									<tr class="d-flex"><td class="col-2"><b>Method</b></td>            <td class="col-10">POST</td></tr>
+									<tr class="d-flex"><td class="col-2"><b>Relative Path</b></td>              <td class="col-10">/Patient/$getstructuredrecord</td></tr>
+									<tr class="d-flex"><td class="col-2"><b>Request Headers</b></td>           <td class="col-10"><b>Accept:</b> application/fhir+json;charset=utf-8
+									<br><b>Content-Type:</b> application/fhir+json;charset=utf-8
+									<br><b>Ssp-TraceID:</b> Consumer’s Trace ID (a GUID or UUID)
+									<br><b>Ssp-From:</b> Consumer’s ASID
+									<br><b>Ssp-To:</b> Provider’s ASID
+									<br><b>Ssp-InteractionID:</b> urn:nhs:names:services:discovery:fhir:operation:getstructuredrecord-1</td></tr>
+									<tr class="d-flex"><td class="col-2"><b>Payload request body</b></td>              <td class="col-10"><b>patientNHSNumber</b>	<u>Mandatory</u>	NHS Number of the patient for whom to retrieve the structured record.
+										<br><b>includeAllergies</b>	<u>Optional</u>	Include allergies and intolerances in the response.
+										<br><b>includeMedication</b>	<u>Optional</u>	Include medication in the response.
+										</td></tr>
+								</table>
+							</div>
+							<hr>
+							<div class="card-text">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text" id="basic-addon10" style="width:280px">FHIR® absolute request operation</span>
+											</div>
+											<input [(ngModel)]="path" name="path" type="text" class="form-control" aria-label="Host" aria-describedby="basic-addon10">
+										</div>
+									</div>
+									<div class="col-md-12">
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text" id="basic-addon12" style="width:280px">Payload request body</span>
+											</div>
+											<textarea [(ngModel)]="params" name="params" type="text" class="form-control" aria-label="Response" aria-describedby="basic-addon12" rows="4" style="font-family: monospace; font-size: 10pt"></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<span class="input-group-text" id="basic-addon13" style="width:280px">Response payload</span>
+											</div>
+												<textarea id="resourceresponse" type="text" class="form-control"  aria-label="Response" aria-describedby="basic-addon13" rows="18" style="font-family: monospace; font-size: 10pt">{{result}}</textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>
 </div>

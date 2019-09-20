@@ -1215,7 +1215,7 @@ CREATE PROCEDURE update_person_record(
 )
 BEGIN
 
-	DECLARE _best_patient_id INT DEFAULT -1;
+	DECLARE _best_patient_id bigint DEFAULT -1;
     DECLARE _patients_remaning INT DEFAULT 1;
 
 	IF (_new_person_id IS NOT NULL) THEN 

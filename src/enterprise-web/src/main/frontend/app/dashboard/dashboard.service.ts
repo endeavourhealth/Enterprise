@@ -8,7 +8,7 @@ export class DashboardService extends BaseHttp2Service {
 	constructor(http : Http) { super(http); }
 
 
-	getStructuredRecord(params : string):Observable<String> {
+	getStructuredRecord(params : string):Observable<string> {
 		var parameters : URLSearchParams = new URLSearchParams();
 		parameters.append('params', params);
 

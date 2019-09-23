@@ -18,9 +18,9 @@ export class DashboardComponent {
 		this.refresh();
 	}
 
-	result = "";
-	params = '{"resourceType": "Parameters", "parameter": [{"name": "patientNHSNumber","valueIdentifier": {"system": "https://fhir.nhs.uk/Id/nhs-number","value": "9999999999"}},{"name": "includeAllergies"},{"name": "includeMedication","part": [{"name": "includePrescriptionIssues","valueBoolean": true},{"name": "medicationSearchFromDate","valueDate": "2017-06-04"}]}]}';
-	path="https://discovery.gateway.org/api/Patient/$getstructuredrecord"
+	result = '';
+	params = '{"resourceType": "Parameters", "parameter": [{"name": "patietNHSNumber","valueIdentifier": {"system": "https://fhir.nhs.uk/Id/nhs-number","value": "9999999999"}},{"name": "includeAllergies"},{"name": "includeMedication","part": [{"name": "includePrescriptionIssues","valueBoolean": true},{"name": "medicationSearchFromDate","valueDate": "2017-06-04"}]}]}';
+	path='https://discovery.gateway.org/api/Patient/$getstructuredrecord';
 
 	refresh() {
 	}

@@ -150,7 +150,11 @@ public class ReportResultEntity {
     }
 
     public static List getNHSNo(String pseudoId) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseDemographic();
+
+        //Enterprise server no longer has access to the corexx servers, so this hasn't worked
+        //for a long while. Changing the code so I can make it clear
+        throw new RuntimeException("Not possible to get NHS number for Pseudo ID");
+        /*EntityManager entityManager = PersistenceManager.INSTANCE.getEmEnterpriseDemographic();
 
         Query q = entityManager.createNativeQuery("SELECT distinct(nhs_number) FROM pseudo_id_map s " +
                 "join eds.patient_search p on p.patient_id = s.patient_id "+
@@ -161,6 +165,6 @@ public class ReportResultEntity {
 
         entityManager.close();
 
-        return resultList;
+        return resultList;*/
     }
 }

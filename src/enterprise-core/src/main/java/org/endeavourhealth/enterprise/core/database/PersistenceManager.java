@@ -21,44 +21,50 @@ public class PersistenceManager implements ContextShutdownHook {
     private EntityManagerFactory emEnterpriseAdmin;
     private EntityManagerFactory emEnterpriseData;
 	private EntityManagerFactory emDataSharingManagerData;
-	private EntityManagerFactory emPublisherCommon;
+	//private EntityManagerFactory emPublisherCommon;
 	private EntityManagerFactory emRf2;
-	private EntityManagerFactory emEnterpriseDemographic;
+	//private EntityManagerFactory emEnterpriseDemographic;
 
     private PersistenceManager() {
         StartupConfig.registerShutdownHook("Enterprise Persistence Manager", this);
 
-        System.out.println("Fetching hibernate overrides (admin)...");
-		Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");
-        System.out.println("Connecting to database (admin)...");
-		emEnterpriseAdmin = Persistence.createEntityManagerFactory("enterprise_admin", override);
+		try {
+			System.out.println("Fetching hibernate overrides (admin)...");
+			Map<String, Object> override = getHibernateOverridesFromConfig("admin_database");
+			System.out.println("Connecting to database (admin)...");
+			emEnterpriseAdmin = Persistence.createEntityManagerFactory("enterprise_admin", override);
 
-        System.out.println("Fetching hibernate overrides (patient)...");
-		override = getHibernateOverridesFromConfig("patient_database");
-        System.out.println("Connecting to database (patient)...");
-		emEnterpriseData = Persistence.createEntityManagerFactory("enterprise_data", override);
+			System.out.println("Fetching hibernate overrides (patient)...");
+			override = getHibernateOverridesFromConfig("patient_database");
+			System.out.println("Connecting to database (patient)...");
+			emEnterpriseData = Persistence.createEntityManagerFactory("enterprise_data", override);
 
-        System.out.println("Fetching hibernate overrides (DSM)...");
-		override = getHibernateOverridesFromConfig("data_sharing_manager");
-        System.out.println("Connecting to database (DSM)...");
-		emDataSharingManagerData = Persistence.createEntityManagerFactory("data_sharing_manager", override);
+			System.out.println("Fetching hibernate overrides (DSM)...");
+			override = getHibernateOverridesFromConfig("data_sharing_manager");
+			System.out.println("Connecting to database (DSM)...");
+			emDataSharingManagerData = Persistence.createEntityManagerFactory("data_sharing_manager", override);
 
-		System.out.println("Fetching hibernate overrides (publisher)...");
-		override = getHibernateOverridesFromConfig("publisher_common");
-		System.out.println("Connecting to database (publisher)...");
-		emPublisherCommon = Persistence.createEntityManagerFactory("publisher_common", override);
+			/*System.out.println("Fetching hibernate overrides (publisher)...");
+			override = getHibernateOverridesFromConfig("publisher_common");
+			System.out.println("Connecting to database (publisher)...");
+			emPublisherCommon = Persistence.createEntityManagerFactory("publisher_common", override);*/
 
-		System.out.println("Fetching hibernate overrides (rf2)...");
-		override = getHibernateOverridesFromConfig("rf2");
-		System.out.println("Connecting to database (rf2)...");
-		emRf2 = Persistence.createEntityManagerFactory("rf2", override);
+			System.out.println("Fetching hibernate overrides (rf2)...");
+			override = getHibernateOverridesFromConfig("rf2");
+			System.out.println("Connecting to database (rf2)...");
+			emRf2 = Persistence.createEntityManagerFactory("rf2", override);
 
-		System.out.println("Fetching hibernate overrides (demographic)...");
-		override = getHibernateOverridesFromConfig("demographic");
-		System.out.println("Connecting to database (demographic)...");
-		emEnterpriseDemographic = Persistence.createEntityManagerFactory("enterprise_demographic", override);
+			/*System.out.println("Fetching hibernate overrides (demographic)...");
+			override = getHibernateOverridesFromConfig("demographic");
+			System.out.println("Connecting to database (demographic)...");
+			emEnterpriseDemographic = Persistence.createEntityManagerFactory("enterprise_demographic", override);*/
 
-		System.out.println("Persistence manager initialized");
+			System.out.println("Persistence manager initialized");
+		} catch (Throwable t) {
+			String s = t.toString();
+			System.out.println(s);
+			throw t;
+		}
 	}
 
 	public EntityManager getEmEnterpriseAdmin() {
@@ -73,25 +79,25 @@ public class PersistenceManager implements ContextShutdownHook {
 		return emDataSharingManagerData.createEntityManager();
 	}
 
-	public EntityManager getEmPublisherCommonData() {
+	/*public EntityManager getEmPublisherCommonData() {
 		return emPublisherCommon.createEntityManager();
-	}
+	}*/
 
 	public EntityManager getEmRf2() {
 		return emRf2.createEntityManager();
 	}
 
-	public EntityManager getEmEnterpriseDemographic() {
+	/*public EntityManager getEmEnterpriseDemographic() {
 		return emEnterpriseDemographic.createEntityManager();
-	}
+	}*/
 
     public void close() {
         emEnterpriseAdmin.close();
         emEnterpriseData.close();
 		emDataSharingManagerData.close();
-		emPublisherCommon.close();
+		//emPublisherCommon.close();
 		emRf2.close();
-		emEnterpriseDemographic.close();
+		//emEnterpriseDemographic.close();
 
     }
 

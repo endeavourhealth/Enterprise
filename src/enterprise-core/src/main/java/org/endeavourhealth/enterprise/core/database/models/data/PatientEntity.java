@@ -20,7 +20,7 @@ public class PatientEntity {
     private Integer ageWeeks;
     private Date dateOfDeath;
     private String postcodePrefix;
-    private Long householdId;
+    //private Long householdId;
     private String lsoaCode;
     private String msoaCode;
 
@@ -124,7 +124,7 @@ public class PatientEntity {
         this.postcodePrefix = postcodePrefix;
     }
 
-    @Basic
+    /*@Basic
     @Column(name = "household_id", nullable = true)
     public Long getHouseholdId() {
         return householdId;
@@ -132,7 +132,7 @@ public class PatientEntity {
 
     public void setHouseholdId(Long householdId) {
         this.householdId = householdId;
-    }
+    }*/
 
     @Basic
     @Column(name = "lsoa_code", nullable = true, length = 50)
@@ -174,7 +174,7 @@ public class PatientEntity {
         if (dateOfDeath != null ? !dateOfDeath.equals(that.dateOfDeath) : that.dateOfDeath != null) return false;
         if (postcodePrefix != null ? !postcodePrefix.equals(that.postcodePrefix) : that.postcodePrefix != null)
             return false;
-        if (householdId != null ? !householdId.equals(that.householdId) : that.householdId != null) return false;
+        //if (householdId != null ? !householdId.equals(that.householdId) : that.householdId != null) return false;
         if (lsoaCode != null ? !lsoaCode.equals(that.lsoaCode) : that.lsoaCode != null) return false;
         if (msoaCode != null ? !msoaCode.equals(that.msoaCode) : that.msoaCode != null) return false;
 
@@ -194,7 +194,7 @@ public class PatientEntity {
         result = 31 * result + (ageWeeks != null ? ageWeeks.hashCode() : 0);
         result = 31 * result + (dateOfDeath != null ? dateOfDeath.hashCode() : 0);
         result = 31 * result + (postcodePrefix != null ? postcodePrefix.hashCode() : 0);
-        result = 31 * result + (householdId != null ? householdId.hashCode() : 0);
+        //result = 31 * result + (householdId != null ? householdId.hashCode() : 0);
         result = 31 * result + (lsoaCode != null ? lsoaCode.hashCode() : 0);
         result = 31 * result + (msoaCode != null ? msoaCode.hashCode() : 0);
 

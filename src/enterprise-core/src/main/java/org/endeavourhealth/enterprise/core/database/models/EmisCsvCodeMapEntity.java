@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "emis_csv_code_map", schema = "publisher_common")
+//access to corexx servers removed, so moved this table to another DB
+//@Table(name = "emis_csv_code_map", schema = "publisher_common")
+@Table(name = "emis_csv_code_map", schema = "rf2")
 @IdClass(EmisCsvCodeMapEntityPK.class)
 public class EmisCsvCodeMapEntity {
     private byte medication;
@@ -183,7 +185,8 @@ public class EmisCsvCodeMapEntity {
     }
 
     public static Long findCodeIdFromReadCode(String code) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEmPublisherCommonData();
+        //EntityManager entityManager = PersistenceManager.INSTANCE.getEmPublisherCommonData();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmRf2();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<EmisCsvCodeMapEntity> cq = cb.createQuery(EmisCsvCodeMapEntity.class);
@@ -205,7 +208,8 @@ public class EmisCsvCodeMapEntity {
     }
 
     public static List<EmisCsvCodeMapEntity> findChildCodes(List<Long> parents) throws Exception {
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEmPublisherCommonData();
+        //EntityManager entityManager = PersistenceManager.INSTANCE.getEmPublisherCommonData();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEmRf2();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<EmisCsvCodeMapEntity> cq = cb.createQuery(EmisCsvCodeMapEntity.class);

@@ -95,7 +95,7 @@ public class CohortPatientsEntity {
         return result;
     }
 
-    public static List<Object[]> getCohortPatientsOld(String type, String queryItemUuid, String runDate, Long organisationId) throws Exception {
+    /*public static List<Object[]> getCohortPatientsOld(String type, String queryItemUuid, String runDate, Long organisationId) throws Exception {
         String where = "";
 
         if (type.equals("EHR"))
@@ -141,7 +141,7 @@ public class CohortPatientsEntity {
 
         return ent;
 
-    }
+    }*/
 
     public static List<PatientEntity> getCohortPatients(String queryItemUuid, String runDate, Long organisationId) throws Exception {
         String where = "select p "+

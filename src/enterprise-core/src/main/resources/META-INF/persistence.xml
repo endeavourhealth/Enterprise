@@ -83,6 +83,7 @@
         <class>org.endeavourhealth.enterprise.core.database.models.data.Sct2DescriptionEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.Sct2RelationshipEntity</class>
         <class>org.endeavourhealth.enterprise.core.database.models.data.Sct2TransitiveclosureEntity</class>
+        <class>org.endeavourhealth.enterprise.core.database.models.EmisCsvCodeMapEntity</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/rf2"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
@@ -95,6 +96,7 @@
             <property name="hbm2ddl.auto" value="update"/>
         </properties>
     </persistence-unit>
+    <!--security locked down so Enterprise can't access Corexx servers, so moving Emis code table to above
     <persistence-unit name="publisher_common">
         <class>org.endeavourhealth.enterprise.core.database.models.EmisCsvCodeMapEntity</class>
         <properties>
@@ -107,7 +109,7 @@
             <property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost:3306/publisher_common"/>
             <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
         </properties>
-    </persistence-unit>
+    </persistence-unit>-->
     <persistence-unit name="enterprise_demographic">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
